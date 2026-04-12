@@ -54,7 +54,7 @@ export default function ResourcesClients({ palette }) {
         </a>
 
         <a
-          href="https://sites.ed.gov/idea/"
+          href="https://sites.ed.gov/idea/statute-chapter-33/subchapter-ii"
           target="_blank"
           rel="noreferrer"
           className="rounded-2xl border p-5 transition hover:shadow-md"
@@ -69,7 +69,7 @@ export default function ResourcesClients({ palette }) {
         </a>
 
         <a
-          href="https://www.dol.gov/agencies/oasam/centers-offices/civil-rights-center/statutes/rehabilitation-act-of-1973"
+          href="https://www.eeoc.gov/rehabilitation-act-1973#:~:text=Section%20501%20prohibits%20employment%20discrimination,attorney's%20fees%20under%20Section%20501."
           target="_blank"
           rel="noreferrer"
           className="rounded-2xl border p-5 transition hover:shadow-md md:col-span-2"

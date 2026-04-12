@@ -62,7 +62,7 @@ export default function ResourcesInterpreters({ palette }) {
         </a>
 
         <a
-          href="https://rid.org/ethics/code-of-professional-conduct/standard-practice-papers/"
+          href="https://rid.org/resources/#spp"
           target="_blank"
           rel="noreferrer"
           className="rounded-2xl border p-5 transition hover:shadow-md"
@@ -92,17 +92,17 @@ export default function ResourcesInterpreters({ palette }) {
         </a>
 
         <a
-          href="https://www.registryofinterpreters.com/"
+          href="https://naiedu.org/codeofethics/"
           target="_blank"
           rel="noreferrer"
           className="rounded-2xl border p-5 transition hover:shadow-md"
           style={{ borderColor: palette.border }}
         >
           <div className="mb-2 font-semibold" style={{ color: palette.charcoal }}>
-            Interpreter resource directory
+            NAIE Code of Ethics
           </div>
           <div className="text-sm leading-6" style={{ color: "#5f5f5f" }}>
-            A place to continue exploring tools and professional resources that support interpreters.
+            Familiarize yourself with the ethical standards and practices of interpreters working in K-12 settings.
           </div>
         </a>
       </div>
