@@ -1,16 +1,32 @@
-# React + Vite
+## Miqueas Language Solutions Website
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This project contains the source code for a small marketing website for **Miqueas Language Solutions**. It is built
+using [React](https://react.dev/), [Vite](https://vitejs.dev/), and [Tailwind CSS](https://tailwindcss.com/). The
+site introduces the company’s services, background, and resources, and provides a contact form for requesting a
+quote.
 
-Currently, two official plugins are available:
+### Development
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+To run the site locally, ensure you have Node.js installed. Then run:
 
-## React Compiler
+```bash
+npm install
+npm run dev
+```
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+The development server will start, and you can view the site at <http://localhost:5173> (the default Vite port).
 
-## Expanding the ESLint configuration
+### Project Structure
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- `index.html` – entry point served by Vite.
+- `src/main.jsx` – sets up the React application and router.
+- `src/App.jsx` – top-level component with header, footer, and routing.
+- `src/pages/` – individual page components (`Home.jsx`, `Services.jsx`, `About.jsx`, `Resources.jsx`, `Contact.jsx`).
+- `src/logo.png` – logo used in the header and footer (placeholder graphic).
+- `vite.config.js` – configuration for Vite with plugins for React and Tailwind CSS.
+- `package.json` – lists dependencies and scripts.
+
+### Styling
+
+The project uses Tailwind CSS for styling and includes a custom color palette defined in `App.jsx`. Additional
+component-specific styling can be applied inline or via Tailwind utility classes.

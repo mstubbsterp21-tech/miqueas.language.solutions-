@@ -7,6 +7,7 @@ import Resources from "./pages/Resources";
 import Contact from "./pages/Contact";
 import logo from "./logo.png";
 
+// Define the color palette used throughout the site.
 const palette = {
   burgundy: "#721100",
   gold: "#dd7d00",
@@ -16,6 +17,7 @@ const palette = {
   border: "#e5e5e5",
 };
 
+// Navigation items for the header and footer.
 const navItems = [
   { path: "/", label: "Home" },
   { path: "/services", label: "Services" },
@@ -55,12 +57,14 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-white text-slate-900">
+      {/* Header with navigation and mobile menu toggle */}
       <header className="sticky top-0 z-50 border-b border-black/5 bg-white/90 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4 md:px-8">
           <Link to="/" className="flex min-w-0 items-center gap-3">
             <BrandLockup />
           </Link>
 
+          {/* Desktop navigation */}
           <nav className="hidden items-center gap-6 md:flex">
             {navItems.map((item) => (
               <Link
@@ -73,6 +77,7 @@ export default function App() {
               </Link>
             ))}
 
+            {/* External Instagram link */}
             <a
               href="https://www.instagram.com/miqueas.language.solutions/"
               target="_blank"
@@ -83,6 +88,7 @@ export default function App() {
               IG
             </a>
 
+            {/* CTA button to request a quote */}
             <Link
               to="/contact"
               className="inline-flex items-center gap-2 rounded-2xl px-5 py-3 text-sm font-semibold text-white hover:opacity-90"
@@ -92,6 +98,7 @@ export default function App() {
             </Link>
           </nav>
 
+          {/* Mobile menu toggle button */}
           <button
             className="rounded-xl p-2 md:hidden"
             onClick={() => setMobileOpen((value) => !value)}
@@ -102,6 +109,7 @@ export default function App() {
           </button>
         </div>
 
+        {/* Mobile navigation drawer */}
         {mobileOpen && (
           <div className="border-t border-black/5 bg-white md:hidden">
             <div className="mx-auto flex max-w-6xl flex-col gap-1 px-5 py-4">
@@ -117,6 +125,7 @@ export default function App() {
                 </Link>
               ))}
 
+              {/* External Instagram link on mobile */}
               <a
                 href="https://www.instagram.com/miqueas.language.solutions/"
                 target="_blank"
@@ -128,6 +137,7 @@ export default function App() {
                 Instagram
               </a>
 
+              {/* CTA button on mobile */}
               <Link
                 to="/contact"
                 className="rounded-2xl px-4 py-3 text-center text-sm font-semibold text-white"
@@ -141,6 +151,7 @@ export default function App() {
         )}
       </header>
 
+      {/* Main content area with routes */}
       <main>
         <Routes>
           <Route path="/" element={<Home palette={palette} />} />
@@ -151,6 +162,7 @@ export default function App() {
         </Routes>
       </main>
 
+      {/* Footer with links and copyright */}
       <footer className="border-t border-black/5 px-5 py-8 md:px-8">
         <div className="mx-auto flex max-w-6xl flex-col gap-6 md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-3">

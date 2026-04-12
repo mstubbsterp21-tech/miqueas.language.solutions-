@@ -1,5 +1,4 @@
-import { Mail } from "lucide-react";
-import { ArrowRight } from "lucide-react";
+import { Mail, ArrowRight } from 'lucide-react';
 
 export default function Contact({ palette }) {
   return (
@@ -7,15 +6,17 @@ export default function Contact({ palette }) {
       <h2 className="mb-6 text-3xl font-bold tracking-tight md:text-4xl" style={{ color: palette.charcoal }}>
         Request a quote
       </h2>
-      <p className="mb-10 max-w-2xl text-base md:text-lg" style={{ color: "#5f5f5f" }}>
-        Share a few details about your assignment. A response can then be tailored to your setting, timeline, and communication needs.
+      <p className="mb-10 max-w-2xl text-base md:text-lg" style={{ color: '#5f5f5f' }}>
+        Share a few details about your assignment. A response can then be tailored to your setting, timeline, and
+        communication needs.
       </p>
 
+      {/* Steps outlining the quote request process */}
       <div className="mb-8 space-y-4 max-w-2xl">
         {[
-          "Submit the inquiry form with assignment details.",
-          "Receive a customized response based on service type, setting, and logistics.",
-          "If the request is a fit, next steps for scheduling and coordination will follow.",
+          'Submit the inquiry form with assignment details.',
+          'Receive a customized response based on service type, setting, and logistics.',
+          'If the request is a fit, next steps for scheduling and coordination will follow.',
         ].map((step, idx) => (
           <div key={step} className="flex items-start gap-4">
             <div
@@ -24,11 +25,14 @@ export default function Contact({ palette }) {
             >
               {idx + 1}
             </div>
-            <p className="pt-1 text-sm leading-6" style={{ color: "#5f5f5f" }}>{step}</p>
+            <p className="pt-1 text-sm leading-6" style={{ color: '#5f5f5f' }}>
+              {step}
+            </p>
           </div>
         ))}
       </div>
 
+      {/* Contact information */}
       <div className="rounded-2xl p-6" style={{ backgroundColor: palette.softGray }}>
         <div className="flex items-center gap-3">
           <Mail size={20} style={{ color: palette.burgundy }} />
@@ -36,7 +40,7 @@ export default function Contact({ palette }) {
             <p className="font-semibold" style={{ color: palette.charcoal }}>
               Contact Miqueas Language Solutions
             </p>
-            <div className="mt-2 space-y-1 text-sm leading-6" style={{ color: "#5f5f5f" }}>
+            <div className="mt-2 space-y-1 text-sm leading-6" style={{ color: '#5f5f5f' }}>
               <p>
                 <a href="mailto:mstubbsterp21@gmail.com" className="hover:opacity-70">
                   mstubbsterp21@gmail.com
@@ -50,7 +54,7 @@ export default function Contact({ palette }) {
 
       <div className="mt-10">
         {/* Fallback link in case the embedded form doesn’t load */}
-        <p className="mb-4 text-sm leading-6" style={{ color: "#5f5f5f" }}>
+        <p className="mb-4 text-sm leading-6" style={{ color: '#5f5f5f' }}>
           If the embedded form does not load, use the button below to open the quote request form in a new tab.
         </p>
         <a
@@ -65,7 +69,7 @@ export default function Contact({ palette }) {
         </a>
       </div>
 
-      {/* Embedded Google Form (if you want to embed it) */}
+      {/* Embedded Google Form */}
       <iframe
         title="Miqueas Language Solutions quote request form"
         src="https://docs.google.com/forms/d/e/1FAIpQLSepJCbUYpT114I1xcH4TWC20wrLdHSc62SFnRJUPQalsAzbfw/viewform?embedded=true"
