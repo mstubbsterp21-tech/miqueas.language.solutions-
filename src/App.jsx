@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from "react";
 import logo from "./logo.png";
 import { motion } from "framer-motion";
-import { Menu, X, ArrowRight, HeartHandshake, Globe, Video, Stethoscope, GraduationCap, Ship, Users, Mail, CheckCircle2, ShieldCheck, Clock3, Instagram, Facebook } from "lucide-react";
+import { Menu, X, ArrowRight, HeartHandshake, Globe, Video, Stethoscope, GraduationCap, Ship, Users, Mail, CheckCircle2, ShieldCheck, Clock3 } from "lucide-react";
 
 const palette = {
   burgundy: "#721100",
@@ -161,78 +161,75 @@ export default function MiqueasLanguageSolutionsWebsite() {
   return (
     <div className="min-h-screen bg-white text-slate-900">
       <header className="sticky top-0 z-50 border-b border-black/5 bg-white/90 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4 md:px-8">
-          <a href="#home" className="flex min-w-0 items-center gap-3">
-            <BrandLockup />
-          </a>
-
-          <nav className="hidden items-center gap-6 md:flex">
-  {navItems.map((item) => (
-    <a
-      key={item.id}
-      href={`#${item.id}`}
-      className="text-sm font-medium transition hover:opacity-70"
-      style={{ color: palette.charcoal }}
-    >
-      {item.label}
-    </a>
-  ))}
-
-  {/* Social Icons */}
-  <div className="flex items-center gap-3 ml-4">
-    <a
-      href="https://www.instagram.com/miqueas.language.solutions/"
-      target="_blank"
-      rel="noreferrer"
-      className="p-2 rounded-full hover:opacity-80"
-      style={{ backgroundColor: palette.gold }}
-    >
-      <Instagram size={18} style={{ color: palette.charcoal }} />
+  <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4 md:px-8">
+    <a href="#home" className="flex min-w-0 items-center gap-3">
+      <BrandLockup />
     </a>
 
+    <nav className="hidden items-center gap-6 md:flex">
+      {navItems.map((item) => (
+        <a
+          key={item.id}
+          href={`#${item.id}`}
+          className="text-sm font-medium transition hover:opacity-70"
+          style={{ color: palette.charcoal }}
+        >
+          {item.label}
+        </a>
+      ))}
+
+      <div className="ml-4 flex items-center gap-3">
+        <a
+          href="https://www.instagram.com/miqueas.language.solutions/"
+          target="_blank"
+          rel="noreferrer"
+          className="rounded-full px-3 py-2 text-xs font-semibold transition hover:opacity-80"
+          style={{ backgroundColor: palette.gold, color: "#ffffff" }}
+        >
+          IG
+        </a>
+      </div>
+
+      <Button href="#contact">Request a Quote</Button>
+    </nav>
+
+    <button
+      className="rounded-xl p-2 md:hidden"
+      onClick={() => setMobileOpen((value) => !value)}
+      aria-label="Toggle menu"
+      aria-expanded={mobileOpen}
+      aria-controls="mobile-navigation"
+      type="button"
+    >
+      {mobileOpen ? <X size={22} /> : <Menu size={22} />}
+    </button>
   </div>
 
-  <Button href="#contact">Request a Quote</Button>
-</nav>
-            
-
-          <button
-            className="rounded-xl p-2 md:hidden"
-            onClick={() => setMobileOpen((value) => !value)}
-            aria-label="Toggle menu"
-            aria-expanded={mobileOpen}
-            aria-controls="mobile-navigation"
-            type="button"
+  {mobileOpen && (
+    <div id="mobile-navigation" className="border-t border-black/5 bg-white md:hidden">
+      <div className="mx-auto flex max-w-6xl flex-col gap-1 px-5 py-4">
+        {navItems.map((item) => (
+          <a
+            key={item.id}
+            href={`#${item.id}`}
+            className="rounded-xl px-3 py-3 text-sm font-medium text-slate-700 hover:bg-black/5"
+            onClick={() => setMobileOpen(false)}
           >
-            {mobileOpen ? <X size={22} /> : <Menu size={22} />}
-          </button>
-        </div>
-
-        {mobileOpen && (
-          <div id="mobile-navigation" className="border-t border-black/5 bg-white md:hidden">
-            <div className="mx-auto flex max-w-6xl flex-col gap-1 px-5 py-4">
-              {navItems.map((item) => (
-                <a
-                  key={item.id}
-                  href={`#${item.id}`}
-                  className="rounded-xl px-3 py-3 text-sm font-medium text-slate-700 hover:bg-black/5"
-                  onClick={() => setMobileOpen(false)}
-                >
-                  {item.label}
-                </a>
-              ))}
-              <a
-                href="#contact"
-                className="mt-2 rounded-2xl px-4 py-3 text-center text-sm font-semibold text-white"
-                style={{ backgroundColor: palette.burgundy }}
-                onClick={() => setMobileOpen(false)}
-              >
-                Request a Quote
-              </a>
-            </div>
-          </div>
-        )}
-      </header>
+            {item.label}
+          </a>
+        ))}
+        <a
+          href="#contact"
+          className="mt-2 rounded-2xl px-4 py-3 text-center text-sm font-semibold text-white"
+          style={{ backgroundColor: palette.burgundy }}
+          onClick={() => setMobileOpen(false)}
+        >
+          Request a Quote
+        </a>
+      </div>
+    </div>
+  )}
+</header>
 
       <main>
         <Section id="home" className="pb-20 pt-10 md:pb-28 md:pt-16">
