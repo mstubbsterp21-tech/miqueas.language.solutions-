@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from "react";
 import { Routes, Route, Link } from "react-router-dom";
+import { Analytics } from "@vercel/analytics/react";
 import Home from "./pages/Home";
 import Services from "./pages/Services";
 import About from "./pages/About";
@@ -57,6 +58,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-white text-slate-900">
+      <Analytics />
       {/* Header with navigation and mobile menu toggle */}
       <header className="sticky top-0 z-50 border-b border-black/5 bg-white/90 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4 md:px-8">
