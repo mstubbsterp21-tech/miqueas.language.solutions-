@@ -6,7 +6,7 @@ import About from "./pages/About";
 import Resources from "./pages/Resources";
 import Contact from "./pages/Contact";
 import logo from "./logo.png";
-import { FaInstagram } from "react-icons/fa";
+import { FaInstagram, FaLinkedinIn } from "react-icons/fa";
 
 // Define the color palette used throughout the site.
 const palette = {
@@ -79,33 +79,51 @@ export default function App() {
       ))}
 
       <div className="ml-2 flex items-center gap-3">
-        {/* External Instagram link */}
-        <a
-          href="https://www.instagram.com/miqueas.language.solutions/"
-          target="_blank"
-          rel="noreferrer"
-          aria-label="Instagram"
-          className="inline-flex h-10 w-10 items-center justify-center rounded-xl transition duration-200 hover:-translate-y-[1px]"
-          style={{ backgroundColor: palette.gold, color: palette.white }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = palette.burgundy;
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = palette.gold;
-          }}
-        >
-          <FaInstagram size={18} />
-        </a>
+  {/* Instagram */}
+  <a
+    href="https://www.instagram.com/miqueas.language.solutions/"
+    target="_blank"
+    rel="noreferrer"
+    aria-label="Instagram"
+    className="inline-flex h-10 w-10 items-center justify-center rounded-xl transition duration-200 hover:-translate-y-0.5"
+    style={{ backgroundColor: palette.gold, color: palette.white }}
+    onMouseEnter={(e) => {
+      e.currentTarget.style.backgroundColor = palette.burgundy;
+    }}
+    onMouseLeave={(e) => {
+      e.currentTarget.style.backgroundColor = palette.gold;
+    }}
+  >
+    <FaInstagram size={18} />
+  </a>
 
-        {/* CTA button to request a quote */}
-        <Link
-          to="/contact"
-          className="inline-flex items-center gap-2 rounded-2xl px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90"
-          style={{ backgroundColor: palette.burgundy }}
-        >
-          Request a Quote
-        </Link>
-      </div>
+  {/* LinkedIn */}
+  <a
+    href="https://www.linkedin.com/in/micah-stubbs-7a7802145/"
+    target="_blank"
+    rel="noreferrer"
+    aria-label="LinkedIn"
+    className="inline-flex h-10 w-10 items-center justify-center rounded-xl transition duration-200 hover:-translate-y-0.5"
+    style={{ backgroundColor: palette.gold, color: palette.white }}
+    onMouseEnter={(e) => {
+      e.currentTarget.style.backgroundColor = palette.burgundy;
+    }}
+    onMouseLeave={(e) => {
+      e.currentTarget.style.backgroundColor = palette.gold;
+    }}
+  >
+    <FaLinkedinIn size={18} />
+  </a>
+
+  {/* CTA button to request a quote */}
+  <Link
+    to="/contact"
+    className="inline-flex items-center gap-2 rounded-2xl px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90"
+    style={{ backgroundColor: palette.burgundy }}
+  >
+    Request a Quote
+  </Link>
+</div>
     </nav>
 
     {/* Mobile menu toggle button */}
@@ -136,35 +154,54 @@ export default function App() {
         ))}
 
         <div className="mt-2 flex items-center gap-3">
-          {/* External Instagram link on mobile */}
-          <a
-            href="https://www.instagram.com/miqueas.language.solutions/"
-            target="_blank"
-            rel="noreferrer"
-            aria-label="Instagram"
-            className="inline-flex h-11 w-11 items-center justify-center rounded-xl transition duration-200"
-            style={{ backgroundColor: palette.gold, color: palette.white }}
-            onClick={() => setMobileOpen(false)}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = palette.burgundy;
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = palette.gold;
-            }}
-          >
-            <FaInstagram size={18} />
-          </a>
+  {/* Instagram */}
+  <a
+    href="https://www.instagram.com/miqueas.language.solutions/"
+    target="_blank"
+    rel="noreferrer"
+    aria-label="Instagram"
+    className="inline-flex h-11 w-11 items-center justify-center rounded-xl transition duration-200"
+    style={{ backgroundColor: palette.gold, color: palette.white }}
+    onClick={() => setMobileOpen(false)}
+    onMouseEnter={(e) => {
+      e.currentTarget.style.backgroundColor = palette.burgundy;
+    }}
+    onMouseLeave={(e) => {
+      e.currentTarget.style.backgroundColor = palette.gold;
+    }}
+  >
+    <FaInstagram size={18} />
+  </a>
 
-          {/* CTA button on mobile */}
-          <Link
-            to="/contact"
-            className="flex-1 rounded-2xl px-4 py-3 text-center text-sm font-semibold text-white"
-            style={{ backgroundColor: palette.burgundy }}
-            onClick={() => setMobileOpen(false)}
-          >
-            Request a Quote
-          </Link>
-        </div>
+  {/* LinkedIn */}
+  <a
+    href="https://www.linkedin.com/"
+    target="_blank"
+    rel="noreferrer"
+    aria-label="LinkedIn"
+    className="inline-flex h-11 w-11 items-center justify-center rounded-xl transition duration-200"
+    style={{ backgroundColor: palette.gold, color: palette.white }}
+    onClick={() => setMobileOpen(false)}
+    onMouseEnter={(e) => {
+      e.currentTarget.style.backgroundColor = palette.burgundy;
+    }}
+    onMouseLeave={(e) => {
+      e.currentTarget.style.backgroundColor = palette.gold;
+    }}
+  >
+    <FaLinkedinIn size={18} />
+  </a>
+
+  {/* CTA button on mobile */}
+  <Link
+    to="/contact"
+    className="flex-1 rounded-2xl px-4 py-3 text-center text-sm font-semibold text-white"
+    style={{ backgroundColor: palette.burgundy }}
+    onClick={() => setMobileOpen(false)}
+  >
+    Request a Quote
+  </Link>
+</div>
       </div>
     </div>
   )}
