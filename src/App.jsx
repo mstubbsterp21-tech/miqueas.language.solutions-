@@ -6,6 +6,7 @@ import About from "./pages/About";
 import Resources from "./pages/Resources";
 import Contact from "./pages/Contact";
 import logo from "./logo.png";
+import { FaInstagram } from "react-icons/fa";
 
 // Define the color palette used throughout the site.
 const palette = {
@@ -58,98 +59,116 @@ export default function App() {
   return (
     <div className="min-h-screen bg-white text-slate-900">
       {/* Header with navigation and mobile menu toggle */}
-      <header className="sticky top-0 z-50 border-b border-black/5 bg-white/90 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4 md:px-8">
-          <Link to="/" className="flex min-w-0 items-center gap-3">
-            <BrandLockup />
-          </Link>
+     <header className="sticky top-0 z-50 border-b border-black/5 bg-white/90 backdrop-blur">
+  <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4 md:px-8">
+    <Link to="/" className="flex min-w-0 items-center gap-3">
+      <BrandLockup />
+    </Link>
 
-          {/* Desktop navigation */}
-          <nav className="hidden items-center gap-6 md:flex">
-            {navItems.map((item) => (
-              <Link
-                key={item.path}
-                to={item.path}
-                className="text-sm font-medium transition hover:opacity-70"
-                style={{ color: palette.charcoal }}
-              >
-                {item.label}
-              </Link>
-            ))}
+    {/* Desktop navigation */}
+    <nav className="hidden items-center gap-6 md:flex">
+      {navItems.map((item) => (
+        <Link
+          key={item.path}
+          to={item.path}
+          className="text-sm font-medium transition hover:opacity-70"
+          style={{ color: palette.charcoal }}
+        >
+          {item.label}
+        </Link>
+      ))}
 
-            {/* External Instagram link */}
-            <a
-              href="https://www.instagram.com/miqueas.language.solutions/"
-              target="_blank"
-              rel="noreferrer"
-              className="rounded-full px-3 py-2 text-xs font-semibold transition hover:opacity-80"
-              style={{ backgroundColor: palette.gold, color: "#ffffff" }}
-            >
-              IG
-            </a>
+      <div className="ml-2 flex items-center gap-3">
+        {/* External Instagram link */}
+        <a
+          href="https://www.instagram.com/miqueas.language.solutions/"
+          target="_blank"
+          rel="noreferrer"
+          aria-label="Instagram"
+          className="inline-flex h-10 w-10 items-center justify-center rounded-xl transition duration-200 hover:-translate-y-[1px]"
+          style={{ backgroundColor: palette.gold, color: palette.white }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = palette.burgundy;
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = palette.gold;
+          }}
+        >
+          <FaInstagram size={18} />
+        </a>
 
-            {/* CTA button to request a quote */}
-            <Link
-              to="/contact"
-              className="inline-flex items-center gap-2 rounded-2xl px-5 py-3 text-sm font-semibold text-white hover:opacity-90"
-              style={{ backgroundColor: palette.burgundy }}
-            >
-              Request a Quote
-            </Link>
-          </nav>
+        {/* CTA button to request a quote */}
+        <Link
+          to="/contact"
+          className="inline-flex items-center gap-2 rounded-2xl px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90"
+          style={{ backgroundColor: palette.burgundy }}
+        >
+          Request a Quote
+        </Link>
+      </div>
+    </nav>
 
-          {/* Mobile menu toggle button */}
-          <button
-            className="rounded-xl p-2 md:hidden"
-            onClick={() => setMobileOpen((value) => !value)}
-            aria-label="Toggle menu"
-            type="button"
+    {/* Mobile menu toggle button */}
+    <button
+      className="rounded-xl p-2 md:hidden"
+      onClick={() => setMobileOpen((value) => !value)}
+      aria-label="Toggle menu"
+      type="button"
+    >
+      {mobileOpen ? "X" : "☰"}
+    </button>
+  </div>
+
+  {/* Mobile navigation drawer */}
+  {mobileOpen && (
+    <div className="border-t border-black/5 bg-white md:hidden">
+      <div className="mx-auto flex max-w-6xl flex-col gap-1 px-5 py-4">
+        {navItems.map((item) => (
+          <Link
+            key={item.path}
+            to={item.path}
+            className="rounded-xl px-3 py-3 text-sm font-medium hover:bg-black/5"
+            style={{ color: palette.charcoal }}
+            onClick={() => setMobileOpen(false)}
           >
-            {mobileOpen ? "X" : "☰"}
-          </button>
+            {item.label}
+          </Link>
+        ))}
+
+        <div className="mt-2 flex items-center gap-3">
+          {/* External Instagram link on mobile */}
+          <a
+            href="https://www.instagram.com/miqueas.language.solutions/"
+            target="_blank"
+            rel="noreferrer"
+            aria-label="Instagram"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-xl transition duration-200"
+            style={{ backgroundColor: palette.gold, color: palette.white }}
+            onClick={() => setMobileOpen(false)}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = palette.burgundy;
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = palette.gold;
+            }}
+          >
+            <FaInstagram size={18} />
+          </a>
+
+          {/* CTA button on mobile */}
+          <Link
+            to="/contact"
+            className="flex-1 rounded-2xl px-4 py-3 text-center text-sm font-semibold text-white"
+            style={{ backgroundColor: palette.burgundy }}
+            onClick={() => setMobileOpen(false)}
+          >
+            Request a Quote
+          </Link>
         </div>
-
-        {/* Mobile navigation drawer */}
-        {mobileOpen && (
-          <div className="border-t border-black/5 bg-white md:hidden">
-            <div className="mx-auto flex max-w-6xl flex-col gap-1 px-5 py-4">
-              {navItems.map((item) => (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  className="rounded-xl px-3 py-3 text-sm font-medium hover:bg-black/5"
-                  style={{ color: palette.charcoal }}
-                  onClick={() => setMobileOpen(false)}
-                >
-                  {item.label}
-                </Link>
-              ))}
-
-              {/* External Instagram link on mobile */}
-              <a
-                href="https://www.instagram.com/miqueas.language.solutions/"
-                target="_blank"
-                rel="noreferrer"
-                className="mt-2 rounded-2xl px-4 py-3 text-center text-sm font-semibold"
-                style={{ backgroundColor: palette.gold, color: "#ffffff" }}
-                onClick={() => setMobileOpen(false)}
-              >
-                Instagram
-              </a>
-
-              {/* CTA button on mobile */}
-              <Link
-                to="/contact"
-                className="rounded-2xl px-4 py-3 text-center text-sm font-semibold text-white"
-                style={{ backgroundColor: palette.burgundy }}
-                onClick={() => setMobileOpen(false)}
-              >
-                Request a Quote
-              </Link>
-            </div>
-          </div>
-        )}
-      </header>
+      </div>
+    </div>
+  )}
+</header> 
 
       {/* Main content area with routes */}
       <main>
