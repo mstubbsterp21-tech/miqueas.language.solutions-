@@ -89,40 +89,42 @@ export default function About({ palette }) {
               className="space-y-5 text-base leading-8 md:text-lg"
               style={{ color: palette.body }}
             >
-              <h2 className="text-xl font-semibold" style={{ color: palette.charcoal }}>Early immersion</h2>
+              <h2 className="text-xl font-semibold" style={{ color: palette.charcoal }}>Early Immersion</h2>
               <p>Hi, I’m Micah.</p>
 
               <p>
-                I started learning ASL in 2013, and from the beginning, my
+                My journey with American Sign Language began in 2013, and from the beginning, my
                 experience was rooted in real-life interaction—not just a
                 classroom. I developed my language skills by spending time
                 directly with Deaf and Hard-of-Hearing individuals, learning
                 through conversation, shared experiences, and consistent
                 community involvement, including community and volunteer-based
-                environments.
+                environments. That environment shaped how I understand language—not just as words or signs,
+                 but as connection.
               </p>
 
-              <h2 className="text-xl font-semibold" style={{ color: palette.charcoal }}>Professional journey</h2>
+              <h2 className="text-xl font-semibold" style={{ color: palette.charcoal }}>Professional Journey</h2>
               <p>
-                When I began interpreting professionally in 2019, everything
-                shifted. I stepped into a role where people were depending on
-                me to ensure communication was accurate, respectful, and
-                accessible. Over time, I’ve worked in a variety of settings and
-                seen how impactful clear communication can be.
+                When I began interpreting professionally in 2019, everything shifted. What once felt like learning became responsibility.
+                I stepped into situations where people were depending on me to ensure communication was accurate, respectful, and fully accessible. 
+                Over time, I’ve worked in a variety of settings and seen how much is at stake when communication is done well—or poorly. From 
+                medical appointments to educational settings to community events and cruise assignments, it's been a privilege to be a small part of 
+                so many different interactions and to see how language access can make a real difference in people’s lives.
+                Those experiences sharpened not just my skills, but my awareness of the role I carry every time I interpret. 
               </p>
 
               <h2 className="text-xl font-semibold" style={{ color: palette.charcoal }}>Philosophy</h2>
               <p className="font-semibold" style={{ color: palette.charcoal }}>
-                That’s the foundation Miqueas Language Solutions is built on.
+                Bridging Perspectives. Delivering Understanding
               </p>
 
               <p>
-                Today, that foundation shows up through dependable service,
-                ongoing growth, and a commitment to providing professional
-                language access with genuine care. If you’re working with me,
-                you’re working with someone who values clear communication,
-                respects the people involved, and understands the
-                responsibility that comes with this role.
+                Miqueas Language Solutions is built on that foundation of real-world experience and responsibility. 
+                The work is guided by a commitment to accuracy, professionalism, and respect for every person involved. 
+                That means prioritizing clear communication, maintaining strong ethical standards, and continuing to grow 
+                in both skill and cultural awareness. When you work with me, you’re working with someone who understands 
+                that this is more than a service—it’s access. And I approach that responsibility with care, consistency, 
+                and intention in order to bridge perspectives and deliver understanding in every interaction.
               </p>
             </div>
           </div>
