@@ -29,7 +29,9 @@ export default function ResourcesInterpreters({ palette }) {
 
       <div className="mt-4">
         <a
-          href="/contact"
+          href="https://forms.gle/cFTE9Qy1c3sFPdnz8"
+          target="_blank"
+          rel="noreferrer"
           className="inline-flex items-center rounded-2xl px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90"
           style={{ backgroundColor: palette.burgundy }}
         >
@@ -69,7 +71,7 @@ export default function ResourcesInterpreters({ palette }) {
           style={{ borderColor: palette.border }}
         >
           <div className="mb-2 font-semibold" style={{ color: palette.charcoal }}>
-            Standard Practice Papers (SPPs)
+            RID Standard Practice Papers (SPPs)
           </div>
           <div className="text-sm leading-6" style={{ color: "#5f5f5f" }}>
             Explore practice guidance for different interpreting settings and service considerations.
@@ -84,7 +86,7 @@ export default function ResourcesInterpreters({ palette }) {
           style={{ borderColor: palette.border }}
         >
           <div className="mb-2 font-semibold" style={{ color: palette.charcoal }}>
-            RID
+            Registry of Interpreters for The Deaf
           </div>
           <div className="text-sm leading-6" style={{ color: "#5f5f5f" }}>
             Access certification information, professional development resources, and industry updates.
