@@ -15,6 +15,7 @@ export default function Home({ palette }) {
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
+        className="section-shell p-7 md:p-10"
       >
         <div
           className="mb-5 inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm"
@@ -47,16 +48,14 @@ export default function Home({ palette }) {
         <div className="mt-8 flex flex-wrap gap-4">
           <Link
             to="/contact"
-            className="inline-flex items-center gap-2 rounded-2xl px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:opacity-90"
-            style={{ backgroundColor: palette.burgundy }}
+            className="btn-primary inline-flex items-center gap-2 rounded-2xl px-5 py-3 text-sm font-semibold shadow-sm transition"
           >
             Request a Quote <ArrowRight size={16} />
           </Link>
 
           <Link
             to="/services"
-            className="inline-flex items-center gap-2 rounded-2xl border px-5 py-3 text-sm font-semibold transition hover:bg-black/5"
-            style={{ borderColor: palette.charcoal, color: palette.charcoal }}
+            className="btn-secondary inline-flex items-center gap-2 rounded-2xl px-5 py-3 text-sm font-semibold transition hover:bg-black/5"
           >
             Explore Services
           </Link>

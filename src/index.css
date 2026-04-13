@@ -1,2 +1,45 @@
 /* Import Tailwind CSS and define base styles for the application */
 @import "tailwindcss";
+
+:root {
+  --mls-burgundy: #721100;
+  --mls-gold: #dd7d00;
+  --mls-charcoal: #464747;
+  --mls-white: #ffffff;
+  --mls-soft-gray: #f5f5f5;
+  --mls-border: #e5e5e5;
+  --mls-body: #5f5f5f;
+}
+
+body {
+  color: var(--mls-charcoal);
+  background:
+    radial-gradient(circle at 0% -20%, rgba(221, 125, 0, 0.08), transparent 45%),
+    radial-gradient(circle at 100% 0%, rgba(114, 17, 0, 0.07), transparent 40%),
+    var(--mls-white);
+}
+
+.section-shell {
+  border: 1px solid var(--mls-border);
+  border-radius: 2rem;
+  background: var(--mls-white);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.04);
+}
+
+.brand-band {
+  background: linear-gradient(135deg, rgba(114, 17, 0, 0.96), rgba(70, 71, 71, 0.96));
+}
+
+.btn-primary {
+  background-color: var(--mls-burgundy);
+  color: var(--mls-white);
+}
+
+.btn-primary:hover {
+  filter: brightness(1.06);
+}
+
+.btn-secondary {
+  border: 1px solid var(--mls-charcoal);
+  color: var(--mls-charcoal);
+}

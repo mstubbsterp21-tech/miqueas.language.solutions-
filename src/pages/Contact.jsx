@@ -42,7 +42,7 @@ export default function Contact({ palette }) {
       </div>
 
       <div
-        className="rounded-2xl p-6"
+        className="section-shell rounded-2xl p-6"
         style={{ backgroundColor: palette.softGray }}
       >
         <p
@@ -82,8 +82,7 @@ export default function Contact({ palette }) {
           href="https://docs.google.com/forms/d/e/1FAIpQLSepJCbUYpT114I1xcH4TWC20wrLdHSc62SFnRJUPQalsAzbfw/viewform"
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 rounded-2xl px-5 py-3 text-sm font-semibold text-white"
-          style={{ backgroundColor: palette.burgundy }}
+          className="btn-primary inline-flex items-center gap-2 rounded-2xl px-5 py-3 text-sm font-semibold"
         >
           Open Form in New Tab
           <ArrowRight size={16} />
@@ -98,7 +97,7 @@ export default function Contact({ palette }) {
         frameBorder="0"
         marginHeight="0"
         marginWidth="0"
-        className="mt-6 rounded-2xl"
+        className="section-shell mt-6 rounded-2xl"
         style={{ border: 0 }}
       >
         Loading…

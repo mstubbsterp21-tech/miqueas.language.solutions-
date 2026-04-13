@@ -24,7 +24,9 @@ export default function ResourcesLayout({ palette }) {
       <div className="mb-10 flex flex-wrap gap-3">
         <NavLink
           to="/resources/clients"
-          className={({ isActive }) => `${tabBase} ${isActive ? "" : "border"}`}
+          className={({ isActive }) =>
+            `${tabBase} ${isActive ? "" : "border hover:bg-black/5"}`
+          }
           style={({ isActive }) => ({
             backgroundColor: isActive ? palette.burgundy : palette.white,
             color: isActive ? palette.white : palette.charcoal,
@@ -36,7 +38,9 @@ export default function ResourcesLayout({ palette }) {
 
         <NavLink
           to="/resources/interpreters"
-          className={({ isActive }) => `${tabBase} ${isActive ? "" : "border"}`}
+          className={({ isActive }) =>
+            `${tabBase} ${isActive ? "" : "border hover:bg-black/5"}`
+          }
           style={({ isActive }) => ({
             backgroundColor: isActive ? palette.burgundy : palette.white,
             color: isActive ? palette.white : palette.charcoal,
@@ -47,7 +51,9 @@ export default function ResourcesLayout({ palette }) {
         </NavLink>
       </div>
 
-      <Outlet />
+      <div className="section-shell p-6 md:p-8">
+        <Outlet />
+      </div>
     </div>
   );
 }

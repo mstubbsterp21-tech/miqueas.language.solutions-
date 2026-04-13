@@ -130,8 +130,7 @@ export default function App() {
 
               <Link
                 to="/contact"
-                className="inline-flex items-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-semibold text-white whitespace-nowrap transition hover:opacity-90"
-                style={{ backgroundColor: palette.burgundy }}
+                className="btn-primary inline-flex items-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-semibold whitespace-nowrap transition"
               >
                 Request a Quote
               </Link>
@@ -183,7 +182,7 @@ export default function App() {
                 </a>
 
                 <a
-                  href="https://www.facebook.com/profile.php?id=615732860781534"
+                  href="https://www.facebook.com/profile.php?id=61573286078153"
                   target="_blank"
                   rel="noreferrer"
                   aria-label="Facebook"
@@ -220,8 +219,7 @@ export default function App() {
 
                 <Link
                   to="/contact"
-                  className="flex-1 rounded-2xl px-4 py-3 text-center text-sm font-semibold text-white"
-                  style={{ backgroundColor: palette.burgundy }}
+                  className="btn-primary flex-1 rounded-2xl px-4 py-3 text-center text-sm font-semibold"
                   onClick={() => setMobileOpen(false)}
                 >
                   Request a Quote
@@ -251,7 +249,7 @@ export default function App() {
         </Routes>
       </main>
 
-      <footer className="border-t border-black/5 px-5 py-8 md:px-8">
+      <footer className="mt-10 border-t border-black/5 bg-[rgba(245,245,245,0.7)] px-5 py-8 md:px-8">
         <div className="mx-auto flex max-w-6xl flex-col gap-6 md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-3">
             <BrandLockup showTagline={false} />
