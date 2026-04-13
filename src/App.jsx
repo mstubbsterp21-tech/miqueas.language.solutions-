@@ -8,7 +8,7 @@ import ResourcesClients from "./pages/ResourcesClients";
 import ResourcesInterpreters from "./pages/ResourcesInterpreters";
 import Contact from "./pages/Contact";
 import logo from "./logo.png";
-import { FaInstagram, FaLinkedinIn } from "react-icons/fa";
+import { FaInstagram, FaLinkedinIn, FaFacebookF } from "react-icons/fa";
 
 const palette = {
   burgundy: "#721100",
@@ -95,6 +95,23 @@ export default function App() {
               </a>
 
               <a
+                href="https://www.facebook.com/profile.php?id=615732860781534"
+                target="_blank"
+                rel="noreferrer"
+                aria-label="Facebook"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-xl transition duration-200 hover:-translate-y-0.5"
+                style={{ backgroundColor: palette.gold, color: palette.white }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = palette.burgundy;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = palette.gold;
+                }}
+              >
+                <FaFacebookF size={18} />
+              </a>
+
+              <a
                 href="https://www.linkedin.com/in/micah-stubbs-7a7802145/"
                 target="_blank"
                 rel="noreferrer"
@@ -163,6 +180,24 @@ export default function App() {
                   }}
                 >
                   <FaInstagram size={18} />
+                </a>
+
+                <a
+                  href="https://www.facebook.com/profile.php?id=615732860781534"
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label="Facebook"
+                  className="inline-flex h-11 w-11 items-center justify-center rounded-xl transition duration-200"
+                  style={{ backgroundColor: palette.gold, color: palette.white }}
+                  onClick={() => setMobileOpen(false)}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = palette.burgundy;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = palette.gold;
+                  }}
+                >
+                  <FaFacebookF size={18} />
                 </a>
 
                 <a
