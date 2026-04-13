@@ -307,6 +307,13 @@ export default function InterpreterRequestForm({ palette = defaultPalette }) {
       if (!formData.participantCount.trim()) {
         nextErrors.participantCount = 'Please enter the participant count.';
       }
+      if (!formData.consumerNames.trim()) {
+        nextErrors.consumerNames = 'Please provide the names of Deaf participants.';
+      }
+      if (!formData.hearingParticipantsLanguages.trim()) {
+        nextErrors.hearingParticipantsLanguages =
+          'Please provide the hearing participants’ primary language(s).';
+      }
       if (formData.communicationStyles.length === 0) {
         nextErrors.communicationStyles = 'Select at least one communication style.';
       }
@@ -315,10 +322,6 @@ export default function InterpreterRequestForm({ palette = defaultPalette }) {
         !formData.communicationStyleOther.trim()
       ) {
         nextErrors.communicationStyleOther = 'Please specify the other communication style.';
-      }
-      if (formData.additionalConsiderations.length === 0) {
-        nextErrors.additionalConsiderations =
-          'Select at least one additional consideration or choose Other.';
       }
       if (
         formData.additionalConsiderations.includes('Other') &&
@@ -382,6 +385,13 @@ export default function InterpreterRequestForm({ palette = defaultPalette }) {
 
     if (!validateStep(6)) {
       setStep(6);
+      return;
+    }
+
+    if (!scriptUrl || scriptUrl.includes('YOUR_WEB_APP_ID')) {
+      setSubmitError(
+        'Submission endpoint is not configured. Please set VITE_GOOGLE_SCRIPT_URL.'
+      );
       return;
     }
 
@@ -827,7 +837,7 @@ export default function InterpreterRequestForm({ palette = defaultPalette }) {
 
               <div>
                 <label htmlFor="consumerNames" className={labelClass}>
-                  Name(s) of Deaf participant(s) (if relevant for preparation)
+                  Name(s) of Deaf participant(s) (if relevant for preparation) *
                 </label>
                 <textarea
                   id="consumerNames"
@@ -838,6 +848,7 @@ export default function InterpreterRequestForm({ palette = defaultPalette }) {
                   onChange={(e) => setField('consumerNames', e.target.value)}
                   className={textareaClass}
                 />
+                <ErrorText errors={errors} name="consumerNames" />
               </div>
 
               <div>
@@ -858,7 +869,7 @@ export default function InterpreterRequestForm({ palette = defaultPalette }) {
 
               <div>
                 <label htmlFor="hearingParticipantsLanguages" className={labelClass}>
-                  Primary language(s) of hearing participants
+                  Primary language(s) of hearing participants *
                 </label>
                 <input
                   id="hearingParticipantsLanguages"
@@ -872,11 +883,12 @@ export default function InterpreterRequestForm({ palette = defaultPalette }) {
                   className={inputClass}
                   placeholder="Example: English, Spanish, bilingual English/Spanish"
                 />
+                <ErrorText errors={errors} name="hearingParticipantsLanguages" />
               </div>
 
               <div>
                 <label className={labelClass}>
-                  Additional communication considerations? *
+                  Additional communication considerations?
                 </label>
                 <CheckboxGroup
                   options={additionalConsiderationOptions}
@@ -890,7 +902,6 @@ export default function InterpreterRequestForm({ palette = defaultPalette }) {
                   }
                   palette={p}
                 />
-                <ErrorText errors={errors} name="additionalConsiderations" />
                 <ErrorText errors={errors} name="additionalConsiderationsOther" />
               </div>
 
@@ -914,7 +925,7 @@ export default function InterpreterRequestForm({ palette = defaultPalette }) {
 
                 <div>
                   <label className={labelClass}>
-                    Will a CDI or additional support be needed?
+                    Will a Certified Deaf Interpreter (CDI) or additional support be needed?
                   </label>
                   <select
                     name="cdiOrAdditionalSupportNeeded"
@@ -1297,7 +1308,7 @@ export default function InterpreterRequestForm({ palette = defaultPalette }) {
                     .join(', '),
                   'Hearing Participant Languages': formData.hearingParticipantsLanguages,
                   'Worked With Interpreter Before': formData.workedWithInterpreterBefore,
-                  'CDI / Additional Support Needed': formData.cdiOrAdditionalSupportNeeded,
+                  'Certified Deaf Interpreter (CDI) / Additional Support Needed': formData.cdiOrAdditionalSupportNeeded,
                   'Assignment Description': formData.assignmentDescription,
                   'Specialized Content': formData.specializedContent,
                   'Specialized Topics': formData.specializedTopics,
