@@ -95,7 +95,7 @@ export default function App() {
               </a>
 
               <a
-                href="https://www.facebook.com/profile.php?id=615732860781534"
+                href="https://www.facebook.com/profile.php?id=61573286078153"
                 target="_blank"
                 rel="noreferrer"
                 aria-label="Facebook"
