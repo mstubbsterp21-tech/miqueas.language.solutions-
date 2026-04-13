@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import logo from '../logo.png';
 
 const defaultPalette = {
   burgundy: '#721100',
@@ -468,7 +469,7 @@ export default function InterpreterRequestForm({ palette = defaultPalette }) {
         >
           <div className="mb-6 flex justify-center">
             <img
-              src="/logo.png"
+              src={logo}
               alt="Miqueas Language Solutions"
               className="h-20 object-contain"
             />
@@ -482,7 +483,7 @@ export default function InterpreterRequestForm({ palette = defaultPalette }) {
           </h1>
 
           <div
-            className="mx-auto mt-6 max-w-3xl space-y-4 text-sm leading-7"
+            className="mx-auto mt-6 max-w-3xl space-y-4 text-sm leading-7 text-center"
             style={{ color: p.charcoal }}
           >
             <p>
