@@ -68,3 +68,10 @@ body {
 .btn-secondary:hover {
   background-color: var(--mls-soft-gray);
 }
+/* Interpreter request form brand styling */
+.form-input { border: 1px solid var(--mls-border); background: var(--mls-white); color: var(--mls-charcoal); }
+.form-input:focus { outline: none; box-shadow: 0 0 0 4px rgba(221, 125, 0, 0.18); }
+.form-note { color: var(--mls-charcoal); }
+.form-hint { background: var(--mls-soft-gray); border-color: var(--mls-border); color: var(--mls-charcoal); }
+.form-checkbox { accent-color: var(--mls-burgundy); border: 1px solid var(--mls-border); }
+.form-error { color: var(--mls-burgundy); }
