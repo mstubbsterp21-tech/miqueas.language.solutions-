@@ -93,12 +93,6 @@ const additionalConsiderationOptions = [
   'Other',
 ];
 
-function formatLabel(key) {
-  return key
-    .replace(/([A-Z])/g, ' $1')
-    .replace(/^./, (str) => str.toUpperCase());
-}
-
 function to12Hour(time) {
   if (!time) return '';
   const [hourStr, minute] = time.split(':');
@@ -124,6 +118,47 @@ function calculateDuration(startTime, endTime) {
   if (hours && minutes) return `${hours} hr ${minutes} min`;
   if (hours) return `${hours} hr`;
   return `${minutes} min`;
+}
+
+function ErrorText({ errors, name }) {
+  if (!errors[name]) return null;
+
+  return (
+    <p className="mt-2 text-xs font-medium form-error">{errors[name]}</p>
+  );
+}
+
+function SectionCard({ title, subtitle, children, step, borderColor, titleColor }) {
+  return (
+    <div
+      className="rounded-[2rem] border bg-white p-6 shadow-sm md:p-8"
+      style={{ borderColor }}
+    >
+      <div className="mb-6">
+        <div
+          className="inline-flex rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em]"
+          style={{
+            backgroundColor: defaultPalette.softGray,
+            color: defaultPalette.gold,
+          }}
+        >
+          Section {step} of 7
+        </div>
+
+        <h2 className="mt-4 text-2xl font-bold" style={{ color: titleColor }}>
+          {title}
+        </h2>
+
+        {subtitle ? (
+          <p className="mt-2 max-w-3xl text-sm leading-6" style={{ color: titleColor }}>
+            {subtitle}
+          </p>
+        ) : null}
+      </div>
+
+      {children}
+    </div>
+  );
 }
 
 function CheckboxGroup({ options, values, onChange, otherValue, onOtherChange, palette }) {
@@ -380,42 +415,6 @@ export default function InterpreterRequestForm({ palette = defaultPalette }) {
     }
   };
 
-  const ErrorText = ({ name }) =>
-    errors[name] ? (
-      <p className="mt-2 text-xs font-medium form-error">{errors[name]}</p>
-    ) : null;
-
-  const SectionCard = ({ title, subtitle, children }) => (
-    <div
-      className="rounded-[2rem] border bg-white p-6 shadow-sm md:p-8"
-      style={{ borderColor: p.border }}
-    >
-      <div className="mb-6">
-        <div
-          className="inline-flex rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em]"
-          style={{
-            backgroundColor: p.softGray,
-            color: p.gold,
-          }}
-        >
-          Section {step} of 7
-        </div>
-
-        <h2 className="mt-4 text-2xl font-bold" style={{ color: p.charcoal }}>
-          {title}
-        </h2>
-
-        {subtitle ? (
-          <p className="mt-2 max-w-3xl text-sm leading-6" style={{ color: p.charcoal }}>
-            {subtitle}
-          </p>
-        ) : null}
-      </div>
-
-      {children}
-    </div>
-  );
-
   if (submitted) {
     return (
       <section className="mx-auto max-w-4xl px-5 py-16 md:px-8">
@@ -467,11 +466,11 @@ export default function InterpreterRequestForm({ palette = defaultPalette }) {
           className="rounded-[2rem] border bg-white p-6 shadow-sm md:p-8"
           style={{ borderColor: p.border }}
         >
-          <div className="mb-6 flex justify-center">
+          <div className="mb-6 text-center">
             <img
               src={logo}
               alt="Miqueas Language Solutions"
-              className="h-20 object-contain"
+              className="mx-auto h-20 object-contain"
             />
           </div>
 
@@ -517,6 +516,9 @@ export default function InterpreterRequestForm({ palette = defaultPalette }) {
 
         {step === 1 && (
           <SectionCard
+            step={step}
+            borderColor={p.border}
+            titleColor={p.charcoal}
             title="Email"
             subtitle="Start with the best email address to use for request follow-up."
           >
@@ -526,19 +528,24 @@ export default function InterpreterRequestForm({ palette = defaultPalette }) {
               </label>
               <input
                 id="emailCapture"
+                name="emailCapture"
                 type="email"
+                autoComplete="email"
                 value={formData.emailCapture}
                 onChange={(e) => setField('emailCapture', e.target.value)}
                 className={inputClass}
                 placeholder="name@example.com"
               />
-              <ErrorText name="emailCapture" />
+              <ErrorText errors={errors} name="emailCapture" />
             </div>
           </SectionCard>
         )}
 
         {step === 2 && (
           <SectionCard
+            step={step}
+            borderColor={p.border}
+            titleColor={p.charcoal}
             title="Contact Information"
             subtitle="Provide the contact and billing details connected to this request."
           >
@@ -549,12 +556,14 @@ export default function InterpreterRequestForm({ palette = defaultPalette }) {
                 </label>
                 <input
                   id="fullName"
+                  name="fullName"
                   type="text"
+                  autoComplete="name"
                   value={formData.fullName}
                   onChange={(e) => setField('fullName', e.target.value)}
                   className={inputClass}
                 />
-                <ErrorText name="fullName" />
+                <ErrorText errors={errors} name="fullName" />
               </div>
 
               <div className="md:col-span-2">
@@ -563,12 +572,14 @@ export default function InterpreterRequestForm({ palette = defaultPalette }) {
                 </label>
                 <input
                   id="organizationName"
+                  name="organizationName"
                   type="text"
+                  autoComplete="organization"
                   value={formData.organizationName}
                   onChange={(e) => setField('organizationName', e.target.value)}
                   className={inputClass}
                 />
-                <ErrorText name="organizationName" />
+                <ErrorText errors={errors} name="organizationName" />
               </div>
 
               <div className="md:col-span-2">
@@ -577,13 +588,15 @@ export default function InterpreterRequestForm({ palette = defaultPalette }) {
                 </label>
                 <textarea
                   id="physicalAddress"
+                  name="physicalAddress"
                   rows={3}
+                  autoComplete="street-address"
                   value={formData.physicalAddress}
                   onChange={(e) => setField('physicalAddress', e.target.value)}
                   className={textareaClass}
                   placeholder="1234 N Sample Street, City, State, USA"
                 />
-                <ErrorText name="physicalAddress" />
+                <ErrorText errors={errors} name="physicalAddress" />
               </div>
 
               <div className="md:col-span-2">
@@ -602,7 +615,10 @@ export default function InterpreterRequestForm({ palette = defaultPalette }) {
 
                 {!formData.billingSameAsPhysical && (
                   <textarea
+                    id="billingAddress"
+                    name="billingAddress"
                     rows={3}
+                    autoComplete="billing street-address"
                     value={formData.billingAddress}
                     onChange={(e) => setField('billingAddress', e.target.value)}
                     className={textareaClass}
@@ -610,7 +626,7 @@ export default function InterpreterRequestForm({ palette = defaultPalette }) {
                   />
                 )}
 
-                <ErrorText name="billingAddress" />
+                <ErrorText errors={errors} name="billingAddress" />
               </div>
 
               <div>
@@ -619,12 +635,14 @@ export default function InterpreterRequestForm({ palette = defaultPalette }) {
                 </label>
                 <input
                   id="contactEmail"
+                  name="contactEmail"
                   type="email"
+                  autoComplete="email"
                   value={formData.contactEmail}
                   onChange={(e) => setField('contactEmail', e.target.value)}
                   className={inputClass}
                 />
-                <ErrorText name="contactEmail" />
+                <ErrorText errors={errors} name="contactEmail" />
               </div>
 
               <div>
@@ -633,12 +651,14 @@ export default function InterpreterRequestForm({ palette = defaultPalette }) {
                 </label>
                 <input
                   id="phoneNumber"
+                  name="phoneNumber"
                   type="tel"
+                  autoComplete="tel"
                   value={formData.phoneNumber}
                   onChange={(e) => setField('phoneNumber', e.target.value)}
                   className={inputClass}
                 />
-                <ErrorText name="phoneNumber" />
+                <ErrorText errors={errors} name="phoneNumber" />
               </div>
             </div>
           </SectionCard>
@@ -646,6 +666,9 @@ export default function InterpreterRequestForm({ palette = defaultPalette }) {
 
         {step === 3 && (
           <SectionCard
+            step={step}
+            borderColor={p.border}
+            titleColor={p.charcoal}
             title="Assignment Overview"
             subtitle="Share the core scheduling and service details for this request. All times should be submitted in Eastern Time (New York)."
           >
@@ -668,7 +691,7 @@ export default function InterpreterRequestForm({ palette = defaultPalette }) {
                     </label>
                   ))}
                 </div>
-                <ErrorText name="serviceNeeded" />
+                <ErrorText errors={errors} name="serviceNeeded" />
               </div>
 
               <div>
@@ -689,7 +712,7 @@ export default function InterpreterRequestForm({ palette = defaultPalette }) {
                     </label>
                   ))}
                 </div>
-                <ErrorText name="setting" />
+                <ErrorText errors={errors} name="setting" />
               </div>
 
               <div className="grid gap-5 md:grid-cols-2">
@@ -699,12 +722,14 @@ export default function InterpreterRequestForm({ palette = defaultPalette }) {
                   </label>
                   <input
                     id="assignmentDate"
+                    name="assignmentDate"
                     type="date"
+                    autoComplete="bday"
                     value={formData.assignmentDate}
                     onChange={(e) => setField('assignmentDate', e.target.value)}
                     className={inputClass}
                   />
-                  <ErrorText name="assignmentDate" />
+                  <ErrorText errors={errors} name="assignmentDate" />
                 </div>
 
                 <div>
@@ -713,6 +738,7 @@ export default function InterpreterRequestForm({ palette = defaultPalette }) {
                   </label>
                   <input
                     id="estimatedDuration"
+                    name="estimatedDuration"
                     type="text"
                     value={formData.estimatedDuration || derivedDuration}
                     onChange={(e) => setField('estimatedDuration', e.target.value)}
@@ -727,12 +753,13 @@ export default function InterpreterRequestForm({ palette = defaultPalette }) {
                   </label>
                   <input
                     id="startTime"
+                    name="startTime"
                     type="time"
                     value={formData.startTime}
                     onChange={(e) => setField('startTime', e.target.value)}
                     className={inputClass}
                   />
-                  <ErrorText name="startTime" />
+                  <ErrorText errors={errors} name="startTime" />
                 </div>
 
                 <div>
@@ -741,12 +768,13 @@ export default function InterpreterRequestForm({ palette = defaultPalette }) {
                   </label>
                   <input
                     id="endTime"
+                    name="endTime"
                     type="time"
                     value={formData.endTime}
                     onChange={(e) => setField('endTime', e.target.value)}
                     className={inputClass}
                   />
-                  <ErrorText name="endTime" />
+                  <ErrorText errors={errors} name="endTime" />
                 </div>
 
                 <div className="md:col-span-2">
@@ -755,6 +783,7 @@ export default function InterpreterRequestForm({ palette = defaultPalette }) {
                   </label>
                   <textarea
                     id="assignmentLocationPlatform"
+                    name="assignmentLocationPlatform"
                     rows={3}
                     value={formData.assignmentLocationPlatform}
                     onChange={(e) =>
@@ -763,7 +792,7 @@ export default function InterpreterRequestForm({ palette = defaultPalette }) {
                     className={textareaClass}
                     placeholder="Street address, room/facility details, or virtual meeting link / platform information"
                   />
-                  <ErrorText name="assignmentLocationPlatform" />
+                  <ErrorText errors={errors} name="assignmentLocationPlatform" />
                 </div>
               </div>
             </div>
@@ -772,6 +801,9 @@ export default function InterpreterRequestForm({ palette = defaultPalette }) {
 
         {step === 4 && (
           <SectionCard
+            step={step}
+            borderColor={p.border}
+            titleColor={p.charcoal}
             title="Consumer & Language Needs"
             subtitle="This information helps determine communication access needs, preparation requirements, and whether additional support may be needed."
           >
@@ -782,13 +814,15 @@ export default function InterpreterRequestForm({ palette = defaultPalette }) {
                 </label>
                 <input
                   id="participantCount"
+                  name="participantCount"
                   type="text"
+                  autoComplete="off"
                   value={formData.participantCount}
                   onChange={(e) => setField('participantCount', e.target.value)}
                   className={inputClass}
                   placeholder="Provide the exact number if known"
                 />
-                <ErrorText name="participantCount" />
+                <ErrorText errors={errors} name="participantCount" />
               </div>
 
               <div>
@@ -797,7 +831,9 @@ export default function InterpreterRequestForm({ palette = defaultPalette }) {
                 </label>
                 <textarea
                   id="consumerNames"
+                  name="consumerNames"
                   rows={3}
+                  autoComplete="off"
                   value={formData.consumerNames}
                   onChange={(e) => setField('consumerNames', e.target.value)}
                   className={textareaClass}
@@ -816,8 +852,8 @@ export default function InterpreterRequestForm({ palette = defaultPalette }) {
                   onOtherChange={(value) => setField('communicationStyleOther', value)}
                   palette={p}
                 />
-                <ErrorText name="communicationStyles" />
-                <ErrorText name="communicationStyleOther" />
+                <ErrorText errors={errors} name="communicationStyles" />
+                <ErrorText errors={errors} name="communicationStyleOther" />
               </div>
 
               <div>
@@ -826,7 +862,9 @@ export default function InterpreterRequestForm({ palette = defaultPalette }) {
                 </label>
                 <input
                   id="hearingParticipantsLanguages"
+                  name="hearingParticipantsLanguages"
                   type="text"
+                  autoComplete="off"
                   value={formData.hearingParticipantsLanguages}
                   onChange={(e) =>
                     setField('hearingParticipantsLanguages', e.target.value)
@@ -852,8 +890,8 @@ export default function InterpreterRequestForm({ palette = defaultPalette }) {
                   }
                   palette={p}
                 />
-                <ErrorText name="additionalConsiderations" />
-                <ErrorText name="additionalConsiderationsOther" />
+                <ErrorText errors={errors} name="additionalConsiderations" />
+                <ErrorText errors={errors} name="additionalConsiderationsOther" />
               </div>
 
               <div className="grid gap-5 md:grid-cols-2">
@@ -862,6 +900,7 @@ export default function InterpreterRequestForm({ palette = defaultPalette }) {
                     Has the Deaf participant worked with this interpreter before?
                   </label>
                   <select
+                    name="workedWithInterpreterBefore"
                     value={formData.workedWithInterpreterBefore}
                     onChange={(e) => setField('workedWithInterpreterBefore', e.target.value)}
                     className={inputClass}
@@ -878,6 +917,7 @@ export default function InterpreterRequestForm({ palette = defaultPalette }) {
                     Will a CDI or additional support be needed?
                   </label>
                   <select
+                    name="cdiOrAdditionalSupportNeeded"
                     value={formData.cdiOrAdditionalSupportNeeded}
                     onChange={(e) =>
                       setField('cdiOrAdditionalSupportNeeded', e.target.value)
@@ -898,7 +938,9 @@ export default function InterpreterRequestForm({ palette = defaultPalette }) {
                 </label>
                 <textarea
                   id="communicationNotes"
+                  name="communicationNotes"
                   rows={4}
+                  autoComplete="off"
                   value={formData.communicationNotes}
                   onChange={(e) => setField('communicationNotes', e.target.value)}
                   className={textareaClass}
@@ -910,6 +952,9 @@ export default function InterpreterRequestForm({ palette = defaultPalette }) {
 
         {step === 5 && (
           <SectionCard
+            step={step}
+            borderColor={p.border}
+            titleColor={p.charcoal}
             title="Assignment Complexity"
             subtitle="This section helps identify preparation needs, specialized content, and whether materials should be reviewed in advance."
           >
@@ -920,12 +965,14 @@ export default function InterpreterRequestForm({ palette = defaultPalette }) {
                 </label>
                 <textarea
                   id="assignmentDescription"
+                  name="assignmentDescription"
                   rows={5}
+                  autoComplete="off"
                   value={formData.assignmentDescription}
                   onChange={(e) => setField('assignmentDescription', e.target.value)}
                   className={textareaClass}
                 />
-                <ErrorText name="assignmentDescription" />
+                <ErrorText errors={errors} name="assignmentDescription" />
               </div>
 
               <div>
@@ -948,7 +995,7 @@ export default function InterpreterRequestForm({ palette = defaultPalette }) {
                     </label>
                   ))}
                 </div>
-                <ErrorText name="specializedContent" />
+                <ErrorText errors={errors} name="specializedContent" />
               </div>
 
               <div>
@@ -957,7 +1004,9 @@ export default function InterpreterRequestForm({ palette = defaultPalette }) {
                 </label>
                 <input
                   id="specializedTopics"
+                  name="specializedTopics"
                   type="text"
+                  autoComplete="off"
                   value={formData.specializedTopics}
                   onChange={(e) => setField('specializedTopics', e.target.value)}
                   className={inputClass}
@@ -971,7 +1020,9 @@ export default function InterpreterRequestForm({ palette = defaultPalette }) {
                 </label>
                 <input
                   id="interactionGoal"
+                  name="interactionGoal"
                   type="text"
+                  autoComplete="off"
                   value={formData.interactionGoal}
                   onChange={(e) => setField('interactionGoal', e.target.value)}
                   className={inputClass}
@@ -1014,7 +1065,7 @@ export default function InterpreterRequestForm({ palette = defaultPalette }) {
                     </label>
                   ))}
                 </div>
-                <ErrorText name="materialsAvailable" />
+                <ErrorText errors={errors} name="materialsAvailable" />
               </div>
 
               {formData.materialsAvailable &&
@@ -1025,7 +1076,9 @@ export default function InterpreterRequestForm({ palette = defaultPalette }) {
                     </label>
                     <textarea
                       id="materialsList"
+                      name="materialsList"
                       rows={4}
+                      autoComplete="off"
                       value={formData.materialsList}
                       onChange={(e) => setField('materialsList', e.target.value)}
                       className={textareaClass}
@@ -1053,7 +1106,7 @@ export default function InterpreterRequestForm({ palette = defaultPalette }) {
                     </label>
                   ))}
                 </div>
-                <ErrorText name="highStakesSensitive" />
+                <ErrorText errors={errors} name="highStakesSensitive" />
               </div>
             </div>
           </SectionCard>
@@ -1061,6 +1114,9 @@ export default function InterpreterRequestForm({ palette = defaultPalette }) {
 
         {step === 6 && (
           <SectionCard
+            step={step}
+            borderColor={p.border}
+            titleColor={p.charcoal}
             title="Teaming & Logistics"
             subtitle="This section helps identify whether the assignment setup supports effective communication access and whether team support may be needed."
           >
@@ -1083,7 +1139,7 @@ export default function InterpreterRequestForm({ palette = defaultPalette }) {
                     </label>
                   ))}
                 </div>
-                <ErrorText name="exceedsTwoHours" />
+                <ErrorText errors={errors} name="exceedsTwoHours" />
               </div>
 
               <div>
@@ -1113,7 +1169,7 @@ export default function InterpreterRequestForm({ palette = defaultPalette }) {
                     </label>
                   ))}
                 </div>
-                <ErrorText name="teamInterpreterArranged" />
+                <ErrorText errors={errors} name="teamInterpreterArranged" />
               </div>
 
               <div className="grid gap-5 md:grid-cols-2">
@@ -1174,12 +1230,14 @@ export default function InterpreterRequestForm({ palette = defaultPalette }) {
 
                 <textarea
                   id="environmentalFactors"
+                  name="environmentalFactors"
                   rows={6}
+                  autoComplete="off"
                   value={formData.environmentalFactors}
                   onChange={(e) => setField('environmentalFactors', e.target.value)}
                   className={textareaClass}
                 />
-                <ErrorText name="environmentalFactors" />
+                <ErrorText errors={errors} name="environmentalFactors" />
               </div>
             </div>
           </SectionCard>
@@ -1187,6 +1245,9 @@ export default function InterpreterRequestForm({ palette = defaultPalette }) {
 
         {step === 7 && (
           <SectionCard
+            step={step}
+            borderColor={p.border}
+            titleColor={p.charcoal}
             title="Review Your Request"
             subtitle="Review your information before submitting. You can go back to make changes if needed."
           >
