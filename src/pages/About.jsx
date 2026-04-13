@@ -1,4 +1,4 @@
-import { ShieldCheck, HeartHandshake, Clock3, Stethoscope, GraduationCap, Ship, Users } from 'lucide-react';
+import { ShieldCheck, HeartHandshake, Clock3 } from 'lucide-react';
 
 export default function About({ palette }) {
   // Define the company's core values and associated icons.
@@ -67,13 +67,13 @@ export default function About({ palette }) {
         <div className="mt-5 grid gap-4 sm:grid-cols-2">
           {[
             ['EIPA', 'Educational Interpreter Performance Assessment'],
-            ['Pre‑Certified (NIC)', 'Written exam passed; performance exam in progress'],
             ['7 Years', 'Professional interpreting experience'],
             ['Remote + On-Site', 'Experience across VRI and in-person settings'],
           ].map(([title, body]) => (
             <div
               key={title}
-              className="rounded-2xl bg-white p-4 shadow-sm border border-gray-200"
+              className="rounded-2xl p-4 shadow-sm border"
+style={{ backgroundColor: palette.white, borderColor: palette.border }}
             >
               <div className="font-semibold" style={{ color: palette.burgundy }}>
                 {title}
