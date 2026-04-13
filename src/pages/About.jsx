@@ -2,6 +2,24 @@ import { motion } from 'framer-motion';
 import profilePic from '../assets/lightX.PNG';
 
 export default function About({ palette }) {
+  const testimonials = [
+    {
+      quote:
+        'Micah is professional and competent. He works well as part of an interpreting team, is attentive in the support role, receptive to feedback, and communicates well when assessing how to better meet the needs of the consumer.',
+      role: 'Interpreter Colleague',
+    },
+    {
+      quote:
+        'Micah is a highly intelligent, motivated, and skilled interpreter. He stays engaged with the Deaf community, actively seeks ways to continue learning and growing, and possesses a genuine love, passion, and respect for the language, community, and field.',
+      role: 'Interpreter Mentor and Colleague',
+    },
+    {
+      quote:
+        'Micah is very involved in the interpreting field and the Deaf community he serves. He consistently makes every effort to adapt to the needs of Deaf consumers, anticipates needs well, follows through, and shows strong professionalism and attention to detail.',
+      role: 'Deaf Consumer',
+    },
+  ];
+
   return (
     <div className="mx-auto max-w-6xl px-5 py-20 md:px-8">
       <motion.section
@@ -119,6 +137,67 @@ export default function About({ palette }) {
               </p>
             </div>
           </div>
+        </div>
+      </motion.section>
+
+      <motion.section
+        initial={{ opacity: 0, y: 16 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.2 }}
+        transition={{ duration: 0.6 }}
+        className="mt-20"
+      >
+        <div className="max-w-3xl">
+          <p
+            className="text-sm font-semibold uppercase tracking-[0.2em]"
+            style={{ color: palette.gold }}
+          >
+            Testimonials
+          </p>
+
+          <h2
+            className="mt-3 text-3xl font-bold tracking-tight md:text-4xl"
+            style={{ color: palette.charcoal }}
+          >
+            What people are saying
+          </h2>
+
+          <p
+            className="mt-4 text-lg leading-8"
+            style={{ color: '#5f5f5f' }}
+          >
+            Feedback from those who have experienced the professionalism, care,
+            and community-centered approach behind the work.
+          </p>
+        </div>
+
+        <div className="mt-10 grid gap-6 md:grid-cols-3">
+          {testimonials.map((testimonial, index) => (
+            <div
+              key={index}
+              className="rounded-[2rem] border p-6 shadow-sm"
+              style={{
+                backgroundColor: palette.white,
+                borderColor: palette.border,
+              }}
+            >
+              <p
+                className="text-base leading-8 italic"
+                style={{ color: '#5f5f5f' }}
+              >
+                “{testimonial.quote}”
+              </p>
+
+              <div className="mt-6">
+                <p
+                  className="text-sm font-semibold uppercase tracking-[0.12em]"
+                  style={{ color: palette.gold }}
+                >
+                  {testimonial.role}
+                </p>
+              </div>
+            </div>
+          ))}
         </div>
       </motion.section>
     </div>
