@@ -1,9 +1,11 @@
-import { Users, Video, Globe, Stethoscope, GraduationCap, Ship } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Users, Video, Globe, Stethoscope, GraduationCap, Ship, ArrowRight } from 'lucide-react';
 
 export default function Services({ palette }) {
   // Define information for service cards and specialties.
   const serviceCards = [
     {
+      id: 'in-person-interpreting',
       icon: Users,
       title: 'In‑Person Interpreting',
       text: 'Professional ASL interpreting services for on-site assignments across a variety of settings.',
@@ -12,6 +14,7 @@ export default function Services({ palette }) {
       rates: 'Typical range: $60–$120/hr (varies with setting, travel, and prep)',
     },
     {
+      id: 'video-remote-interpreting',
       icon: Video,
       title: 'Video Remote Interpreting',
       text: 'Reliable interpreting for virtual meetings, appointments, and remote communication needs.',
@@ -20,6 +23,7 @@ export default function Services({ palette }) {
       rates: 'Typical range: $40–$90/hr (lower minimums for short sessions)',
     },
     {
+      id: 'english-asl-translation',
       icon: Globe,
       title: 'English → ASL Translation (Video)',
       text: 'Recorded video translations from English into ASL for accessible communication.',
@@ -28,6 +32,7 @@ export default function Services({ palette }) {
       rates: 'Project-based; samples often start around $150+ depending on length and editing',
     },
     {
+      id: 'asl-english-translation',
       icon: Globe,
       title: 'ASL → English Translation',
       text: 'Captioned video or written/spoken transcription of ASL content into English.',
@@ -59,9 +64,10 @@ export default function Services({ palette }) {
         {serviceCards.map((card) => {
           const Icon = card.icon;
           return (
-            <div
+            <Link
               key={card.title}
-              className="rounded-[1.75rem] border p-6 shadow-sm"
+              to={`/services/${card.id}`}
+              className="group rounded-[1.75rem] border p-6 shadow-sm transition hover:shadow-md"
               style={{ backgroundColor: palette.white, borderColor: palette.border }}
             >
               <div
@@ -96,7 +102,11 @@ export default function Services({ palette }) {
                   </div>
                 )}
               </div>
-            </div>
+
+              <div className="mt-6 flex items-center gap-2 text-sm font-semibold" style={{ color: palette.burgundy }}>
+                Learn More <ArrowRight size={16} className="transition group-hover:translate-x-1" />
+              </div>
+            </Link>
           );
         })}
       </div>

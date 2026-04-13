@@ -2,6 +2,7 @@ import React, { useState, useMemo } from "react";
 import { Routes, Route, Link, Navigate } from "react-router-dom";
 import Home from "./pages/Home";
 import Services from "./pages/Services";
+import ServiceDetail from "./pages/ServiceDetail";
 import About from "./pages/About";
 import ResourcesLayout from "./pages/ResourcesLayout";
 import ResourcesClients from "./pages/ResourcesClients";
@@ -235,6 +236,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Home palette={palette} />} />
           <Route path="/services" element={<Services palette={palette} />} />
+          <Route path="/services/:serviceId" element={<ServiceDetail palette={palette} />} />
           <Route path="/about" element={<About palette={palette} />} />
 
           <Route path="/resources" element={<ResourcesLayout palette={palette} />}>
