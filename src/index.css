@@ -8,7 +8,7 @@
   --mls-white: #ffffff;
   --mls-soft-gray: #f5f5f5;
   --mls-border: #e5e5e5;
-  --mls-body: #5f5f5f;
+  --mls-body: #444444;
 }
 
 body {
@@ -42,4 +42,30 @@ body {
 .btn-secondary {
   border: 1px solid var(--mls-charcoal);
   color: var(--mls-charcoal);
+  background: var(--mls-white);
+}
+
+/* Shared CTA base to keep spacing, type and focus consistent */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 9999px;
+  padding: 0.625rem 1.25rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  transition: all 160ms ease;
+  text-decoration: none;
+}
+
+/* Accessible focus outline for keyboard users */
+.btn-primary:focus,
+.btn-secondary:focus {
+  outline: 3px solid rgba(114, 17, 0, 0.12);
+  outline-offset: 3px;
+}
+
+.btn-secondary:hover {
+  background-color: var(--mls-soft-gray);
+}
 }

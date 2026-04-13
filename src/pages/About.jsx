@@ -38,13 +38,14 @@ export default function About({ palette }) {
           <h1
             className="mt-3 text-4xl font-bold tracking-tight md:text-5xl"
             style={{ color: palette.charcoal }}
+            id="about-heading"
           >
             Meet the Interpreter Behind Miqueas Language Solutions
           </h1>
 
           <p
             className="mt-6 text-lg leading-8"
-            style={{ color: '#5f5f5f' }}
+            style={{ color: palette.body }}
           >
             Learn more about the story, values, and real-world experience behind
             the work.
@@ -85,8 +86,9 @@ export default function About({ palette }) {
           <div>
             <div
               className="space-y-5 text-base leading-8 md:text-lg"
-              style={{ color: '#5f5f5f' }}
+              style={{ color: palette.body }}
             >
+              <h2 className="text-xl font-semibold" style={{ color: palette.charcoal }}>Early immersion</h2>
               <p>Hi, I’m Micah.</p>
 
               <p>
@@ -99,27 +101,16 @@ export default function About({ palette }) {
                 environments.
               </p>
 
-              <p>
-                That kind of immersive learning shaped how I understand
-                communication. It taught me to focus on meaning, adapt to
-                different signing styles, and stay present with the person in
-                front of me.
-              </p>
-
+              <h2 className="text-xl font-semibold" style={{ color: palette.charcoal }}>Professional journey</h2>
               <p>
                 When I began interpreting professionally in 2019, everything
                 shifted. I stepped into a role where people were depending on
                 me to ensure communication was accurate, respectful, and
-                accessible.
+                accessible. Over time, I’ve worked in a variety of settings and
+                seen how impactful clear communication can be.
               </p>
 
-              <p>
-                Over time, I’ve worked in a variety of settings and seen how
-                impactful clear communication can be—and how frustrating it is
-                when access isn’t there. That perspective continues to shape
-                how I approach this work today.
-              </p>
-
+              <h2 className="text-xl font-semibold" style={{ color: palette.charcoal }}>Philosophy</h2>
               <p className="font-semibold" style={{ color: palette.charcoal }}>
                 That’s the foundation Miqueas Language Solutions is built on.
               </p>
@@ -127,13 +118,10 @@ export default function About({ palette }) {
               <p>
                 Today, that foundation shows up through dependable service,
                 ongoing growth, and a commitment to providing professional
-                language access with genuine care.
-              </p>
-
-              <p>
-                If you’re working with me, you’re working with someone who
-                values clear communication, respects the people involved, and
-                understands the responsibility that comes with this role.
+                language access with genuine care. If you’re working with me,
+                you’re working with someone who values clear communication,
+                respects the people involved, and understands the
+                responsibility that comes with this role.
               </p>
             </div>
           </div>
@@ -164,7 +152,7 @@ export default function About({ palette }) {
 
           <p
             className="mt-4 text-lg leading-8"
-            style={{ color: '#5f5f5f' }}
+            style={{ color: palette.body }}
           >
             Feedback from those who have experienced the professionalism, care,
             and community-centered approach behind the work.
@@ -183,7 +171,7 @@ export default function About({ palette }) {
             >
               <p
                 className="text-base leading-8 italic"
-                style={{ color: '#5f5f5f' }}
+                style={{ color: palette.body }}
               >
                 “{testimonial.quote}”
               </p>

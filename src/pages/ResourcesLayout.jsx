@@ -14,7 +14,7 @@ export default function ResourcesLayout({ palette }) {
         </h1>
         <p
           className="mt-3 max-w-3xl text-base leading-7 md:text-lg"
-          style={{ color: "#5f5f5f" }}
+          style={{ color: palette.body }}
         >
           Whether you are booking services or providing them, clear communication
           starts with understanding what language access really looks like.

@@ -17,6 +17,7 @@ const palette = {
   white: "#ffffff",
   softGray: "#f5f5f5",
   border: "#e5e5e5",
+  body: "#444444",
 };
 
 const navItems = [
@@ -130,7 +131,7 @@ export default function App() {
 
               <Link
                 to="/contact"
-                className="btn-primary inline-flex items-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-semibold whitespace-nowrap transition"
+                className="btn btn-primary inline-flex items-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-semibold whitespace-nowrap transition"
               >
                 Request a Quote
               </Link>
@@ -219,7 +220,7 @@ export default function App() {
 
                 <Link
                   to="/contact"
-                  className="btn-primary flex-1 rounded-2xl px-4 py-3 text-center text-sm font-semibold"
+                  className="btn btn-primary flex-1 rounded-2xl px-4 py-3 text-center text-sm font-semibold"
                   onClick={() => setMobileOpen(false)}
                 >
                   Request a Quote

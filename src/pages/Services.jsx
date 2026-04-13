@@ -7,21 +7,33 @@ export default function Services({ palette }) {
       icon: Users,
       title: 'In‑Person Interpreting',
       text: 'Professional ASL interpreting services for on-site assignments across a variety of settings.',
+      certifications: 'EIPA; RID-aligned practices; ongoing professional development',
+      examples: 'Hospital intake, clinic appointments, parent‑teacher meetings, community events',
+      rates: 'Typical range: $60–$120/hr (varies with setting, travel, and prep)',
     },
     {
       icon: Video,
       title: 'Video Remote Interpreting',
       text: 'Reliable interpreting for virtual meetings, appointments, and remote communication needs.',
+      certifications: 'Remote interpreting best practices; HIPAA-aware for medical settings',
+      examples: 'Telehealth visits, remote meetings, brief virtual consultations',
+      rates: 'Typical range: $40–$90/hr (lower minimums for short sessions)',
     },
     {
       icon: Globe,
       title: 'English → ASL Translation (Video)',
       text: 'Recorded video translations from English into ASL for accessible communication.',
+      certifications: 'Experience producing clear ASL narrative translations; video captioning knowledge',
+      examples: 'Patient education videos, informational content, short training clips',
+      rates: 'Project-based; samples often start around $150+ depending on length and editing',
     },
     {
       icon: Globe,
       title: 'ASL → English Translation',
       text: 'Captioned video or written/spoken transcription of ASL content into English.',
+      certifications: 'Transcription and caption review experience; accuracy-focused workflow',
+      examples: 'Event recordings, ASL interviews, classroom content transcription',
+      rates: 'Typical range: $45–$95/hr (depends on turnaround and complexity)',
     },
   ];
 
@@ -34,10 +46,10 @@ export default function Services({ palette }) {
 
   return (
     <div className="mx-auto max-w-6xl px-5 md:px-8 py-20">
-      <h2 className="mb-6 text-3xl font-bold tracking-tight md:text-4xl" style={{ color: palette.charcoal }}>
+      <h1 className="mb-6 text-3xl font-bold tracking-tight md:text-4xl" style={{ color: palette.charcoal }}>
         Practical language support across remote and in-person settings
-      </h2>
-      <p className="mb-10 max-w-3xl text-base md:text-lg" style={{ color: '#5f5f5f' }}>
+      </h1>
+      <p className="mb-10 max-w-3xl text-base md:text-lg" style={{ color: palette.body }}>
         Whether the need is virtual, on-site, or recorded, services are designed to make communication access feel
         smoother, more human, and more dependable.
       </p>
@@ -61,9 +73,29 @@ export default function Services({ palette }) {
               <h3 className="mt-5 text-xl font-semibold" style={{ color: palette.charcoal }}>
                 {card.title}
               </h3>
-              <p className="mt-3 text-sm leading-7" style={{ color: '#5f5f5f' }}>
+              <p className="mt-3 text-sm leading-7" style={{ color: palette.body }}>
                 {card.text}
               </p>
+
+              <div className="mt-3 text-sm leading-6" style={{ color: palette.body }}>
+                {card.certifications && (
+                  <div>
+                    <strong style={{ color: palette.charcoal }}>Certifications:</strong> {card.certifications}
+                  </div>
+                )}
+
+                {card.examples && (
+                  <div className="mt-1">
+                    <strong style={{ color: palette.charcoal }}>Example assignments:</strong> {card.examples}
+                  </div>
+                )}
+
+                {card.rates && (
+                  <div className="mt-1">
+                    <strong style={{ color: palette.charcoal }}>Typical rates:</strong> {card.rates}
+                  </div>
+                )}
+              </div>
             </div>
           );
         })}

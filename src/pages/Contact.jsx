@@ -1,18 +1,19 @@
+import { useState } from "react";
 import { Mail, Phone, ArrowRight } from "lucide-react";
 
 export default function Contact({ palette }) {
   return (
     <div className="mx-auto max-w-6xl px-5 py-20 md:px-8">
-      <h2
+      <h1
         className="mb-6 text-3xl font-bold tracking-tight md:text-4xl"
         style={{ color: palette.charcoal }}
       >
         Request a quote
-      </h2>
+      </h1>
 
       <p
         className="mb-10 max-w-2xl text-base md:text-lg"
-        style={{ color: "#5f5f5f" }}
+        style={{ color: palette.body }}
       >
         Share a few details about your assignment. A response can then be tailored
         to your setting, timeline, and communication needs.
@@ -33,14 +34,13 @@ export default function Contact({ palette }) {
             </div>
             <p
               className="pt-1 text-sm leading-6"
-              style={{ color: "#5f5f5f" }}
+              style={{ color: palette.body }}
             >
               {step}
             </p>
           </div>
         ))}
       </div>
-
       <div
         className="section-shell rounded-2xl p-6"
         style={{ backgroundColor: palette.softGray }}
@@ -52,56 +52,68 @@ export default function Contact({ palette }) {
           Contact Miqueas Language Solutions
         </p>
 
-        <div className="space-y-3 text-sm leading-6" style={{ color: "#5f5f5f" }}>
-          <div className="flex items-center gap-3">
-            <Mail size={18} style={{ color: palette.burgundy }} />
-            <a href="mailto:mstubbsterp21@gmail.com" className="hover:opacity-70">
-              mstubbsterp21@gmail.com
-            </a>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            const form = e.currentTarget;
+            const data = new FormData(form);
+            const name = data.get('name') || '';
+            const email = data.get('email') || '';
+            const phone = data.get('phone') || '';
+            const service = data.get('service') || '';
+            const details = data.get('details') || '';
+
+            const body = `Name: ${name}\nEmail: ${email}\nPhone: ${phone}\nService: ${service}\n\nDetails:\n${details}`;
+            const subject = 'Quote request from website';
+            window.location.href = `mailto:mstubbsterp21@gmail.com?subject=${encodeURIComponent(
+              subject
+            )}&body=${encodeURIComponent(body)}`;
+            form.reset();
+          }}
+          aria-labelledby="contact-heading"
+        >
+          <div className="grid gap-3 md:grid-cols-2">
+            <label className="flex flex-col">
+              <span className="text-sm font-medium" style={{ color: palette.charcoal }}>Full name</span>
+              <input name="name" required className="mt-1 rounded-md border px-3 py-2" />
+            </label>
+
+            <label className="flex flex-col">
+              <span className="text-sm font-medium" style={{ color: palette.charcoal }}>Email</span>
+              <input name="email" type="email" required className="mt-1 rounded-md border px-3 py-2" />
+            </label>
+
+            <label className="flex flex-col">
+              <span className="text-sm font-medium" style={{ color: palette.charcoal }}>Phone</span>
+              <input name="phone" className="mt-1 rounded-md border px-3 py-2" />
+            </label>
+
+            <label className="flex flex-col">
+              <span className="text-sm font-medium" style={{ color: palette.charcoal }}>Service type</span>
+              <select name="service" className="mt-1 rounded-md border px-3 py-2">
+                <option>In‑Person Interpreting</option>
+                <option>Video Remote Interpreting</option>
+                <option>English → ASL Translation (Video)</option>
+                <option>ASL → English Translation</option>
+              </select>
+            </label>
           </div>
 
-          <div className="flex items-center gap-3">
-            <Phone size={18} style={{ color: palette.burgundy }} />
-            <a href="tel:13523968098" className="hover:opacity-70">
-              (352) 396-8098
+          <label className="mt-4 flex flex-col">
+            <span className="text-sm font-medium" style={{ color: palette.charcoal }}>Assignment details</span>
+            <textarea name="details" required className="mt-1 min-h-[120px] rounded-md border px-3 py-2" />
+          </label>
+
+          <div className="mt-4 flex items-center gap-3">
+            <button type="submit" className="btn btn-primary inline-flex items-center">
+              Submit request
+            </button>
+            <a href="mailto:mstubbsterp21@gmail.com" className="btn btn-secondary inline-flex items-center">
+              Email directly
             </a>
           </div>
-        </div>
+        </form>
       </div>
-
-      <div className="mt-10">
-        <p
-          className="mb-4 text-sm leading-6"
-          style={{ color: "#5f5f5f" }}
-        >
-          If the embedded form does not load, use the button below to open the
-          quote request form in a new tab.
-        </p>
-
-        <a
-          href="https://docs.google.com/forms/d/e/1FAIpQLSepJCbUYpT114I1xcH4TWC20wrLdHSc62SFnRJUPQalsAzbfw/viewform"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="btn-primary inline-flex items-center gap-2 rounded-2xl px-5 py-3 text-sm font-semibold"
-        >
-          Open Form in New Tab
-          <ArrowRight size={16} />
-        </a>
-      </div>
-
-      <iframe
-        title="Miqueas Language Solutions quote request form"
-        src="https://docs.google.com/forms/d/e/1FAIpQLSepJCbUYpT114I1xcH4TWC20wrLdHSc62SFnRJUPQalsAzbfw/viewform?embedded=true"
-        width="100%"
-        height="1300"
-        frameBorder="0"
-        marginHeight="0"
-        marginWidth="0"
-        className="section-shell mt-6 rounded-2xl"
-        style={{ border: 0 }}
-      >
-        Loading…
-      </iframe>
     </div>
   );
 }

@@ -10,7 +10,7 @@ export default function ResourcesInterpreters({ palette }) {
 
       <p
         className="mb-6 max-w-3xl text-base leading-7 md:text-lg"
-        style={{ color: "#5f5f5f" }}
+        style={{ color: palette.body }}
       >
         If you are an interpreter who values clear, ethical, and effective communication,
         this section is here to connect you with helpful professional resources and an opportunity
@@ -20,7 +20,7 @@ export default function ResourcesInterpreters({ palette }) {
       <h3 className="mt-8 text-2xl font-bold" style={{ color: palette.charcoal }}>
         Join Us
       </h3>
-      <p className="mt-2 text-sm leading-7" style={{ color: "#5f5f5f" }}>
+      <p className="mt-2 text-sm leading-7" style={{ color: palette.body }}>
         We are always open to connecting with qualified interpreters who care deeply about
         communication access, professionalism, and strong service delivery. Whether your experience
         is primarily in community, medical, educational, or remote interpreting, we would love
@@ -32,7 +32,7 @@ export default function ResourcesInterpreters({ palette }) {
           href="https://forms.gle/cFTE9Qy1c3sFPdnz8"
           target="_blank"
           rel="noreferrer"
-          className="inline-flex items-center rounded-2xl px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90"
+          className="btn btn-primary inline-flex items-center rounded-2xl px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90"
           style={{ backgroundColor: palette.burgundy }}
         >
           Join Us
@@ -42,7 +42,7 @@ export default function ResourcesInterpreters({ palette }) {
       <h3 className="mt-8 text-2xl font-bold" style={{ color: palette.charcoal }}>
         Professional standards and helpful resources
       </h3>
-      <p className="mt-2 text-sm leading-7" style={{ color: "#5f5f5f" }}>
+      <p className="mt-2 text-sm leading-7" style={{ color: palette.body }}>
         Professional growth is strengthened by staying connected to the standards, guidance,
         and resources that shape effective interpreting practice.
       </p>
@@ -58,7 +58,7 @@ export default function ResourcesInterpreters({ palette }) {
           <div className="mb-2 font-semibold" style={{ color: palette.charcoal }}>
             RID Code of Professional Conduct
           </div>
-          <div className="text-sm leading-6" style={{ color: "#5f5f5f" }}>
+          <div className="text-sm leading-6" style={{ color: palette.body }}>
             Review the core ethical standards that guide professional interpreting practice.
           </div>
         </a>
@@ -73,7 +73,7 @@ export default function ResourcesInterpreters({ palette }) {
           <div className="mb-2 font-semibold" style={{ color: palette.charcoal }}>
             RID Standard Practice Papers (SPPs)
           </div>
-          <div className="text-sm leading-6" style={{ color: "#5f5f5f" }}>
+          <div className="text-sm leading-6" style={{ color: palette.body }}>
             Explore practice guidance for different interpreting settings and service considerations.
           </div>
         </a>
@@ -88,7 +88,7 @@ export default function ResourcesInterpreters({ palette }) {
           <div className="mb-2 font-semibold" style={{ color: palette.charcoal }}>
             Registry of Interpreters for The Deaf
           </div>
-          <div className="text-sm leading-6" style={{ color: "#5f5f5f" }}>
+          <div className="text-sm leading-6" style={{ color: palette.body }}>
             Access certification information, professional development resources, and industry updates.
           </div>
         </a>
@@ -103,7 +103,7 @@ export default function ResourcesInterpreters({ palette }) {
           <div className="mb-2 font-semibold" style={{ color: palette.charcoal }}>
             NAIE Code of Ethics
           </div>
-          <div className="text-sm leading-6" style={{ color: "#5f5f5f" }}>
+          <div className="text-sm leading-6" style={{ color: palette.body }}>
             Familiarize yourself with the ethical standards and practices of interpreters working in K-12 settings.
           </div>
         </a>

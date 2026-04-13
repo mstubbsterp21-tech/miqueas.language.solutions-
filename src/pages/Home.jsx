@@ -38,7 +38,7 @@ export default function Home({ palette }) {
 
         <p
           className="mt-6 max-w-2xl text-lg md:text-xl"
-          style={{ color: '#5f5f5f' }}
+          style={{ color: palette.body }}
         >
           Miqueas Language Solutions provides ASL ↔ English interpreting and ASL video
           translation services with the care, responsiveness, and professionalism clients
@@ -48,14 +48,14 @@ export default function Home({ palette }) {
         <div className="mt-8 flex flex-wrap gap-4">
           <Link
             to="/contact"
-            className="btn-primary inline-flex items-center gap-2 rounded-2xl px-5 py-3 text-sm font-semibold shadow-sm transition"
+            className="btn btn-primary inline-flex items-center gap-2 rounded-2xl px-5 py-3 text-sm font-semibold shadow-sm transition"
           >
             Request a Quote <ArrowRight size={16} />
           </Link>
 
           <Link
             to="/services"
-            className="btn-secondary inline-flex items-center gap-2 rounded-2xl px-5 py-3 text-sm font-semibold transition hover:bg-black/5"
+            className="btn btn-secondary inline-flex items-center gap-2 rounded-2xl px-5 py-3 text-sm font-semibold transition hover:bg-black/5"
           >
             Explore Services
           </Link>
@@ -74,7 +74,7 @@ export default function Home({ palette }) {
               <div className="text-lg font-bold" style={{ color: palette.burgundy }}>
                 {stat}
               </div>
-              <div className="mt-2 text-sm leading-6" style={{ color: '#5f5f5f' }}>
+              <div className="mt-2 text-sm leading-6" style={{ color: palette.body }}>
                 {label}
               </div>
             </div>
