@@ -33,7 +33,7 @@ function BrandLockup({ showTagline = true }) {
       <img
         src={logo}
         alt="Miqueas Language Solutions logo"
-        className="h-20 w-auto object-contain"
+        className="h-16 w-auto object-contain"
       />
       <div className="min-w-0">
         <div
@@ -64,7 +64,7 @@ export default function App() {
             <BrandLockup />
           </Link>
 
-          <nav className="hidden items-center gap-6 md:flex">
+          <nav className="hidden items-center gap-4 lg:gap-6 md:flex">
             {navItems.map((item) => (
               <Link
                 key={item.path}
@@ -76,7 +76,7 @@ export default function App() {
               </Link>
             ))}
 
-            <div className="ml-2 flex items-center gap-3">
+            <div className="ml-2 flex items-center gap-2">
               <a
                 href="https://www.instagram.com/miqueas.language.solutions/"
                 target="_blank"
@@ -130,7 +130,7 @@ export default function App() {
 
               <Link
                 to="/contact"
-                className="inline-flex items-center gap-2 rounded-2xl px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90"
+                className="inline-flex items-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-semibold text-white whitespace-nowrap transition hover:opacity-90"
                 style={{ backgroundColor: palette.burgundy }}
               >
                 Request a Quote
