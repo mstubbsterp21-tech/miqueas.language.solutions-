@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Mail, Phone, ArrowRight } from "lucide-react";
 
 export default function Contact({ palette }) {
