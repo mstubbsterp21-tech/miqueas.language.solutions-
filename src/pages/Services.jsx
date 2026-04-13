@@ -83,26 +83,6 @@ export default function Services({ palette }) {
                 {card.text}
               </p>
 
-              <div className="mt-3 text-sm leading-6" style={{ color: palette.body }}>
-                {card.certifications && (
-                  <div>
-                    <strong style={{ color: palette.charcoal }}>Certifications:</strong> {card.certifications}
-                  </div>
-                )}
-
-                {card.examples && (
-                  <div className="mt-1">
-                    <strong style={{ color: palette.charcoal }}>Example assignments:</strong> {card.examples}
-                  </div>
-                )}
-
-                {card.rates && (
-                  <div className="mt-1">
-                    <strong style={{ color: palette.charcoal }}>Typical rates:</strong> {card.rates}
-                  </div>
-                )}
-              </div>
-
               <div className="mt-6 flex items-center gap-2 text-sm font-semibold" style={{ color: palette.burgundy }}>
                 Learn More <ArrowRight size={16} className="transition group-hover:translate-x-1" />
               </div>
