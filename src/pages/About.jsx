@@ -2,153 +2,396 @@ import { motion } from "framer-motion";
 import profilePic from "../assets/lightX.PNG";
 
 export default function About({ palette }) {
+  const cardStyle = {
+    borderColor: palette.border,
+    backgroundColor: palette.white,
+  };
+
+  const sectionTitleStyle = {
+    color: palette.charcoal,
+  };
+
+  const accentStyle = {
+    color: palette.gold,
+  };
+
+  const buttonStyle = {
+    backgroundColor: palette.gold,
+    color: palette.white,
+  };
+
   return (
-    <div className="mx-auto max-w-5xl px-5 py-16 md:px-8 md:py-20">
+    <div className="mx-auto max-w-6xl px-5 py-16 md:px-8 md:py-20">
       <motion.section
-        initial={{ opacity: 0, y: 16 }}
+        initial={{ opacity: 0, y: 18 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
+        transition={{ duration: 0.55 }}
+        className="rounded-[2rem] border p-6 shadow-sm md:p-10"
+        style={{ borderColor: palette.border, backgroundColor: "#fafafa" }}
       >
-        {/* Header */}
-        <div className="text-center max-w-2xl mx-auto">
-          <h1
-            className="text-3xl md:text-5xl font-bold tracking-tight"
-            style={{ color: palette.charcoal }}
-          >
-            Meet the Interpreter Behind Miqueas Language Solutions
-          </h1>
-
-          <p className="mt-4 text-base md:text-lg text-gray-600">
-            Clear communication. Thoughtful preparation. A process designed to
-            make things simple for you.
-          </p>
-        </div>
-
-        {/* Profile */}
-        <div className="mt-10 flex flex-col items-center">
-          <img
-            src={profilePic}
-            alt="Micah"
-            className="w-40 h-40 rounded-full object-cover shadow-md"
-          />
-        </div>
-
-        {/* Content */}
-        <div className="mt-12 space-y-10 text-gray-700 leading-relaxed text-[15px] md:text-base">
-
-          {/* Early Immersion */}
-          <section>
-            <h2 className="text-xl font-semibold mb-3" style={{ color: palette.charcoal }}>
-              Early Immersion
-            </h2>
-            <p>
-              Hi, I’m Micah.
-            </p>
-            <p className="mt-3">
-              I didn’t learn ASL from a textbook first—I learned it through people.
-            </p>
-            <p className="mt-3">
-              Back in 2013, I was spending time in real conversations with Deaf
-              and Hard-of-Hearing individuals, learning how communication actually
-              works in everyday life. That experience shaped everything for me.
-            </p>
-          </section>
-
-          {/* Professional Journey */}
-          <section>
-            <h2 className="text-xl font-semibold mb-3" style={{ color: palette.charcoal }}>
-              Professional Journey
-            </h2>
-            <p>
-              When I started interpreting professionally in 2019, things shifted.
-            </p>
-            <p className="mt-3">
-              Now it wasn’t just about knowing the language—it was about
-              responsibility. People were depending on me in real moments where
-              communication couldn’t afford to break down.
-            </p>
-            <p className="mt-3">
-              I’ve worked across medical, educational, community, and cruise
-              settings, and each environment reinforced how important clear
-              communication really is.
-            </p>
-          </section>
-
-          {/* Philosophy */}
-          <section>
-            <h2 className="text-xl font-semibold mb-3" style={{ color: palette.charcoal }}>
-              Philosophy
-            </h2>
-            <p className="font-medium">
-              Bridging Perspectives. Delivering Understanding.
-            </p>
-            <p className="mt-3">
-              Every assignment is different—and I treat it that way.
-            </p>
-            <p className="mt-3">
-              Before anything is confirmed, I take time to understand the people
-              involved, the setting, and what will make communication flow
-              naturally.
-            </p>
-          </section>
-
-          {/* Experience */}
-          <section>
-            <h2 className="text-xl font-semibold mb-3" style={{ color: palette.charcoal }}>
-              Experience Across Settings
-            </h2>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div className="border rounded-lg p-4">Medical</div>
-              <div className="border rounded-lg p-4">Educational</div>
-              <div className="border rounded-lg p-4">Community</div>
-              <div className="border rounded-lg p-4">Cruise / Travel</div>
+        <div className="mx-auto max-w-5xl">
+          <div className="grid items-start gap-10 lg:grid-cols-[320px_minmax(0,1fr)]">
+            <div className="flex flex-col items-center lg:sticky lg:top-24">
+              <div
+                className="w-full max-w-[320px] rounded-[2rem] border p-6 shadow-sm"
+                style={cardStyle}
+              >
+                <img
+                  src={profilePic}
+                  alt="Micah"
+                  className="mx-auto w-full max-w-[220px] object-contain"
+                />
+              </div>
             </div>
-          </section>
 
-          {/* What It's Like */}
-          <section>
-            <h2 className="text-xl font-semibold mb-3" style={{ color: palette.charcoal }}>
-              What It’s Like to Work With Me
-            </h2>
+            <div>
+              <div className="max-w-3xl">
+                <h1
+                  className="text-3xl font-bold tracking-tight md:text-5xl"
+                  style={{ color: palette.charcoal }}
+                >
+                  Meet the Interpreter Behind
+                  <br className="hidden sm:block" /> Miqueas Language Solutions
+                </h1>
 
-            <ul className="space-y-2 list-disc pl-5">
-              <li>Clear, natural communication</li>
-              <li>Reduced confusion and stress</li>
-              <li>Thoughtful preparation for your specific situation</li>
-              <li>Guidance so you don’t have to figure things out alone</li>
-            </ul>
-          </section>
+                <p
+                  className="mt-4 max-w-2xl text-base leading-7 md:text-lg"
+                  style={{ color: palette.charcoal }}
+                >
+                  Professional interpreting that keeps communication clear and
+                  stress-free.
+                </p>
 
-          {/* Process */}
-          <section>
-            <h2 className="text-xl font-semibold mb-3" style={{ color: palette.charcoal }}>
-              What Happens Next
-            </h2>
+                <p
+                  className="mt-3 max-w-2xl text-sm leading-6 md:text-base"
+                  style={{ color: "#5f6368" }}
+                >
+                  Trusted in medical, educational, community, and travel-based
+                  environments where clear communication matters most.
+                </p>
+              </div>
 
-            <ol className="space-y-2 list-decimal pl-5">
-              <li>Submit your request</li>
-              <li>I review your details and communication needs</li>
-              <li>You receive a follow-up to confirm availability</li>
-            </ol>
+              <div className="mt-10 space-y-10 md:space-y-12">
+                <motion.section
+                  initial={{ opacity: 0, y: 14 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.2 }}
+                  transition={{ duration: 0.45 }}
+                >
+                  <h2
+                    className="text-2xl font-semibold"
+                    style={sectionTitleStyle}
+                  >
+                    Early Immersion
+                  </h2>
 
-            <p className="mt-4 text-sm text-gray-500">
-              Submitting a request does not lock you into anything.
-            </p>
-          </section>
+                  <div
+                    className="mt-4 space-y-4 text-[15px] leading-8 md:text-lg"
+                    style={{ color: palette.charcoal }}
+                  >
+                    <p>Hi, I’m Micah.</p>
 
-          {/* CTA */}
-          <div className="text-center mt-12">
-            <button
-              className="px-6 py-3 rounded-full text-white font-medium shadow-md hover:opacity-90 transition"
-              style={{ backgroundColor: palette.gold }}
-            >
-              Request an Interpreter
-            </button>
+                    <p>
+                      I didn’t learn ASL from a textbook first—I learned it
+                      through people.
+                    </p>
 
-            <p className="mt-3 text-sm text-gray-500">
-              Takes less than 5 minutes • No commitment required
-            </p>
+                    <p>
+                      Back in 2013, I was spending time in real conversations
+                      with Deaf and Hard-of-Hearing individuals, learning how
+                      communication actually works in everyday life. That
+                      experience shaped everything for me. It taught me that
+                      language isn’t just about words or signs—it’s about
+                      connection, clarity, and making sure people truly
+                      understand each other.
+                    </p>
+                  </div>
+                </motion.section>
+
+                <motion.section
+                  initial={{ opacity: 0, y: 14 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.2 }}
+                  transition={{ duration: 0.45, delay: 0.03 }}
+                >
+                  <h2
+                    className="text-2xl font-semibold"
+                    style={sectionTitleStyle}
+                  >
+                    Professional Journey
+                  </h2>
+
+                  <div
+                    className="mt-4 space-y-4 text-[15px] leading-8 md:text-lg"
+                    style={{ color: palette.charcoal }}
+                  >
+                    <p>
+                      When I started interpreting professionally in 2019, things
+                      shifted.
+                    </p>
+
+                    <p>
+                      Now it wasn’t just about knowing the language—it was about
+                      responsibility. People were depending on me in real
+                      moments—medical appointments, classrooms, meetings, and
+                      situations where communication couldn’t afford to break
+                      down.
+                    </p>
+
+                    <p>
+                      Over time, I’ve worked across medical, educational,
+                      community, and cruise settings. Each environment sharpened
+                      not just my skills, but my awareness of what’s at stake
+                      every time I interpret.
+                    </p>
+                  </div>
+                </motion.section>
+
+                <motion.section
+                  initial={{ opacity: 0, y: 14 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.2 }}
+                  transition={{ duration: 0.45, delay: 0.05 }}
+                >
+                  <h2
+                    className="text-2xl font-semibold"
+                    style={sectionTitleStyle}
+                  >
+                    Philosophy
+                  </h2>
+
+                  <div
+                    className="mt-4 space-y-4 text-[15px] leading-8 md:text-lg"
+                    style={{ color: palette.charcoal }}
+                  >
+                    <p className="font-semibold" style={accentStyle}>
+                      Bridging Perspectives. Delivering Understanding.
+                    </p>
+
+                    <p>
+                      Every assignment is different—and I treat it that way.
+                    </p>
+
+                    <p>
+                      Before anything is confirmed, I take time to understand:
+                    </p>
+
+                    <ul className="space-y-2 pl-6 text-[15px] leading-8 md:text-lg list-disc">
+                      <li>who is involved</li>
+                      <li>what the setting requires</li>
+                      <li>and what will make communication flow naturally</li>
+                    </ul>
+
+                    <p>
+                      Because good interpreting isn’t just accurate—it feels
+                      seamless to everyone involved.
+                    </p>
+                  </div>
+                </motion.section>
+
+                <motion.section
+                  initial={{ opacity: 0, y: 14 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.2 }}
+                  transition={{ duration: 0.45, delay: 0.07 }}
+                >
+                  <h2
+                    className="text-2xl font-semibold"
+                    style={sectionTitleStyle}
+                  >
+                    Experience Across Settings
+                  </h2>
+
+                  <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                    {["Medical", "Educational", "Community", "Cruise / Travel"].map(
+                      (item) => (
+                        <div
+                          key={item}
+                          className="rounded-xl border bg-white px-4 py-4 text-sm font-medium shadow-sm transition hover:-translate-y-0.5 hover:shadow-md md:text-base"
+                          style={cardStyle}
+                        >
+                          {item}
+                        </div>
+                      )
+                    )}
+                  </div>
+                </motion.section>
+
+                <motion.section
+                  initial={{ opacity: 0, y: 14 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.2 }}
+                  transition={{ duration: 0.45, delay: 0.09 }}
+                >
+                  <h2
+                    className="text-2xl font-semibold"
+                    style={sectionTitleStyle}
+                  >
+                    What It’s Like to Work With Me
+                  </h2>
+
+                  <div
+                    className="mt-4 space-y-4 text-[15px] leading-8 md:text-lg"
+                    style={{ color: palette.charcoal }}
+                  >
+                    <p>
+                      If you’re here, you’re probably trying to make sure
+                      everything goes smoothly—and that’s exactly where I come
+                      in.
+                    </p>
+
+                    <p>My role is to:</p>
+
+                    <ul className="space-y-2 pl-6 text-[15px] leading-8 md:text-lg list-disc">
+                      <li>reduce confusion</li>
+                      <li>remove communication barriers</li>
+                      <li>and help everyone stay focused on what actually matters</li>
+                    </ul>
+
+                    <p>
+                      You don’t have to figure everything out on your own. I’ll
+                      walk through the details with you and make sure the
+                      assignment is set up properly from the start.
+                    </p>
+                  </div>
+                </motion.section>
+
+                <motion.section
+                  initial={{ opacity: 0, y: 14 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.2 }}
+                  transition={{ duration: 0.45, delay: 0.11 }}
+                >
+                  <h2
+                    className="text-2xl font-semibold"
+                    style={sectionTitleStyle}
+                  >
+                    What Happens Next
+                  </h2>
+
+                  <div
+                    className="mt-4 space-y-4 text-[15px] leading-8 md:text-lg"
+                    style={{ color: palette.charcoal }}
+                  >
+                    <p>Once you submit a request:</p>
+
+                    <ol className="space-y-2 pl-6 list-decimal">
+                      <li>I review your details personally</li>
+                      <li>I assess the communication needs and setting</li>
+                      <li>
+                        and I follow up with you to confirm availability and
+                        next steps
+                      </li>
+                    </ol>
+
+                    <p className="font-medium">
+                      No guesswork. No confusion. Just clear communication from
+                      the beginning.
+                    </p>
+                  </div>
+                </motion.section>
+
+                <motion.section
+                  initial={{ opacity: 0, y: 14 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.2 }}
+                  transition={{ duration: 0.45, delay: 0.13 }}
+                >
+                  <div
+                    className="rounded-2xl border p-6 shadow-sm"
+                    style={{
+                      borderColor: palette.border,
+                      backgroundColor: palette.white,
+                    }}
+                  >
+                    <h2
+                      className="text-2xl font-semibold"
+                      style={sectionTitleStyle}
+                    >
+                      Reassurance
+                    </h2>
+
+                    <div
+                      className="mt-4 space-y-4 text-[15px] leading-8 md:text-lg"
+                      style={{ color: palette.charcoal }}
+                    >
+                      <p>
+                        Submitting a request does not lock you into anything.
+                      </p>
+
+                      <p>
+                        It simply starts the process so we can make sure
+                        everything is the right fit.
+                      </p>
+
+                      <p style={{ color: "#5f6368" }}>
+                        If you’re unsure about any details, that’s completely
+                        okay—just submit what you have, and I’ll help guide the
+                        rest.
+                      </p>
+                    </div>
+                  </div>
+                </motion.section>
+
+                <motion.section
+                  initial={{ opacity: 0, y: 14 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.2 }}
+                  transition={{ duration: 0.45, delay: 0.15 }}
+                >
+                  <h2
+                    className="text-2xl font-semibold"
+                    style={sectionTitleStyle}
+                  >
+                    Closing
+                  </h2>
+
+                  <div
+                    className="mt-4 space-y-4 text-[15px] leading-8 md:text-lg"
+                    style={{ color: palette.charcoal }}
+                  >
+                    <p>
+                      This work is guided by accuracy, professionalism, and
+                      respect.
+                    </p>
+
+                    <p className="font-semibold">
+                      But more than anything—it’s about access.
+                    </p>
+                  </div>
+                </motion.section>
+
+                <motion.div
+                  initial={{ opacity: 0, y: 14 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.2 }}
+                  transition={{ duration: 0.45, delay: 0.17 }}
+                  className="pt-2 text-center"
+                >
+                  <p
+                    className="mx-auto mb-4 max-w-2xl text-sm leading-6 md:text-base"
+                    style={{ color: "#5f6368" }}
+                  >
+                    Ready to get the process started?
+                  </p>
+
+                  <a
+                    href="/request"
+                    className="inline-flex items-center justify-center rounded-full px-6 py-3 text-sm font-semibold shadow-md transition hover:opacity-90 md:text-base"
+                    style={buttonStyle}
+                  >
+                    Request an Interpreter
+                  </a>
+
+                  <p
+                    className="mt-3 text-xs font-medium md:text-sm"
+                    style={{ color: "#5f6368" }}
+                  >
+                    Takes less than 2 minutes • No commitment required
+                  </p>
+                </motion.div>
+              </div>
+            </div>
           </div>
         </div>
       </motion.section>
