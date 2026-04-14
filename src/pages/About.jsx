@@ -168,6 +168,12 @@ export default function About({ palette }) {
                       Bridging Perspectives. Delivering Understanding.
                     </p>
 
+                    <p>I think of interpreting like a bridge;
+                      On one side is you. On the other side is the person you’re trying to communicate with. 
+                      
+                      My role is to help both of you cross that space clearly, naturally, and without unnecessary confusion.
+                    </p>
+
                     <p>
                       Every assignment is different—and I treat it that way.
                     </p>
@@ -279,7 +285,7 @@ export default function About({ palette }) {
                       <li>I review your details personally</li>
                       <li>I assess the communication needs and setting</li>
                       <li>
-                        and I follow up with you to confirm availability and
+                          I follow up with you to confirm availability and
                         next steps
                       </li>
                     </ol>
@@ -343,7 +349,7 @@ export default function About({ palette }) {
                     className="text-2xl font-semibold"
                     style={sectionTitleStyle}
                   >
-                    Closing
+                    In Closing...
                   </h2>
 
                   <div
@@ -356,7 +362,8 @@ export default function About({ palette }) {
                     </p>
 
                     <p className="font-semibold">
-                      But more than anything—it’s about access.
+                      But more than anything—it’s about you, your client, and making sure 
+                      both of you can cross that bridge into mutual understanding.
                     </p>
                   </div>
                 </motion.section>
@@ -376,7 +383,7 @@ export default function About({ palette }) {
                   </p>
 
                   <a
-                    href="/request"
+                    href="/contact"
                     className="inline-flex items-center justify-center rounded-full px-6 py-3 text-sm font-semibold shadow-md transition hover:opacity-90 md:text-base"
                     style={buttonStyle}
                   >
@@ -387,7 +394,7 @@ export default function About({ palette }) {
                     className="mt-3 text-xs font-medium md:text-sm"
                     style={{ color: "#5f6368" }}
                   >
-                    Takes less than 2 minutes • No commitment required
+                    Takes less than 5 minutes • No commitment required
                   </p>
                 </motion.div>
               </div>
