@@ -1,69 +1,80 @@
+import ResourcesClients from "./ResourcesClients";
+import ResourcesInterpreters from "./ResourcesInterpreters";
+import { useState } from "react";
+
 export default function Resources({ palette }) {
+  const [activeTab, setActiveTab] = useState("clients");
+
   return (
-    <div className="mx-auto max-w-6xl px-5 md:px-8 py-20">
-      <h2 className="mb-6 text-3xl font-bold tracking-tight md:text-4xl" style={{ color: palette.charcoal }}>
-        Working With an ASL Interpreter
-      </h2>
-      <p className="mb-6 max-w-2xl text-base md:text-lg" style={{ color: palette.body }}>
-        Practical guidance for creating clear, effective, and accessible communication.
-      </p>
+    <div className="mx-auto max-w-6xl px-5 py-16 md:px-8 md:py-20">
+      <div
+        className="overflow-hidden rounded-[2rem] border shadow-sm"
+        style={{
+          borderColor: palette.border,
+          background: `linear-gradient(180deg, ${palette.softGray} 0%, ${palette.white} 100%)`,
+        }}
+      >
+        <div className="border-b px-6 py-10 md:px-10 md:py-12" style={{ borderColor: palette.border }}>
+          <div
+            className="mb-4 inline-flex rounded-full px-4 py-1 text-xs font-semibold uppercase tracking-[0.2em]"
+            style={{
+              backgroundColor: `${palette.gold}14`,
+              color: palette.gold,
+            }}
+          >
+            Resources & Guidance
+          </div>
 
-      <h3 className="mt-8 text-2xl font-bold" style={{ color: palette.charcoal }}>
-        Why this matters
-      </h3>
-      <p className="mt-2 text-sm leading-7" style={{ color: palette.body }}>
-        Clear communication is not just about exchanging words—it’s about ensuring that everyone involved fully
-        understands and is understood. When working with Deaf individuals who use American Sign Language (ASL),
-        providing a qualified interpreter helps create direct, meaningful communication. It allows all parties
-        to participate fully, ask questions, and make informed decisions without barriers.
-      </p>
+          <h1
+            className="max-w-3xl text-3xl font-bold tracking-tight md:text-5xl"
+            style={{ color: palette.charcoal }}
+          >
+            Practical guidance for clearer, more effective communication
+          </h1>
 
-      <h3 className="mt-6 text-2xl font-bold" style={{ color: palette.charcoal }}>
-        When an interpreter is needed
-      </h3>
-      <p className="mt-2 text-sm leading-7" style={{ color: palette.body }}>
-        An ASL interpreter is appropriate anytime communication needs to be clear, accurate, and fully accessible.
-        Common situations include medical appointments and consultations, educational settings (classrooms, meetings,
-        evaluations), workplace communication (trainings, interviews, meetings), community interactions and public
-        services, and virtual appointments and remote communication.
-      </p>
+          <p
+            className="mt-4 max-w-2xl text-base leading-7 md:text-lg"
+            style={{ color: palette.body }}
+          >
+            Whether you are booking services or providing them, understanding language access
+            helps create smoother, more effective interactions for everyone involved.
+          </p>
 
-      <h3 className="mt-6 text-2xl font-bold" style={{ color: palette.charcoal }}>
-        ASL is not English
-      </h3>
-      <p className="mt-2 text-sm leading-7" style={{ color: palette.body }}>
-        American Sign Language (ASL) is a complete, natural language with its own grammar, structure, and cultural
-        context. It is not simply a signed version of English. Because of this, direct word‑for‑word translation is
-        not always possible, so meaning must be interpreted rather than converted.
-      </p>
+          <div className="mt-8 inline-flex rounded-2xl border p-1.5 shadow-sm" style={{ borderColor: palette.border, backgroundColor: palette.white }}>
+            <button
+              type="button"
+              onClick={() => setActiveTab("clients")}
+              className="rounded-xl px-5 py-2.5 text-sm font-semibold transition"
+              style={{
+                backgroundColor: activeTab === "clients" ? palette.burgundy : "transparent",
+                color: activeTab === "clients" ? palette.white : palette.charcoal,
+              }}
+            >
+              Clients
+            </button>
 
-      <h3 className="mt-6 text-2xl font-bold" style={{ color: palette.charcoal }}>
-        Captions vs. interpreting
-      </h3>
-      <p className="mt-2 text-sm leading-7" style={{ color: palette.body }}>
-        While captions can be helpful in some situations, they do not always provide full access. Captions rely on
-        reading speed and literacy, may miss tone or nuance, and can lag or contain errors. ASL interpreting, on
-        the other hand, provides real‑time, natural language access with tone, intent, and meaning, and allows for
-        interaction and clarification.
-      </p>
+            <button
+              type="button"
+              onClick={() => setActiveTab("interpreters")}
+              className="rounded-xl px-5 py-2.5 text-sm font-semibold transition"
+              style={{
+                backgroundColor: activeTab === "interpreters" ? palette.burgundy : "transparent",
+                color: activeTab === "interpreters" ? palette.white : palette.charcoal,
+              }}
+            >
+              Interpreters
+            </button>
+          </div>
+        </div>
 
-      <h3 className="mt-6 text-2xl font-bold" style={{ color: palette.charcoal }}>
-        How to work effectively with an interpreter
-      </h3>
-      <p className="mt-2 text-sm leading-7" style={{ color: palette.body }}>
-        To get the most out of an interpreted interaction, speak directly to the Deaf individual, maintain natural
-        pacing, allow time for interpretation before expecting a response, provide materials in advance when possible,
-        and be open to clarification if something is unclear.
-      </p>
-
-      <h3 className="mt-6 text-2xl font-bold" style={{ color: palette.charcoal }}>
-        When additional support may be needed
-      </h3>
-      <p className="mt-2 text-sm leading-7" style={{ color: palette.body }}>
-        Some situations may require additional support, such as team interpreting (for longer or more demanding
-        assignments) or Deaf interpreters (for language variation or complex communication needs). These decisions
-        are made to ensure the highest level of communication access.
-      </p>
+        <div className="px-6 py-8 md:px-10 md:py-10">
+          {activeTab === "clients" ? (
+            <ResourcesClients palette={palette} />
+          ) : (
+            <ResourcesInterpreters palette={palette} />
+          )}
+        </div>
+      </div>
     </div>
   );
 }
