@@ -369,16 +369,14 @@ export default function InterpreterRequestForm({ palette = defaultPalette }) {
   };
 
   const handleNext = () => {
-    if (validateStep(step)) {
-      setStep((prev) => Math.min(prev + 1, 7));
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-  };
+  if (validateStep(step)) {
+    setStep((prev) => Math.min(prev + 1, 7));
+  }
+};
 
   const handleBack = () => {
-    setStep((prev) => Math.max(prev - 1, 1));
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
+  setStep((prev) => Math.max(prev - 1, 1));
+};
 
   const handleSubmit = async (e) => {
   if (e) e.preventDefault();
@@ -427,7 +425,7 @@ const response = await fetch(scriptUrl, {
 
       setSubmitted(true);
 setIsSubmitting(false);
-window.scrollTo({ top: 0, behavior: 'smooth' });
+
     } catch (error) {
       setSubmitError('Unable to submit request. Please check your connection and try again.');
       setIsSubmitting(false);
