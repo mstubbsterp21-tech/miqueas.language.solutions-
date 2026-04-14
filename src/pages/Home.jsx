@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 export default function Home({ palette }) {
   const stats = [
     ['7 Years', 'Professional interpreting experience'],
-    ['EIPA', 'Credentialed educational interpreting background'],
+    ['Educational Interpreter Performance Assessment (EIPA)','Credentialed educational interpreting background'],
     ['Medical • Educational • Cruise • Community', 'Current specialties'],
   ];
 
@@ -40,7 +40,7 @@ export default function Home({ palette }) {
           className="mt-6 max-w-2xl text-lg md:text-xl"
           style={{ color: palette.body }}
         >
-          Miqueas Language Solutions provides ASL ↔ English interpreting and ASL video
+          Miqueas Language Solutions provides ASL ↔ English interpreting and
           translation services with the care, responsiveness, and professionalism clients
           deserve.
         </p>
