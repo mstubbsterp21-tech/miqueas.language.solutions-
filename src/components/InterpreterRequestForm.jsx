@@ -413,10 +413,7 @@ Object.entries(formData).forEach(([key, value]) => {
 
 const response = await fetch(scriptUrl, {
   method: 'POST',
-  headers: {
-    'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
-  },
-  body: encodedData.toString(),
+  body: encodedData,
 });
 
       const result = await response.json();
