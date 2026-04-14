@@ -399,13 +399,25 @@ export default function InterpreterRequestForm({ palette = defaultPalette }) {
     setSubmitError('');
 
     try {
-      const response = await fetch(scriptUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
+      const encodedData = new URLSearchParams();
+
+Object.entries(formData).forEach(([key, value]) => {
+  if (Array.isArray(value)) {
+    encodedData.append(key, value.join(', '));
+  } else if (typeof value === 'boolean') {
+    encodedData.append(key, value ? 'true' : 'false');
+  } else {
+    encodedData.append(key, value ?? '');
+  }
+});
+
+const response = await fetch(scriptUrl, {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+  },
+  body: encodedData.toString(),
+});
 
       const result = await response.json();
 
