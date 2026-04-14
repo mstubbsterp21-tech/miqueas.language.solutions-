@@ -381,7 +381,7 @@ export default function InterpreterRequestForm({ palette = defaultPalette }) {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  if (e) e.preventDefault();
 
     if (!validateStep(6)) {
       setStep(6);
@@ -1167,7 +1167,7 @@ const response = await fetch(scriptUrl, {
                   Has a team interpreter already been requested or arranged? *
                 </label>
                 <p className="mb-3 text-sm leading-6" style={{ color: p.charcoal }}>
-                  Team interpreting is industry standard for live interpreting assignments of
+                  Team interpreting is industry standard for live in person or video interpreting assignments of
                   great complexity and/or duration longer than 1 hour.
                 </p>
 
@@ -1378,23 +1378,24 @@ const response = await fetch(scriptUrl, {
               )}
 
               {step < 7 ? (
-                <button
-                  type="button"
-                  onClick={handleNext}
-                  className="btn btn-primary"
-                  disabled={isSubmitting}
-                >
-                  Continue
-                </button>
-              ) : (
-                <button
-                  type="submit"
-                  className="btn btn-primary"
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? 'Submitting...' : 'Submit Request'}
-                </button>
-              )}
+  <button
+    type="button"
+    onClick={handleNext}
+    className="btn btn-primary"
+    disabled={isSubmitting}
+  >
+    Continue
+  </button>
+) : (
+  <button
+    type="button"
+    onClick={handleSubmit}
+    className="btn btn-primary"
+    disabled={isSubmitting}
+  >
+    {isSubmitting ? 'Submitting...' : 'Submit Request'}
+  </button>
+)}
             </div>
           </div>
         </div>
