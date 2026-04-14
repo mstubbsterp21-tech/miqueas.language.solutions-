@@ -426,7 +426,8 @@ const response = await fetch(scriptUrl, {
       }
 
       setSubmitted(true);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+setIsSubmitting(false);
+window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (error) {
       setSubmitError('Unable to submit request. Please check your connection and try again.');
       setIsSubmitting(false);
@@ -464,11 +465,13 @@ const response = await fetch(scriptUrl, {
           <button
             type="button"
             onClick={() => {
-              setFormData(initialFormData);
-              setSubmitted(false);
-              setStep(1);
-              setErrors({});
-            }}
+  setFormData(initialFormData);
+  setSubmitted(false);
+  setStep(1);
+  setErrors({});
+  setSubmitError('');
+  setIsSubmitting(false);
+}}
             className="btn btn-primary"
           >
             Submit Another Request
