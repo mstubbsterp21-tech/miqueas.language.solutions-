@@ -1352,14 +1352,14 @@ setIsSubmitting(false);
           style={{ borderColor: p.border }}
         >
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: p.gold }}>
-                Progress
-              </p>
-              <p className="mt-1 text-sm font-medium" style={{ color: p.charcoal }}>
-                Step {step} of 7
-              </p>
-            </div>
+            <div aria-live="polite" role="status">
+  <p className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: p.gold }}>
+    Progress
+  </p>
+  <p className="mt-1 text-sm font-medium" style={{ color: p.charcoal }}>
+    Step {step} of 7
+  </p>
+</div>
 
             {submitError && (
               <p className="mb-3 text-sm font-medium form-error">{submitError}</p>

@@ -8,6 +8,7 @@ import ResourcesLayout from "./pages/ResourcesLayout";
 import ResourcesClients from "./pages/ResourcesClients";
 import ResourcesInterpreters from "./pages/ResourcesInterpreters";
 import Contact from "./pages/Contact";
+import NotFound from "./pages/NotFound";
 import logo from "./logo.png";
 import { FaInstagram, FaLinkedinIn, FaFacebookF } from "react-icons/fa";
 
@@ -54,12 +55,35 @@ function BrandLockup({ showTagline = true }) {
   );
 }
 
+function SocialIcon({ href, label, children, closeMobileMenu = null }) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noreferrer"
+      aria-label={label}
+      onClick={closeMobileMenu || undefined}
+      className="inline-flex h-10 w-10 items-center justify-center rounded-xl transition-transform duration-200 hover:-translate-y-0.5 hover:opacity-85 focus:outline-none focus:ring-2 focus:ring-offset-2"
+      style={{ backgroundColor: palette.gold, color: palette.white }}
+    >
+      {children}
+    </a>
+  );
+}
+
 export default function App() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const year = useMemo(() => new Date().getFullYear(), []);
 
   return (
     <div className="min-h-screen bg-white text-slate-900">
+      <a
+        href="#main-content"
+        className="sr-only absolute left-2 top-2 z-50 rounded bg-white p-2 text-sm font-medium text-black focus:not-sr-only focus:ring-2"
+      >
+        Skip to main content
+      </a>
+
       <header className="sticky top-0 z-50 border-b border-black/5 bg-white/90 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4 md:px-8">
           <Link to="/" className="flex min-w-0 items-center gap-3">
@@ -79,56 +103,26 @@ export default function App() {
             ))}
 
             <div className="ml-2 flex items-center gap-2">
-              <a
+              <SocialIcon
                 href="https://www.instagram.com/miqueas.language.solutions/"
-                target="_blank"
-                rel="noreferrer"
-                aria-label="Instagram"
-                className="inline-flex h-10 w-10 items-center justify-center rounded-xl transition duration-200 hover:-translate-y-0.5"
-                style={{ backgroundColor: palette.gold, color: palette.white }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = palette.burgundy;
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = palette.gold;
-                }}
+                label="Instagram"
               >
-                <FaInstagram size={18} />
-              </a>
+                <FaInstagram size={18} aria-hidden="true" />
+              </SocialIcon>
 
-              <a
+              <SocialIcon
                 href="https://www.facebook.com/profile.php?id=615732860781534"
-                target="_blank"
-                rel="noreferrer"
-                aria-label="Facebook"
-                className="inline-flex h-10 w-10 items-center justify-center rounded-xl transition duration-200 hover:-translate-y-0.5"
-                style={{ backgroundColor: palette.gold, color: palette.white }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = palette.burgundy;
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = palette.gold;
-                }}
+                label="Facebook"
               >
-                <FaFacebookF size={18} />
-              </a>
+                <FaFacebookF size={18} aria-hidden="true" />
+              </SocialIcon>
 
-              <a
+              <SocialIcon
                 href="https://www.linkedin.com/in/micah-stubbs-7a7802145/"
-                target="_blank"
-                rel="noreferrer"
-                aria-label="LinkedIn"
-                className="inline-flex h-10 w-10 items-center justify-center rounded-xl transition duration-200 hover:-translate-y-0.5"
-                style={{ backgroundColor: palette.gold, color: palette.white }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = palette.burgundy;
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = palette.gold;
-                }}
+                label="LinkedIn"
               >
-                <FaLinkedinIn size={18} />
-              </a>
+                <FaLinkedinIn size={18} aria-hidden="true" />
+              </SocialIcon>
 
               <Link
                 to="/contact"
@@ -143,6 +137,7 @@ export default function App() {
             className="rounded-xl p-2 md:hidden"
             onClick={() => setMobileOpen((value) => !value)}
             aria-label="Toggle menu"
+            aria-expanded={mobileOpen}
             type="button"
           >
             {mobileOpen ? "X" : "☰"}
@@ -165,59 +160,29 @@ export default function App() {
               ))}
 
               <div className="mt-2 flex items-center gap-3">
-                <a
+                <SocialIcon
                   href="https://www.instagram.com/miqueas.language.solutions/"
-                  target="_blank"
-                  rel="noreferrer"
-                  aria-label="Instagram"
-                  className="inline-flex h-11 w-11 items-center justify-center rounded-xl transition duration-200"
-                  style={{ backgroundColor: palette.gold, color: palette.white }}
-                  onClick={() => setMobileOpen(false)}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = palette.burgundy;
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = palette.gold;
-                  }}
+                  label="Instagram"
+                  closeMobileMenu={() => setMobileOpen(false)}
                 >
-                  <FaInstagram size={18} />
-                </a>
+                  <FaInstagram size={18} aria-hidden="true" />
+                </SocialIcon>
 
-                <a
-                  href="https://www.facebook.com/profile.php?id=61573286078153"
-                  target="_blank"
-                  rel="noreferrer"
-                  aria-label="Facebook"
-                  className="inline-flex h-11 w-11 items-center justify-center rounded-xl transition duration-200"
-                  style={{ backgroundColor: palette.gold, color: palette.white }}
-                  onClick={() => setMobileOpen(false)}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = palette.burgundy;
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = palette.gold;
-                  }}
+                <SocialIcon
+                  href="https://www.facebook.com/profile.php?id=615732860781534"
+                  label="Facebook"
+                  closeMobileMenu={() => setMobileOpen(false)}
                 >
-                  <FaFacebookF size={18} />
-                </a>
+                  <FaFacebookF size={18} aria-hidden="true" />
+                </SocialIcon>
 
-                <a
+                <SocialIcon
                   href="https://www.linkedin.com/in/micah-stubbs-7a7802145/"
-                  target="_blank"
-                  rel="noreferrer"
-                  aria-label="LinkedIn"
-                  className="inline-flex h-11 w-11 items-center justify-center rounded-xl transition duration-200"
-                  style={{ backgroundColor: palette.gold, color: palette.white }}
-                  onClick={() => setMobileOpen(false)}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = palette.burgundy;
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = palette.gold;
-                  }}
+                  label="LinkedIn"
+                  closeMobileMenu={() => setMobileOpen(false)}
                 >
-                  <FaLinkedinIn size={18} />
-                </a>
+                  <FaLinkedinIn size={18} aria-hidden="true" />
+                </SocialIcon>
 
                 <Link
                   to="/contact"
@@ -232,11 +197,14 @@ export default function App() {
         )}
       </header>
 
-      <main>
+      <main id="main-content">
         <Routes>
           <Route path="/" element={<Home palette={palette} />} />
           <Route path="/services" element={<Services palette={palette} />} />
-          <Route path="/services/:serviceId" element={<ServiceDetail palette={palette} />} />
+          <Route
+            path="/services/:serviceId"
+            element={<ServiceDetail palette={palette} />}
+          />
           <Route path="/about" element={<About palette={palette} />} />
 
           <Route path="/resources" element={<ResourcesLayout palette={palette} />}>
@@ -249,6 +217,7 @@ export default function App() {
           </Route>
 
           <Route path="/contact" element={<Contact palette={palette} />} />
+          <Route path="*" element={<NotFound palette={palette} />} />
         </Routes>
       </main>
 
@@ -266,8 +235,18 @@ export default function App() {
             ))}
           </div>
 
-          <div className="text-sm text-slate-500">
-            © {year} Miqueas Language Solutions. All rights reserved.
+          <div className="text-sm text-slate-600 flex flex-col md:items-end space-y-1">
+            <span>
+              Email:{" "}
+              <a
+                href="mailto:mstubbsterp21@gmail.com"
+                className="hover:underline"
+              >
+                mstubbsterp21@gmail.com
+              </a>
+            </span>
+            <span>Based in Ocala, Florida</span>
+            <span>© {year} Miqueas Language Solutions. All rights reserved.</span>
           </div>
         </div>
       </footer>

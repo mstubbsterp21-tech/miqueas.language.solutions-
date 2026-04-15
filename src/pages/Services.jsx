@@ -73,8 +73,9 @@ export default function Services({ palette }) {
               <div
                 className="flex h-12 w-12 items-center justify-center rounded-2xl"
                 style={{ backgroundColor: palette.softGray }}
-              >
-                <Icon size={22} style={{ color: palette.burgundy }} />
+
+              ><Icon size={22} style={{ color: palette.burgundy }} aria-hidden="true" />
+                
               </div>
               <h3 className="mt-5 text-xl font-semibold" style={{ color: palette.charcoal }}>
                 {card.title}
@@ -84,7 +85,7 @@ export default function Services({ palette }) {
               </p>
 
               <div className="mt-6 flex items-center gap-2 text-sm font-semibold" style={{ color: palette.burgundy }}>
-                Learn More <ArrowRight size={16} className="transition group-hover:translate-x-1" />
+                Learn More <ArrowRight size={16} className="transition group-hover:translate-x-1" aria-hidden="true" />
               </div>
             </Link>
           );
@@ -119,7 +120,7 @@ export default function Services({ palette }) {
                     className="flex h-11 w-11 items-center justify-center rounded-2xl"
                     style={{ backgroundColor: palette.gold, color: '#ffffff' }}
                   >
-                    <Icon size={20} />
+                    <Icon size={20} aria-hidden="true" />
                   </div>
                   <span className="font-medium" style={{ color: palette.charcoal }}>
                     {item.title}

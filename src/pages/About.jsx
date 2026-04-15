@@ -38,7 +38,7 @@ export default function About({ palette }) {
               >
                 <img
                   src={profilePic}
-                  alt="Micah"
+                  alt="Portrait of Micah Stubbs, ASL interpreter"
                   className="mx-auto w-full max-w-[220px] object-contain"
                 />
               </div>
@@ -64,7 +64,7 @@ export default function About({ palette }) {
 
                 <p
                   className="mt-3 max-w-2xl text-sm leading-6 md:text-base"
-                  style={{ color: "#5f6368" }}
+                  style={{ color: palette.charcoal }}
                 >
                   Trusted in medical, educational, community, and travel-based
                   environments where clear communication matters most.
@@ -168,10 +168,15 @@ export default function About({ palette }) {
                       Bridging Perspectives. Delivering Understanding.
                     </p>
 
-                    <p>I think of interpreting like a bridge;
-                      On one side is you. On the other side is the person you’re trying to communicate with. 
-                      
-                      My role is to help both of you cross that space clearly, naturally, and without unnecessary confusion.
+                    <p>
+                      I think of interpreting like a bridge. On one side is you.
+                      On the other side is the person you’re trying to
+                      communicate with.
+                    </p>
+
+                    <p>
+                      My role is to help both of you cross that space clearly,
+                      naturally, and without unnecessary confusion.
                     </p>
 
                     <p>
@@ -185,7 +190,7 @@ export default function About({ palette }) {
                     <ul className="space-y-2 pl-6 text-[15px] leading-8 md:text-lg list-disc">
                       <li>who is involved</li>
                       <li>what the setting requires</li>
-                      <li>and what will make communication flow naturally</li>
+                      <li>what will make communication flow naturally</li>
                     </ul>
 
                     <p>
@@ -251,7 +256,7 @@ export default function About({ palette }) {
                     <ul className="space-y-2 pl-6 text-[15px] leading-8 md:text-lg list-disc">
                       <li>reduce confusion</li>
                       <li>remove communication barriers</li>
-                      <li>and help everyone stay focused on what actually matters</li>
+                      <li>help everyone stay focused on what actually matters</li>
                     </ul>
 
                     <p>
@@ -284,10 +289,7 @@ export default function About({ palette }) {
                     <ol className="space-y-2 pl-6 list-decimal">
                       <li>I review your details personally</li>
                       <li>I assess the communication needs and setting</li>
-                      <li>
-                          I follow up with you to confirm availability and
-                        next steps
-                      </li>
+                      <li>I follow up with you to confirm availability and next steps</li>
                     </ol>
 
                     <p className="font-medium">
@@ -330,7 +332,7 @@ export default function About({ palette }) {
                         everything is the right fit.
                       </p>
 
-                      <p style={{ color: "#5f6368" }}>
+                      <p style={{ color: palette.charcoal }}>
                         If you’re unsure about any details, that’s completely
                         okay—just submit what you have, and I’ll help guide the
                         rest.
@@ -362,8 +364,9 @@ export default function About({ palette }) {
                     </p>
 
                     <p className="font-semibold">
-                      But more than anything—it’s about you, your client, and making sure 
-                      both of you can cross that bridge into mutual understanding.
+                      But more than anything—it’s about you, your client, and
+                      making sure both of you can cross that bridge into mutual
+                      understanding.
                     </p>
                   </div>
                 </motion.section>
@@ -377,7 +380,7 @@ export default function About({ palette }) {
                 >
                   <p
                     className="mx-auto mb-4 max-w-2xl text-sm leading-6 md:text-base"
-                    style={{ color: "#5f6368" }}
+                    style={{ color: palette.charcoal }}
                   >
                     Ready to get the process started?
                   </p>
@@ -392,7 +395,7 @@ export default function About({ palette }) {
 
                   <p
                     className="mt-3 text-xs font-medium md:text-sm"
-                    style={{ color: "#5f6368" }}
+                    style={{ color: palette.charcoal }}
                   >
                     Takes less than 5 minutes • No commitment required
                   </p>

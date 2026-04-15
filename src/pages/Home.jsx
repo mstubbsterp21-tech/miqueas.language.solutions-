@@ -25,7 +25,7 @@ export default function Home({ palette }) {
             backgroundColor: palette.white,
           }}
         >
-          <CheckCircle2 size={16} style={{ color: palette.gold }} />
+          <CheckCircle2 size={16} style={{ color: palette.gold }} aria-hidden="true" />
           Based in Ocala, FL • Travel & remote services available
         </div>
 
@@ -50,7 +50,7 @@ export default function Home({ palette }) {
             to="/contact"
             className="btn btn-primary inline-flex items-center gap-2 rounded-2xl px-5 py-3 text-sm font-semibold shadow-sm transition flex-1 sm:flex-none"
           >
-            Request a Quote <ArrowRight size={16} />
+            Request a Quote <ArrowRight size={16} aria-hidden="true" />
           </Link>
 
           <Link

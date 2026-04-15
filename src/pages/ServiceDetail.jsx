@@ -141,7 +141,7 @@ export default function ServiceDetail({ palette }) {
             Service not found
           </h1>
           <Link to="/services" className="btn btn-primary mt-6 inline-flex items-center">
-            <ArrowLeft size={16} />
+            <ArrowLeft size={16} aria-hidden="true" />
             Back to Services
           </Link>
         </div>
@@ -152,7 +152,7 @@ export default function ServiceDetail({ palette }) {
   return (
     <div className="mx-auto max-w-3xl px-5 py-20 md:px-8">
       <Link to="/services" className="btn btn-secondary mb-8 inline-flex items-center gap-2">
-        <ArrowLeft size={16} />
+        <ArrowLeft size={16} aria-hidden="true" />
         Back to Services
       </Link>
 
