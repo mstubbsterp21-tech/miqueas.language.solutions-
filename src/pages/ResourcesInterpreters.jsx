@@ -1,3 +1,5 @@
+import InterpreterNetworkForm from '../components/InterpreterNetworkForm';
+
 export default function ResourcesInterpreters({ palette }) {
   return (
     <div className="space-y-10">
@@ -43,7 +45,7 @@ export default function ResourcesInterpreters({ palette }) {
         }}
       >
         <h3 className="text-2xl font-bold" style={{ color: palette.charcoal }}>
-          Join Us
+          Join Our Interpreter Network
         </h3>
         <p className="mt-3 max-w-4xl text-sm leading-7 md:text-base" style={{ color: palette.body }}>
           We are always open to connecting with qualified interpreters who care deeply about
@@ -51,19 +53,9 @@ export default function ResourcesInterpreters({ palette }) {
           is primarily in community, medical, educational, or remote interpreting, we would love
           to hear from you.
         </p>
-
-        <div className="mt-5">
-          <a
-            href="https://forms.gle/cFTE9Qy1c3sFPdnz8"
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex items-center rounded-2xl px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:-translate-y-0.5 hover:opacity-95 hover:shadow-md"
-            style={{ backgroundColor: palette.burgundy }}
-          >
-            Join Us
-          </a>
-        </div>
       </section>
+
+      <InterpreterNetworkForm palette={palette} />
 
       <section className="space-y-8">
         <div>
