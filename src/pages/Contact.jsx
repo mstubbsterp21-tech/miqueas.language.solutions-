@@ -26,7 +26,7 @@ export default function Contact({ palette }) {
         </p>
 
         <a
-          href="mailto:m.stubbs@miqueaslanguagesolutions.com"
+          href="mailto:m.stubbs@miqueaslanguagesolutions.com?subject=Inquiry%20for%20Miqueas%20Language%20Solutions&body=Hi%20Micah%2C%0A%0AI%E2%80%99m%20reaching%20out%20about%20interpreting%20services.%20Here%20are%20my%20details%3A%0A%0AService%20needed%3A%0ADate%3A%0ATime%3A%0ALocation%20or%20platform%3A%0AOrganization%3A%0AAdditional%20details%3A%0A%0AThank%20you."
           className="mt-5 inline-flex items-center justify-center rounded-full px-6 py-3 text-sm font-semibold shadow-sm transition hover:opacity-90"
           style={{
             backgroundColor: palette.gold,
