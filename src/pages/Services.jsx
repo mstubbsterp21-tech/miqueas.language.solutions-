@@ -2,64 +2,13 @@ import { Link } from 'react-router-dom';
 import {
   ArrowRight,
   CheckCircle2,
-  ClipboardList,
-  Clock3,
-  FileText,
   Globe,
-  Laptop2,
-  MapPinned,
-  MessagesSquare,
-  ShieldCheck,
   Ship,
   Stethoscope,
   GraduationCap,
   Users,
   Video,
 } from 'lucide-react';
-
-const workflowIconMap = {
-  request: ClipboardList,
-  review: FileText,
-  confirm: CheckCircle2,
-  deliver: MessagesSquare,
-  closeout: Clock3,
-  platform: Laptop2,
-  location: MapPinned,
-  privacy: ShieldCheck,
-  video: Video,
-};
-
-function WorkflowMini({ steps, palette }) {
-  return (
-    <div className="mt-6 grid gap-3">
-      {steps.map((step, index) => {
-        const Icon = workflowIconMap[step.icon] ?? ClipboardList;
-        return (
-          <div
-            key={step.title}
-            className="flex items-start gap-3 rounded-2xl border p-4 transition duration-300 hover:-translate-y-0.5 hover:shadow-sm"
-            style={{ borderColor: palette.border, backgroundColor: palette.softGray }}
-          >
-            <div
-              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl"
-              style={{ backgroundColor: index % 2 === 0 ? palette.burgundy : palette.gold, color: palette.white }}
-            >
-              <Icon size={18} />
-            </div>
-            <div>
-              <div className="text-sm font-semibold" style={{ color: palette.charcoal }}>
-                {step.title}
-              </div>
-              <div className="mt-1 text-sm leading-6" style={{ color: palette.body }}>
-                {step.text}
-              </div>
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  );
-}
 
 function UseCaseList({ title, items, palette }) {
   return (
@@ -95,52 +44,24 @@ export default function Services({ palette }) {
       icon: Users,
       title: 'In‑Person Interpreting',
       text: 'On-site communication access for appointments, meetings, events, and live environments where presence, visibility, and nuance matter.',
-      bestFor: 'Best when the interaction is high-stakes, physically dynamic, or dependent on room flow and direct visual access.',
-      workflow: [
-        { icon: 'request', title: 'Request', text: 'Share the setting, date, location, and communication needs.' },
-        { icon: 'review', title: 'Review', text: 'MLS evaluates fit, logistics, prep needs, and staffing recommendations.' },
-        { icon: 'location', title: 'Deliver', text: 'The interpreter arrives prepared and supports live communication access on-site.' },
-      ],
-      examples: ['Hospital intake and specialist visits', 'IEP meetings and educational conferences', 'Community events and service-provider conversations'],
     },
     {
       id: 'video-remote-interpreting',
       icon: Video,
       title: 'Video Remote Interpreting',
       text: 'Real-time ASL access for telehealth, virtual meetings, short-notice requests, and remote communication across locations.',
-      bestFor: 'Best when the platform supports clear audio/video and remote access is more practical than travel.',
-      workflow: [
-        { icon: 'request', title: 'Request', text: 'Share the platform, timeline, context, and whether the session is general or specialized.' },
-        { icon: 'platform', title: 'Check', text: 'MLS confirms platform fit, visual framing, and communication setup.' },
-        { icon: 'video', title: 'Deliver', text: 'The interpreter joins live and provides real-time communication support.' },
-      ],
-      examples: ['Telehealth appointments', 'Remote staff or HR meetings', 'Shorter virtual consultations and quick-turn support'],
     },
     {
       id: 'english-asl-translation',
       icon: Globe,
       title: 'English → ASL Translation',
       text: 'Recorded ASL video translation for information that needs to be clearly and naturally communicated to Deaf viewers.',
-      bestFor: 'Best for patient education, trainings, policy updates, public information, and accessible organizational messaging.',
-      workflow: [
-        { icon: 'request', title: 'Source', text: 'You provide the script, document, or source content.' },
-        { icon: 'review', title: 'Scope', text: 'MLS reviews audience, terminology, revisions, and final delivery needs.' },
-        { icon: 'deliver', title: 'Produce', text: 'The content is translated, recorded, refined, and delivered in the agreed format.' },
-      ],
-      examples: ['Patient education videos', 'Training modules and internal announcements', 'Accessible website or public-facing content'],
     },
     {
       id: 'asl-english-translation',
       icon: Globe,
       title: 'ASL → English Translation',
       text: 'English transcripts, captions, summaries, or documentation-ready outputs created from ASL source content.',
-      bestFor: 'Best when ASL video needs to be converted into a usable English-facing format for review, publication, or recordkeeping.',
-      workflow: [
-        { icon: 'request', title: 'Submit', text: 'You send the source video and identify the output you need.' },
-        { icon: 'review', title: 'Plan', text: 'MLS confirms whether the project requires captions, transcripts, summaries, or polished translation.' },
-        { icon: 'deliver', title: 'Finalize', text: 'The content is translated, formatted, quality-checked, and delivered.' },
-      ],
-      examples: ['ASL interview review', 'Transcripts of event or classroom recordings', 'Caption-ready or documentation-ready English outputs'],
     },
   ];
 
@@ -245,22 +166,6 @@ export default function Services({ palette }) {
               <p className="mt-3 text-sm leading-7" style={{ color: palette.body }}>
                 {card.text}
               </p>
-              <p className="mt-4 text-sm leading-7" style={{ color: palette.body }}>
-                <span className="font-semibold" style={{ color: palette.charcoal }}>Best fit:</span> {card.bestFor}
-              </p>
-
-              <WorkflowMini steps={card.workflow} palette={palette} />
-
-              <div className="mt-6 space-y-2">
-                {card.examples.map((item) => (
-                  <div key={item} className="flex items-start gap-3">
-                    <CheckCircle2 size={16} style={{ color: palette.gold, marginTop: 3, flexShrink: 0 }} />
-                    <span className="text-sm leading-6" style={{ color: palette.body }}>
-                      {item}
-                    </span>
-                  </div>
-                ))}
-              </div>
 
               <Link
                 to={`/services/${card.id}`}
