@@ -50,7 +50,7 @@ export default function Services({ palette }) {
   ];
 
   return (
-    <div className="mx-auto max-w-6xl px-5 md:px-8 py-20">
+    <div className="mx-auto max-w-6xl px-5 py-20 md:px-8">
       <h1 className="mb-6 text-3xl font-bold tracking-tight md:text-4xl" style={{ color: palette.charcoal }}>
         Practical language support across remote and in-person settings
       </h1>
@@ -66,11 +66,11 @@ export default function Services({ palette }) {
             <Link
               key={card.title}
               to={`/services/${card.id}`}
-              className="group rounded-[1.75rem] border p-6 shadow-sm transition hover:shadow-md"
+              className="group rounded-[1.75rem] border p-6 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg"
               style={{ backgroundColor: palette.white, borderColor: palette.border }}
             >
               <div
-                className="flex h-12 w-12 items-center justify-center rounded-2xl"
+                className="flex h-12 w-12 items-center justify-center rounded-2xl transition duration-300 group-hover:scale-105"
                 style={{ backgroundColor: palette.softGray }}
               >
                 <Icon size={22} style={{ color: palette.burgundy }} />
@@ -83,7 +83,7 @@ export default function Services({ palette }) {
               </p>
 
               <div className="mt-6 flex items-center gap-2 text-sm font-semibold" style={{ color: palette.burgundy }}>
-                Learn More <ArrowRight size={16} className="transition group-hover:translate-x-1" />
+                Learn More <ArrowRight size={16} className="transition duration-300 group-hover:translate-x-1" />
               </div>
             </Link>
           );
@@ -92,7 +92,7 @@ export default function Services({ palette }) {
 
       <div className="mt-14 grid gap-8 lg:grid-cols-[1fr_1.15fr]">
         <div
-          className="rounded-[2rem] border p-7 shadow-sm"
+          className="rounded-[2rem] border p-7 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-md"
           style={{ backgroundColor: palette.white, borderColor: palette.border }}
         >
           <p
@@ -110,11 +110,11 @@ export default function Services({ palette }) {
               return (
                 <div
                   key={item.title}
-                  className="flex items-center gap-3 rounded-2xl p-4"
+                  className="flex items-center gap-3 rounded-2xl p-4 transition duration-300 hover:-translate-y-0.5"
                   style={{ backgroundColor: palette.softGray }}
                 >
                   <div
-                    className="flex h-11 w-11 items-center justify-center rounded-2xl"
+                    className="flex h-11 w-11 items-center justify-center rounded-2xl transition duration-300 hover:scale-105"
                     style={{ backgroundColor: palette.gold, color: '#ffffff' }}
                   >
                     <Icon size={20} />
@@ -128,7 +128,10 @@ export default function Services({ palette }) {
           </div>
         </div>
 
-        <div className="rounded-[2rem] p-7 shadow-sm" style={{ backgroundColor: palette.charcoal }}>
+        <div
+          className="rounded-[2rem] p-7 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-md"
+          style={{ backgroundColor: palette.charcoal }}
+        >
           <p
             className="text-sm font-semibold uppercase tracking-[0.18em]"
             style={{ color: palette.gold }}
@@ -152,7 +155,7 @@ export default function Services({ palette }) {
             ].map((item) => (
               <div
                 key={item}
-                className="flex items-start gap-3 rounded-2xl border border-white/10 bg-white/5 p-4"
+                className="flex items-start gap-3 rounded-2xl border border-white/10 bg-white/5 p-4 transition duration-300 hover:bg-white/10"
               >
                 <span className="text-sm leading-6 text-white/85">{item}</span>
               </div>
