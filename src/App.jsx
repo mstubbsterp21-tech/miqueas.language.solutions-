@@ -267,12 +267,20 @@ export default function App() {
 
           <div className="flex items-center gap-3 text-sm text-slate-500">
             <span>© 2026 Miqueas Language Solutions LLC. All rights reserved.</span>
-            <img
-              src="https://images.credly.com/size/340x340/images/eec9e878-8dcd-48fe-b57e-7e4d55637755/image.png"
-              alt="Credential badge"
-              className="h-14 w-14 object-contain"
-              loading="lazy"
-            />
+            <a
+              href="https://www.credly.com/badges/a160083c-07d6-4c48-adb3-6ad7e0d7b8d5/wallet"
+              target="_blank"
+              rel="noreferrer"
+              aria-label="View credential badge on Credly"
+              className="transition hover:opacity-80"
+            >
+              <img
+                src="https://images.credly.com/size/340x340/images/eec9e878-8dcd-48fe-b57e-7e4d55637755/image.png"
+                alt="Credential badge"
+                className="h-14 w-14 object-contain"
+                loading="lazy"
+              />
+            </a>
           </div>
         </div>
       </footer>
