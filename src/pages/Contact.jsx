@@ -26,7 +26,7 @@ export default function Contact({ palette }) {
         </p>
 
         <a
-          href="mailto:mstubbsterp21@gmail.com"
+          href="mailto:m.stubbs@miqueaslanguagesolutions.com"
           className="mt-5 inline-flex items-center justify-center rounded-full px-6 py-3 text-sm font-semibold shadow-sm transition hover:opacity-90"
           style={{
             backgroundColor: palette.gold,
