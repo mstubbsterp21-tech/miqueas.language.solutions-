@@ -56,7 +56,6 @@ function BrandLockup({ showTagline = true }) {
 
 export default function App() {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const year = useMemo(() => new Date().getFullYear(), []);
 
   return (
     <div className="min-h-screen bg-white text-slate-900">
@@ -266,8 +265,14 @@ export default function App() {
             ))}
           </div>
 
-          <div className="text-sm text-slate-500">
-            © {year} Miqueas Language Solutions. All rights reserved.
+          <div className="flex items-center gap-3 text-sm text-slate-500">
+            <span>© 2026 Miqueas Language Solutions LLC. All rights reserved.</span>
+            <img
+              src="https://images.credly.com/size/340x340/images/eec9e878-8dcd-48fe-b57e-7e4d55637755/image.png"
+              alt="Credential badge"
+              className="h-10 w-10 object-contain"
+              loading="lazy"
+            />
           </div>
         </div>
       </footer>
