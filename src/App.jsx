@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState } from "react";
 import { Routes, Route, Link, Navigate } from "react-router-dom";
 import Home from "./pages/Home";
 import Services from "./pages/Services";
@@ -270,7 +270,7 @@ export default function App() {
             <img
               src="https://images.credly.com/size/340x340/images/eec9e878-8dcd-48fe-b57e-7e4d55637755/image.png"
               alt="Credential badge"
-              className="h-10 w-10 object-contain"
+              className="h-14 w-14 object-contain"
               loading="lazy"
             />
           </div>
