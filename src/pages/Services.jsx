@@ -2,43 +2,30 @@ import { Link } from 'react-router-dom';
 import { Users, Video, Globe, Stethoscope, GraduationCap, Ship, ArrowRight } from 'lucide-react';
 
 export default function Services({ palette }) {
-  // Define information for service cards and specialties.
   const serviceCards = [
     {
       id: 'in-person-interpreting',
       icon: Users,
       title: 'In‑Person Interpreting',
       text: 'Professional ASL interpreting services for on-site assignments across a variety of settings.',
-      certifications: 'EIPA; RID-aligned practices; ongoing professional development',
-      examples: 'Hospital intake, clinic appointments, parent‑teacher meetings, community events',
-      rates: 'Typical range: $60–$120/hr (varies with setting, travel, and prep)',
     },
     {
       id: 'video-remote-interpreting',
       icon: Video,
       title: 'Video Remote Interpreting',
       text: 'Reliable interpreting for virtual meetings, appointments, and remote communication needs.',
-      certifications: 'Remote interpreting best practices; HIPAA-aware for medical settings',
-      examples: 'Telehealth visits, remote meetings, brief virtual consultations',
-      rates: 'Typical range: $40–$90/hr (lower minimums for short sessions)',
     },
     {
       id: 'english-asl-translation',
       icon: Globe,
       title: 'English → ASL Translation (Video)',
       text: 'Recorded video translations from English into ASL for accessible communication.',
-      certifications: 'Experience producing clear ASL narrative translations; video captioning knowledge',
-      examples: 'Patient education videos, informational content, short training clips',
-      rates: 'Project-based; samples often start around $150+ depending on length and editing',
     },
     {
       id: 'asl-english-translation',
       icon: Globe,
       title: 'ASL → English Translation',
       text: 'Captioned video or written/spoken transcription of ASL content into English.',
-      certifications: 'Transcription and caption review experience; accuracy-focused workflow',
-      examples: 'Event recordings, ASL interviews, classroom content transcription',
-      rates: 'Typical range: $45–$95/hr (depends on turnaround and complexity)',
     },
   ];
 
@@ -66,24 +53,35 @@ export default function Services({ palette }) {
             <Link
               key={card.title}
               to={`/services/${card.id}`}
-              className="group rounded-[1.75rem] border p-6 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg"
+              className="group relative overflow-hidden rounded-[1.75rem] border p-6 shadow-sm transition-all duration-500 ease-out hover:-translate-y-1.5 hover:shadow-[0_18px_45px_rgba(0,0,0,0.08)] focus-visible:-translate-y-1.5 focus-visible:shadow-[0_18px_45px_rgba(0,0,0,0.08)]"
               style={{ backgroundColor: palette.white, borderColor: palette.border }}
             >
               <div
-                className="flex h-12 w-12 items-center justify-center rounded-2xl transition duration-300 group-hover:scale-105"
+                className="pointer-events-none absolute inset-x-0 top-0 h-1 origin-left scale-x-0 transition-transform duration-500 ease-out group-hover:scale-x-100 group-focus-visible:scale-x-100"
+                style={{ backgroundColor: palette.gold }}
+              />
+
+              <div
+                className="flex h-12 w-12 items-center justify-center rounded-2xl transition-all duration-500 ease-out group-hover:scale-105 group-hover:shadow-md"
                 style={{ backgroundColor: palette.softGray }}
               >
                 <Icon size={22} style={{ color: palette.burgundy }} />
               </div>
-              <h3 className="mt-5 text-xl font-semibold" style={{ color: palette.charcoal }}>
+
+              <h3 className="mt-5 text-xl font-semibold transition-colors duration-300" style={{ color: palette.charcoal }}>
                 {card.title}
               </h3>
+
               <p className="mt-3 text-sm leading-7" style={{ color: palette.body }}>
                 {card.text}
               </p>
 
-              <div className="mt-6 flex items-center gap-2 text-sm font-semibold" style={{ color: palette.burgundy }}>
-                Learn More <ArrowRight size={16} className="transition duration-300 group-hover:translate-x-1" />
+              <div
+                className="mt-6 flex items-center gap-2 text-sm font-semibold transition-all duration-300 group-hover:gap-3"
+                style={{ color: palette.burgundy }}
+              >
+                Learn More
+                <ArrowRight size={16} className="transition-transform duration-500 ease-out group-hover:translate-x-1.5" />
               </div>
             </Link>
           );
@@ -92,7 +90,7 @@ export default function Services({ palette }) {
 
       <div className="mt-14 grid gap-8 lg:grid-cols-[1fr_1.15fr]">
         <div
-          className="rounded-[2rem] border p-7 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-md"
+          className="rounded-[2rem] border p-7 shadow-sm transition-all duration-500 ease-out hover:-translate-y-1 hover:shadow-[0_16px_36px_rgba(0,0,0,0.06)]"
           style={{ backgroundColor: palette.white, borderColor: palette.border }}
         >
           <p
@@ -110,11 +108,11 @@ export default function Services({ palette }) {
               return (
                 <div
                   key={item.title}
-                  className="flex items-center gap-3 rounded-2xl p-4 transition duration-300 hover:-translate-y-0.5"
+                  className="group flex items-center gap-3 rounded-2xl p-4 transition-all duration-300 ease-out hover:-translate-y-0.5 hover:shadow-sm"
                   style={{ backgroundColor: palette.softGray }}
                 >
                   <div
-                    className="flex h-11 w-11 items-center justify-center rounded-2xl transition duration-300 hover:scale-105"
+                    className="flex h-11 w-11 items-center justify-center rounded-2xl transition-transform duration-300 ease-out group-hover:scale-105"
                     style={{ backgroundColor: palette.gold, color: '#ffffff' }}
                   >
                     <Icon size={20} />
@@ -129,7 +127,7 @@ export default function Services({ palette }) {
         </div>
 
         <div
-          className="rounded-[2rem] p-7 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-md"
+          className="rounded-[2rem] p-7 shadow-sm transition-all duration-500 ease-out hover:-translate-y-1 hover:shadow-[0_16px_36px_rgba(0,0,0,0.12)]"
           style={{ backgroundColor: palette.charcoal }}
         >
           <p
@@ -155,7 +153,7 @@ export default function Services({ palette }) {
             ].map((item) => (
               <div
                 key={item}
-                className="flex items-start gap-3 rounded-2xl border border-white/10 bg-white/5 p-4 transition duration-300 hover:bg-white/10"
+                className="rounded-2xl border border-white/10 bg-white/5 p-4 transition-all duration-300 ease-out hover:bg-white/10 hover:border-white/20"
               >
                 <span className="text-sm leading-6 text-white/85">{item}</span>
               </div>
