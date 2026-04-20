@@ -170,8 +170,14 @@ export default function Services({ palette }) {
               <p className="mt-3 text-sm leading-7" style={{ color: palette.body }}>
                 {card.text}
               </p>
-              <p className="mt-4 text-xs font-medium tracking-[0.04em] opacity-70" style={{ color: palette.charcoal }}>
-                {card.label}
+              <p
+                className="mt-4 text-xs font-medium tracking-[0.04em] transition-all duration-300 group-hover:translate-x-0.5"
+                style={{ color: palette.body, opacity: 0.72 }}
+              >
+                <span style={{ color: palette.gold }}>•</span>{' '}
+                <span className="group-hover:opacity-100" style={{ color: palette.charcoal, opacity: 0.82 }}>
+                  {card.label}
+                </span>
               </p>
 
               <Link
