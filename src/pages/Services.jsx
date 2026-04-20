@@ -44,24 +44,28 @@ export default function Services({ palette }) {
       icon: Users,
       title: 'In‑Person Interpreting',
       text: 'On-site communication access for appointments, meetings, events, and live environments where presence, visibility, and nuance matter.',
+      label: 'On-site • High-context • Live interaction',
     },
     {
       id: 'video-remote-interpreting',
       icon: Video,
       title: 'Video Remote Interpreting',
       text: 'Real-time ASL access for telehealth, virtual meetings, short-notice requests, and remote communication across locations.',
+      label: 'Remote • Flexible • Real-time access',
     },
     {
       id: 'english-asl-translation',
       icon: Globe,
       title: 'English → ASL Translation',
       text: 'Recorded ASL video translation for information that needs to be clearly and naturally communicated to Deaf viewers.',
+      label: 'Recorded • Accessible • Audience-focused',
     },
     {
       id: 'asl-english-translation',
       icon: Globe,
       title: 'ASL → English Translation',
       text: 'English transcripts, captions, summaries, or documentation-ready outputs created from ASL source content.',
+      label: 'Documentation • Clarity • Reusable content',
     },
   ];
 
@@ -165,6 +169,9 @@ export default function Services({ palette }) {
               </h3>
               <p className="mt-3 text-sm leading-7" style={{ color: palette.body }}>
                 {card.text}
+              </p>
+              <p className="mt-4 text-xs font-medium tracking-[0.04em] opacity-70" style={{ color: palette.charcoal }}>
+                {card.label}
               </p>
 
               <Link
