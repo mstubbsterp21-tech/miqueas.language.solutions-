@@ -130,14 +130,9 @@ export default function Home({ palette }) {
 
                 <Link
                   to="/resources/interpreters"
-                  className="inline-flex flex-1 items-center justify-center gap-2 rounded-2xl border px-6 py-3.5 text-sm font-semibold transition hover:-translate-y-0.5 sm:flex-none"
-                  style={{
-                    color: palette.charcoal,
-                    borderColor: `${palette.gold}40`,
-                    backgroundColor: 'rgba(255,255,255,0.72)',
-                  }}
+                  className="btn btn-primary inline-flex flex-1 items-center justify-center gap-2 rounded-2xl px-6 py-3.5 text-sm font-semibold shadow-lg shadow-black/10 transition sm:flex-none"
                 >
-                  Join the Interpreter Roster
+                  Join the Interpreter Roster <ArrowRight size={16} />
                 </Link>
               </motion.div>
 
@@ -179,8 +174,8 @@ export default function Home({ palette }) {
                   background: `linear-gradient(160deg, ${palette.charcoal} 0%, #2d2d2d 100%)`,
                 }}
               >
-                <div className="flex items-center justify-between gap-4 border-b border-white/10 pb-5">
-                  <div>
+                <div className="flex items-start justify-between gap-4 border-b border-white/10 pb-5">
+                  <div className="min-w-0 flex-1">
                     <div className="text-sm uppercase tracking-[0.2em] text-white/60">
                       Miqueas Language Solutions
                     </div>
@@ -189,7 +184,7 @@ export default function Home({ palette }) {
                     </div>
                   </div>
                   <div
-                    className="flex h-14 w-14 items-center justify-center rounded-2xl"
+                    className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl"
                     style={{ backgroundColor: palette.gold }}
                   >
                     <MonitorSmartphone size={24} color="#ffffff" />
