@@ -35,7 +35,7 @@ const steps = [
 
 export default function Contact({ palette }) {
   return (
-    <div className="space-y-10">
+    <div className="space-y-10 pt-8 md:pt-12">
       <motion.section
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
