@@ -19,10 +19,26 @@ export default function Home({ palette }) {
   ];
 
   const sectors = [
-    { icon: Stethoscope, label: 'Medical' },
-    { icon: Building2, label: 'Educational' },
-    { icon: BriefcaseBusiness, label: 'Business' },
-    { icon: Users, label: 'Community' },
+    {
+      icon: Stethoscope,
+      label: 'Medical',
+      description: 'Support for appointments, consultations, and healthcare interactions where clarity and accuracy matter.',
+    },
+    {
+      icon: Building2,
+      label: 'Educational',
+      description: 'Interpreting for classroom settings, meetings, and school-based communication access needs.',
+    },
+    {
+      icon: BriefcaseBusiness,
+      label: 'Business',
+      description: 'Professional access for workplace meetings, trainings, interviews, and organizational communication.',
+    },
+    {
+      icon: Users,
+      label: 'Community',
+      description: 'Language access for social services, public events, and everyday interactions in the community.',
+    },
   ];
 
   const highlights = ['In-Person & Remote', 'Based in Florida', 'Travel Available', 'Professional Service'];
@@ -181,16 +197,14 @@ export default function Home({ palette }) {
                 </div>
 
                 <div className="mt-6 grid gap-3 sm:grid-cols-2">
-                  {sectors.map(({ icon: Icon, label }) => (
+                  {sectors.map(({ icon: Icon, label, description }) => (
                     <div
                       key={label}
                       className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur"
                     >
                       <Icon size={18} style={{ color: palette.gold }} />
                       <div className="mt-3 text-base font-semibold text-white">{label}</div>
-                      <div className="mt-1 text-sm leading-6 text-white/70">
-                        Professional interpreting support tailored to real-world communication needs.
-                      </div>
+                      <div className="mt-1 text-sm leading-6 text-white/70">{description}</div>
                     </div>
                   ))}
                 </div>
