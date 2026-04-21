@@ -146,7 +146,7 @@ export default function Contact({ palette }) {
 
           <div className="mt-5 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <a
-              href="tel:+13523968098"
+              href="tel:+13213798010"
               className="inline-flex min-w-[220px] items-center justify-center gap-3 rounded-full px-5 py-3 text-sm font-semibold shadow-sm transition hover:opacity-90"
               style={{
                 backgroundColor: palette.gold,
