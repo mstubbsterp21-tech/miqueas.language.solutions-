@@ -68,6 +68,13 @@ export default function App() {
 
   return (
     <div className="min-h-screen overflow-x-hidden bg-white pb-24 text-slate-900 md:pb-0">
+      <style>{`
+        @keyframes mlsPulse {
+          0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(221, 125, 0, 0.18); }
+          50% { transform: scale(1.03); box-shadow: 0 0 0 10px rgba(221, 125, 0, 0); }
+        }
+      `}</style>
+
       <header className="sticky top-0 z-50 border-b border-black/5 bg-white/90 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 md:px-8 md:py-4">
           <Link to="/" className="flex min-w-0 flex-1 items-center gap-3">
@@ -308,7 +315,7 @@ export default function App() {
         <div className="mx-auto flex max-w-6xl items-center gap-3">
           <Link
             to="/contact"
-            className="inline-flex flex-1 items-center justify-center rounded-2xl px-4 py-3 text-sm font-semibold"
+            className="inline-flex flex-1 items-center justify-center rounded-2xl px-4 py-3 text-sm font-semibold transition duration-200 active:scale-[0.98]"
             style={{
               backgroundColor: palette.gold,
               color: palette.white,
@@ -319,11 +326,12 @@ export default function App() {
 
           <a
             href="tel:+13213798010"
-            className="inline-flex flex-1 items-center justify-center rounded-2xl border px-4 py-3 text-sm font-semibold"
+            className="inline-flex flex-1 items-center justify-center rounded-2xl border px-4 py-3 text-sm font-semibold transition duration-200 active:scale-[0.98]"
             style={{
               borderColor: palette.border,
               backgroundColor: palette.white,
               color: palette.charcoal,
+              animation: 'mlsPulse 8s ease-in-out infinite',
             }}
           >
             Call Now
