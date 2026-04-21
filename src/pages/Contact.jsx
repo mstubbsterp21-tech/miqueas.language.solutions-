@@ -11,6 +11,39 @@ export default function Contact({ palette }) {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.5 }}
+        className="mx-auto max-w-6xl rounded-2xl border p-4 md:p-6 shadow-sm"
+        style={{
+          borderColor: palette.border,
+          backgroundColor: palette.white,
+        }}
+      >
+        <div className="mb-6 text-center md:text-left">
+          <h3 className="text-2xl font-semibold" style={{ color: palette.charcoal }}>
+            Book an Appointment
+          </h3>
+
+          <p className="mt-3 text-sm leading-6" style={{ color: palette.body }}>
+            Choose a time that works best for you.
+          </p>
+        </div>
+
+        <div className="w-full overflow-hidden rounded-2xl border" style={{ borderColor: palette.border }}>
+          <iframe
+            src="https://calendar.google.com/calendar/appointments/schedules/AcZssZ1IsSpbyLU-AVkN8IohbJ0DKcNBJo_wdJs2eqwCrx1NHTZfuFR1vqbekuvpgMVMISqFqcIVDlh4?gv=true"
+            style={{ border: 0 }}
+            width="100%"
+            height="750"
+            frameBorder="0"
+            title="Google Calendar Appointment Scheduling"
+          />
+        </div>
+      </motion.section>
+
+      <motion.section
+        initial={{ opacity: 0, y: 16 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5 }}
         className="mx-auto max-w-3xl rounded-2xl border p-6 text-center shadow-sm"
         style={{
           borderColor: palette.border,
