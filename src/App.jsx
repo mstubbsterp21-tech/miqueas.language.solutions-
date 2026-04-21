@@ -38,23 +38,23 @@ const legalItems = [
   { path: "/accessibility", label: "Accessibility" },
 ];
 
-function BrandLockup({ showTagline = true }) {
+function BrandLockup({ showTagline = true, mobileCompact = false }) {
   return (
     <>
       <img
         src={logo}
         alt="Miqueas Language Solutions logo"
-        className="h-16 w-auto object-contain"
+        className={mobileCompact ? "h-12 w-auto object-contain sm:h-14" : "h-16 w-auto object-contain"}
       />
       <div className="min-w-0">
         <div
-          className="text-lg font-bold tracking-tight"
+          className={mobileCompact ? "text-sm font-bold leading-tight tracking-tight sm:text-base" : "text-lg font-bold tracking-tight"}
           style={{ color: palette.charcoal }}
         >
           Miqueas Language Solutions
         </div>
         {showTagline && (
-          <div className="text-sm" style={{ color: palette.burgundy }}>
+          <div className={mobileCompact ? "mt-0.5 text-[11px] leading-tight sm:text-xs" : "text-sm"} style={{ color: palette.burgundy }}>
             Bridging Perspectives. Delivering Understanding.
           </div>
         )}
@@ -67,11 +67,16 @@ export default function App() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-white text-slate-900">
+    <div className="min-h-screen overflow-x-hidden bg-white text-slate-900">
       <header className="sticky top-0 z-50 border-b border-black/5 bg-white/90 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4 md:px-8">
-          <Link to="/" className="flex min-w-0 items-center gap-3">
-            <BrandLockup />
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 md:px-8 md:py-4">
+          <Link to="/" className="flex min-w-0 flex-1 items-center gap-3">
+            <div className="hidden md:flex min-w-0 items-center gap-3">
+              <BrandLockup />
+            </div>
+            <div className="flex md:hidden min-w-0 items-center gap-2">
+              <BrandLockup mobileCompact />
+            </div>
           </Link>
 
           <nav className="hidden items-center gap-4 lg:gap-6 md:flex">
@@ -148,7 +153,7 @@ export default function App() {
           </nav>
 
           <button
-            className="rounded-xl p-2 md:hidden"
+            className="shrink-0 rounded-xl p-2 md:hidden"
             onClick={() => setMobileOpen((value) => !value)}
             aria-label="Toggle menu"
             type="button"
@@ -159,7 +164,7 @@ export default function App() {
 
         {mobileOpen && (
           <div className="border-t border-black/5 bg-white md:hidden">
-            <div className="mx-auto flex max-w-6xl flex-col gap-1 px-5 py-4">
+            <div className="mx-auto flex max-w-6xl flex-col gap-1 px-4 py-4">
               {navItems.map((item) => (
                 <Link
                   key={item.path}
@@ -172,7 +177,7 @@ export default function App() {
                 </Link>
               ))}
 
-              <div className="mt-2 flex items-center gap-3">
+              <div className="mt-2 flex flex-wrap items-center gap-3">
                 <a
                   href="https://www.instagram.com/miqueas.language.solutions/"
                   target="_blank"
@@ -181,12 +186,6 @@ export default function App() {
                   className="inline-flex h-11 w-11 items-center justify-center rounded-xl transition duration-200"
                   style={{ backgroundColor: palette.gold, color: palette.white }}
                   onClick={() => setMobileOpen(false)}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = palette.burgundy;
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = palette.gold;
-                  }}
                 >
                   <FaInstagram size={18} />
                 </a>
@@ -199,12 +198,6 @@ export default function App() {
                   className="inline-flex h-11 w-11 items-center justify-center rounded-xl transition duration-200"
                   style={{ backgroundColor: palette.gold, color: palette.white }}
                   onClick={() => setMobileOpen(false)}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = palette.burgundy;
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = palette.gold;
-                  }}
                 >
                   <FaFacebookF size={18} />
                 </a>
@@ -217,19 +210,13 @@ export default function App() {
                   className="inline-flex h-11 w-11 items-center justify-center rounded-xl transition duration-200"
                   style={{ backgroundColor: palette.gold, color: palette.white }}
                   onClick={() => setMobileOpen(false)}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = palette.burgundy;
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = palette.gold;
-                  }}
                 >
                   <FaLinkedinIn size={18} />
                 </a>
 
                 <Link
                   to="/contact"
-                  className="btn btn-primary flex-1 rounded-2xl px-4 py-3 text-center text-sm font-semibold"
+                  className="btn btn-primary min-w-[180px] flex-1 rounded-2xl px-4 py-3 text-center text-sm font-semibold"
                   onClick={() => setMobileOpen(false)}
                 >
                   Request a Quote
@@ -263,17 +250,17 @@ export default function App() {
         </Routes>
       </main>
 
-      <footer className="mt-10 border-t border-black/5 bg-[rgba(245,245,245,0.7)] px-5 py-8 md:px-8">
+      <footer className="mt-10 border-t border-black/5 bg-[rgba(245,245,245,0.7)] px-4 py-8 md:px-8">
         <div className="mx-auto grid max-w-6xl gap-8 md:grid-cols-[minmax(240px,1.2fr)_minmax(260px,1fr)_minmax(260px,1fr)_auto] md:items-start">
           <div className="flex items-center gap-3">
-            <BrandLockup showTagline={false} />
+            <BrandLockup showTagline={false} mobileCompact />
           </div>
 
           <div>
             <div className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
               Navigation
             </div>
-            <div className="flex flex-wrap gap-x-5 gap-y-2 text-sm text-slate-600">
+            <div className="flex flex-col gap-2 text-sm text-slate-600 sm:flex-row sm:flex-wrap sm:gap-x-5 sm:gap-y-2">
               {navItems.map((item) => (
                 <Link key={item.path} to={item.path} className="hover:text-slate-900">
                   {item.label}
@@ -286,7 +273,7 @@ export default function App() {
             <div className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
               Legal
             </div>
-            <div className="flex flex-wrap gap-x-5 gap-y-2 text-sm text-slate-600">
+            <div className="flex flex-col gap-2 text-sm text-slate-600 sm:flex-row sm:flex-wrap sm:gap-x-5 sm:gap-y-2">
               {legalItems.map((item) => (
                 <Link key={item.path} to={item.path} className="hover:text-slate-900">
                   {item.label}
@@ -295,7 +282,7 @@ export default function App() {
             </div>
           </div>
 
-          <div className="flex items-start gap-3 md:justify-self-end">
+          <div className="flex flex-col items-start gap-3 md:items-end md:justify-self-end">
             <div className="max-w-[210px] text-sm leading-6 text-slate-500 md:text-right">
               © 2026 Miqueas Language Solutions LLC. All rights reserved.
             </div>
