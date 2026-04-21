@@ -5,21 +5,8 @@ const emailIcon = (
   <svg viewBox="0 0 64 64" aria-hidden="true" className="h-8 w-8 md:h-10 md:w-10">
     <circle cx="32" cy="32" r="30" fill="#8B2E00" />
     <circle cx="32" cy="32" r="24" fill="none" stroke="#FFFFFF" strokeWidth="3" />
-    <path
-      d="M18 22h28v20H18z"
-      fill="none"
-      stroke="#FFFFFF"
-      strokeWidth="3"
-      strokeLinejoin="round"
-    />
-    <path
-      d="M18 22l14 12 14-12"
-      fill="none"
-      stroke="#FFFFFF"
-      strokeWidth="3"
-      strokeLinejoin="round"
-      strokeLinecap="round"
-    />
+    <path d="M18 22h28v20H18z" fill="none" stroke="#FFFFFF" strokeWidth="3" strokeLinejoin="round" />
+    <path d="M18 22l14 12 14-12" fill="none" stroke="#FFFFFF" strokeWidth="3" strokeLinejoin="round" strokeLinecap="round" />
   </svg>
 );
 
@@ -27,40 +14,117 @@ const phoneIcon = (
   <svg viewBox="0 0 64 64" aria-hidden="true" className="h-8 w-8 md:h-10 md:w-10">
     <circle cx="32" cy="32" r="30" fill="#8B2E00" />
     <circle cx="32" cy="32" r="24" fill="none" stroke="#FFFFFF" strokeWidth="3" />
-    <path
-      d="M25 18c1 0 2 .6 2.5 1.5l3 5.5c.6 1 .5 2.3-.3 3.1l-2.4 2.4c2 3.8 5.1 6.9 8.9 8.9l2.4-2.4c.8-.8 2.1-.9 3.1-.3l5.5 3c.9.5 1.5 1.5 1.5 2.5V47c0 1.7-1.3 3-3 3-15.5 0-28-12.5-28-28 0-1.7 1.3-3 3-3h4Z"
-      fill="none"
-      stroke="#FFFFFF"
-      strokeWidth="3"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
+    <path d="M25 18c1 0 2 .6 2.5 1.5l3 5.5c.6 1 .5 2.3-.3 3.1l-2.4 2.4c2 3.8 5.1 6.9 8.9 8.9l2.4-2.4c.8-.8 2.1-.9 3.1-.3l5.5 3c.9.5 1.5 1.5 1.5 2.5V47c0 1.7-1.3 3-3 3-15.5 0-28-12.5-28-28 0-1.7 1.3-3 3-3h4Z" fill="none" stroke="#FFFFFF" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
   </svg>
 );
+
+const steps = [
+  {
+    title: '1. Submit the request form',
+    description: 'Best for clients who already know the date, time, location, and service details needed for an interpreting request.',
+  },
+  {
+    title: '2. Book an info session',
+    description: 'Best if you want help talking through the request before submitting the form or need guidance on what information to provide.',
+  },
+  {
+    title: '3. Call or email for urgent needs',
+    description: 'Best for time-sensitive requests that need a faster response or immediate clarification.',
+  },
+];
 
 export default function Contact({ palette }) {
   return (
     <div className="space-y-10">
-      <InterpreterRequestForm palette={palette} />
+      <motion.section
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="mx-auto max-w-6xl rounded-3xl border px-5 py-8 md:px-8 md:py-10 shadow-sm"
+        style={{
+          borderColor: palette.border,
+          backgroundColor: palette.white,
+        }}
+      >
+        <div className="max-w-3xl">
+          <p
+            className="inline-flex rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em]"
+            style={{
+              color: palette.charcoal,
+              borderColor: palette.border,
+              backgroundColor: `${palette.gold}12`,
+            }}
+          >
+            Contact Miqueas Language Solutions
+          </p>
+
+          <h1 className="mt-4 text-3xl font-semibold leading-tight md:text-4xl" style={{ color: palette.charcoal }}>
+            Request interpreting services the way that works best for you.
+          </h1>
+
+          <p className="mt-4 max-w-2xl text-base leading-7 md:text-lg" style={{ color: palette.body }}>
+            Use the request form if you are ready to submit details. If you would rather talk through it first, book a quick info session and I can help you complete the form. For urgent requests, call or email directly.
+          </p>
+        </div>
+
+        <div className="mt-8 grid gap-4 md:grid-cols-3">
+          {steps.map((step) => (
+            <div
+              key={step.title}
+              className="rounded-2xl border p-5"
+              style={{
+                borderColor: palette.border,
+                backgroundColor: `${palette.gold}08`,
+              }}
+            >
+              <h2 className="text-base font-semibold" style={{ color: palette.charcoal }}>
+                {step.title}
+              </h2>
+              <p className="mt-2 text-sm leading-6" style={{ color: palette.body }}>
+                {step.description}
+              </p>
+            </div>
+          ))}
+        </div>
+      </motion.section>
 
       <motion.section
         initial={{ opacity: 0, y: 16 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.5 }}
-        className="mx-auto max-w-6xl rounded-2xl border p-4 md:p-6 shadow-sm"
+        className="mx-auto max-w-6xl"
+      >
+        <div className="mb-4 px-1 text-center md:text-left">
+          <h2 className="text-2xl font-semibold" style={{ color: palette.charcoal }}>
+            Ready to submit your request?
+          </h2>
+          <p className="mt-2 text-sm leading-6" style={{ color: palette.body }}>
+            Fill out the form below with as much detail as you have. The more complete the request, the faster I can review it and respond.
+          </p>
+        </div>
+
+        <InterpreterRequestForm palette={palette} />
+      </motion.section>
+
+      <motion.section
+        initial={{ opacity: 0, y: 16 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5 }}
+        className="mx-auto max-w-6xl rounded-3xl border p-4 md:p-6 shadow-sm"
         style={{
           borderColor: palette.border,
           backgroundColor: palette.white,
         }}
       >
-        <div className="mb-6 text-center md:text-left">
-          <h3 className="text-2xl font-semibold" style={{ color: palette.charcoal }}>
-            Need help with the form?
-          </h3>
+        <div className="mb-6 max-w-3xl text-center md:text-left">
+          <h2 className="text-2xl font-semibold" style={{ color: palette.charcoal }}>
+            Need help before submitting the form?
+          </h2>
 
           <p className="mt-3 text-sm leading-6" style={{ color: palette.body }}>
-            If you would rather talk it through first, book an info session and I can help you complete the request form. If your request is urgent, call or email directly below.
+            Book a short info session if you want to walk through your request with me first. This is helpful if you are unsure what type of service you need, what details to include, or whether the assignment is a good fit.
           </p>
         </div>
 
