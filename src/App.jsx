@@ -264,21 +264,29 @@ export default function App() {
       </main>
 
       <footer className="mt-10 border-t border-black/5 bg-[rgba(245,245,245,0.7)] px-5 py-8 md:px-8">
-        <div className="mx-auto flex max-w-6xl flex-col gap-6 md:flex-row md:items-start md:justify-between">
+        <div className="mx-auto grid max-w-6xl gap-8 md:grid-cols-[minmax(240px,1.2fr)_minmax(260px,1fr)_minmax(260px,1fr)_auto] md:items-start">
           <div className="flex items-center gap-3">
             <BrandLockup showTagline={false} />
           </div>
 
-          <div className="flex flex-col gap-4 text-sm text-slate-600 md:flex-row md:gap-10">
-            <div className="flex flex-wrap gap-x-5 gap-y-2">
+          <div>
+            <div className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+              Navigation
+            </div>
+            <div className="flex flex-wrap gap-x-5 gap-y-2 text-sm text-slate-600">
               {navItems.map((item) => (
                 <Link key={item.path} to={item.path} className="hover:text-slate-900">
                   {item.label}
                 </Link>
               ))}
             </div>
+          </div>
 
-            <div className="flex flex-wrap gap-x-5 gap-y-2">
+          <div>
+            <div className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+              Legal
+            </div>
+            <div className="flex flex-wrap gap-x-5 gap-y-2 text-sm text-slate-600">
               {legalItems.map((item) => (
                 <Link key={item.path} to={item.path} className="hover:text-slate-900">
                   {item.label}
@@ -287,14 +295,16 @@ export default function App() {
             </div>
           </div>
 
-          <div className="flex items-center gap-3 text-sm text-slate-500">
-            <span>© 2026 Miqueas Language Solutions LLC. All rights reserved.</span>
+          <div className="flex items-start gap-3 md:justify-self-end">
+            <div className="max-w-[210px] text-sm leading-6 text-slate-500 md:text-right">
+              © 2026 Miqueas Language Solutions LLC. All rights reserved.
+            </div>
             <a
               href="https://www.credly.com/badges/a160083c-07d6-4c48-adb3-6ad7e0d7b8d5/wallet"
               target="_blank"
               rel="noreferrer"
               aria-label="View credential badge on Credly"
-              className="transition hover:opacity-80"
+              className="shrink-0 transition hover:opacity-80"
             >
               <img
                 src="https://images.credly.com/size/340x340/images/eec9e878-8dcd-48fe-b57e-7e4d55637755/image.png"
