@@ -13,10 +13,10 @@ import {
 function UseCaseList({ title, items, palette }) {
   return (
     <div
-      className="rounded-[2rem] border p-6 md:p-8"
+      className="rounded-[2rem] border p-5 md:p-8"
       style={{ borderColor: palette.border, backgroundColor: palette.white }}
     >
-      <h3 className="text-2xl font-bold" style={{ color: palette.charcoal }}>
+      <h3 className="text-xl font-bold md:text-2xl" style={{ color: palette.charcoal }}>
         {title}
       </h3>
       <div className="mt-5 space-y-3">
@@ -114,15 +114,15 @@ export default function Services({ palette }) {
   ];
 
   return (
-    <div className="mx-auto max-w-6xl px-5 py-20 md:px-8">
-      <section className="rounded-[2.25rem] border p-8 shadow-sm md:p-12" style={{ borderColor: palette.border, backgroundColor: palette.white }}>
+    <div className="mx-auto max-w-6xl px-4 py-14 md:px-8 md:py-20">
+      <section className="rounded-[2rem] border p-5 shadow-sm md:rounded-[2.25rem] md:p-12" style={{ borderColor: palette.border, backgroundColor: palette.white }}>
         <p className="text-sm font-semibold uppercase tracking-[0.18em]" style={{ color: palette.gold }}>
           Services
         </p>
-        <h1 className="mt-4 max-w-4xl text-4xl font-bold tracking-tight md:text-5xl" style={{ color: palette.charcoal }}>
+        <h1 className="mt-4 max-w-4xl text-3xl font-bold tracking-tight md:text-5xl" style={{ color: palette.charcoal }}>
           Communication support designed with more depth, more clarity, and a better fit for the assignment.
         </h1>
-        <p className="mt-5 max-w-3xl text-base leading-8 md:text-lg" style={{ color: palette.body }}>
+        <p className="mt-5 max-w-3xl text-sm leading-7 md:text-lg md:leading-8" style={{ color: palette.body }}>
           Miqueas Language Solutions offers interpreting and translation services for clients who want more than generic coverage. Each service is structured around assignment fit, preparation, and a clear workflow so you know what to expect before the request is ever placed.
         </p>
 
@@ -143,13 +143,13 @@ export default function Services({ palette }) {
         </div>
       </section>
 
-      <div className="mt-12 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+      <div className="mt-10 grid gap-5 md:mt-12 md:gap-6 md:grid-cols-2 xl:grid-cols-4">
         {serviceCards.map((card) => {
           const Icon = card.icon;
           return (
             <div
               key={card.title}
-              className="group relative overflow-hidden rounded-[1.75rem] border p-6 shadow-sm transition-all duration-500 ease-out hover:-translate-y-1.5 hover:shadow-[0_18px_45px_rgba(0,0,0,0.08)]"
+              className="group relative overflow-hidden rounded-[1.5rem] border p-5 shadow-sm transition-all duration-500 ease-out hover:-translate-y-1.5 hover:shadow-[0_18px_45px_rgba(0,0,0,0.08)] md:rounded-[1.75rem] md:p-6"
               style={{ backgroundColor: palette.white, borderColor: palette.border }}
             >
               <div
@@ -193,18 +193,18 @@ export default function Services({ palette }) {
         })}
       </div>
 
-      <div className="mt-14 rounded-[2rem] border p-7 shadow-sm" style={{ borderColor: palette.border, backgroundColor: palette.white }}>
+      <div className="mt-12 rounded-[2rem] border p-5 shadow-sm md:mt-14 md:p-7" style={{ borderColor: palette.border, backgroundColor: palette.white }}>
         <p className="text-sm font-semibold uppercase tracking-[0.18em]" style={{ color: palette.gold }}>
           Compare your options
         </p>
-        <h2 className="mt-3 text-3xl font-bold" style={{ color: palette.charcoal }}>
+        <h2 className="mt-3 text-2xl font-bold md:text-3xl" style={{ color: palette.charcoal }}>
           Which service is right for your request?
         </h2>
         <p className="mt-4 max-w-3xl text-sm leading-7" style={{ color: palette.body }}>
           Every request still goes through the same quote form, but the service type changes the workflow, the preparation, and how pricing is structured. This comparison helps you choose the right starting point.
         </p>
 
-        <div className="mt-8 overflow-hidden rounded-[1.75rem] border" style={{ borderColor: palette.border }}>
+        <div className="mt-8 hidden overflow-hidden rounded-[1.75rem] border md:block" style={{ borderColor: palette.border }}>
           <div className="grid grid-cols-5 text-sm font-semibold" style={{ backgroundColor: palette.softGray, color: palette.charcoal }}>
             <div className="border-r p-4" style={{ borderColor: palette.border }}>Category</div>
             <div className="border-r p-4" style={{ borderColor: palette.border }}>In‑Person</div>
@@ -237,13 +237,40 @@ export default function Services({ palette }) {
             </div>
           ))}
         </div>
+
+        <div className="mt-8 space-y-4 md:hidden">
+          {serviceCards.map((card, cardIndex) => (
+            <div
+              key={card.title}
+              className="rounded-[1.5rem] border p-5"
+              style={{ borderColor: palette.border, backgroundColor: palette.softGray }}
+            >
+              <h3 className="text-lg font-semibold" style={{ color: palette.charcoal }}>
+                {card.title}
+              </h3>
+
+              <div className="mt-4 space-y-4">
+                {comparisonRows.map((row) => (
+                  <div key={`${card.title}-${row.label}`}>
+                    <p className="text-xs font-semibold uppercase tracking-[0.12em]" style={{ color: palette.gold }}>
+                      {row.label}
+                    </p>
+                    <p className="mt-1 text-sm leading-6" style={{ color: palette.body }}>
+                      {row.values[cardIndex]}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
 
-      <div className="mt-14 grid gap-8 lg:grid-cols-[1fr_1.15fr]">
+      <div className="mt-12 grid gap-6 lg:mt-14 lg:grid-cols-[1fr_1.15fr] lg:gap-8">
         <UseCaseList title="Real-world use cases" items={useCases} palette={palette} />
 
         <div
-          className="rounded-[2rem] p-7 shadow-sm transition-all duration-500 ease-out hover:-translate-y-1 hover:shadow-[0_16px_36px_rgba(0,0,0,0.12)]"
+          className="rounded-[2rem] p-5 shadow-sm transition-all duration-500 ease-out hover:-translate-y-1 hover:shadow-[0_16px_36px_rgba(0,0,0,0.12)] md:p-7"
           style={{ backgroundColor: palette.charcoal }}
         >
           <p className="text-sm font-semibold uppercase tracking-[0.18em]" style={{ color: palette.gold }}>
