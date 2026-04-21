@@ -67,7 +67,7 @@ export default function App() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <div className="min-h-screen overflow-x-hidden bg-white text-slate-900">
+    <div className="min-h-screen overflow-x-hidden bg-white pb-24 text-slate-900 md:pb-0">
       <header className="sticky top-0 z-50 border-b border-black/5 bg-white/90 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 md:px-8 md:py-4">
           <Link to="/" className="flex min-w-0 flex-1 items-center gap-3">
@@ -303,6 +303,33 @@ export default function App() {
           </div>
         </div>
       </footer>
+
+      <div className="fixed inset-x-0 bottom-0 z-50 border-t border-black/10 bg-white/95 px-4 py-3 shadow-[0_-10px_30px_rgba(0,0,0,0.08)] backdrop-blur md:hidden">
+        <div className="mx-auto flex max-w-6xl items-center gap-3">
+          <Link
+            to="/contact"
+            className="inline-flex flex-1 items-center justify-center rounded-2xl px-4 py-3 text-sm font-semibold"
+            style={{
+              backgroundColor: palette.gold,
+              color: palette.white,
+            }}
+          >
+            Request Services
+          </Link>
+
+          <a
+            href="tel:+13213798010"
+            className="inline-flex flex-1 items-center justify-center rounded-2xl border px-4 py-3 text-sm font-semibold"
+            style={{
+              borderColor: palette.border,
+              backgroundColor: palette.white,
+              color: palette.charcoal,
+            }}
+          >
+            Call Now
+          </a>
+        </div>
+      </div>
     </div>
   );
 }
