@@ -8,6 +8,9 @@ import ResourcesLayout from "./pages/ResourcesLayout";
 import ResourcesClients from "./pages/ResourcesClients";
 import ResourcesInterpreters from "./pages/ResourcesInterpreters";
 import Contact from "./pages/Contact";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import Terms from "./pages/Terms";
+import Accessibility from "./pages/Accessibility";
 import logo from "./logo.png";
 import { FaInstagram, FaLinkedinIn, FaFacebookF } from "react-icons/fa";
 
@@ -27,6 +30,12 @@ const navItems = [
   { path: "/about", label: "About" },
   { path: "/resources", label: "Resources" },
   { path: "/contact", label: "Contact" },
+];
+
+const legalItems = [
+  { path: "/privacy", label: "Privacy Policy" },
+  { path: "/terms", label: "Terms & Conditions" },
+  { path: "/accessibility", label: "Accessibility" },
 ];
 
 function BrandLockup({ showTagline = true }) {
@@ -248,21 +257,34 @@ export default function App() {
           </Route>
 
           <Route path="/contact" element={<Contact palette={palette} />} />
+          <Route path="/privacy" element={<PrivacyPolicy palette={palette} />} />
+          <Route path="/terms" element={<Terms palette={palette} />} />
+          <Route path="/accessibility" element={<Accessibility palette={palette} />} />
         </Routes>
       </main>
 
       <footer className="mt-10 border-t border-black/5 bg-[rgba(245,245,245,0.7)] px-5 py-8 md:px-8">
-        <div className="mx-auto flex max-w-6xl flex-col gap-6 md:flex-row md:items-center md:justify-between">
+        <div className="mx-auto flex max-w-6xl flex-col gap-6 md:flex-row md:items-start md:justify-between">
           <div className="flex items-center gap-3">
             <BrandLockup showTagline={false} />
           </div>
 
-          <div className="flex flex-wrap gap-x-5 gap-y-2 text-sm text-slate-600">
-            {navItems.map((item) => (
-              <Link key={item.path} to={item.path} className="hover:text-slate-900">
-                {item.label}
-              </Link>
-            ))}
+          <div className="flex flex-col gap-4 text-sm text-slate-600 md:flex-row md:gap-10">
+            <div className="flex flex-wrap gap-x-5 gap-y-2">
+              {navItems.map((item) => (
+                <Link key={item.path} to={item.path} className="hover:text-slate-900">
+                  {item.label}
+                </Link>
+              ))}
+            </div>
+
+            <div className="flex flex-wrap gap-x-5 gap-y-2">
+              {legalItems.map((item) => (
+                <Link key={item.path} to={item.path} className="hover:text-slate-900">
+                  {item.label}
+                </Link>
+              ))}
+            </div>
           </div>
 
           <div className="flex items-center gap-3 text-sm text-slate-500">
