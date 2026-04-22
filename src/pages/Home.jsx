@@ -46,20 +46,17 @@ export default function Home({ palette }) {
     {
       quote:
         'Micah is very involved in the interpreting field and Deaf community. He consistently makes every effort to adapt to the needs of his Deaf consumers, appropriately anticipates my needs, and follows through.',
-      attribution: 'Anonymous Deaf Consumer',
-      role: 'Consumer Reference',
+      role: 'Deaf Consumer',
     },
     {
       quote:
         'Micah is a highly intelligent, motivated, and skilled interpreter. He is respectful, professional, and actively seeks ways to continue learning and growing. You will have no regrets in hiring Micah Stubbs.',
-      attribution: 'Anonymous Professional Reference',
       role: 'Interpreter Mentor',
     },
     {
       quote:
         'Micah is professional and competent. He works well as part of an interpreting team, communicates well about consumer needs, and demonstrates humility by continuing to learn without going beyond the scope of his skills and experience.',
-      attribution: 'Anonymous Colleague',
-      role: 'Interpreting Colleague',
+      role: 'Interpreter Colleague',
     },
   ];
 
@@ -295,7 +292,7 @@ export default function Home({ palette }) {
           <div className="mt-8 grid gap-5 lg:grid-cols-3">
             {testimonials.map((testimonial) => (
               <motion.div
-                key={`${testimonial.attribution}-${testimonial.role}`}
+                key={`${testimonial.role}-${testimonial.quote.slice(0, 20)}`}
                 variants={staggerItem}
                 initial="hidden"
                 whileInView="show"
@@ -318,10 +315,7 @@ export default function Home({ palette }) {
                 </p>
 
                 <div className="mt-6 border-t pt-4" style={{ borderColor: palette.border }}>
-                  <div className="text-base font-semibold" style={{ color: palette.charcoal }}>
-                    {testimonial.attribution}
-                  </div>
-                  <div className="mt-1 text-sm" style={{ color: palette.burgundy }}>
+                  <div className="text-sm font-semibold uppercase tracking-[0.14em]" style={{ color: palette.burgundy }}>
                     {testimonial.role}
                   </div>
                 </div>
