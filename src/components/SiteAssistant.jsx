@@ -8,7 +8,7 @@ import {
   getStarterPrompts,
 } from '../lib/siteAssistantKnowledge';
 
-const STORAGE_KEY = 'mls-site-assistant-v1';
+const STORAGE_KEY = 'mls-site-assistant-v2';
 
 const palette = {
   burgundy: '#721100',
@@ -124,13 +124,14 @@ export default function SiteAssistant() {
 
       const data = await response.json();
       const fallback = getFallbackResponse({ message: text, pathname: location.pathname });
+      const responseText = typeof data.reply === 'string' ? data.reply.trim() : '';
 
       setMessages((current) => [
         ...current,
         {
           id: `assistant-${Date.now()}`,
           role: 'assistant',
-          content: data.reply || fallback.reply,
+          content: responseText || fallback.reply,
           actions: data.actions?.length ? data.actions : fallback.actions,
         },
       ]);
@@ -147,6 +148,20 @@ export default function SiteAssistant() {
       ]);
     } finally {
       setLoading(false);
+    }
+  }
+
+  function clearConversation() {
+    const greeting = {
+      id: `assistant-${Date.now()}`,
+      role: 'assistant',
+      content: buildGreeting(location.pathname),
+      actions: footerActions,
+    };
+    setMessages([greeting]);
+    setDraft('');
+    if (typeof window !== 'undefined') {
+      window.sessionStorage.removeItem(STORAGE_KEY);
     }
   }
 
@@ -260,10 +275,21 @@ export default function SiteAssistant() {
             </button>
           </div>
 
-          <div className="mt-3 flex flex-wrap justify-end gap-2">
-            {footerActions.map((action) => (
-              <AssistantLink key={`${action.label}-${action.href}`} action={action} />
-            ))}
+          <div className="mt-3 flex items-center justify-between gap-2">
+            <button
+              type="button"
+              onClick={clearConversation}
+              className="text-xs font-semibold uppercase tracking-[0.14em] transition hover:opacity-70"
+              style={{ color: palette.burgundy }}
+            >
+              New chat
+            </button>
+
+            <div className="flex flex-wrap justify-end gap-2">
+              {footerActions.map((action) => (
+                <AssistantLink key={`${action.label}-${action.href}`} action={action} />
+              ))}
+            </div>
           </div>
         </form>
       </div>
