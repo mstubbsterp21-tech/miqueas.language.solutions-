@@ -1,9 +1,9 @@
 import { Link } from 'react-router-dom';
 import {
   ArrowRight,
+  BriefcaseBusiness,
   CheckCircle2,
   Globe,
-  Ship,
   Stethoscope,
   GraduationCap,
   Users,
@@ -72,7 +72,7 @@ export default function Services({ palette }) {
   const specialtyCards = [
     { icon: Stethoscope, title: 'Medical' },
     { icon: GraduationCap, title: 'Educational' },
-    { icon: Ship, title: 'Cruise' },
+    { icon: BriefcaseBusiness, title: 'Business' },
     { icon: Users, title: 'Community' },
   ];
 
