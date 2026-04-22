@@ -13,6 +13,7 @@ import Terms from "./pages/Terms";
 import Accessibility from "./pages/Accessibility";
 import logo from "./logo.png";
 import { FaInstagram, FaLinkedinIn, FaFacebookF } from "react-icons/fa";
+import { Mail, Phone } from "lucide-react";
 
 const palette = {
   burgundy: "#721100",
@@ -75,124 +76,74 @@ export default function App() {
         }
       `}</style>
 
-      <header className="sticky top-0 z-50 border-b border-black/5 bg-white/90 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 md:px-8 md:py-4">
-          <Link to="/" className="flex min-w-0 flex-1 items-center gap-3">
-            <div className="hidden md:flex min-w-0 items-center gap-3">
-              <BrandLockup />
+      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur">
+        <div className="border-b border-black/5 bg-[rgba(245,245,245,0.85)]">
+          <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-x-5 gap-y-2 px-4 py-2 text-xs sm:justify-between md:px-8">
+            <div className="hidden text-[11px] font-medium uppercase tracking-[0.18em] text-slate-500 sm:block">
+              Professional ASL-English Interpreting
             </div>
-            <div className="flex md:hidden min-w-0 items-center gap-2">
-              <BrandLockup mobileCompact />
-            </div>
-          </Link>
 
-          <nav className="hidden items-center gap-4 lg:gap-6 md:flex">
-            {navItems.map((item) => (
-              <Link
-                key={item.path}
-                to={item.path}
-                className="text-sm font-medium transition hover:opacity-70"
+            <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 sm:justify-end">
+              <a
+                href="tel:+13213798010"
+                className="inline-flex items-center gap-2 text-sm font-medium transition hover:opacity-75"
                 style={{ color: palette.charcoal }}
               >
-                {item.label}
-              </Link>
-            ))}
-
-            <div className="ml-2 flex items-center gap-2">
-              <a
-                href="https://www.instagram.com/miqueas.language.solutions/"
-                target="_blank"
-                rel="noreferrer"
-                aria-label="Instagram"
-                className="inline-flex h-10 w-10 items-center justify-center rounded-xl transition duration-200 hover:-translate-y-0.5"
-                style={{ backgroundColor: palette.gold, color: palette.white }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = palette.burgundy;
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = palette.gold;
-                }}
-              >
-                <FaInstagram size={18} />
+                <Phone size={14} style={{ color: palette.gold }} />
+                <span>(321) 379-8010</span>
               </a>
 
-              <a
-                href="https://www.facebook.com/profile.php?id=61573286078153"
-                target="_blank"
-                rel="noreferrer"
-                aria-label="Facebook"
-                className="inline-flex h-10 w-10 items-center justify-center rounded-xl transition duration-200 hover:-translate-y-0.5"
-                style={{ backgroundColor: palette.gold, color: palette.white }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = palette.burgundy;
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = palette.gold;
-                }}
-              >
-                <FaFacebookF size={18} />
-              </a>
+              <div className="hidden h-4 w-px bg-black/10 sm:block" />
 
               <a
-                href="https://www.linkedin.com/in/micah-stubbs-7a7802145/"
-                target="_blank"
-                rel="noreferrer"
-                aria-label="LinkedIn"
-                className="inline-flex h-10 w-10 items-center justify-center rounded-xl transition duration-200 hover:-translate-y-0.5"
-                style={{ backgroundColor: palette.gold, color: palette.white }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = palette.burgundy;
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = palette.gold;
-                }}
+                href="mailto:m.stubbs@miqueaslanguagesolutions.com"
+                className="inline-flex items-center gap-2 text-sm font-medium transition hover:opacity-75"
+                style={{ color: palette.charcoal }}
               >
-                <FaLinkedinIn size={18} />
+                <Mail size={14} style={{ color: palette.gold }} />
+                <span className="break-all sm:break-normal">m.stubbs@miqueaslanguagesolutions.com</span>
               </a>
-
-              <Link
-                to="/contact"
-                className="btn btn-primary inline-flex items-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-semibold whitespace-nowrap transition"
-              >
-                Request a Quote
-              </Link>
             </div>
-          </nav>
-
-          <button
-            className="shrink-0 rounded-xl p-2 md:hidden"
-            onClick={() => setMobileOpen((value) => !value)}
-            aria-label="Toggle menu"
-            type="button"
-          >
-            {mobileOpen ? "X" : "☰"}
-          </button>
+          </div>
         </div>
 
-        {mobileOpen && (
-          <div className="border-t border-black/5 bg-white md:hidden">
-            <div className="mx-auto flex max-w-6xl flex-col gap-1 px-4 py-4">
+        <div className="border-b border-black/5">
+          <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 md:px-8 md:py-4">
+            <Link to="/" className="flex min-w-0 flex-1 items-center gap-3">
+              <div className="hidden md:flex min-w-0 items-center gap-3">
+                <BrandLockup />
+              </div>
+              <div className="flex md:hidden min-w-0 items-center gap-2">
+                <BrandLockup mobileCompact />
+              </div>
+            </Link>
+
+            <nav className="hidden items-center gap-4 lg:gap-6 md:flex">
               {navItems.map((item) => (
                 <Link
                   key={item.path}
                   to={item.path}
-                  className="rounded-xl px-3 py-3 text-sm font-medium hover:bg-black/5"
+                  className="text-sm font-medium transition hover:opacity-70"
                   style={{ color: palette.charcoal }}
-                  onClick={() => setMobileOpen(false)}
                 >
                   {item.label}
                 </Link>
               ))}
 
-              <div className="mt-2 flex flex-wrap items-center gap-3">
+              <div className="ml-2 flex items-center gap-2">
                 <a
                   href="https://www.instagram.com/miqueas.language.solutions/"
                   target="_blank"
                   rel="noreferrer"
                   aria-label="Instagram"
-                  className="inline-flex h-11 w-11 items-center justify-center rounded-xl transition duration-200"
+                  className="inline-flex h-10 w-10 items-center justify-center rounded-xl transition duration-200 hover:-translate-y-0.5"
                   style={{ backgroundColor: palette.gold, color: palette.white }}
-                  onClick={() => setMobileOpen(false)}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = palette.burgundy;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = palette.gold;
+                  }}
                 >
                   <FaInstagram size={18} />
                 </a>
@@ -202,9 +153,14 @@ export default function App() {
                   target="_blank"
                   rel="noreferrer"
                   aria-label="Facebook"
-                  className="inline-flex h-11 w-11 items-center justify-center rounded-xl transition duration-200"
+                  className="inline-flex h-10 w-10 items-center justify-center rounded-xl transition duration-200 hover:-translate-y-0.5"
                   style={{ backgroundColor: palette.gold, color: palette.white }}
-                  onClick={() => setMobileOpen(false)}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = palette.burgundy;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = palette.gold;
+                  }}
                 >
                   <FaFacebookF size={18} />
                 </a>
@@ -214,24 +170,101 @@ export default function App() {
                   target="_blank"
                   rel="noreferrer"
                   aria-label="LinkedIn"
-                  className="inline-flex h-11 w-11 items-center justify-center rounded-xl transition duration-200"
+                  className="inline-flex h-10 w-10 items-center justify-center rounded-xl transition duration-200 hover:-translate-y-0.5"
                   style={{ backgroundColor: palette.gold, color: palette.white }}
-                  onClick={() => setMobileOpen(false)}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = palette.burgundy;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = palette.gold;
+                  }}
                 >
                   <FaLinkedinIn size={18} />
                 </a>
 
                 <Link
                   to="/contact"
-                  className="btn btn-primary min-w-[180px] flex-1 rounded-2xl px-4 py-3 text-center text-sm font-semibold"
-                  onClick={() => setMobileOpen(false)}
+                  className="btn btn-primary inline-flex items-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-semibold whitespace-nowrap transition"
                 >
                   Request a Quote
                 </Link>
               </div>
-            </div>
+            </nav>
+
+            <button
+              className="shrink-0 rounded-xl p-2 md:hidden"
+              onClick={() => setMobileOpen((value) => !value)}
+              aria-label="Toggle menu"
+              type="button"
+            >
+              {mobileOpen ? "X" : "☰"}
+            </button>
           </div>
-        )}
+
+          {mobileOpen && (
+            <div className="border-t border-black/5 bg-white md:hidden">
+              <div className="mx-auto flex max-w-6xl flex-col gap-1 px-4 py-4">
+                {navItems.map((item) => (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    className="rounded-xl px-3 py-3 text-sm font-medium hover:bg-black/5"
+                    style={{ color: palette.charcoal }}
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+
+                <div className="mt-2 flex flex-wrap items-center gap-3">
+                  <a
+                    href="https://www.instagram.com/miqueas.language.solutions/"
+                    target="_blank"
+                    rel="noreferrer"
+                    aria-label="Instagram"
+                    className="inline-flex h-11 w-11 items-center justify-center rounded-xl transition duration-200"
+                    style={{ backgroundColor: palette.gold, color: palette.white }}
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    <FaInstagram size={18} />
+                  </a>
+
+                  <a
+                    href="https://www.facebook.com/profile.php?id=61573286078153"
+                    target="_blank"
+                    rel="noreferrer"
+                    aria-label="Facebook"
+                    className="inline-flex h-11 w-11 items-center justify-center rounded-xl transition duration-200"
+                    style={{ backgroundColor: palette.gold, color: palette.white }}
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    <FaFacebookF size={18} />
+                  </a>
+
+                  <a
+                    href="https://www.linkedin.com/in/micah-stubbs-7a7802145/"
+                    target="_blank"
+                    rel="noreferrer"
+                    aria-label="LinkedIn"
+                    className="inline-flex h-11 w-11 items-center justify-center rounded-xl transition duration-200"
+                    style={{ backgroundColor: palette.gold, color: palette.white }}
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    <FaLinkedinIn size={18} />
+                  </a>
+
+                  <Link
+                    to="/contact"
+                    className="btn btn-primary min-w-[180px] flex-1 rounded-2xl px-4 py-3 text-center text-sm font-semibold"
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    Request a Quote
+                  </Link>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
       </header>
 
       <main>
@@ -276,16 +309,41 @@ export default function App() {
             </div>
           </div>
 
-          <div>
-            <div className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-              Legal
+          <div className="space-y-6">
+            <div>
+              <div className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+                Contact
+              </div>
+              <div className="flex flex-col gap-3 text-sm text-slate-600">
+                <a
+                  href="tel:+13213798010"
+                  className="inline-flex items-center gap-2 hover:text-slate-900"
+                >
+                  <Phone size={16} style={{ color: palette.gold }} />
+                  <span>(321) 379-8010</span>
+                </a>
+
+                <a
+                  href="mailto:m.stubbs@miqueaslanguagesolutions.com"
+                  className="inline-flex items-center gap-2 break-all hover:text-slate-900 sm:break-normal"
+                >
+                  <Mail size={16} style={{ color: palette.gold }} />
+                  <span>m.stubbs@miqueaslanguagesolutions.com</span>
+                </a>
+              </div>
             </div>
-            <div className="flex flex-col gap-2 text-sm text-slate-600 sm:flex-row sm:flex-wrap sm:gap-x-5 sm:gap-y-2">
-              {legalItems.map((item) => (
-                <Link key={item.path} to={item.path} className="hover:text-slate-900">
-                  {item.label}
-                </Link>
-              ))}
+
+            <div>
+              <div className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+                Legal
+              </div>
+              <div className="flex flex-col gap-2 text-sm text-slate-600">
+                {legalItems.map((item) => (
+                  <Link key={item.path} to={item.path} className="hover:text-slate-900">
+                    {item.label}
+                  </Link>
+                ))}
+              </div>
             </div>
           </div>
 
