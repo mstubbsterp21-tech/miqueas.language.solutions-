@@ -173,7 +173,7 @@ export default function App() {
         </div>
 
         <div className="border-b border-black/5 bg-[rgba(245,245,245,0.85)]">
-          <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-x-5 gap-y-2 px-4 py-2.5 text-sm md:px-8 md:justify-end">
+          <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-x-5 gap-y-2 px-4 py-2.5 text-sm md:px-8">
             <a
               href="tel:+13213798010"
               className="inline-flex items-center gap-2 font-medium transition hover:opacity-75"
