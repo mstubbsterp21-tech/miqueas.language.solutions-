@@ -5,6 +5,7 @@ import {
   BriefcaseBusiness,
   Building2,
   MonitorSmartphone,
+  Quote,
   Stethoscope,
   Users,
 } from 'lucide-react';
@@ -38,6 +39,27 @@ export default function Home({ palette }) {
       icon: Users,
       label: 'Community',
       description: 'Language access for social services, public events, and everyday interactions in the community.',
+    },
+  ];
+
+  const testimonials = [
+    {
+      quote:
+        "Micah is very involved in the interpreting field and Deaf community. He consistently makes every effort to adapt to the needs of his Deaf consumers, appropriately anticipates my needs, and follows through.",
+      attribution: 'Jasmin',
+      role: 'Deaf Consumer',
+    },
+    {
+      quote:
+        "Micah is a highly intelligent, motivated, and skilled interpreter. He is respectful, professional, and actively seeks ways to continue learning and growing. You will have no regrets in hiring Micah Stubbs.",
+      attribution: 'Glenda A. Foster, NIC',
+      role: 'Professional Reference',
+    },
+    {
+      quote:
+        "Micah is professional and competent. He works well as part of an interpreting team, communicates well about consumer needs, and demonstrates humility by continuing to learn without going beyond the scope of his skills and experience.",
+      attribution: 'Allyssa Blue',
+      role: 'Interpreting Colleague',
     },
   ];
 
@@ -241,6 +263,76 @@ export default function Home({ palette }) {
               </motion.div>
             ))}
           </motion.div>
+        </motion.section>
+
+        <motion.section
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.15 }}
+          transition={{ duration: 0.5 }}
+          className="mt-12 rounded-[2rem] border p-6 shadow-sm md:mt-14 md:p-10"
+          style={{
+            borderColor: `${palette.gold}20`,
+            backgroundColor: 'rgba(255,255,255,0.82)',
+          }}
+        >
+          <div className="max-w-3xl">
+            <div
+              className="inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium"
+              style={{
+                color: palette.charcoal,
+                borderColor: `${palette.gold}33`,
+                backgroundColor: 'rgba(255,255,255,0.8)',
+              }}
+            >
+              <Quote size={16} style={{ color: palette.gold }} />
+              Trusted by consumers and colleagues
+            </div>
+
+            <h2 className="mt-5 text-3xl font-bold tracking-tight md:text-4xl" style={{ color: palette.charcoal }}>
+              What others are saying about Micah
+            </h2>
+            <p className="mt-4 text-base leading-7 md:text-lg" style={{ color: palette.body }}>
+              These references speak to professionalism, adaptability, and a strong commitment to both the Deaf community and the interpreting field.
+            </p>
+          </div>
+
+          <div className="mt-8 grid gap-5 lg:grid-cols-3">
+            {testimonials.map((testimonial) => (
+              <motion.div
+                key={testimonial.attribution}
+                variants={staggerItem}
+                initial="hidden"
+                whileInView="show"
+                viewport={{ once: true, amount: 0.2 }}
+                className="h-full rounded-[1.75rem] border p-6 shadow-sm"
+                style={{
+                  borderColor: `${palette.gold}18`,
+                  backgroundColor: palette.white,
+                }}
+              >
+                <div
+                  className="flex h-11 w-11 items-center justify-center rounded-2xl"
+                  style={{ backgroundColor: `${palette.gold}16` }}
+                >
+                  <Quote size={18} style={{ color: palette.burgundy }} />
+                </div>
+
+                <p className="mt-5 text-sm leading-7 md:text-base" style={{ color: palette.body }}>
+                  “{testimonial.quote}”
+                </p>
+
+                <div className="mt-6 border-t pt-4" style={{ borderColor: palette.border }}>
+                  <div className="text-base font-semibold" style={{ color: palette.charcoal }}>
+                    {testimonial.attribution}
+                  </div>
+                  <div className="mt-1 text-sm" style={{ color: palette.burgundy }}>
+                    {testimonial.role}
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
         </motion.section>
       </div>
     </div>
