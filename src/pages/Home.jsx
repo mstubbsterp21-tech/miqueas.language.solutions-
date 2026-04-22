@@ -10,7 +10,7 @@ import {
   Users,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { fadeUp, staggerContainer, staggerItem } from '../lib/motion';
+import { staggerContainer, staggerItem } from '../lib/motion';
 
 export default function Home({ palette }) {
   const stats = [
@@ -45,20 +45,20 @@ export default function Home({ palette }) {
   const testimonials = [
     {
       quote:
-        "Micah is very involved in the interpreting field and Deaf community. He consistently makes every effort to adapt to the needs of his Deaf consumers, appropriately anticipates my needs, and follows through.",
-      attribution: 'Jasmin',
-      role: 'Deaf Consumer',
+        'Micah is very involved in the interpreting field and Deaf community. He consistently makes every effort to adapt to the needs of his Deaf consumers, appropriately anticipates my needs, and follows through.',
+      attribution: 'Anonymous Deaf Consumer',
+      role: 'Consumer Reference',
     },
     {
       quote:
-        "Micah is a highly intelligent, motivated, and skilled interpreter. He is respectful, professional, and actively seeks ways to continue learning and growing. You will have no regrets in hiring Micah Stubbs.",
-      attribution: 'Glenda A. Foster, NIC',
-      role: 'Professional Reference',
+        'Micah is a highly intelligent, motivated, and skilled interpreter. He is respectful, professional, and actively seeks ways to continue learning and growing. You will have no regrets in hiring Micah Stubbs.',
+      attribution: 'Anonymous Professional Reference',
+      role: 'Interpreter Mentor',
     },
     {
       quote:
-        "Micah is professional and competent. He works well as part of an interpreting team, communicates well about consumer needs, and demonstrates humility by continuing to learn without going beyond the scope of his skills and experience.",
-      attribution: 'Allyssa Blue',
+        'Micah is professional and competent. He works well as part of an interpreting team, communicates well about consumer needs, and demonstrates humility by continuing to learn without going beyond the scope of his skills and experience.',
+      attribution: 'Anonymous Colleague',
       role: 'Interpreting Colleague',
     },
   ];
@@ -76,7 +76,9 @@ export default function Home({ palette }) {
 
       <div className="relative mx-auto max-w-6xl px-5 py-16 md:px-8 md:py-24">
         <motion.section
-          {...fadeUp}
+          initial={{ opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
           className="relative overflow-hidden rounded-[2rem] border p-6 shadow-[0_25px_80px_rgba(0,0,0,0.08)] md:p-10"
           style={{
             borderColor: `${palette.gold}22`,
@@ -97,8 +99,7 @@ export default function Home({ palette }) {
             <div>
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
+                animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.45 }}
                 className="mb-5 inline-flex flex-wrap items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium"
                 style={{
@@ -113,8 +114,7 @@ export default function Home({ palette }) {
 
               <motion.h1
                 initial={{ opacity: 0, y: 16 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
+                animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.05 }}
                 className="max-w-4xl text-4xl font-bold leading-tight tracking-tight md:text-6xl"
                 style={{ color: palette.charcoal }}
@@ -124,8 +124,7 @@ export default function Home({ palette }) {
 
               <motion.p
                 initial={{ opacity: 0, y: 16 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
+                animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.1 }}
                 className="mt-6 max-w-3xl text-lg leading-8 md:text-xl"
                 style={{ color: palette.body }}
@@ -138,8 +137,7 @@ export default function Home({ palette }) {
 
               <motion.div
                 initial={{ opacity: 0, y: 16 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
+                animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.45, delay: 0.15 }}
                 className="mt-8 flex flex-wrap gap-4"
               >
@@ -161,8 +159,7 @@ export default function Home({ palette }) {
               <motion.div
                 variants={staggerContainer}
                 initial="hidden"
-                whileInView="show"
-                viewport={{ once: true, amount: 0.2 }}
+                animate="show"
                 className="mt-8 flex flex-wrap gap-3"
               >
                 {highlights.map((item) => (
@@ -184,8 +181,7 @@ export default function Home({ palette }) {
 
             <motion.div
               initial={{ opacity: 0, x: 24 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
+              animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.55, delay: 0.1 }}
               className="relative"
             >
@@ -239,8 +235,7 @@ export default function Home({ palette }) {
           <motion.div
             variants={staggerContainer}
             initial="hidden"
-            whileInView="show"
-            viewport={{ once: true, amount: 0.2 }}
+            animate="show"
             className="relative mt-10 grid gap-4 sm:grid-cols-3"
           >
             {stats.map(([stat, label]) => (
@@ -300,7 +295,7 @@ export default function Home({ palette }) {
           <div className="mt-8 grid gap-5 lg:grid-cols-3">
             {testimonials.map((testimonial) => (
               <motion.div
-                key={testimonial.attribution}
+                key={`${testimonial.attribution}-${testimonial.role}`}
                 variants={staggerItem}
                 initial="hidden"
                 whileInView="show"
