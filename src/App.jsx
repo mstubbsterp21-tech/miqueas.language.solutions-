@@ -77,36 +77,6 @@ export default function App() {
       `}</style>
 
       <header className="sticky top-0 z-50 bg-white/95 backdrop-blur">
-        <div className="border-b border-black/5 bg-[rgba(245,245,245,0.85)]">
-          <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-x-5 gap-y-2 px-4 py-2 text-xs sm:justify-between md:px-8">
-            <div className="hidden text-[11px] font-medium uppercase tracking-[0.18em] text-slate-500 sm:block">
-              Professional ASL-English Interpreting
-            </div>
-
-            <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 sm:justify-end">
-              <a
-                href="tel:+13213798010"
-                className="inline-flex items-center gap-2 text-sm font-medium transition hover:opacity-75"
-                style={{ color: palette.charcoal }}
-              >
-                <Phone size={14} style={{ color: palette.gold }} />
-                <span>(321) 379-8010</span>
-              </a>
-
-              <div className="hidden h-4 w-px bg-black/10 sm:block" />
-
-              <a
-                href="mailto:m.stubbs@miqueaslanguagesolutions.com"
-                className="inline-flex items-center gap-2 text-sm font-medium transition hover:opacity-75"
-                style={{ color: palette.charcoal }}
-              >
-                <Mail size={14} style={{ color: palette.gold }} />
-                <span className="break-all sm:break-normal">m.stubbs@miqueaslanguagesolutions.com</span>
-              </a>
-            </div>
-          </div>
-        </div>
-
         <div className="border-b border-black/5">
           <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 md:px-8 md:py-4">
             <Link to="/" className="flex min-w-0 flex-1 items-center gap-3">
@@ -200,71 +170,95 @@ export default function App() {
               {mobileOpen ? "X" : "☰"}
             </button>
           </div>
+        </div>
 
-          {mobileOpen && (
-            <div className="border-t border-black/5 bg-white md:hidden">
-              <div className="mx-auto flex max-w-6xl flex-col gap-1 px-4 py-4">
-                {navItems.map((item) => (
-                  <Link
-                    key={item.path}
-                    to={item.path}
-                    className="rounded-xl px-3 py-3 text-sm font-medium hover:bg-black/5"
-                    style={{ color: palette.charcoal }}
-                    onClick={() => setMobileOpen(false)}
-                  >
-                    {item.label}
-                  </Link>
-                ))}
+        <div className="border-b border-black/5 bg-[rgba(245,245,245,0.85)]">
+          <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-x-5 gap-y-2 px-4 py-2.5 text-sm md:px-8 md:justify-end">
+            <a
+              href="tel:+13213798010"
+              className="inline-flex items-center gap-2 font-medium transition hover:opacity-75"
+              style={{ color: palette.charcoal }}
+            >
+              <Phone size={14} style={{ color: palette.gold }} />
+              <span>(321) 379-8010</span>
+            </a>
 
-                <div className="mt-2 flex flex-wrap items-center gap-3">
-                  <a
-                    href="https://www.instagram.com/miqueas.language.solutions/"
-                    target="_blank"
-                    rel="noreferrer"
-                    aria-label="Instagram"
-                    className="inline-flex h-11 w-11 items-center justify-center rounded-xl transition duration-200"
-                    style={{ backgroundColor: palette.gold, color: palette.white }}
-                    onClick={() => setMobileOpen(false)}
-                  >
-                    <FaInstagram size={18} />
-                  </a>
+            <div className="hidden h-4 w-px bg-black/10 sm:block" />
 
-                  <a
-                    href="https://www.facebook.com/profile.php?id=61573286078153"
-                    target="_blank"
-                    rel="noreferrer"
-                    aria-label="Facebook"
-                    className="inline-flex h-11 w-11 items-center justify-center rounded-xl transition duration-200"
-                    style={{ backgroundColor: palette.gold, color: palette.white }}
-                    onClick={() => setMobileOpen(false)}
-                  >
-                    <FaFacebookF size={18} />
-                  </a>
+            <a
+              href="mailto:m.stubbs@miqueaslanguagesolutions.com"
+              className="inline-flex items-center gap-2 font-medium transition hover:opacity-75"
+              style={{ color: palette.charcoal }}
+            >
+              <Mail size={14} style={{ color: palette.gold }} />
+              <span className="break-all sm:break-normal">m.stubbs@miqueaslanguagesolutions.com</span>
+            </a>
+          </div>
+        </div>
 
-                  <a
-                    href="https://www.linkedin.com/in/micah-stubbs-7a7802145/"
-                    target="_blank"
-                    rel="noreferrer"
-                    aria-label="LinkedIn"
-                    className="inline-flex h-11 w-11 items-center justify-center rounded-xl transition duration-200"
-                    style={{ backgroundColor: palette.gold, color: palette.white }}
-                    onClick={() => setMobileOpen(false)}
-                  >
-                    <FaLinkedinIn size={18} />
-                  </a>
+        {mobileOpen && (
+          <div className="border-b border-black/5 bg-white md:hidden">
+            <div className="mx-auto flex max-w-6xl flex-col gap-1 px-4 py-4">
+              {navItems.map((item) => (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  className="rounded-xl px-3 py-3 text-sm font-medium hover:bg-black/5"
+                  style={{ color: palette.charcoal }}
+                  onClick={() => setMobileOpen(false)}
+                >
+                  {item.label}
+                </Link>
+              ))}
 
-                  <Link
-                    to="/contact"
-                    className="btn btn-primary min-w-[180px] flex-1 rounded-2xl px-4 py-3 text-center text-sm font-semibold"
-                    onClick={() => setMobileOpen(false)}
-                  >
-                    Request a Quote
-                  </Link>
-                </div>
+              <div className="mt-2 flex flex-wrap items-center gap-3">
+                <a
+                  href="https://www.instagram.com/miqueas.language.solutions/"
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label="Instagram"
+                  className="inline-flex h-11 w-11 items-center justify-center rounded-xl transition duration-200"
+                  style={{ backgroundColor: palette.gold, color: palette.white }}
+                  onClick={() => setMobileOpen(false)}
+                >
+                  <FaInstagram size={18} />
+                </a>
+
+                <a
+                  href="https://www.facebook.com/profile.php?id=61573286078153"
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label="Facebook"
+                  className="inline-flex h-11 w-11 items-center justify-center rounded-xl transition duration-200"
+                  style={{ backgroundColor: palette.gold, color: palette.white }}
+                  onClick={() => setMobileOpen(false)}
+                >
+                  <FaFacebookF size={18} />
+                </a>
+
+                <a
+                  href="https://www.linkedin.com/in/micah-stubbs-7a7802145/"
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label="LinkedIn"
+                  className="inline-flex h-11 w-11 items-center justify-center rounded-xl transition duration-200"
+                  style={{ backgroundColor: palette.gold, color: palette.white }}
+                  onClick={() => setMobileOpen(false)}
+                >
+                  <FaLinkedinIn size={18} />
+                </a>
+
+                <Link
+                  to="/contact"
+                  className="btn btn-primary min-w-[180px] flex-1 rounded-2xl px-4 py-3 text-center text-sm font-semibold"
+                  onClick={() => setMobileOpen(false)}
+                >
+                  Request a Quote
+                </Link>
               </div>
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </header>
 
       <main>
