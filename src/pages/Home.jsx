@@ -1,9 +1,12 @@
-import { motion } from 'framer-motion';
+import { useEffect, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowRight,
   BadgeCheck,
   BriefcaseBusiness,
   Building2,
+  ChevronLeft,
+  ChevronRight,
   MonitorSmartphone,
   Quote,
   Stethoscope,
@@ -13,6 +16,8 @@ import { Link } from 'react-router-dom';
 import { staggerContainer, staggerItem } from '../lib/motion';
 
 export default function Home({ palette }) {
+  const [activeTestimonial, setActiveTestimonial] = useState(0);
+
   const stats = [
     ['7+ Years', 'Professional interpreting experience across diverse real-world settings'],
     ['EIPA 3.9', 'Credentialed educational interpreting background with ongoing professional development'],
@@ -61,6 +66,24 @@ export default function Home({ palette }) {
   ];
 
   const highlights = ['In-Person & Remote', 'Based in Florida', 'Travel Available', 'Professional Service'];
+
+  useEffect(() => {
+    const interval = window.setInterval(() => {
+      setActiveTestimonial((current) => (current + 1) % testimonials.length);
+    }, 6000);
+
+    return () => window.clearInterval(interval);
+  }, [testimonials.length]);
+
+  const goToPreviousTestimonial = () => {
+    setActiveTestimonial((current) =>
+      current === 0 ? testimonials.length - 1 : current - 1
+    );
+  };
+
+  const goToNextTestimonial = () => {
+    setActiveTestimonial((current) => (current + 1) % testimonials.length);
+  };
 
   return (
     <div className="relative overflow-hidden">
@@ -289,38 +312,109 @@ export default function Home({ palette }) {
             </p>
           </div>
 
-          <div className="mt-8 grid gap-5 lg:grid-cols-3">
-            {testimonials.map((testimonial) => (
-              <motion.div
-                key={`${testimonial.role}-${testimonial.quote.slice(0, 20)}`}
-                variants={staggerItem}
-                initial="hidden"
-                whileInView="show"
-                viewport={{ once: true, amount: 0.2 }}
-                className="h-full rounded-[1.75rem] border p-6 shadow-sm"
-                style={{
-                  borderColor: `${palette.gold}18`,
-                  backgroundColor: palette.white,
-                }}
-              >
+          <div className="mt-8">
+            <div
+              className="relative overflow-hidden rounded-[1.75rem] border p-6 shadow-sm md:p-8"
+              style={{
+                borderColor: `${palette.gold}18`,
+                backgroundColor: palette.white,
+              }}
+            >
+              <div className="flex items-start justify-between gap-4">
                 <div
-                  className="flex h-11 w-11 items-center justify-center rounded-2xl"
+                  className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl"
                   style={{ backgroundColor: `${palette.gold}16` }}
                 >
                   <Quote size={18} style={{ color: palette.burgundy }} />
                 </div>
 
-                <p className="mt-5 text-sm leading-7 md:text-base" style={{ color: palette.body }}>
-                  “{testimonial.quote}”
-                </p>
-
-                <div className="mt-6 border-t pt-4" style={{ borderColor: palette.border }}>
-                  <div className="text-sm font-semibold uppercase tracking-[0.14em]" style={{ color: palette.burgundy }}>
-                    {testimonial.role}
-                  </div>
+                <div
+                  className="inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.14em]"
+                  style={{
+                    color: palette.burgundy,
+                    borderColor: `${palette.gold}30`,
+                    backgroundColor: `${palette.gold}10`,
+                  }}
+                >
+                  <BadgeCheck size={14} style={{ color: palette.gold }} />
+                  Verified Reference
                 </div>
-              </motion.div>
-            ))}
+              </div>
+
+              <div className="mt-6 min-h-[180px] md:min-h-[140px]">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={activeTestimonial}
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    transition={{ duration: 0.35 }}
+                  >
+                    <p className="text-base leading-8 md:text-lg" style={{ color: palette.body }}>
+                      “{testimonials[activeTestimonial].quote}”
+                    </p>
+
+                    <div className="mt-8 border-t pt-4" style={{ borderColor: palette.border }}>
+                      <div
+                        className="text-sm font-semibold uppercase tracking-[0.14em]"
+                        style={{ color: palette.burgundy }}
+                      >
+                        {testimonials[activeTestimonial].role}
+                      </div>
+                    </div>
+                  </motion.div>
+                </AnimatePresence>
+              </div>
+
+              <div className="mt-6 flex items-center justify-between gap-4">
+                <div className="flex items-center gap-2">
+                  {testimonials.map((testimonial, index) => (
+                    <button
+                      key={`${testimonial.role}-${index}`}
+                      type="button"
+                      aria-label={`Show testimonial ${index + 1}`}
+                      onClick={() => setActiveTestimonial(index)}
+                      className="h-2.5 rounded-full transition-all duration-200"
+                      style={{
+                        width: index === activeTestimonial ? '2rem' : '0.625rem',
+                        backgroundColor:
+                          index === activeTestimonial ? palette.gold : `${palette.gold}40`,
+                      }}
+                    />
+                  ))}
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={goToPreviousTestimonial}
+                    aria-label="Previous testimonial"
+                    className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border transition hover:-translate-y-0.5"
+                    style={{
+                      borderColor: `${palette.gold}30`,
+                      color: palette.charcoal,
+                      backgroundColor: palette.white,
+                    }}
+                  >
+                    <ChevronLeft size={18} />
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={goToNextTestimonial}
+                    aria-label="Next testimonial"
+                    className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border transition hover:-translate-y-0.5"
+                    style={{
+                      borderColor: `${palette.gold}30`,
+                      color: palette.charcoal,
+                      backgroundColor: palette.white,
+                    }}
+                  >
+                    <ChevronRight size={18} />
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         </motion.section>
       </div>
