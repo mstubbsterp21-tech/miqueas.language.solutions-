@@ -178,6 +178,10 @@ function formatJoined(values, otherValue) {
     .join(', ');
 }
 
+function isValidEmail(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email || '').trim());
+}
+
 export default function InterpreterNetworkForm({ palette = defaultPalette }) {
   const p = { ...defaultPalette, ...palette };
   const totalSteps = 7;
@@ -224,7 +228,11 @@ export default function InterpreterNetworkForm({ palette = defaultPalette }) {
 
     if (currentStep === 1) {
       if (!formData.fullName.trim()) nextErrors.fullName = 'Full name is required.';
-      if (!formData.emailAddress.trim()) nextErrors.emailAddress = 'Email address is required.';
+      if (!formData.emailAddress.trim()) {
+        nextErrors.emailAddress = 'Email address is required.';
+      } else if (!isValidEmail(formData.emailAddress)) {
+        nextErrors.emailAddress = 'Enter a valid email address.';
+      }
       if (!formData.phoneNumber.trim()) nextErrors.phoneNumber = 'Phone number is required.';
       if (!formData.currentLocation.trim()) nextErrors.currentLocation = 'Current location is required.';
       if (formData.preferredMethodOfContact.length === 0) {

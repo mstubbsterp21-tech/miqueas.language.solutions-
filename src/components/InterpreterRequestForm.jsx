@@ -197,6 +197,11 @@ function CheckboxGroup({ options, values, onChange, otherValue, onOtherChange, p
   );
 }
 
+
+function isValidEmail(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email || '').trim());
+}
+
 export default function InterpreterRequestForm({ palette = defaultPalette }) {
   const p = { ...defaultPalette, ...palette };
   const scriptUrl = import.meta.env.VITE_GOOGLE_SCRIPT_URL ||
@@ -266,6 +271,8 @@ export default function InterpreterRequestForm({ palette = defaultPalette }) {
     if (currentStep === 1) {
       if (!formData.emailCapture.trim()) {
         nextErrors.emailCapture = 'Email is required.';
+      } else if (!isValidEmail(formData.emailCapture)) {
+        nextErrors.emailCapture = 'Enter a valid email address.';
       }
     }
 
@@ -280,7 +287,11 @@ export default function InterpreterRequestForm({ palette = defaultPalette }) {
       if (!formData.billingSameAsPhysical && !formData.billingAddress.trim()) {
         nextErrors.billingAddress = 'Billing address is required.';
       }
-      if (!formData.contactEmail.trim()) nextErrors.contactEmail = 'Email address is required.';
+      if (!formData.contactEmail.trim()) {
+        nextErrors.contactEmail = 'Email address is required.';
+      } else if (!isValidEmail(formData.contactEmail)) {
+        nextErrors.contactEmail = 'Enter a valid email address.';
+      }
       if (!formData.phoneNumber.trim()) nextErrors.phoneNumber = 'Phone number is required.';
     }
 
