@@ -345,20 +345,36 @@ export default function App() {
             <div className="max-w-[210px] text-sm leading-6 text-slate-500 md:text-right">
               © 2026 Miqueas Language Solutions LLC. All rights reserved.
             </div>
-            <a
-              href="https://www.credly.com/badges/a160083c-07d6-4c48-adb3-6ad7e0d7b8d5/wallet"
-              target="_blank"
-              rel="noreferrer"
-              aria-label="View credential badge on Credly"
-              className="shrink-0 transition hover:opacity-80"
-            >
-              <img
-                src="https://images.credly.com/size/340x340/images/eec9e878-8dcd-48fe-b57e-7e4d55637755/image.png"
-                alt="Credential badge"
-                className="h-14 w-14 object-contain"
-                loading="lazy"
-              />
-            </a>
+            <div className="flex flex-wrap items-center gap-3 md:justify-end">
+              <a
+                href="https://www.credly.com/badges/a160083c-07d6-4c48-adb3-6ad7e0d7b8d5/wallet"
+                target="_blank"
+                rel="noreferrer"
+                aria-label="View credential badge on Credly"
+                className="shrink-0 transition hover:opacity-80"
+              >
+                <img
+                  src="https://images.credly.com/size/340x340/images/eec9e878-8dcd-48fe-b57e-7e4d55637755/image.png"
+                  alt="Credential badge"
+                  className="h-14 w-14 object-contain"
+                  loading="lazy"
+                />
+              </a>
+              <a
+                href="https://www.fridcentral.org/"
+                target="_blank"
+                rel="noreferrer"
+                aria-label="Visit Florida Registry of Interpreters for the Deaf"
+                className="shrink-0 transition hover:opacity-80"
+              >
+                <img
+                  src="https://www.fridcentral.org/resources/Pictures/FRID-Logo-wText.png"
+                  alt="Florida Registry of Interpreters for the Deaf logo"
+                  className="h-14 max-w-[150px] object-contain"
+                  loading="lazy"
+                />
+              </a>
+            </div>
           </div>
         </div>
       </footer>
