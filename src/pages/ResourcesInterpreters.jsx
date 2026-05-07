@@ -1,4 +1,4 @@
-import InterpreterNetworkForm from '../components/InterpreterNetworkForm';
+import InterpreterNetworkForm from '../components/InterpreterNetworkFormOptional';
 
 export default function ResourcesInterpreters({ palette }) {
   return (
