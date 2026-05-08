@@ -284,74 +284,124 @@ export default function App() {
         </Routes>
       </main>
 
-      <footer className="mt-10 border-t border-black/5 bg-[rgba(245,245,245,0.7)] px-4 py-8 md:px-8">
-        <div className="mx-auto grid max-w-6xl gap-8 md:grid-cols-[minmax(240px,1.2fr)_minmax(260px,1fr)_minmax(260px,1fr)_auto] md:items-start">
-          <div className="flex items-center gap-3">
-            <BrandLockup showTagline={false} mobileCompact />
-          </div>
+      <footer className="mt-16 bg-[#202020] px-4 pt-14 pb-8 text-white md:px-8">
+        <div className="mx-auto max-w-6xl">
+          <div className="grid gap-10 lg:grid-cols-[1.45fr_0.9fr_0.9fr_1.15fr]">
+            <div className="space-y-5">
+              <Link to="/" className="inline-flex items-center gap-3 rounded-2xl bg-white px-4 py-3 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+                <img
+                  src={logo}
+                  alt="Miqueas Language Solutions logo"
+                  className="h-14 w-auto object-contain"
+                />
+                <div className="min-w-0">
+                  <div className="text-base font-bold leading-tight text-[#464747]">
+                    Miqueas Language Solutions
+                  </div>
+                  <div className="mt-1 text-xs font-semibold text-[#721100]">
+                    Bridging Perspectives. Delivering Understanding.
+                  </div>
+                </div>
+              </Link>
 
-          <div>
-            <div className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-              Navigation
-            </div>
-            <div className="flex flex-col gap-2 text-sm text-slate-600 sm:flex-row sm:flex-wrap sm:gap-x-5 sm:gap-y-2">
-              {navItems.map((item) => (
-                <Link key={item.path} to={item.path} className="hover:text-slate-900">
-                  {item.label}
+              <p className="max-w-md text-sm leading-7 text-white/75">
+                Professional ASL/English interpreting and ASL video translation services built around clarity, access, and genuine human connection.
+              </p>
+
+              <div className="flex flex-wrap gap-3">
+                <Link
+                  to="/contact"
+                  className="rounded-2xl px-5 py-3 text-sm font-bold transition hover:-translate-y-0.5"
+                  style={{ backgroundColor: palette.gold, color: palette.white }}
+                >
+                  Request Services
                 </Link>
-              ))}
-            </div>
-          </div>
-
-          <div className="space-y-6">
-            <div>
-              <div className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-                Contact
+                <Link
+                  to="/resources/clients"
+                  className="rounded-2xl border border-white/15 px-5 py-3 text-sm font-bold text-white transition hover:-translate-y-0.5 hover:border-white/35 hover:bg-white/10"
+                >
+                  Client Resources
+                </Link>
               </div>
-              <div className="flex flex-col gap-3 text-sm text-slate-600">
+            </div>
+
+            <div>
+              <h2 className="mb-4 text-xs font-bold uppercase tracking-[0.22em] text-[#dd7d00]">
+                Services
+              </h2>
+              <div className="flex flex-col gap-3 text-sm text-white/75">
+                <Link to="/services" className="transition hover:text-white">ASL/English Interpreting</Link>
+                <Link to="/services" className="transition hover:text-white">Remote Interpreting</Link>
+                <Link to="/services" className="transition hover:text-white">On-Site Interpreting</Link>
+                <Link to="/services" className="transition hover:text-white">ASL Video Translation</Link>
+              </div>
+            </div>
+
+            <div>
+              <h2 className="mb-4 text-xs font-bold uppercase tracking-[0.22em] text-[#dd7d00]">
+                Explore
+              </h2>
+              <div className="flex flex-col gap-3 text-sm text-white/75">
+                {navItems.map((item) => (
+                  <Link key={item.path} to={item.path} className="transition hover:text-white">
+                    {item.label}
+                  </Link>
+                ))}
+                <Link to="/resources/interpreters" className="transition hover:text-white">
+                  Join Our Roster
+                </Link>
+              </div>
+            </div>
+
+            <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-6">
+              <h2 className="mb-4 text-xs font-bold uppercase tracking-[0.22em] text-[#dd7d00]">
+                Contact
+              </h2>
+              <div className="space-y-4 text-sm text-white/75">
                 <a
                   href="tel:+13213798010"
-                  className="inline-flex items-center gap-2 hover:text-slate-900"
+                  className="flex items-center gap-3 transition hover:text-white"
                 >
-                  <Phone size={16} style={{ color: palette.gold }} />
+                  <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/10">
+                    <Phone size={17} style={{ color: palette.gold }} />
+                  </span>
                   <span>(321) 379-8010</span>
                 </a>
 
                 <a
                   href="mailto:m.stubbs@miqueaslanguagesolutions.com"
-                  className="inline-flex items-center gap-2 break-all hover:text-slate-900 sm:break-normal"
+                  className="flex items-start gap-3 transition hover:text-white"
                 >
-                  <Mail size={16} style={{ color: palette.gold }} />
-                  <span>m.stubbs@miqueaslanguagesolutions.com</span>
+                  <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/10">
+                    <Mail size={17} style={{ color: palette.gold }} />
+                  </span>
+                  <span className="break-all">m.stubbs@miqueaslanguagesolutions.com</span>
                 </a>
-              </div>
-            </div>
 
-            <div>
-              <div className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-                Legal
-              </div>
-              <div className="flex flex-col gap-2 text-sm text-slate-600">
-                {legalItems.map((item) => (
-                  <Link key={item.path} to={item.path} className="hover:text-slate-900">
-                    {item.label}
-                  </Link>
-                ))}
+                <div className="rounded-2xl bg-white/5 p-4 leading-6">
+                  Remote services available nationwide. Florida-based on-site services available by request.
+                </div>
               </div>
             </div>
           </div>
 
-          <div className="flex flex-col items-start gap-3 md:items-end md:justify-self-end">
-            <div className="max-w-[210px] text-sm leading-6 text-slate-500 md:text-right">
-              © 2026 Miqueas Language Solutions LLC. All rights reserved.
+          <div className="mt-10 grid gap-6 rounded-3xl border border-white/10 bg-white/[0.04] p-5 md:grid-cols-[1fr_auto] md:items-center">
+            <div>
+              <h2 className="text-xs font-bold uppercase tracking-[0.22em] text-[#dd7d00]">
+                Professional Affiliations & Credentials
+              </h2>
+              <p className="mt-3 max-w-2xl text-sm leading-7 text-white/70">
+                MLS prioritizes ethical practice, clear communication, and professional standards in every interpreting request.
+              </p>
             </div>
-            <div className="flex flex-wrap items-center gap-3 md:justify-end">
+
+            <div className="flex flex-wrap items-center gap-4 md:justify-end">
               <a
                 href="https://www.credly.com/badges/a160083c-07d6-4c48-adb3-6ad7e0d7b8d5/wallet"
                 target="_blank"
                 rel="noreferrer"
                 aria-label="View credential badge on Credly"
-                className="shrink-0 transition hover:opacity-80"
+                className="rounded-2xl bg-white p-2 transition hover:-translate-y-0.5 hover:shadow-lg"
               >
                 <img
                   src="https://images.credly.com/size/340x340/images/eec9e878-8dcd-48fe-b57e-7e4d55637755/image.png"
@@ -365,16 +415,60 @@ export default function App() {
                 target="_blank"
                 rel="noreferrer"
                 aria-label="Visit Florida Registry of Interpreters for the Deaf"
-                className="shrink-0 transition hover:opacity-80"
+                className="rounded-2xl bg-white p-3 transition hover:-translate-y-0.5 hover:shadow-lg"
               >
                 <img
                   src="https://www.fridcentral.org/resources/Pictures/FRID-Logo-wText.png"
                   alt="Florida Registry of Interpreters for the Deaf logo"
-                  className="h-14 max-w-[150px] object-contain"
+                  className="h-12 max-w-[160px] object-contain"
                   loading="lazy"
                 />
               </a>
             </div>
+          </div>
+
+          <div className="mt-8 flex flex-col gap-6 border-t border-white/10 pt-6 md:flex-row md:items-center md:justify-between">
+            <div className="flex flex-wrap gap-x-5 gap-y-2 text-sm text-white/60">
+              {legalItems.map((item) => (
+                <Link key={item.path} to={item.path} className="transition hover:text-white">
+                  {item.label}
+                </Link>
+              ))}
+            </div>
+
+            <div className="flex items-center gap-3">
+              <a
+                href="https://www.instagram.com/miqueas.language.solutions/"
+                target="_blank"
+                rel="noreferrer"
+                aria-label="Instagram"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 text-white transition hover:-translate-y-0.5 hover:bg-[#dd7d00]"
+              >
+                <FaInstagram size={17} />
+              </a>
+              <a
+                href="https://www.facebook.com/profile.php?id=61573286078153"
+                target="_blank"
+                rel="noreferrer"
+                aria-label="Facebook"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 text-white transition hover:-translate-y-0.5 hover:bg-[#dd7d00]"
+              >
+                <FaFacebookF size={17} />
+              </a>
+              <a
+                href="https://www.linkedin.com/in/micah-stubbs-7a7802145/"
+                target="_blank"
+                rel="noreferrer"
+                aria-label="LinkedIn"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 text-white transition hover:-translate-y-0.5 hover:bg-[#dd7d00]"
+              >
+                <FaLinkedinIn size={17} />
+              </a>
+            </div>
+          </div>
+
+          <div className="mt-6 text-sm text-white/50">
+            © {new Date().getFullYear()} Miqueas Language Solutions LLC. All rights reserved.
           </div>
         </div>
       </footer>
