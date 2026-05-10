@@ -42,6 +42,10 @@ export default function PoliciesConsumers({ palette }) {
         description="This guide explains how Deaf, DeafBlind, and Hard-of-Hearing consumers can share communication preferences, request support, report access concerns, and submit feedback to MLS."
       />
 
+      <PolicyCallout palette={palette} title="Public-facing policy summary">
+        This guide is a public-facing summary of MLS policies. Specific assignments may be governed by signed agreements, written confirmations, assignment summaries, and applicable law.
+      </PolicyCallout>
+
       <PolicySection palette={palette} number="1" title="Consumer-Centered Service Standard">
         <p>
           MLS recognizes that the paying client is not always the person most affected by interpreting quality. MLS considers the communication access, dignity, preferences, and needs of Deaf, DeafBlind, Hard-of-Hearing, and hearing consumers in assignment planning and quality review.
@@ -197,6 +201,9 @@ export default function PoliciesConsumers({ palette }) {
         </p>
         <p>
           MLS prohibits retaliation against anyone who submits good-faith feedback, access concerns, complaints, incident reports, ethical concerns, or safety concerns.
+        </p>
+        <p>
+          MLS standards do not override stricter court, school district, facility, state, federal, or contract requirements.
         </p>
       </PolicySection>
 
