@@ -61,12 +61,19 @@ export default function PoliciesInterpreters({ palette }) {
         description="This guide summarizes MLS expectations for interpreters and contractors, including qualifications, screening, assignment acceptance, confidentiality, conduct, documentation, and roster status."
       />
 
+      <PolicyCallout palette={palette} title="Public-facing policy summary">
+        This guide is a public-facing summary of MLS policies. Specific assignments may be governed by signed agreements, written confirmations, assignment summaries, and applicable law.
+      </PolicyCallout>
+
       <PolicySection palette={palette} number="1" title="Professional Standards">
         <p>
           MLS expects interpreters and contractors to follow the NAD-RID Code of Professional Conduct, applicable professional standards, client-specific requirements, and MLS policies for every assignment accepted through MLS.
         </p>
         <p>
           MLS will not assign based on availability alone. Assignment matching is based on credentials, documented experience, setting, language and communication needs, modality, risk level, consumer preferences, conflicts of interest, team/CDI/DI needs, working conditions, and setting-specific requirements.
+        </p>
+        <p>
+          MLS standards do not override stricter court, school district, facility, state, federal, or contract requirements.
         </p>
       </PolicySection>
 
@@ -103,7 +110,7 @@ export default function PoliciesInterpreters({ palette }) {
             ["Basic Medical", "RID, BEI, or EIPA 4.0+ with passed EIPA Written preferred; MLS-approved screened interpreters may be considered when ready."],
             ["High-Risk Medical", "RID, BEI, or EIPA 4.0+ with passed EIPA Written plus documented medical experience."],
             ["Crisis Mental Health", "Recognized certification plus documented mental health/crisis interpreting experience required."],
-            ["Legal / Semi-Legal", "NIC generally required for hearing interpreters unless another court/agency-approved credential is accepted and MLS approves; documented legal training/experience required; SC:L strongly preferred."],
+            ["Legal / Semi-Legal", "Legal and semi-legal assignments are not automatically accepted and require specialized review. NIC generally required for hearing interpreters unless another court/agency-approved credential is accepted and MLS approves; documented legal training/experience required; RID Specialist Certificate: Legal (SC:L) strongly preferred."],
             ["DeafBlind / Tactile / Protactile", "Documented DeafBlind/tactile/protactile experience is the primary qualification factor."],
             ["CDI / DI Assignments", "CDI preferred. Non-certified DIs may be approved after MLS screening, documented experience, references, and work sample review."],
           ]}
