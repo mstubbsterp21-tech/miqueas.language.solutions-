@@ -70,6 +70,10 @@ export default function PoliciesClients({ palette }) {
         description="This guide explains how Miqueas Language Solutions handles assignment requests, confirmation, client responsibilities, billing, cancellation, VRI, confidentiality, and feedback."
       />
 
+      <PolicyCallout palette={palette} title="Public-facing policy summary">
+        This guide is a public-facing summary of MLS policies. Specific assignments may be governed by signed agreements, written confirmations, assignment summaries, and applicable law.
+      </PolicyCallout>
+
       <PolicySection palette={palette} number="1" title="Purpose">
         <p>
           Miqueas Language Solutions provides professional ASL/English interpreting, Video Remote Interpreting, and ASL/English translation services. MLS is committed to services that are ethical, qualified, consumer-centered, and aligned with professional interpreting standards.
@@ -80,6 +84,9 @@ export default function PoliciesClients({ palette }) {
         <PolicyList items={services} />
         <PolicyCallout palette={palette} title="Services MLS does not provide">
           MLS does not provide Video Relay Service, relay-style telephone calls, VRS platform staffing, or consumer-initiated relay services. MLS may decline, delay, or refer a request if the assignment cannot be staffed safely, ethically, or effectively.
+        </PolicyCallout>
+        <PolicyCallout palette={palette} title="Stricter requirements may apply">
+          MLS standards do not override stricter court, school district, facility, state, federal, or contract requirements.
         </PolicyCallout>
       </PolicySection>
 
@@ -150,6 +157,9 @@ export default function PoliciesClients({ palette }) {
         <p>
           Clients are responsible for their own compliance with applicable accessibility laws, including the ADA and other relevant legal obligations. MLS provides interpreting services but does not assume responsibility for the client’s legal accommodation duties.
         </p>
+        <p>
+          MLS standards do not override stricter court, school district, facility, state, federal, or contract requirements.
+        </p>
       </PolicySection>
 
       <PolicySection palette={palette} number="9" title="Preparation Materials">
@@ -191,14 +201,20 @@ export default function PoliciesClients({ palette }) {
       </PolicySection>
 
       <PolicySection palette={palette} number="13" title="Legal and Semi-Legal Assignments">
+        <PolicyCallout palette={palette} title="Restricted specialized service">
+          Legal and semi-legal assignments are not automatically accepted and require specialized review before confirmation.
+        </PolicyCallout>
         <p>
-          MLS may accept legal or semi-legal assignments only when appropriately qualified interpreters are available. Legal and semi-legal assignments require specialized review before confirmation.
+          MLS may accept legal or semi-legal assignments only when appropriately qualified interpreters are available.
         </p>
         <p>
-          For hearing interpreters, MLS generally requires NIC or another legal-setting-approved credential, plus documented legal interpreting training or experience. SC:L is strongly preferred when available.
+          For hearing interpreters, MLS generally requires NIC or another legal-setting-approved credential, plus documented legal interpreting training or experience. RID Specialist Certificate: Legal (SC:L) is strongly preferred when available.
         </p>
         <p>
-          For Deaf Interpreters in legal assignments, CDI is generally required unless the court, agency, or legal setting approves another arrangement and MLS also approves it. CDI + SC:L is strongly preferred when available.
+          For Deaf Interpreters in legal assignments, CDI is generally required unless the court, agency, or legal setting approves another arrangement and MLS also approves it. CDI + RID Specialist Certificate: Legal (SC:L) is strongly preferred when available.
+        </p>
+        <p>
+          MLS standards do not override stricter court, agency, facility, state, federal, or contract requirements.
         </p>
       </PolicySection>
 
