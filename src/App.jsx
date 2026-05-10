@@ -7,6 +7,10 @@ import About from "./pages/About";
 import ResourcesLayout from "./pages/ResourcesLayout";
 import ResourcesClients from "./pages/ResourcesClients";
 import ResourcesInterpreters from "./pages/ResourcesInterpreters";
+import PoliciesLayout from "./pages/PoliciesLayout";
+import PoliciesClients from "./pages/PoliciesClients";
+import PoliciesConsumers from "./pages/PoliciesConsumers";
+import PoliciesInterpreters from "./pages/PoliciesInterpreters";
 import Contact from "./pages/Contact";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import Terms from "./pages/Terms";
@@ -30,10 +34,13 @@ const navItems = [
   { path: "/services", label: "Services" },
   { path: "/about", label: "About" },
   { path: "/resources", label: "Resources" },
+  { path: "/policies", label: "Policies" },
   { path: "/contact", label: "Contact" },
 ];
 
 const legalItems = [
+  { path: "/policies/clients", label: "Client Policies" },
+  { path: "/policies/consumers", label: "Consumer Access" },
   { path: "/privacy", label: "Privacy Policy" },
   { path: "/terms", label: "Terms & Conditions" },
   { path: "/accessibility", label: "Accessibility" },
@@ -277,6 +284,13 @@ export default function App() {
             />
           </Route>
 
+          <Route path="/policies" element={<PoliciesLayout palette={palette} />}>
+            <Route index element={<Navigate to="clients" replace />} />
+            <Route path="clients" element={<PoliciesClients palette={palette} />} />
+            <Route path="consumers" element={<PoliciesConsumers palette={palette} />} />
+            <Route path="interpreters" element={<PoliciesInterpreters palette={palette} />} />
+          </Route>
+
           <Route path="/contact" element={<Contact palette={palette} />} />
           <Route path="/privacy" element={<PrivacyPolicy palette={palette} />} />
           <Route path="/terms" element={<Terms palette={palette} />} />
@@ -317,10 +331,10 @@ export default function App() {
                   Request Services
                 </Link>
                 <Link
-                  to="/resources/clients"
+                  to="/policies/clients"
                   className="rounded-2xl border border-white/15 px-5 py-3 text-sm font-bold text-white transition hover:-translate-y-0.5 hover:border-white/35 hover:bg-white/10"
                 >
-                  Client Resources
+                  View Policies
                 </Link>
               </div>
             </div>
@@ -347,6 +361,9 @@ export default function App() {
                     {item.label}
                   </Link>
                 ))}
+                <Link to="/policies/consumers" className="transition hover:text-white">
+                  Consumer Access Guide
+                </Link>
                 <Link to="/resources/interpreters" className="transition hover:text-white">
                   Join Our Roster
                 </Link>
