@@ -42,6 +42,27 @@ const navItems = [
   { path: "/contact", label: "Contact" },
 ];
 
+const socialItems = [
+  {
+    href: "https://www.instagram.com/miqueas.language.solutions/",
+    label: "Instagram",
+    shortLabel: "IG",
+    Icon: FaInstagram,
+  },
+  {
+    href: "https://www.facebook.com/profile.php?id=61573286078153",
+    label: "Facebook",
+    shortLabel: "FB",
+    Icon: FaFacebookF,
+  },
+  {
+    href: "https://www.linkedin.com/in/micah-stubbs-7a7802145/",
+    label: "LinkedIn",
+    shortLabel: "IN",
+    Icon: FaLinkedinIn,
+  },
+];
+
 const legalItems = [
   { path: "/policies/clients", label: "Client Policies" },
   { path: "/policies/consumers", label: "Consumer Access" },
@@ -86,15 +107,28 @@ export default function App() {
               <div className="md:hidden"><BrandLockup compact /></div>
             </Link>
 
-            <nav className="hidden items-center gap-5 md:flex">
+            <nav className="hidden items-center gap-4 md:flex">
               {navItems.map((item) => (
                 <Link key={item.path} to={item.path} className="text-sm font-medium transition hover:opacity-70" style={{ color: palette.charcoal }}>
                   {item.label}
                 </Link>
               ))}
-              <a href="https://www.instagram.com/miqueas.language.solutions/" target="_blank" rel="noreferrer" aria-label="Instagram" className="inline-flex h-10 w-10 items-center justify-center rounded-xl text-white transition hover:-translate-y-0.5" style={{ backgroundColor: palette.gold }}><FaInstagram size={18} /></a>
-              <a href="https://www.facebook.com/profile.php?id=61573286078153" target="_blank" rel="noreferrer" aria-label="Facebook" className="inline-flex h-10 w-10 items-center justify-center rounded-xl text-white transition hover:-translate-y-0.5" style={{ backgroundColor: palette.gold }}><FaFacebookF size={18} /></a>
-              <a href="https://www.linkedin.com/in/micah-stubbs-7a7802145/" target="_blank" rel="noreferrer" aria-label="LinkedIn" className="inline-flex h-10 w-10 items-center justify-center rounded-xl text-white transition hover:-translate-y-0.5" style={{ backgroundColor: palette.gold }}><FaLinkedinIn size={18} /></a>
+              <div className="flex items-center gap-2">
+                {socialItems.map(({ href, label, shortLabel, Icon }) => (
+                  <a
+                    key={label}
+                    href={href}
+                    target="_blank"
+                    rel="noreferrer"
+                    aria-label={label}
+                    className="inline-flex h-10 items-center gap-2 rounded-full px-3 text-xs font-bold text-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+                    style={{ backgroundColor: palette.gold }}
+                  >
+                    <Icon size={16} />
+                    <span>{shortLabel}</span>
+                  </a>
+                ))}
+              </div>
               <Link to="/contact" className="rounded-2xl px-4 py-2.5 text-sm font-semibold text-white transition hover:-translate-y-0.5" style={{ backgroundColor: palette.gold }}>
                 Request a Quote
               </Link>
@@ -205,9 +239,11 @@ export default function App() {
                 <a href="tel:+13213798010" className="flex items-center gap-3 transition hover:text-white"><Phone size={17} style={{ color: palette.gold }} /><span>(321) 379-8010</span></a>
                 <a href="mailto:m.stubbs@miqueaslanguagesolutions.com" className="flex items-start gap-3 transition hover:text-white"><Mail size={17} style={{ color: palette.gold }} /><span className="break-all">m.stubbs@miqueaslanguagesolutions.com</span></a>
                 <div className="flex gap-3 pt-2">
-                  <a href="https://www.instagram.com/miqueas.language.solutions/" target="_blank" rel="noreferrer" aria-label="Instagram" className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 text-white transition hover:bg-[#dd7d00]"><FaInstagram size={17} /></a>
-                  <a href="https://www.facebook.com/profile.php?id=61573286078153" target="_blank" rel="noreferrer" aria-label="Facebook" className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 text-white transition hover:bg-[#dd7d00]"><FaFacebookF size={17} /></a>
-                  <a href="https://www.linkedin.com/in/micah-stubbs-7a7802145/" target="_blank" rel="noreferrer" aria-label="LinkedIn" className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 text-white transition hover:bg-[#dd7d00]"><FaLinkedinIn size={17} /></a>
+                  {socialItems.map(({ href, label, Icon }) => (
+                    <a key={label} href={href} target="_blank" rel="noreferrer" aria-label={label} className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 text-white transition hover:bg-[#dd7d00]">
+                      <Icon size={17} />
+                    </a>
+                  ))}
                 </div>
               </div>
             </div>
