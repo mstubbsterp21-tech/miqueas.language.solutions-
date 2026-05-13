@@ -46,19 +46,16 @@ const socialItems = [
   {
     href: "https://www.instagram.com/miqueas.language.solutions/",
     label: "Instagram",
-    shortLabel: "IG",
     Icon: FaInstagram,
   },
   {
     href: "https://www.facebook.com/profile.php?id=61573286078153",
     label: "Facebook",
-    shortLabel: "FB",
     Icon: FaFacebookF,
   },
   {
     href: "https://www.linkedin.com/in/micah-stubbs-7a7802145/",
     label: "LinkedIn",
-    shortLabel: "IN",
     Icon: FaLinkedinIn,
   },
 ];
@@ -114,18 +111,17 @@ export default function App() {
                 </Link>
               ))}
               <div className="flex items-center gap-2">
-                {socialItems.map(({ href, label, shortLabel, Icon }) => (
+                {socialItems.map(({ href, label, Icon }) => (
                   <a
                     key={label}
                     href={href}
                     target="_blank"
                     rel="noreferrer"
                     aria-label={label}
-                    className="inline-flex h-10 items-center gap-2 rounded-full px-3 text-xs font-bold text-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+                    className="inline-flex h-10 w-10 items-center justify-center rounded-full text-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
                     style={{ backgroundColor: palette.gold }}
                   >
-                    <Icon size={16} />
-                    <span>{shortLabel}</span>
+                    <Icon size={17} />
                   </a>
                 ))}
               </div>
@@ -163,24 +159,23 @@ export default function App() {
                 </Link>
               ))}
 
-              <div className="mt-3 border-t border-black/10 pt-4">
+              <div className="mt-3 border-t border-black/10 pt-4 text-center">
                 <div className="mb-3 text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.burgundy }}>
                   Connect
                 </div>
-                <div className="flex flex-wrap gap-2">
-                  {socialItems.map(({ href, label, shortLabel, Icon }) => (
+                <div className="flex flex-wrap justify-center gap-3">
+                  {socialItems.map(({ href, label, Icon }) => (
                     <a
                       key={label}
                       href={href}
                       target="_blank"
                       rel="noreferrer"
                       aria-label={label}
-                      className="inline-flex h-10 items-center gap-2 rounded-full px-4 text-xs font-bold text-white shadow-sm"
+                      className="inline-flex h-10 w-10 items-center justify-center rounded-full text-white shadow-sm"
                       style={{ backgroundColor: palette.gold }}
                       onClick={() => setMobileOpen(false)}
                     >
-                      <Icon size={16} />
-                      <span>{shortLabel}</span>
+                      <Icon size={17} />
                     </a>
                   ))}
                 </div>
