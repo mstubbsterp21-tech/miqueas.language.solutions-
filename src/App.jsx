@@ -30,7 +30,7 @@ const palette = {
   body: "#444444",
 };
 
-const flridLogoUrl = "https://cdn.wildapricot.com/7925/resources/Pictures/FRID-Logo-wText-2.png?version=1491937090000&Policy=eyJTdGF0ZW1lbnQiOiBbeyJSZXNvdXJjZSI6Imh0dHBzOi8vY2RuLndpbGRhcHJpY290LmNvbS83OTI1L3Jlc291cmNlcy9QaWN0dXJlcy9GUklELUxvZ28td1RleHQtMi5wbmc~dmVyc2lvbj0xNDkxOTM3MDkwMDAwIiwiQ29uZGl0aW9uIjp7IkRhdGVMZXNzVGhhbiI6eyJBV1M6RXBvY2hUaW1lIjoxNzc4NjQzNjg3fSwiSXBBZGRyZXNzIjp7IkFXUzpTb3VyY2VJcCI6IjAuMC4wLjAvMCJ9fX1dfQ__&Signature=Caa4oUbO~7d4TflMvQhANm04G~d3OZ~cetkgJ2ru9RuYpaWaxDnV0QNe76xbmGzUuDPurOiKMwxAhQTBS4FC3NLpDNkHlUVi9EuBCCczHU0Cp3on0zpvRgO9-UXoCOktTgXQqH0pX7gt9ZSL226fuP2S6cEFTFphrYo9uYH60OXyos8cglAajMF-WQ~Pw75Ws3UlKW5usBIBKuiAxt5~gnZ1zs3OJuMqUJJPoxsPx8TtEJOPC7hzbaukC2rYCXBTtocL3SE6jmiMoUUqAYoDo-DSXem8SI2uWjwtH435NxH~IaXvzmS4ZkaIBavkdA9hucezEmEtqikLWjEOHODM7g__&Key-Pair-Id=K27MGQSHTHAGGF";
+const flridLogoUrl = "/frid-logo.svg";
 const ridCredlyBadgeUrl = "https://images.credly.com/size/680x680/images/eec9e878-8dcd-48fe-b57e-7e4d55637755/image.png";
 
 const navItems = [
