@@ -30,6 +30,9 @@ const palette = {
   body: "#444444",
 };
 
+const flridLogoUrl = "https://cdn.wildapricot.com/7925/resources/Pictures/FRID-Logo-wText-2.png";
+const ridCredlyBadgeUrl = "https://images.credly.com/size/680x680/images/eec9e878-8dcd-48fe-b57e-7e4d55637755/image.png";
+
 const navItems = [
   { path: "/", label: "Home" },
   { path: "/services", label: "Services" },
@@ -45,6 +48,13 @@ const legalItems = [
   { path: "/privacy", label: "Privacy Policy" },
   { path: "/terms", label: "Terms & Conditions" },
   { path: "/accessibility", label: "Accessibility" },
+];
+
+const footerServiceItems = [
+  "ASL/English Interpreting",
+  "Remote Interpreting",
+  "On-Site Interpreting",
+  "ASL Video Translation",
 ];
 
 function BrandLockup({ compact = false }) {
@@ -150,7 +160,7 @@ export default function App() {
 
       <footer className="mt-16 bg-[#202020] px-4 pt-14 pb-8 text-white md:px-8">
         <div className="mx-auto max-w-6xl">
-          <div className="grid gap-10 lg:grid-cols-[1.45fr_0.9fr_0.9fr_1.15fr]">
+          <div className="grid gap-10 lg:grid-cols-[1.25fr_0.8fr_0.9fr_1.15fr]">
             <div className="space-y-5">
               <Link to="/" className="inline-flex items-center gap-3 rounded-2xl bg-white px-4 py-3 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
                 <img src={logo} alt="Miqueas Language Solutions logo" className="h-14 w-auto object-contain" />
@@ -159,24 +169,33 @@ export default function App() {
                   <div className="mt-1 text-xs font-semibold text-[#721100]">Bridging Perspectives. Delivering Understanding.</div>
                 </div>
               </Link>
-              <p className="max-w-md text-sm leading-7 text-white/75">Professional ASL/English interpreting and ASL video translation services built around clarity, access, and genuine human connection.</p>
+              <p className="max-w-md text-sm leading-7 text-white/75">
+                Professional ASL/English interpreting and ASL video translation services built around clarity, access, and genuine human connection.
+              </p>
+              <Link to="/contact" className="inline-flex rounded-2xl px-5 py-3 text-sm font-bold text-white transition hover:-translate-y-0.5" style={{ backgroundColor: palette.gold }}>
+                Request Services
+              </Link>
             </div>
 
             <div>
               <h2 className="mb-4 text-xs font-bold uppercase tracking-[0.22em] text-[#dd7d00]">Services</h2>
               <div className="flex flex-col gap-3 text-sm text-white/75">
-                <Link to="/services" className="transition hover:text-white">ASL/English Interpreting</Link>
-                <Link to="/services" className="transition hover:text-white">Remote Interpreting</Link>
-                <Link to="/services" className="transition hover:text-white">On-Site Interpreting</Link>
-                <Link to="/services" className="transition hover:text-white">ASL Video Translation</Link>
+                {footerServiceItems.map((item) => (
+                  <Link key={item} to="/services" className="transition hover:text-white">
+                    {item}
+                  </Link>
+                ))}
               </div>
             </div>
 
             <div>
-              <h2 className="mb-4 text-xs font-bold uppercase tracking-[0.22em] text-[#dd7d00]">Explore</h2>
+              <h2 className="mb-4 text-xs font-bold uppercase tracking-[0.22em] text-[#dd7d00]">Quick Links</h2>
               <div className="flex flex-col gap-3 text-sm text-white/75">
-                {navItems.map((item) => <Link key={item.path} to={item.path} className="transition hover:text-white">{item.label}</Link>)}
+                <Link to="/about" className="transition hover:text-white">About MLS</Link>
+                <Link to="/resources/clients" className="transition hover:text-white">Client Resources</Link>
                 <Link to="/resources/interpreters" className="transition hover:text-white">Join Our Roster</Link>
+                <Link to="/policies" className="transition hover:text-white">Policies</Link>
+                <Link to="/contact" className="transition hover:text-white">Contact</Link>
               </div>
             </div>
 
@@ -190,6 +209,25 @@ export default function App() {
                   <a href="https://www.facebook.com/profile.php?id=61573286078153" target="_blank" rel="noreferrer" aria-label="Facebook" className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 text-white transition hover:bg-[#dd7d00]"><FaFacebookF size={17} /></a>
                   <a href="https://www.linkedin.com/in/micah-stubbs-7a7802145/" target="_blank" rel="noreferrer" aria-label="LinkedIn" className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 text-white transition hover:bg-[#dd7d00]"><FaLinkedinIn size={17} /></a>
                 </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-10 rounded-3xl border border-white/10 bg-white/[0.04] p-5 md:p-6">
+            <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
+              <div>
+                <h2 className="text-xs font-bold uppercase tracking-[0.22em] text-[#dd7d00]">Professional Affiliations</h2>
+                <p className="mt-2 max-w-2xl text-sm leading-6 text-white/70">
+                  Proudly connected to professional interpreting organizations and continuing standards of practice.
+                </p>
+              </div>
+              <div className="flex flex-wrap items-center gap-4">
+                <a href="https://www.credly.com/" target="_blank" rel="noreferrer" aria-label="RID credential badge on Credly" className="flex h-20 w-20 items-center justify-center rounded-2xl bg-white p-2 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+                  <img src={ridCredlyBadgeUrl} alt="RID credential badge" className="max-h-full max-w-full object-contain" />
+                </a>
+                <a href="https://www.fridcentral.org/" target="_blank" rel="noreferrer" aria-label="Florida Registry of Interpreters for the Deaf website" className="flex h-20 min-w-40 items-center justify-center rounded-2xl bg-white p-3 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+                  <img src={flridLogoUrl} alt="Florida Registry of Interpreters for the Deaf logo" className="max-h-full max-w-full object-contain" />
+                </a>
               </div>
             </div>
           </div>
