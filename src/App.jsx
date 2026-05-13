@@ -162,6 +162,37 @@ export default function App() {
                   {item.label}
                 </Link>
               ))}
+
+              <div className="mt-3 border-t border-black/10 pt-4">
+                <div className="mb-3 text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.burgundy }}>
+                  Connect
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {socialItems.map(({ href, label, shortLabel, Icon }) => (
+                    <a
+                      key={label}
+                      href={href}
+                      target="_blank"
+                      rel="noreferrer"
+                      aria-label={label}
+                      className="inline-flex h-10 items-center gap-2 rounded-full px-4 text-xs font-bold text-white shadow-sm"
+                      style={{ backgroundColor: palette.gold }}
+                      onClick={() => setMobileOpen(false)}
+                    >
+                      <Icon size={16} />
+                      <span>{shortLabel}</span>
+                    </a>
+                  ))}
+                </div>
+                <Link
+                  to="/contact"
+                  className="mt-4 inline-flex w-full items-center justify-center rounded-2xl px-4 py-3 text-sm font-bold text-white"
+                  style={{ backgroundColor: palette.gold }}
+                  onClick={() => setMobileOpen(false)}
+                >
+                  Request a Quote
+                </Link>
+              </div>
             </div>
           </div>
         )}
