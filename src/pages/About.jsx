@@ -74,6 +74,77 @@ const nextSteps = [
   "You receive follow-up with availability and clear next steps.",
 ];
 
+function BridgeConceptIllustration({ palette }) {
+  return (
+    <svg
+      viewBox="0 0 1050 600"
+      role="img"
+      aria-label="Stylized bridge concept illustration"
+      className="absolute inset-x-[-8%] bottom-[-18px] h-auto w-[116%] max-w-none"
+      preserveAspectRatio="xMidYMid meet"
+    >
+      <defs>
+        <linearGradient id="bridgeDeck" x1="0" x2="1" y1="0" y2="0">
+          <stop offset="0" stopColor={palette.burgundy} stopOpacity="0.78" />
+          <stop offset="0.55" stopColor={palette.burgundy} />
+          <stop offset="1" stopColor={palette.gold} stopOpacity="0.8" />
+        </linearGradient>
+        <filter id="softBridgeShadow" x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="0" dy="16" stdDeviation="18" floodColor="#000000" floodOpacity="0.18" />
+        </filter>
+      </defs>
+
+      <g filter="url(#softBridgeShadow)">
+        <path
+          d="M0 548 C120 544 178 552 238 522 C304 488 354 428 418 402 C492 372 578 385 654 372 C785 350 888 307 1050 285 L1050 328 C898 355 805 395 671 421 C584 438 493 425 421 456 C352 486 312 543 235 570 C164 596 82 579 0 582 Z"
+          fill="url(#bridgeDeck)"
+          opacity="0.98"
+        />
+
+        <path
+          d="M294 338 L338 338 L354 552 L279 552 Z"
+          fill={palette.burgundy}
+          opacity="0.94"
+        />
+        <path
+          d="M668 0 L742 0 L780 548 L619 548 Z"
+          fill={palette.burgundy}
+          opacity="0.96"
+        />
+        <path d="M705 0 L705 548" stroke="#3b120c" strokeWidth="12" opacity="0.28" />
+        <path d="M318 338 L318 552" stroke="#3b120c" strokeWidth="7" opacity="0.22" />
+
+        <g stroke={palette.burgundy} strokeWidth="3.2" strokeLinecap="round" opacity="0.82">
+          {[260, 300, 340, 380, 420, 460, 500, 540, 580, 620, 660].map((x) => (
+            <line key={`left-${x}`} x1="319" y1="344" x2={x} y2="520" />
+          ))}
+          {[445, 485, 525, 565, 605, 645, 685, 725, 765, 805, 845, 885, 925, 965, 1005, 1045].map((x) => (
+            <line key={`main-${x}`} x1="705" y1="6" x2={x} y2="302" />
+          ))}
+          {[420, 455, 490, 525, 560, 595, 630, 665].map((x) => (
+            <line key={`back-${x}`} x1="705" y1="6" x2={x} y2="410" />
+          ))}
+        </g>
+
+        <path
+          d="M0 579 C80 565 125 586 192 570 C248 556 302 558 363 572 C457 594 561 558 652 574 C754 592 847 561 942 577 C996 586 1026 572 1050 568 L1050 600 L0 600 Z"
+          fill={palette.burgundy}
+          opacity="0.97"
+        />
+
+        <g fill={palette.burgundy} opacity="0.94">
+          <rect x="388" y="424" width="7" height="142" rx="2" />
+          <rect x="484" y="391" width="7" height="154" rx="2" />
+          <rect x="544" y="396" width="7" height="154" rx="2" />
+          <rect x="800" y="323" width="8" height="170" rx="2" />
+          <rect x="896" y="303" width="8" height="174" rx="2" />
+          <rect x="1004" y="281" width="8" height="173" rx="2" />
+        </g>
+      </g>
+    </svg>
+  );
+}
+
 export default function About({ palette }) {
   const cardStyle = {
     borderColor: palette.border,
@@ -183,25 +254,36 @@ export default function About({ palette }) {
 
       <section className="px-5 py-12 md:px-8 md:py-16">
         <div className="mx-auto max-w-6xl">
-          <div className="grid gap-8 lg:grid-cols-[0.85fr_1.15fr]">
+          <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr]">
             <motion.div
               initial="hidden"
               whileInView="show"
               viewport={{ once: true, amount: 0.25 }}
               variants={fadeUp}
               transition={{ duration: 0.45 }}
-              className="rounded-[2rem] border p-7 shadow-sm md:p-8"
+              className="overflow-hidden rounded-[2rem] border shadow-sm"
               style={{ borderColor: palette.border, backgroundColor: "#202020" }}
             >
-              <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.gold }}>
-                The bridge concept
-              </p>
-              <h2 className="mt-3 text-3xl font-black leading-tight text-white md:text-4xl">
-                Interpreting is not just transferring words. It is building access in real time.
-              </h2>
-              <p className="mt-5 text-base leading-8 text-white/75">
-                On one side is you. On the other side is the person you’re trying to communicate with. My role is to help both of you cross that space clearly, naturally, and without unnecessary confusion.
-              </p>
+              <div className="p-7 pb-5 md:p-8 md:pb-5">
+                <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.gold }}>
+                  The bridge concept
+                </p>
+                <h2 className="mt-3 text-3xl font-black leading-tight text-white md:text-4xl">
+                  Interpreting is not just transferring words. It is building access in real time.
+                </h2>
+                <p className="mt-5 text-base leading-8 text-white/75">
+                  On one side is you. On the other side is the person you’re trying to communicate with. My role is to help both of you cross that space clearly, naturally, and without unnecessary confusion.
+                </p>
+              </div>
+
+              <div className="relative mx-5 mb-5 h-[250px] overflow-hidden rounded-[1.6rem] border bg-[#f7f3ef] shadow-inner md:mx-7 md:mb-7 md:h-[310px]" style={{ borderColor: "rgba(255,255,255,0.18)" }}>
+                <div className="absolute -left-20 top-10 h-48 w-48 rounded-full blur-3xl" style={{ backgroundColor: "rgba(221,125,0,0.22)" }} />
+                <div className="absolute -right-20 top-2 h-56 w-56 rounded-full blur-3xl" style={{ backgroundColor: "rgba(114,17,0,0.16)" }} />
+                <div className="absolute left-5 top-5 z-10 rounded-full bg-white/80 px-4 py-2 text-xs font-bold uppercase tracking-[0.16em] shadow-sm backdrop-blur" style={{ color: palette.burgundy }}>
+                  Access in motion
+                </div>
+                <BridgeConceptIllustration palette={palette} />
+              </div>
             </motion.div>
 
             <div className="grid gap-4 sm:grid-cols-2">
