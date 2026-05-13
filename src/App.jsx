@@ -283,12 +283,12 @@ export default function App() {
                   Proudly connected to professional interpreting organizations and continuing standards of practice.
                 </p>
               </div>
-              <div className="flex flex-wrap items-center gap-4">
+              <div className="flex flex-wrap items-center justify-center gap-4 md:justify-end">
                 <a href="https://www.credly.com/" target="_blank" rel="noreferrer" aria-label="RID credential badge on Credly" className="flex h-20 w-20 items-center justify-center rounded-2xl bg-white p-2 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
                   <img src={ridCredlyBadgeUrl} alt="RID credential badge" className="max-h-full max-w-full object-contain" />
                 </a>
-                <a href="https://www.fridcentral.org/" target="_blank" rel="noreferrer" aria-label="Florida Registry of Interpreters for the Deaf website" className="flex h-16 w-32 items-center justify-center overflow-hidden rounded-2xl bg-white p-2 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md sm:w-36">
-                  <img src={flridLogoUrl} alt="Florida Registry of Interpreters for the Deaf logo" className="max-h-10 max-w-full object-contain" />
+                <a href="https://www.fridcentral.org/" target="_blank" rel="noreferrer" aria-label="Florida Registry of Interpreters for the Deaf website" className="flex h-28 w-56 items-center justify-center overflow-hidden rounded-2xl bg-white p-3 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md sm:h-32 sm:w-64">
+                  <img src={flridLogoUrl} alt="Florida Registry of Interpreters for the Deaf logo" className="max-h-full max-w-full object-contain" />
                 </a>
               </div>
             </div>
