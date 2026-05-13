@@ -15,6 +15,8 @@ import {
 import { Link } from 'react-router-dom';
 import { staggerContainer, staggerItem } from '../lib/motion';
 
+const bridgeImageUrl = '/bridge.png';
+
 export default function Home({ palette }) {
   const [activeTestimonial, setActiveTestimonial] = useState(0);
 
@@ -93,6 +95,19 @@ export default function Home({ palette }) {
           background: `radial-gradient(circle at top left, ${palette.gold}18 0%, transparent 32%), radial-gradient(circle at 85% 18%, ${palette.burgundy}14 0%, transparent 24%), linear-gradient(180deg, #fffaf4 0%, #ffffff 52%, #f8f8f8 100%)`,
         }}
       />
+      <img
+        src={bridgeImageUrl}
+        alt=""
+        aria-hidden="true"
+        className="pointer-events-none absolute left-1/2 top-20 w-[1350px] max-w-none -translate-x-1/2 select-none opacity-[0.055] blur-[0.5px] md:top-10 md:w-[1650px] lg:w-[1900px]"
+      />
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            'linear-gradient(180deg, rgba(255,250,244,0.82) 0%, rgba(255,255,255,0.9) 42%, rgba(248,248,248,0.94) 100%)',
+        }}
+      />
 
       <div className="relative mx-auto max-w-6xl px-5 py-16 md:px-8 md:py-24">
         <motion.section
@@ -103,7 +118,7 @@ export default function Home({ palette }) {
           style={{
             borderColor: `${palette.gold}22`,
             background:
-              'linear-gradient(135deg, rgba(255,255,255,0.96) 0%, rgba(255,248,240,0.98) 40%, rgba(255,255,255,0.98) 100%)',
+              'linear-gradient(135deg, rgba(255,255,255,0.92) 0%, rgba(255,248,240,0.94) 40%, rgba(255,255,255,0.95) 100%)',
           }}
         >
           <div
@@ -125,7 +140,7 @@ export default function Home({ palette }) {
                 style={{
                   color: palette.charcoal,
                   borderColor: `${palette.gold}33`,
-                  backgroundColor: 'rgba(255,255,255,0.8)',
+                  backgroundColor: 'rgba(255,255,255,0.82)',
                 }}
               >
                 <BadgeCheck size={16} style={{ color: palette.gold }} />
@@ -190,7 +205,7 @@ export default function Home({ palette }) {
                     style={{
                       color: palette.charcoal,
                       borderColor: `${palette.gold}26`,
-                      backgroundColor: 'rgba(255,255,255,0.75)',
+                      backgroundColor: 'rgba(255,255,255,0.78)',
                     }}
                   >
                     {item}
@@ -265,7 +280,7 @@ export default function Home({ palette }) {
                 transition={{ duration: 0.45 }}
                 className="rounded-3xl border p-5 shadow-sm"
                 style={{
-                  backgroundColor: 'rgba(255,255,255,0.78)',
+                  backgroundColor: 'rgba(255,255,255,0.8)',
                   borderColor: `${palette.gold}20`,
                 }}
               >
@@ -288,7 +303,7 @@ export default function Home({ palette }) {
           className="mt-12 rounded-[2rem] border p-6 shadow-sm md:mt-14 md:p-10"
           style={{
             borderColor: `${palette.gold}20`,
-            backgroundColor: 'rgba(255,255,255,0.82)',
+            backgroundColor: 'rgba(255,255,255,0.84)',
           }}
         >
           <div className="max-w-3xl">
