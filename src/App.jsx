@@ -30,7 +30,7 @@ const palette = {
   body: "#444444",
 };
 
-const flridLogoUrl = "/frid-logo.svg";
+const flridLogoUrl = "/FRID-Logo-wText-2.png";
 const ridCredlyBadgeUrl = "https://images.credly.com/size/680x680/images/eec9e878-8dcd-48fe-b57e-7e4d55637755/image.png";
 
 const navItems = [
