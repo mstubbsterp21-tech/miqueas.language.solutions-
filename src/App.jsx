@@ -4,7 +4,6 @@ import Home from "./pages/Home";
 import Services from "./pages/Services";
 import ServiceDetail from "./pages/ServiceDetail";
 import About from "./pages/About";
-import ResourcesLayout from "./pages/ResourcesLayout";
 import ResourcesClients from "./pages/ResourcesClients";
 import ResourcesInterpreters from "./pages/ResourcesInterpreters";
 import PoliciesLayout from "./pages/PoliciesLayout";
@@ -250,15 +249,13 @@ export default function App() {
           <Route path="/interpreters" element={<ResourcesInterpreters palette={palette} />} />
           <Route path="/deaf-and-hard-of-hearing" element={<DeafAndHardOfHearingPage palette={palette} />} />
           <Route path="/consumers" element={<Navigate to="/deaf-and-hard-of-hearing" replace />} />
+          <Route path="/resources" element={<Navigate to="/clients" replace />} />
+          <Route path="/resources/clients" element={<Navigate to="/clients" replace />} />
+          <Route path="/resources/interpreters" element={<Navigate to="/interpreters" replace />} />
           <Route path="/join-our-team" element={<InterpreterNetworkForm palette={palette} />} />
           <Route path="/services" element={<Services palette={palette} />} />
           <Route path="/services/:serviceId" element={<ServiceDetail palette={palette} />} />
           <Route path="/about" element={<About palette={palette} />} />
-          <Route path="/resources" element={<ResourcesLayout palette={palette} />}>
-            <Route index element={<Navigate to="clients" replace />} />
-            <Route path="clients" element={<ResourcesClients palette={palette} />} />
-            <Route path="interpreters" element={<ResourcesInterpreters palette={palette} />} />
-          </Route>
           <Route path="/policies" element={<PoliciesLayout palette={palette} />}>
             <Route index element={<Navigate to="clients" replace />} />
             <Route path="clients" element={<PoliciesClients palette={palette} />} />
