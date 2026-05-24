@@ -141,21 +141,6 @@ export default function App() {
                 ))}
               </div>
               <div className="flex shrink-0 items-center gap-2">
-                {socialItems.map(({ href, label, Icon }) => (
-                  <a
-                    key={label}
-                    href={href}
-                    target="_blank"
-                    rel="noreferrer"
-                    aria-label={label}
-                    className="inline-flex h-10 w-10 items-center justify-center rounded-full text-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
-                    style={{ backgroundColor: palette.gold }}
-                  >
-                    <Icon size={17} />
-                  </a>
-                ))}
-              </div>
-              <div className="flex shrink-0 items-center gap-2">
                 <Link to="/contact" className="rounded-2xl px-4 py-2.5 text-sm font-semibold leading-tight text-white transition hover:-translate-y-0.5" style={{ backgroundColor: palette.burgundy }}>
                   Request an Interpreter
                 </Link>
@@ -172,16 +157,36 @@ export default function App() {
         </div>
 
         <div className="border-b border-black/5 bg-[rgba(245,245,245,0.85)]">
-          <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-x-5 gap-y-2 px-4 py-2.5 text-sm md:px-8">
-            <a href="tel:+13213798010" className="inline-flex items-center gap-2 font-medium transition hover:opacity-75" style={{ color: palette.charcoal }}>
-              <Phone size={14} style={{ color: palette.gold }} />
-              <span>(321) 379-8010</span>
-            </a>
-            <div className="hidden h-4 w-px bg-black/10 sm:block" />
-            <a href="mailto:m.stubbs@miqueaslanguagesolutions.com" className="inline-flex items-center gap-2 font-medium transition hover:opacity-75" style={{ color: palette.charcoal }}>
-              <Mail size={14} style={{ color: palette.gold }} />
-              <span className="break-all sm:break-normal">m.stubbs@miqueaslanguagesolutions.com</span>
-            </a>
+          <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-x-5 gap-y-2 px-4 py-2.5 text-sm md:px-8">
+            <div className="inline-flex items-center gap-3 font-semibold" style={{ color: palette.burgundy }}>
+              <span>Connect With Us</span>
+              <div className="flex items-center gap-2">
+                {socialItems.map(({ href, label, Icon }) => (
+                  <a
+                    key={label}
+                    href={href}
+                    target="_blank"
+                    rel="noreferrer"
+                    aria-label={label}
+                    className="inline-flex h-8 w-8 items-center justify-center rounded-full text-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+                    style={{ backgroundColor: palette.gold }}
+                  >
+                    <Icon size={14} />
+                  </a>
+                ))}
+              </div>
+            </div>
+            <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
+              <a href="tel:+13213798010" className="inline-flex items-center gap-2 font-medium transition hover:opacity-75" style={{ color: palette.charcoal }}>
+                <Phone size={14} style={{ color: palette.gold }} />
+                <span>(321) 379-8010</span>
+              </a>
+              <div className="hidden h-4 w-px bg-black/10 sm:block" />
+              <a href="mailto:m.stubbs@miqueaslanguagesolutions.com" className="inline-flex items-center gap-2 font-medium transition hover:opacity-75" style={{ color: palette.charcoal }}>
+                <Mail size={14} style={{ color: palette.gold }} />
+                <span className="break-all sm:break-normal">m.stubbs@miqueaslanguagesolutions.com</span>
+              </a>
+            </div>
           </div>
         </div>
 
@@ -196,7 +201,7 @@ export default function App() {
 
               <div className="mt-3 border-t border-black/10 pt-4 text-center">
                 <div className="mb-3 text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.burgundy }}>
-                  Connect
+                  Connect With Us
                 </div>
                 <div className="flex flex-wrap justify-center gap-3">
                   {socialItems.map(({ href, label, Icon }) => (
