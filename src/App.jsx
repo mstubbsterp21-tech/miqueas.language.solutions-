@@ -30,7 +30,6 @@ const navItems = [
   { path: "/clients", label: "Clients" },
   { path: "/interpreters", label: "Interpreters" },
   { path: "/consumers", label: "Consumers" },
-  { path: "/join-our-team", label: "Join Our Team" },
 ];
 
 const legalItems = [
@@ -183,10 +182,10 @@ export default function App() {
                 </a>
 
                 <Link
-                  to="/contact"
+                  to="/join-our-team"
                   className="btn btn-primary inline-flex items-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-semibold whitespace-nowrap transition"
                 >
-                  Request a Quote
+                  Join Our Team
                 </Link>
               </div>
             </nav>
@@ -279,11 +278,11 @@ export default function App() {
                 </a>
 
                 <Link
-                  to="/contact"
+                  to="/join-our-team"
                   className="btn btn-primary min-w-[180px] flex-1 rounded-2xl px-4 py-3 text-center text-sm font-semibold"
                   onClick={() => setMobileOpen(false)}
                 >
-                  Request a Quote
+                  Join Our Team
                 </Link>
               </div>
             </div>
@@ -337,7 +336,7 @@ export default function App() {
               Navigation
             </div>
             <div className="flex flex-col gap-2 text-sm text-slate-600 sm:flex-row sm:flex-wrap sm:gap-x-5 sm:gap-y-2">
-              {navItems.map((item) => (
+              {[...navItems, { path: "/join-our-team", label: "Join Our Team" }].map((item) => (
                 <Link key={item.path} to={item.path} className="hover:text-slate-900">
                   {item.label}
                 </Link>
