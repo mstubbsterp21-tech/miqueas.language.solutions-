@@ -41,9 +41,7 @@ const navItems = [
   { path: "/clients", label: "Clients" },
   { path: "/interpreters", label: "Interpreters" },
   { path: "/deaf-and-hard-of-hearing", label: "Deaf & Hard of Hearing" },
-  { path: "/resources", label: "Resources" },
   { path: "/policies", label: "Policies" },
-  { path: "/contact", label: "Contact" },
 ];
 
 const socialItems = [
@@ -305,10 +303,11 @@ export default function App() {
               <h2 className="mb-4 text-xs font-bold uppercase tracking-[0.22em] text-[#dd7d00]">Quick Links</h2>
               <div className="flex flex-col gap-3 text-sm text-white/75">
                 <Link to="/about" className="transition hover:text-white">About MLS</Link>
-                <Link to="/resources/clients" className="transition hover:text-white">Client Resources</Link>
+                <Link to="/clients" className="transition hover:text-white">Client Information</Link>
+                <Link to="/interpreters" className="transition hover:text-white">Interpreter Information</Link>
+                <Link to="/deaf-and-hard-of-hearing" className="transition hover:text-white">Deaf & Hard of Hearing</Link>
                 <Link to="/join-our-team" className="transition hover:text-white">Join Our Roster</Link>
                 <Link to="/policies" className="transition hover:text-white">Policies</Link>
-                <Link to="/contact" className="transition hover:text-white">Contact</Link>
               </div>
             </div>
 
