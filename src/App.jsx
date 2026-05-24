@@ -6,6 +6,7 @@ import ServiceDetail from "./pages/ServiceDetail";
 import About from "./pages/About";
 import ResourcesClients from "./pages/ResourcesClients";
 import ResourcesInterpreters from "./pages/ResourcesInterpreters";
+import DeafHardOfHearing from "./pages/DeafHardOfHearing";
 import PoliciesLayout from "./pages/PoliciesLayout";
 import PoliciesClients from "./pages/PoliciesClients";
 import PoliciesConsumers from "./pages/PoliciesConsumers";
@@ -88,33 +89,6 @@ function BrandLockup({ compact = false }) {
         </div>
       </div>
     </div>
-  );
-}
-
-function DeafAndHardOfHearingPage({ palette }) {
-  return (
-    <section className="mx-auto max-w-6xl px-4 py-16 md:px-8 md:py-20">
-      <div
-        className="rounded-[2rem] border p-6 shadow-sm md:p-10"
-        style={{
-          borderColor: palette.border,
-          background: `linear-gradient(135deg, ${palette.white} 0%, ${palette.softGray} 100%)`,
-        }}
-      >
-        <div
-          className="mb-4 inline-flex rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em]"
-          style={{ backgroundColor: `${palette.gold}14`, color: palette.gold }}
-        >
-          Deaf & Hard of Hearing
-        </div>
-        <h1 className="mb-4 text-4xl font-bold tracking-tight md:text-5xl" style={{ color: palette.charcoal }}>
-          Deaf & Hard of Hearing Resources
-        </h1>
-        <p className="max-w-3xl text-base leading-7 md:text-lg" style={{ color: palette.body }}>
-          Resources for Deaf, DeafBlind, hard-of-hearing, late-deafened, and hearing community members are being organized here.
-        </p>
-      </div>
-    </section>
   );
 }
 
@@ -247,7 +221,7 @@ export default function App() {
           <Route path="/" element={<Home palette={palette} />} />
           <Route path="/clients" element={<ResourcesClients palette={palette} />} />
           <Route path="/interpreters" element={<ResourcesInterpreters palette={palette} />} />
-          <Route path="/deaf-and-hard-of-hearing" element={<DeafAndHardOfHearingPage palette={palette} />} />
+          <Route path="/deaf-and-hard-of-hearing" element={<DeafHardOfHearing palette={palette} />} />
           <Route path="/consumers" element={<Navigate to="/deaf-and-hard-of-hearing" replace />} />
           <Route path="/resources" element={<Navigate to="/clients" replace />} />
           <Route path="/resources/clients" element={<Navigate to="/clients" replace />} />
