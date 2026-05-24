@@ -157,7 +157,7 @@ export default function App() {
                 ))}
               </div>
               <div className="flex items-center gap-2">
-                <Link to="/contact" className="rounded-2xl px-4 py-2.5 text-sm font-semibold text-white transition hover:-translate-y-0.5" style={{ backgroundColor: palette.gold }}>
+                <Link to="/contact" className="rounded-2xl px-4 py-2.5 text-sm font-semibold text-white transition hover:-translate-y-0.5" style={{ backgroundColor: palette.burgundy }}>
                   Request an Interpreter
                 </Link>
                 <Link to="/join-our-team" className="rounded-2xl px-4 py-2.5 text-sm font-semibold text-white transition hover:-translate-y-0.5" style={{ backgroundColor: palette.burgundy }}>
@@ -219,7 +219,7 @@ export default function App() {
                   <Link
                     to="/contact"
                     className="inline-flex w-full items-center justify-center rounded-2xl px-4 py-3 text-sm font-bold text-white"
-                    style={{ backgroundColor: palette.gold }}
+                    style={{ backgroundColor: palette.burgundy }}
                     onClick={() => setMobileOpen(false)}
                   >
                     Request an Interpreter
