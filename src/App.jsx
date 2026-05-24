@@ -26,11 +26,10 @@ const palette = {
 };
 
 const navItems = [
-  { path: "/", label: "Home" },
-  { path: "/services", label: "Services" },
-  { path: "/about", label: "About" },
-  { path: "/resources", label: "Resources" },
-  { path: "/contact", label: "Contact" },
+  { path: "/clients", label: "Clients" },
+  { path: "/interpreters", label: "Interpreters" },
+  { path: "/consumers", label: "Consumers" },
+  { path: "/join-our-team", label: "Join Our Team" },
 ];
 
 const legalItems = [
@@ -61,6 +60,36 @@ function BrandLockup({ showTagline = true, mobileCompact = false }) {
         )}
       </div>
     </>
+  );
+}
+
+function PlaceholderPage({ palette, eyebrow, title, children }) {
+  return (
+    <section className="mx-auto max-w-6xl px-4 py-16 md:px-8 md:py-20">
+      <div
+        className="rounded-[2rem] border p-6 shadow-sm md:p-10"
+        style={{
+          borderColor: palette.border,
+          background: `linear-gradient(135deg, ${palette.white} 0%, ${palette.softGray} 100%)`,
+        }}
+      >
+        <div
+          className="mb-4 inline-flex rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em]"
+          style={{ backgroundColor: `${palette.gold}14`, color: palette.gold }}
+        >
+          {eyebrow}
+        </div>
+        <h1
+          className="mb-4 text-4xl font-bold tracking-tight md:text-5xl"
+          style={{ color: palette.charcoal }}
+        >
+          {title}
+        </h1>
+        <p className="max-w-3xl text-base leading-7 md:text-lg" style={{ color: palette.body }}>
+          {children}
+        </p>
+      </div>
+    </section>
   );
 }
 
@@ -264,6 +293,25 @@ export default function App() {
       <main>
         <Routes>
           <Route path="/" element={<Home palette={palette} />} />
+          <Route path="/clients" element={<ResourcesClients palette={palette} />} />
+          <Route path="/interpreters" element={<ResourcesInterpreters palette={palette} />} />
+          <Route
+            path="/consumers"
+            element={
+              <PlaceholderPage palette={palette} eyebrow="Consumers" title="Consumer Resources">
+                Resources for Deaf, DeafBlind, hard-of-hearing, and hearing consumers are being organized here.
+              </PlaceholderPage>
+            }
+          />
+          <Route
+            path="/join-our-team"
+            element={
+              <PlaceholderPage palette={palette} eyebrow="Join Our Team" title="Join the MLS Interpreter Network">
+                Interpreter onboarding information and the team application flow will live here.
+              </PlaceholderPage>
+            }
+          />
+
           <Route path="/services" element={<Services palette={palette} />} />
           <Route path="/services/:serviceId" element={<ServiceDetail palette={palette} />} />
           <Route path="/about" element={<About palette={palette} />} />
