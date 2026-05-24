@@ -41,7 +41,6 @@ const navItems = [
   { path: "/clients", label: "Clients" },
   { path: "/interpreters", label: "Interpreters" },
   { path: "/deaf-and-hard-of-hearing", label: "Deaf & Hard of Hearing" },
-  { path: "/policies", label: "Policies" },
 ];
 
 const socialItems = [
