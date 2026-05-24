@@ -126,31 +126,32 @@ export default function App() {
     <div className="min-h-screen overflow-x-hidden bg-white pb-24 text-slate-900 md:pb-0">
       <header className="sticky top-0 z-50 bg-white/95 backdrop-blur">
         <div className="border-b border-black/5">
-          <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-x-6 gap-y-3 px-4 py-3 md:px-8 md:py-4">
+          <div className="mx-auto grid max-w-7xl grid-cols-[auto_1fr_auto] items-center gap-x-8 gap-y-3 px-4 py-5 md:px-8">
             <Link to="/" className="shrink-0">
               <div className="hidden md:block"><BrandLockup /></div>
               <div className="md:hidden"><BrandLockup compact /></div>
             </Link>
 
-            <nav className="hidden min-w-0 flex-1 flex-wrap items-center gap-x-4 gap-y-3 self-center md:flex md:translate-y-4">
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-2 self-center">
+            <nav className="hidden items-center justify-center md:flex">
+              <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 pt-6">
                 {navItems.map((item) => (
                   <Link key={item.path} to={item.path} className="text-sm font-medium leading-tight transition hover:opacity-70" style={{ color: palette.charcoal }}>
                     {item.label}
                   </Link>
                 ))}
               </div>
-              <div className="ml-auto flex shrink-0 items-center gap-2 self-center">
-                <Link to="/contact" className="rounded-2xl px-4 py-2.5 text-sm font-semibold leading-tight text-white transition hover:-translate-y-0.5" style={{ backgroundColor: palette.burgundy }}>
-                  Request an Interpreter
-                </Link>
-                <Link to="/join-our-team" className="rounded-2xl px-4 py-2.5 text-sm font-semibold leading-tight text-white transition hover:-translate-y-0.5" style={{ backgroundColor: palette.burgundy }}>
-                  Join Our Team
-                </Link>
-              </div>
             </nav>
 
-            <button className="ml-auto shrink-0 rounded-xl p-2 md:hidden" onClick={() => setMobileOpen((value) => !value)} aria-label="Toggle menu" type="button">
+            <div className="hidden items-center gap-2 md:flex md:self-center">
+              <Link to="/contact" className="rounded-2xl px-4 py-2.5 text-sm font-semibold leading-tight text-white transition hover:-translate-y-0.5" style={{ backgroundColor: palette.burgundy }}>
+                Request an Interpreter
+              </Link>
+              <Link to="/join-our-team" className="rounded-2xl px-4 py-2.5 text-sm font-semibold leading-tight text-white transition hover:-translate-y-0.5" style={{ backgroundColor: palette.burgundy }}>
+                Join Our Team
+              </Link>
+            </div>
+
+            <button className="col-start-3 row-start-1 ml-auto shrink-0 rounded-xl p-2 md:hidden" onClick={() => setMobileOpen((value) => !value)} aria-label="Toggle menu" type="button">
               {mobileOpen ? "X" : "☰"}
             </button>
           </div>
