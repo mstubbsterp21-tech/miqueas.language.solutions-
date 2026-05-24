@@ -16,6 +16,7 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import Terms from "./pages/Terms";
 import Accessibility from "./pages/Accessibility";
 import InterpreterCommunity from "./pages/InterpreterCommunity";
+import InterpreterNetworkForm from "./components/InterpreterNetworkFormOptional";
 import logo from "./logo.png";
 import { FaInstagram, FaLinkedinIn, FaFacebookF } from "react-icons/fa";
 import { Mail, Phone } from "lucide-react";
@@ -34,12 +35,9 @@ const flridLogoUrl = "/FRID-Logo-wText-2.png";
 const ridCredlyBadgeUrl = "https://images.credly.com/size/680x680/images/eec9e878-8dcd-48fe-b57e-7e4d55637755/image.png";
 
 const navItems = [
-  { path: "/", label: "Home" },
-  { path: "/services", label: "Services" },
-  { path: "/about", label: "About" },
-  { path: "/resources", label: "Resources" },
-  { path: "/policies", label: "Policies" },
-  { path: "/contact", label: "Contact" },
+  { path: "/clients", label: "Clients" },
+  { path: "/interpreters", label: "Interpreters" },
+  { path: "/deaf-and-hard-of-hearing", label: "Deaf & Hard of Hearing" },
 ];
 
 const socialItems = [
@@ -91,6 +89,33 @@ function BrandLockup({ compact = false }) {
   );
 }
 
+function DeafAndHardOfHearingPage({ palette }) {
+  return (
+    <section className="mx-auto max-w-6xl px-4 py-16 md:px-8 md:py-20">
+      <div
+        className="rounded-[2rem] border p-6 shadow-sm md:p-10"
+        style={{
+          borderColor: palette.border,
+          background: `linear-gradient(135deg, ${palette.white} 0%, ${palette.softGray} 100%)`,
+        }}
+      >
+        <div
+          className="mb-4 inline-flex rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em]"
+          style={{ backgroundColor: `${palette.gold}14`, color: palette.gold }}
+        >
+          Deaf & Hard of Hearing
+        </div>
+        <h1 className="mb-4 text-4xl font-bold tracking-tight md:text-5xl" style={{ color: palette.charcoal }}>
+          Deaf & Hard of Hearing Resources
+        </h1>
+        <p className="max-w-3xl text-base leading-7 md:text-lg" style={{ color: palette.body }}>
+          Resources for Deaf, DeafBlind, hard-of-hearing, late-deafened, and hearing community members are being organized here.
+        </p>
+      </div>
+    </section>
+  );
+}
+
 export default function App() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -125,8 +150,8 @@ export default function App() {
                   </a>
                 ))}
               </div>
-              <Link to="/contact" className="rounded-2xl px-4 py-2.5 text-sm font-semibold text-white transition hover:-translate-y-0.5" style={{ backgroundColor: palette.gold }}>
-                Request a Quote
+              <Link to="/join-our-team" className="rounded-2xl px-4 py-2.5 text-sm font-semibold text-white transition hover:-translate-y-0.5" style={{ backgroundColor: palette.gold }}>
+                Join Our Team
               </Link>
             </nav>
 
@@ -180,12 +205,12 @@ export default function App() {
                   ))}
                 </div>
                 <Link
-                  to="/contact"
+                  to="/join-our-team"
                   className="mt-4 inline-flex w-full items-center justify-center rounded-2xl px-4 py-3 text-sm font-bold text-white"
                   style={{ backgroundColor: palette.gold }}
                   onClick={() => setMobileOpen(false)}
                 >
-                  Request a Quote
+                  Join Our Team
                 </Link>
               </div>
             </div>
@@ -196,6 +221,11 @@ export default function App() {
       <main>
         <Routes>
           <Route path="/" element={<Home palette={palette} />} />
+          <Route path="/clients" element={<ResourcesClients palette={palette} />} />
+          <Route path="/interpreters" element={<ResourcesInterpreters palette={palette} />} />
+          <Route path="/deaf-and-hard-of-hearing" element={<DeafAndHardOfHearingPage palette={palette} />} />
+          <Route path="/consumers" element={<Navigate to="/deaf-and-hard-of-hearing" replace />} />
+          <Route path="/join-our-team" element={<InterpreterNetworkForm palette={palette} />} />
           <Route path="/services" element={<Services palette={palette} />} />
           <Route path="/services/:serviceId" element={<ServiceDetail palette={palette} />} />
           <Route path="/about" element={<About palette={palette} />} />
@@ -253,7 +283,7 @@ export default function App() {
               <div className="flex flex-col gap-3 text-sm text-white/75">
                 <Link to="/about" className="transition hover:text-white">About MLS</Link>
                 <Link to="/resources/clients" className="transition hover:text-white">Client Resources</Link>
-                <Link to="/resources/interpreters" className="transition hover:text-white">Join Our Roster</Link>
+                <Link to="/join-our-team" className="transition hover:text-white">Join Our Roster</Link>
                 <Link to="/policies" className="transition hover:text-white">Policies</Link>
                 <Link to="/contact" className="transition hover:text-white">Contact</Link>
               </div>
