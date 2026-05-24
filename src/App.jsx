@@ -35,9 +35,15 @@ const flridLogoUrl = "/FRID-Logo-wText-2.png";
 const ridCredlyBadgeUrl = "https://images.credly.com/size/680x680/images/eec9e878-8dcd-48fe-b57e-7e4d55637755/image.png";
 
 const navItems = [
+  { path: "/", label: "Home" },
+  { path: "/services", label: "Services" },
+  { path: "/about", label: "About" },
   { path: "/clients", label: "Clients" },
   { path: "/interpreters", label: "Interpreters" },
   { path: "/deaf-and-hard-of-hearing", label: "Deaf & Hard of Hearing" },
+  { path: "/resources", label: "Resources" },
+  { path: "/policies", label: "Policies" },
+  { path: "/contact", label: "Contact" },
 ];
 
 const socialItems = [
@@ -150,9 +156,14 @@ export default function App() {
                   </a>
                 ))}
               </div>
-              <Link to="/join-our-team" className="rounded-2xl px-4 py-2.5 text-sm font-semibold text-white transition hover:-translate-y-0.5" style={{ backgroundColor: palette.gold }}>
-                Join Our Team
-              </Link>
+              <div className="flex items-center gap-2">
+                <Link to="/contact" className="rounded-2xl px-4 py-2.5 text-sm font-semibold text-white transition hover:-translate-y-0.5" style={{ backgroundColor: palette.gold }}>
+                  Request an Interpreter
+                </Link>
+                <Link to="/join-our-team" className="rounded-2xl px-4 py-2.5 text-sm font-semibold text-white transition hover:-translate-y-0.5" style={{ backgroundColor: palette.burgundy }}>
+                  Join Our Team
+                </Link>
+              </div>
             </nav>
 
             <button className="shrink-0 rounded-xl p-2 md:hidden" onClick={() => setMobileOpen((value) => !value)} aria-label="Toggle menu" type="button">
@@ -204,14 +215,24 @@ export default function App() {
                     </a>
                   ))}
                 </div>
-                <Link
-                  to="/join-our-team"
-                  className="mt-4 inline-flex w-full items-center justify-center rounded-2xl px-4 py-3 text-sm font-bold text-white"
-                  style={{ backgroundColor: palette.gold }}
-                  onClick={() => setMobileOpen(false)}
-                >
-                  Join Our Team
-                </Link>
+                <div className="mt-4 grid gap-2 sm:grid-cols-2">
+                  <Link
+                    to="/contact"
+                    className="inline-flex w-full items-center justify-center rounded-2xl px-4 py-3 text-sm font-bold text-white"
+                    style={{ backgroundColor: palette.gold }}
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    Request an Interpreter
+                  </Link>
+                  <Link
+                    to="/join-our-team"
+                    className="inline-flex w-full items-center justify-center rounded-2xl px-4 py-3 text-sm font-bold text-white"
+                    style={{ backgroundColor: palette.burgundy }}
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    Join Our Team
+                  </Link>
+                </div>
               </div>
             </div>
           </div>
