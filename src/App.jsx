@@ -29,7 +29,7 @@ const palette = {
 const navItems = [
   { path: "/clients", label: "Clients" },
   { path: "/interpreters", label: "Interpreters" },
-  { path: "/consumers", label: "Consumers" },
+  { path: "/deaf-and-hard-of-hearing", label: "Deaf & Hard of Hearing" },
 ];
 
 const legalItems = [
@@ -296,13 +296,14 @@ export default function App() {
           <Route path="/clients" element={<ResourcesClients palette={palette} />} />
           <Route path="/interpreters" element={<ResourcesInterpreters palette={palette} />} />
           <Route
-            path="/consumers"
+            path="/deaf-and-hard-of-hearing"
             element={
-              <PlaceholderPage palette={palette} eyebrow="Consumers" title="Consumer Resources">
-                Resources for Deaf, DeafBlind, hard-of-hearing, and hearing consumers are being organized here.
+              <PlaceholderPage palette={palette} eyebrow="Deaf & Hard of Hearing" title="Deaf & Hard of Hearing Resources">
+                Resources for Deaf, DeafBlind, hard-of-hearing, late-deafened, and hearing community members are being organized here.
               </PlaceholderPage>
             }
           />
+          <Route path="/consumers" element={<Navigate to="/deaf-and-hard-of-hearing" replace />} />
           <Route path="/join-our-team" element={<InterpreterNetworkForm palette={palette} />} />
 
           <Route path="/services" element={<Services palette={palette} />} />
