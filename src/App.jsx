@@ -11,6 +11,7 @@ import Contact from "./pages/Contact";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import Terms from "./pages/Terms";
 import Accessibility from "./pages/Accessibility";
+import InterpreterNetworkForm from "./components/InterpreterNetworkForm";
 import logo from "./logo.png";
 import { FaInstagram, FaLinkedinIn, FaFacebookF } from "react-icons/fa";
 import { Mail, Phone } from "lucide-react";
@@ -303,14 +304,7 @@ export default function App() {
               </PlaceholderPage>
             }
           />
-          <Route
-            path="/join-our-team"
-            element={
-              <PlaceholderPage palette={palette} eyebrow="Join Our Team" title="Join the MLS Interpreter Network">
-                Interpreter onboarding information and the team application flow will live here.
-              </PlaceholderPage>
-            }
-          />
+          <Route path="/join-our-team" element={<InterpreterNetworkForm palette={palette} />} />
 
           <Route path="/services" element={<Services palette={palette} />} />
           <Route path="/services/:serviceId" element={<ServiceDetail palette={palette} />} />
