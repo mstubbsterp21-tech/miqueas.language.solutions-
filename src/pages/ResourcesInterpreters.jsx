@@ -1,4 +1,4 @@
-import InterpreterNetworkForm from '../components/InterpreterNetworkFormOptional';
+import { Link } from 'react-router-dom';
 
 export default function ResourcesInterpreters({ palette }) {
   return (
@@ -32,8 +32,8 @@ export default function ResourcesInterpreters({ palette }) {
           style={{ color: palette.body }}
         >
           If you are an interpreter who values clear, ethical, and effective communication,
-          this section is here to connect you with helpful professional resources and an opportunity
-          to learn more about working with us.
+          this section is here to connect you with helpful professional resources and information
+          about the standards that guide work with Miqueas Language Solutions.
         </p>
       </section>
 
@@ -45,17 +45,21 @@ export default function ResourcesInterpreters({ palette }) {
         }}
       >
         <h3 className="text-2xl font-bold" style={{ color: palette.charcoal }}>
-          Join Our Interpreter Network
+          Interested in joining the MLS interpreter network?
         </h3>
         <p className="mt-3 max-w-4xl text-sm leading-7 md:text-base" style={{ color: palette.body }}>
           We are always open to connecting with qualified interpreters who care deeply about
-          communication access, professionalism, and strong service delivery. Whether your experience
-          is primarily in community, medical, educational, or remote interpreting, we would love
-          to hear from you.
+          communication access, professionalism, and strong service delivery. The application form
+          is available through the Join Our Team button.
         </p>
+        <Link
+          to="/join-our-team"
+          className="mt-5 inline-flex rounded-2xl px-5 py-3 text-sm font-semibold text-white transition hover:-translate-y-0.5"
+          style={{ backgroundColor: palette.burgundy }}
+        >
+          Join Our Team
+        </Link>
       </section>
-
-      <InterpreterNetworkForm palette={palette} />
 
       <section className="space-y-8">
         <div>
