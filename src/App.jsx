@@ -45,21 +45,9 @@ const navItems = [
 ];
 
 const socialItems = [
-  {
-    href: "https://www.instagram.com/miqueas.language.solutions/",
-    label: "Instagram",
-    Icon: FaInstagram,
-  },
-  {
-    href: "https://www.facebook.com/profile.php?id=61573286078153",
-    label: "Facebook",
-    Icon: FaFacebookF,
-  },
-  {
-    href: "https://www.linkedin.com/in/micah-stubbs-7a7802145/",
-    label: "LinkedIn",
-    Icon: FaLinkedinIn,
-  },
+  { href: "https://www.instagram.com/miqueas.language.solutions/", label: "Instagram", Icon: FaInstagram },
+  { href: "https://www.facebook.com/profile.php?id=61573286078153", label: "Facebook", Icon: FaFacebookF },
+  { href: "https://www.linkedin.com/in/micah-stubbs-7a7802145/", label: "LinkedIn", Icon: FaLinkedinIn },
 ];
 
 const legalItems = [
@@ -81,12 +69,12 @@ const footerServiceItems = [
 function BrandLockup({ compact = false }) {
   return (
     <div className="flex min-w-0 items-center gap-3">
-      <img src={logo} alt="Miqueas Language Solutions logo" className={compact ? "h-12 w-auto shrink-0 object-contain" : "h-16 w-auto shrink-0 object-contain"} />
+      <img src={logo} alt="Miqueas Language Solutions logo" className={compact ? "h-11 w-auto shrink-0 object-contain sm:h-12" : "h-16 w-auto shrink-0 object-contain"} />
       <div className="min-w-0 text-left">
-        <div className={compact ? "text-sm font-bold leading-tight" : "text-lg font-bold tracking-tight"} style={{ color: palette.charcoal }}>
+        <div className={compact ? "max-w-[190px] truncate text-sm font-bold leading-tight sm:max-w-none" : "text-lg font-bold tracking-tight"} style={{ color: palette.charcoal }}>
           Miqueas Language Solutions
         </div>
-        <div className={compact ? "mt-0.5 text-[11px] leading-tight" : "text-sm"} style={{ color: palette.burgundy }}>
+        <div className={compact ? "mt-0.5 max-w-[190px] truncate text-[11px] leading-tight sm:max-w-none" : "text-sm"} style={{ color: palette.burgundy }}>
           Bridging Perspectives. Delivering Understanding.
         </div>
       </div>
@@ -101,8 +89,8 @@ export default function App() {
     <div className="min-h-screen overflow-x-hidden bg-white pb-24 text-slate-900 md:pb-0">
       <header className="sticky top-0 z-50 bg-white/95 backdrop-blur">
         <div className="border-b border-black/5">
-          <div className="mx-auto grid max-w-7xl grid-cols-[auto_1fr_auto] items-center gap-x-8 gap-y-3 px-4 py-5 md:px-8">
-            <Link to="/" className="shrink-0">
+          <div className="mx-auto grid max-w-7xl grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 gap-y-3 px-4 py-4 md:grid-cols-[auto_1fr_auto] md:gap-x-8 md:px-8 md:py-5">
+            <Link to="/" className="min-w-0 shrink">
               <div className="hidden md:block"><BrandLockup /></div>
               <div className="md:hidden"><BrandLockup compact /></div>
             </Link>
@@ -126,13 +114,13 @@ export default function App() {
               </Link>
             </div>
 
-            <button className="col-start-3 row-start-1 ml-auto shrink-0 rounded-xl p-2 md:hidden" onClick={() => setMobileOpen((value) => !value)} aria-label="Toggle menu" type="button">
-              {mobileOpen ? "X" : "☰"}
+            <button className="ml-auto shrink-0 rounded-xl border border-black/10 px-3 py-2 text-lg leading-none md:hidden" onClick={() => setMobileOpen((value) => !value)} aria-label="Toggle menu" type="button">
+              {mobileOpen ? "×" : "☰"}
             </button>
           </div>
         </div>
 
-        <div className="border-b border-black/5 bg-[rgba(245,245,245,0.85)]">
+        <div className="hidden border-b border-black/5 bg-[rgba(245,245,245,0.85)] sm:block">
           <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-x-5 gap-y-2 px-4 py-2.5 text-sm md:px-8">
             <div className="inline-flex items-center gap-3 font-semibold" style={{ color: palette.burgundy }}>
               <span>Connect With Us</span>
@@ -158,7 +146,7 @@ export default function App() {
         </div>
 
         {mobileOpen && (
-          <div className="border-b border-black/5 bg-white md:hidden">
+          <div className="max-h-[calc(100vh-76px)] overflow-y-auto border-b border-black/5 bg-white md:hidden">
             <div className="mx-auto flex max-w-6xl flex-col gap-1 px-4 py-4">
               {navItems.map((item) => (
                 <Link key={item.path} to={item.path} className="rounded-xl px-3 py-3 text-sm font-medium hover:bg-black/5" style={{ color: palette.charcoal }} onClick={() => setMobileOpen(false)}>
@@ -176,6 +164,16 @@ export default function App() {
                       <Icon size={17} />
                     </a>
                   ))}
+                </div>
+                <div className="mt-4 space-y-2">
+                  <a href="tel:+13213798010" className="flex items-center justify-center gap-2 rounded-xl bg-black/[0.03] px-3 py-3 text-sm font-semibold" style={{ color: palette.charcoal }}>
+                    <Phone size={15} style={{ color: palette.gold }} />
+                    (321) 379-8010
+                  </a>
+                  <a href="mailto:m.stubbs@miqueaslanguagesolutions.com" className="flex items-center justify-center gap-2 rounded-xl bg-black/[0.03] px-3 py-3 text-sm font-semibold" style={{ color: palette.charcoal }}>
+                    <Mail size={15} style={{ color: palette.gold }} />
+                    <span className="break-all">m.stubbs@miqueaslanguagesolutions.com</span>
+                  </a>
                 </div>
                 <div className="mt-4 grid gap-2 sm:grid-cols-2">
                   <Link to="/contact" className="inline-flex w-full items-center justify-center rounded-2xl px-4 py-3 text-sm font-bold text-white" style={{ backgroundColor: palette.burgundy }} onClick={() => setMobileOpen(false)}>
@@ -219,18 +217,18 @@ export default function App() {
         </Routes>
       </main>
 
-      <footer className="mt-16 bg-[#202020] px-4 pt-14 pb-8 text-white md:px-8">
+      <footer className="mt-16 bg-[#202020] px-4 pt-12 pb-8 text-white md:px-8 md:pt-14">
         <div className="mx-auto max-w-6xl">
-          <div className="grid gap-10 lg:grid-cols-[1.25fr_0.8fr_0.9fr_1.15fr]">
+          <div className="grid gap-10 text-center md:text-left lg:grid-cols-[1.25fr_0.8fr_0.9fr_1.15fr]">
             <div className="space-y-5">
-              <Link to="/" className="inline-flex items-center gap-3 rounded-2xl bg-white px-4 py-3 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
-                <img src={logo} alt="Miqueas Language Solutions logo" className="h-14 w-auto object-contain" />
+              <Link to="/" className="mx-auto inline-flex max-w-full items-center gap-3 rounded-2xl bg-white px-4 py-3 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md md:mx-0">
+                <img src={logo} alt="Miqueas Language Solutions logo" className="h-12 w-auto shrink-0 object-contain sm:h-14" />
                 <div className="min-w-0 text-left">
-                  <div className="text-base font-bold leading-tight text-[#464747]">Miqueas Language Solutions</div>
-                  <div className="mt-1 text-xs font-semibold text-[#721100]">Bridging Perspectives. Delivering Understanding.</div>
+                  <div className="max-w-[210px] truncate text-sm font-bold leading-tight text-[#464747] sm:max-w-none sm:text-base">Miqueas Language Solutions</div>
+                  <div className="mt-1 max-w-[210px] truncate text-xs font-semibold text-[#721100] sm:max-w-none">Bridging Perspectives. Delivering Understanding.</div>
                 </div>
               </Link>
-              <p className="max-w-md text-sm leading-7 text-white/75">
+              <p className="mx-auto max-w-md text-sm leading-7 text-white/75 md:mx-0">
                 Professional ASL/English interpreting and ASL video translation services built around clarity, access, and genuine human connection.
               </p>
               <Link to="/contact" className="inline-flex rounded-2xl px-5 py-3 text-sm font-bold text-white transition hover:-translate-y-0.5" style={{ backgroundColor: palette.gold }}>
@@ -264,8 +262,8 @@ export default function App() {
             <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-6">
               <h2 className="mb-4 text-xs font-bold uppercase tracking-[0.22em] text-[#dd7d00]">Contact</h2>
               <div className="space-y-4 text-sm text-white/75">
-                <a href="tel:+13213798010" className="flex items-center gap-3 transition hover:text-white"><Phone size={17} style={{ color: palette.gold }} /><span>(321) 379-8010</span></a>
-                <a href="mailto:m.stubbs@miqueaslanguagesolutions.com" className="flex items-start gap-3 transition hover:text-white"><Mail size={17} style={{ color: palette.gold }} /><span className="break-all">m.stubbs@miqueaslanguagesolutions.com</span></a>
+                <a href="tel:+13213798010" className="flex items-center justify-center gap-3 transition hover:text-white md:justify-start"><Phone size={17} style={{ color: palette.gold }} /><span>(321) 379-8010</span></a>
+                <a href="mailto:m.stubbs@miqueaslanguagesolutions.com" className="flex items-start justify-center gap-3 transition hover:text-white md:justify-start"><Mail size={17} style={{ color: palette.gold, flexShrink: 0 }} /><span className="break-all text-left">m.stubbs@miqueaslanguagesolutions.com</span></a>
                 <div className="flex justify-center gap-3 pt-2">
                   {socialItems.map(({ href, label, Icon }) => (
                     <a key={label} href={href} target="_blank" rel="noreferrer" aria-label={label} className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 text-white transition hover:bg-[#dd7d00]">
@@ -277,11 +275,11 @@ export default function App() {
             </div>
           </div>
 
-          <div className="mt-10 rounded-3xl border border-white/10 bg-white/[0.04] p-5 md:p-6">
+          <div className="mt-10 rounded-3xl border border-white/10 bg-white/[0.04] p-5 text-center md:p-6 md:text-left">
             <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
               <div>
                 <h2 className="text-xs font-bold uppercase tracking-[0.22em] text-[#dd7d00]">Professional Affiliations</h2>
-                <p className="mt-2 max-w-2xl text-sm leading-6 text-white/70">
+                <p className="mx-auto mt-2 max-w-2xl text-sm leading-6 text-white/70 md:mx-0">
                   Proudly connected to professional interpreting organizations and continuing standards of practice.
                 </p>
               </div>
@@ -289,15 +287,15 @@ export default function App() {
                 <a href={ridCredlyBadgeLink} target="_blank" rel="noreferrer" aria-label="RID credential badge on Credly" className="flex h-20 w-20 items-center justify-center rounded-2xl bg-white p-2 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
                   <img src={ridCredlyBadgeUrl} alt="RID credential badge" className="max-h-full max-w-full object-contain" />
                 </a>
-                <a href="https://www.fridcentral.org/" target="_blank" rel="noreferrer" aria-label="Florida Registry of Interpreters for the Deaf website" className="flex h-28 w-56 items-center justify-center overflow-hidden rounded-2xl bg-white p-3 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md sm:h-32 sm:w-64">
+                <a href="https://www.fridcentral.org/" target="_blank" rel="noreferrer" aria-label="Florida Registry of Interpreters for the Deaf website" className="flex h-24 w-48 items-center justify-center overflow-hidden rounded-2xl bg-white p-3 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md sm:h-32 sm:w-64">
                   <img src={flridLogoUrl} alt="Florida Registry of Interpreters for the Deaf logo" className="max-h-full max-w-full object-contain" />
                 </a>
               </div>
             </div>
           </div>
 
-          <div className="mt-8 flex flex-col gap-4 border-t border-white/10 pt-6 md:flex-row md:items-center md:justify-between">
-            <div className="flex flex-wrap gap-x-5 gap-y-2 text-sm text-white/60">
+          <div className="mt-8 flex flex-col gap-4 border-t border-white/10 pt-6 text-center md:flex-row md:items-center md:justify-between md:text-left">
+            <div className="flex flex-wrap justify-center gap-x-5 gap-y-2 text-sm text-white/60 md:justify-start">
               {legalItems.map((item) => <Link key={item.path} to={item.path} className="transition hover:text-white">{item.label}</Link>)}
             </div>
             <div className="text-sm text-white/50">© {new Date().getFullYear()} Miqueas Language Solutions LLC. All rights reserved.</div>
