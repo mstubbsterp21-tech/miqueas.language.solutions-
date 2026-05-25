@@ -101,14 +101,14 @@ export default function DeafHardOfHearing({ palette }) {
                   In many settings, organizations may be responsible for providing effective communication. A qualified interpreter can help make sure you are not just present, but actually able to understand, respond, ask questions, and make informed decisions.
                 </p>
               </div>
-              <div className="grid gap-4 sm:grid-cols-2">
+              <div className="grid auto-rows-fr gap-4 sm:grid-cols-2">
                 {[
                   { icon: ShieldCheck, title: "Understand", copy: "You should be able to understand important information clearly." },
                   { icon: MessageCircle, title: "Respond", copy: "You should be able to ask questions and express your own thoughts." },
                   { icon: Users, title: "Participate", copy: "You should be included in the actual conversation, not left on the side." },
                   { icon: HeartHandshake, title: "Be respected", copy: "Access should support dignity, privacy, and meaningful involvement." },
                 ].map(({ icon: Icon, title, copy }, index) => (
-                  <motion.div key={title} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.25 }} variants={fadeUp} transition={{ duration: 0.45, delay: index * 0.04 }} className="rounded-[1.5rem] border border-white/10 bg-white/[0.06] p-5">
+                  <motion.div key={title} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.25 }} variants={fadeUp} transition={{ duration: 0.45, delay: index * 0.04 }} className="h-full rounded-[1.5rem] border border-white/10 bg-white/[0.06] p-5">
                     <Icon size={23} style={{ color: palette.gold }} />
                     <h3 className="mt-4 text-lg font-black text-white">{title}</h3>
                     <p className="mt-2 text-sm leading-6 text-white/65">{copy}</p>
@@ -126,9 +126,9 @@ export default function DeafHardOfHearing({ palette }) {
             <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.gold }}>Common situations</p>
             <h2 className="mt-3 text-3xl font-black tracking-tight md:text-5xl" style={{ color: palette.charcoal }}>Access may be needed in more places than people realize.</h2>
           </motion.div>
-          <div className="grid gap-4 md:grid-cols-4">
+          <div className="grid auto-rows-fr gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {situations.map(({ icon: Icon, title, copy }, index) => (
-              <motion.div key={title} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.25 }} variants={fadeUp} transition={{ duration: 0.45, delay: index * 0.04 }} className={index === 0 ? "rounded-[1.6rem] border bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-lg md:col-span-2" : "rounded-[1.6rem] border bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-lg"} style={cardStyle}>
+              <motion.div key={title} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.25 }} variants={fadeUp} transition={{ duration: 0.45, delay: index * 0.04 }} className="h-full rounded-[1.6rem] border bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-lg" style={cardStyle}>
                 <div className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-2xl" style={{ backgroundColor: "rgba(221,125,0,0.12)", color: palette.gold }}><Icon size={22} /></div>
                 <h3 className="text-lg font-black" style={{ color: palette.charcoal }}>{title}</h3>
                 <p className="mt-3 text-sm leading-7 text-[#666]">{copy}</p>
@@ -166,9 +166,9 @@ export default function DeafHardOfHearing({ palette }) {
                 <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.gold }}>Working with interpreters</p>
                 <h2 className="mt-3 text-3xl font-black tracking-tight md:text-5xl" style={{ color: palette.charcoal }}>The interpreter supports communication. They do not replace your voice.</h2>
               </motion.div>
-              <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-1">
+              <div className="grid auto-rows-fr gap-4 md:grid-cols-3 lg:grid-cols-1">
                 {interpreterTips.map(({ icon: Icon, title, copy }, index) => (
-                  <motion.div key={title} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.25 }} variants={fadeUp} transition={{ duration: 0.45, delay: index * 0.04 }} className="rounded-[1.5rem] border bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-lg" style={cardStyle}>
+                  <motion.div key={title} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.25 }} variants={fadeUp} transition={{ duration: 0.45, delay: index * 0.04 }} className="h-full rounded-[1.5rem] border bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-lg" style={cardStyle}>
                     <Icon size={23} style={{ color: palette.gold }} />
                     <h3 className="mt-4 text-lg font-black" style={{ color: palette.charcoal }}>{title}</h3>
                     <p className="mt-3 text-sm leading-7 text-[#666]">{copy}</p>
@@ -204,9 +204,9 @@ export default function DeafHardOfHearing({ palette }) {
             <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.gold }}>Helpful resources</p>
             <h2 className="mt-3 text-3xl font-black tracking-tight md:text-5xl" style={{ color: palette.charcoal }}>Learn more about communication access and advocacy.</h2>
           </motion.div>
-          <div className="grid gap-4 md:grid-cols-3">
+          <div className="grid auto-rows-fr gap-4 md:grid-cols-3">
             {resources.map((resource, index) => (
-              <motion.a key={resource.title} href={resource.href} target="_blank" rel="noreferrer" initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.25 }} variants={fadeUp} transition={{ duration: 0.45, delay: index * 0.04 }} className="rounded-[1.5rem] border bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-lg" style={cardStyle}>
+              <motion.a key={resource.title} href={resource.href} target="_blank" rel="noreferrer" initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.25 }} variants={fadeUp} transition={{ duration: 0.45, delay: index * 0.04 }} className="h-full rounded-[1.5rem] border bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-lg" style={cardStyle}>
                 <BookOpenCheck size={23} style={{ color: palette.gold }} />
                 <h3 className="mt-4 text-lg font-black" style={{ color: palette.charcoal }}>{resource.title}</h3>
                 <p className="mt-3 text-sm leading-7 text-[#666]">{resource.copy}</p>
