@@ -33,6 +33,7 @@ const palette = {
 
 const flridLogoUrl = "/FRID-Logo-wText-2.png";
 const ridCredlyBadgeUrl = "https://images.credly.com/size/680x680/images/eec9e878-8dcd-48fe-b57e-7e4d55637755/image.png";
+const ridCredlyBadgeLink = "https://www.credly.com/badges/a160083c-07d6-4c48-adb3-6ad7e0d7b8d5/wallet";
 
 const navItems = [
   { path: "/", label: "Home" },
@@ -284,7 +285,7 @@ export default function App() {
                 </p>
               </div>
               <div className="flex flex-wrap items-center justify-center gap-4 md:justify-end">
-                <a href="https://www.credly.com/" target="_blank" rel="noreferrer" aria-label="RID credential badge on Credly" className="flex h-20 w-20 items-center justify-center rounded-2xl bg-white p-2 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+                <a href={ridCredlyBadgeLink} target="_blank" rel="noreferrer" aria-label="RID credential badge on Credly" className="flex h-20 w-20 items-center justify-center rounded-2xl bg-white p-2 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
                   <img src={ridCredlyBadgeUrl} alt="RID credential badge" className="max-h-full max-w-full object-contain" />
                 </a>
                 <a href="https://www.fridcentral.org/" target="_blank" rel="noreferrer" aria-label="Florida Registry of Interpreters for the Deaf website" className="flex h-28 w-56 items-center justify-center overflow-hidden rounded-2xl bg-white p-3 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md sm:h-32 sm:w-64">
