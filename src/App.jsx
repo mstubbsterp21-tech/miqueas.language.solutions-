@@ -70,10 +70,10 @@ const legalItems = [
 ];
 
 const footerServiceItems = [
-  "ASL/English Interpreting",
-  "Remote Interpreting",
-  "On-Site Interpreting",
-  "ASL Video Translation",
+  { path: "/services/in-person-interpreting", label: "In-Person Interpreting" },
+  { path: "/services/video-remote-interpreting", label: "Video Remote Interpreting" },
+  { path: "/services/english-asl-translation", label: "English → ASL Translation" },
+  { path: "/services/asl-english-translation", label: "ASL → English Translation" },
 ];
 
 function BrandLockup({ compact = false }) {
@@ -136,15 +136,7 @@ export default function App() {
               <span>Connect With Us</span>
               <div className="flex items-center gap-2">
                 {socialItems.map(({ href, label, Icon }) => (
-                  <a
-                    key={label}
-                    href={href}
-                    target="_blank"
-                    rel="noreferrer"
-                    aria-label={label}
-                    className="inline-flex h-8 w-8 items-center justify-center rounded-full text-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
-                    style={{ backgroundColor: palette.gold }}
-                  >
+                  <a key={label} href={href} target="_blank" rel="noreferrer" aria-label={label} className="inline-flex h-8 w-8 items-center justify-center rounded-full text-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md" style={{ backgroundColor: palette.gold }}>
                     <Icon size={14} />
                   </a>
                 ))}
@@ -178,35 +170,16 @@ export default function App() {
                 </div>
                 <div className="flex flex-wrap justify-center gap-3">
                   {socialItems.map(({ href, label, Icon }) => (
-                    <a
-                      key={label}
-                      href={href}
-                      target="_blank"
-                      rel="noreferrer"
-                      aria-label={label}
-                      className="inline-flex h-10 w-10 items-center justify-center rounded-full text-white shadow-sm"
-                      style={{ backgroundColor: palette.gold }}
-                      onClick={() => setMobileOpen(false)}
-                    >
+                    <a key={label} href={href} target="_blank" rel="noreferrer" aria-label={label} className="inline-flex h-10 w-10 items-center justify-center rounded-full text-white shadow-sm" style={{ backgroundColor: palette.gold }} onClick={() => setMobileOpen(false)}>
                       <Icon size={17} />
                     </a>
                   ))}
                 </div>
                 <div className="mt-4 grid gap-2 sm:grid-cols-2">
-                  <Link
-                    to="/contact"
-                    className="inline-flex w-full items-center justify-center rounded-2xl px-4 py-3 text-sm font-bold text-white"
-                    style={{ backgroundColor: palette.burgundy }}
-                    onClick={() => setMobileOpen(false)}
-                  >
+                  <Link to="/contact" className="inline-flex w-full items-center justify-center rounded-2xl px-4 py-3 text-sm font-bold text-white" style={{ backgroundColor: palette.burgundy }} onClick={() => setMobileOpen(false)}>
                     Request an Interpreter
                   </Link>
-                  <Link
-                    to="/join-our-team"
-                    className="inline-flex w-full items-center justify-center rounded-2xl px-4 py-3 text-sm font-bold text-white"
-                    style={{ backgroundColor: palette.burgundy }}
-                    onClick={() => setMobileOpen(false)}
-                  >
+                  <Link to="/join-our-team" className="inline-flex w-full items-center justify-center rounded-2xl px-4 py-3 text-sm font-bold text-white" style={{ backgroundColor: palette.burgundy }} onClick={() => setMobileOpen(false)}>
                     Join Our Team
                   </Link>
                 </div>
@@ -267,8 +240,8 @@ export default function App() {
               <h2 className="mb-4 text-xs font-bold uppercase tracking-[0.22em] text-[#dd7d00]">Services</h2>
               <div className="flex flex-col gap-3 text-sm text-white/75">
                 {footerServiceItems.map((item) => (
-                  <Link key={item} to="/services" className="transition hover:text-white">
-                    {item}
+                  <Link key={item.path} to={item.path} className="transition hover:text-white">
+                    {item.label}
                   </Link>
                 ))}
               </div>
