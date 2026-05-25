@@ -65,6 +65,7 @@ const socialItems = [
 const legalItems = [
   { path: "/policies/clients", label: "Client Policies" },
   { path: "/policies/consumers", label: "Consumer Access" },
+  { path: "/policies/interpreters", label: "Interpreter Policies" },
   { path: "/privacy", label: "Privacy Policy" },
   { path: "/terms", label: "Terms & Conditions" },
   { path: "/accessibility", label: "Accessibility" },
@@ -265,7 +266,7 @@ export default function App() {
               <div className="space-y-4 text-sm text-white/75">
                 <a href="tel:+13213798010" className="flex items-center gap-3 transition hover:text-white"><Phone size={17} style={{ color: palette.gold }} /><span>(321) 379-8010</span></a>
                 <a href="mailto:m.stubbs@miqueaslanguagesolutions.com" className="flex items-start gap-3 transition hover:text-white"><Mail size={17} style={{ color: palette.gold }} /><span className="break-all">m.stubbs@miqueaslanguagesolutions.com</span></a>
-                <div className="flex gap-3 pt-2">
+                <div className="flex justify-center gap-3 pt-2">
                   {socialItems.map(({ href, label, Icon }) => (
                     <a key={label} href={href} target="_blank" rel="noreferrer" aria-label={label} className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 text-white transition hover:bg-[#dd7d00]">
                       <Icon size={17} />
