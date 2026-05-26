@@ -33,6 +33,12 @@ const storyBlocks = [
       "When I began interpreting professionally, the work became more than language fluency. People were depending on me in medical appointments, classrooms, meetings, and moments where communication could not afford to break down.",
   },
   {
+    eyebrow: "September 2019",
+    title: "EIPA Credential Earned",
+    body:
+      "I took the Educational Interpreter Performance Assessment (EIPA) for the first time in September 2019. Receiving that credential was a huge relief because it gave me something formal to back up the skills I had already been developing through real-world experience in the Deaf community.",
+  },
+  {
     eyebrow: "Today",
     title: "Miqueas Language Solutions",
     body:
