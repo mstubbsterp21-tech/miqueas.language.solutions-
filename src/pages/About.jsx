@@ -39,6 +39,12 @@ const storyBlocks = [
       "I took the Educational Interpreter Performance Assessment (EIPA) for the first time in September 2019. Receiving that credential was a huge relief because it gave me something formal to back up the skills I had already been developing through real-world experience in the Deaf community.",
   },
   {
+    eyebrow: "September 2025",
+    title: "CASLI Generalist Knowledge Exam Passed",
+    body:
+      "I passed both portions of the CASLI Generalist Knowledge Exam: Fundamentals of Interpreting and Ethics and Cultural Responsiveness. This was another major step forward in my professional journey and brought me one step closer to becoming a nationally certified interpreter.",
+  },
+  {
     eyebrow: "Today",
     title: "Miqueas Language Solutions",
     body:
