@@ -90,51 +90,6 @@ export const blogPosts = [
 </ol>`
   },
   {
-    slug: "when-do-you-need-two-asl-interpreters",
-    title: "When Do You Need Two ASL Interpreters?",
-    excerpt: "A practical guide for planning interpreted meetings, events, trainings, and appointments with the right amount of support.",
-    publishDate: "2026-06-01",
-    category: "Client Guidance",
-    readTime: "4 min read",
-    featured: false,
-    content: [
-      {
-        type: "paragraph",
-        text: "A common question clients ask is whether one interpreter is enough. Sometimes yes. But for longer, faster, higher-stakes, or more interactive assignments, two interpreters may be needed to protect accuracy, access, and interpreter effectiveness."
-      },
-      {
-        type: "heading",
-        text: "Two interpreters are often appropriate when the assignment is long or demanding."
-      },
-      {
-        type: "paragraph",
-        text: "Interpreting is active language work. The interpreter is listening or watching, processing meaning, making cultural and linguistic decisions, producing the message, monitoring accuracy, and adjusting in real time. That level of focus is not sustainable indefinitely without support."
-      },
-      {
-        type: "list",
-        items: [
-          "Assignments longer than about one hour",
-          "Meetings with dense technical, medical, legal, educational, or business vocabulary",
-          "Large group events, trainings, panels, or platform presentations",
-          "Situations where Deaf and hearing participants will interact frequently",
-          "Assignments involving rapid turn-taking, emotional content, or complex decision-making"
-        ]
-      },
-      {
-        type: "heading",
-        text: "The goal is not extra staffing. The goal is clear access."
-      },
-      {
-        type: "paragraph",
-        text: "A team allows one interpreter to actively interpret while the other monitors accuracy, tracks information, supports missed details, and prepares to switch. This helps reduce fatigue and improves the consistency of communication access throughout the assignment."
-      },
-      {
-        type: "paragraph",
-        text: "When MLS reviews a request, we look at the setting, length, topic, communication needs, and format before recommending one interpreter or a team. The cleanest setup is the one that supports the interaction without creating unnecessary friction."
-      }
-    ]
-  },
-  {
     slug: "why-vri-is-not-always-the-best-fit",
     title: "Why VRI Is Not Always the Best Fit",
     excerpt: "Video Remote Interpreting can be useful, but some situations need on-site support for full communication access.",
