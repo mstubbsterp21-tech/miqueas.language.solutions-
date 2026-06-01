@@ -27,7 +27,7 @@ export default function Blog({ palette }) {
               Practical guidance for clearer communication access.
             </h1>
             <p className="mt-6 max-w-2xl text-lg leading-8 text-[#555] md:text-xl">
-              Helpful articles for clients, interpreters, and Deaf or hard-of-hearing consumers. New posts can be scheduled in advance by setting a future publish date.
+              Insights for organizations, interpreters, and Deaf community members who want communication access handled with clarity, respect, and professional judgment.
             </p>
           </motion.div>
         </div>
