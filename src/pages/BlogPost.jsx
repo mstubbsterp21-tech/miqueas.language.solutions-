@@ -41,6 +41,20 @@ export default function BlogPost({ palette }) {
 
   return (
     <article className="overflow-hidden bg-white">
+      <style>{`
+        .blog-html > *:first-child { margin-top: 0; }
+        .blog-html p { margin-top: 1.25rem; color: #555; font-size: 1.0625rem; line-height: 1.85; }
+        .blog-html h2 { margin-top: 2.75rem; color: var(--mls-charcoal); font-size: clamp(1.75rem, 3vw, 2.35rem); font-weight: 900; line-height: 1.15; letter-spacing: -0.03em; }
+        .blog-html h3 { margin-top: 2rem; color: var(--mls-burgundy); font-size: 1.35rem; font-weight: 900; line-height: 1.25; }
+        .blog-html img { width: 100%; border-radius: 1.5rem; border: 1px solid var(--mls-border); box-shadow: 0 18px 45px rgba(15, 23, 42, 0.12); }
+        .blog-html a { color: var(--mls-burgundy); font-weight: 800; text-decoration: underline; text-underline-offset: 4px; }
+        .blog-html hr { margin: 2.75rem 0; border: 0; border-top: 1px solid var(--mls-border); }
+        .blog-html ol { margin-top: 1.25rem; padding-left: 1.4rem; list-style: decimal; color: #555; }
+        .blog-html li { margin-top: 0.85rem; padding-left: 0.25rem; font-size: 1.0625rem; line-height: 1.8; }
+        .blog-html strong { color: var(--mls-charcoal); font-weight: 900; }
+        .blog-html blockquote { margin-top: 2rem; border-left: 5px solid var(--mls-gold); border-radius: 1.5rem; background: #fafafa; padding: 1.25rem 1.4rem; }
+        .blog-html blockquote p { margin-top: 0; }
+      `}</style>
       <section className="relative px-5 py-14 md:px-8 md:py-20">
         <div className="absolute inset-0 -z-10" style={{ background: "radial-gradient(circle at 15% 15%, rgba(221,125,0,0.18), transparent 28%), radial-gradient(circle at 85% 10%, rgba(114,17,0,0.12), transparent 32%), linear-gradient(180deg, #ffffff 0%, #f7f3ef 100%)" }} />
         <div className="mx-auto max-w-4xl">
@@ -59,8 +73,12 @@ export default function BlogPost({ palette }) {
       </section>
 
       <section className="px-5 py-12 md:px-8 md:py-16">
-        <div className="mx-auto max-w-3xl rounded-[2rem] border bg-white p-6 shadow-sm md:p-9" style={{ borderColor: palette.border }}>
-          {post.content.map((block, index) => renderBlock(block, index, palette))}
+        <div className="mx-auto max-w-3xl rounded-[2rem] border bg-white p-6 shadow-sm md:p-9" style={{ borderColor: palette.border, "--mls-border": palette.border, "--mls-burgundy": palette.burgundy, "--mls-charcoal": palette.charcoal, "--mls-gold": palette.gold }}>
+          {post.html ? (
+            <div className="blog-html" dangerouslySetInnerHTML={{ __html: post.html }} />
+          ) : (
+            post.content.map((block, index) => renderBlock(block, index, palette))
+          )}
         </div>
       </section>
     </article>
