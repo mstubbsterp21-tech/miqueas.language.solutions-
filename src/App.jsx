@@ -4,6 +4,8 @@ import Home from "./pages/Home";
 import Services from "./pages/Services";
 import ServiceDetail from "./pages/ServiceDetail";
 import About from "./pages/About";
+import Blog from "./pages/Blog";
+import BlogPost from "./pages/BlogPost";
 import ResourcesClients from "./pages/ResourcesClients";
 import ResourcesInterpreters from "./pages/ResourcesInterpreters";
 import DeafHardOfHearing from "./pages/DeafHardOfHearing";
@@ -39,6 +41,7 @@ const navItems = [
   { path: "/", label: "Home" },
   { path: "/services", label: "Services" },
   { path: "/about", label: "About" },
+  { path: "/blog", label: "Blog" },
   { path: "/clients", label: "Clients" },
   { path: "/interpreters", label: "Interpreters" },
   { path: "/deaf-and-hard-of-hearing", label: "Deaf & Hard of Hearing" },
@@ -192,6 +195,8 @@ export default function App() {
       <main>
         <Routes>
           <Route path="/" element={<Home palette={palette} />} />
+          <Route path="/blog" element={<Blog palette={palette} />} />
+          <Route path="/blog/:slug" element={<BlogPost palette={palette} />} />
           <Route path="/clients" element={<ResourcesClients palette={palette} />} />
           <Route path="/interpreters" element={<ResourcesInterpreters palette={palette} />} />
           <Route path="/deaf-and-hard-of-hearing" element={<DeafHardOfHearing palette={palette} />} />
@@ -251,6 +256,7 @@ export default function App() {
               <h2 className="mb-4 text-xs font-bold uppercase tracking-[0.22em] text-[#dd7d00]">Quick Links</h2>
               <div className="flex flex-col gap-3 text-sm text-white/75">
                 <Link to="/about" className="transition hover:text-white">About MLS</Link>
+                <Link to="/blog" className="transition hover:text-white">Blog</Link>
                 <Link to="/clients" className="transition hover:text-white">Client Information</Link>
                 <Link to="/interpreters" className="transition hover:text-white">Interpreter Information</Link>
                 <Link to="/deaf-and-hard-of-hearing" className="transition hover:text-white">Deaf & Hard of Hearing</Link>
