@@ -42,6 +42,25 @@ Each post has this structure:
 }
 ```
 
+## HTML blog posts
+
+If a post is already written in HTML, use the `html` field instead of `content`:
+
+```js
+{
+  slug: "sample-html-post",
+  title: "Sample HTML Blog Post",
+  excerpt: "Short summary shown on the Blog page.",
+  publishDate: "2026-06-22",
+  category: "Client Guidance",
+  readTime: "6 min read",
+  featured: true,
+  html: String.raw`<p>Your HTML article content goes here.</p>`
+}
+```
+
+The blog article page supports common HTML elements including paragraphs, images, links, headings, ordered lists, blockquotes, and horizontal rules.
+
 ## How scheduling works
 
 The site only displays posts where:
@@ -59,7 +78,7 @@ That means you can write several posts now and give them future dates. They will
 1. Open `src/content/blogPosts.js`.
 2. Copy one existing post object.
 3. Paste it inside the `blogPosts` array.
-4. Change the `slug`, `title`, `excerpt`, `publishDate`, `category`, `readTime`, and `content`.
+4. Change the `slug`, `title`, `excerpt`, `publishDate`, `category`, `readTime`, and either `content` or `html`.
 5. Commit the change.
 6. When the publish date arrives, the post will appear automatically on `/blog`.
 
