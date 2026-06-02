@@ -80,6 +80,62 @@
   </head>
   <body>
     <div id="root"></div>
+    <script>
+      (function () {
+        const availabilityReplacements = [
+          ['Afternoon (1PM-5PM EST)', 'Afternoon (12PM-6PM EST)'],
+          ['Evening (6PM-9PM EST)', 'Evening (6PM-12AM EST)'],
+        ];
+
+        function replaceAvailabilityText(value) {
+          return availabilityReplacements.reduce(
+            (text, [oldValue, newValue]) => text.split(oldValue).join(newValue),
+            String(value || '')
+          );
+        }
+
+        function normalizeAvailabilityLabels() {
+          const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+          let node;
+
+          while ((node = walker.nextNode())) {
+            const updated = replaceAvailabilityText(node.nodeValue);
+            if (updated !== node.nodeValue) node.nodeValue = updated;
+          }
+        }
+
+        function normalizeRequestBody(body) {
+          if (body instanceof URLSearchParams) {
+            const normalized = new URLSearchParams();
+            body.forEach((value, key) => normalized.append(key, replaceAvailabilityText(value)));
+            return normalized;
+          }
+
+          return body;
+        }
+
+        const originalFetch = window.fetch;
+        window.fetch = function (resource, options) {
+          if (options && options.body) {
+            return originalFetch.call(this, resource, { ...options, body: normalizeRequestBody(options.body) });
+          }
+
+          return originalFetch.apply(this, arguments);
+        };
+
+        const observer = new MutationObserver(normalizeAvailabilityLabels);
+
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', function () {
+            normalizeAvailabilityLabels();
+            observer.observe(document.body, { childList: true, subtree: true });
+          });
+        } else {
+          normalizeAvailabilityLabels();
+          observer.observe(document.body, { childList: true, subtree: true });
+        }
+      })();
+    </script>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
