@@ -1,3 +1,7 @@
+import hurricanePrepHtml from "./blog/asl-access-florida-hurricane-prep-guide.html?raw";
+import aiVsHumanHtml from "./blog/ai-vs-human-asl-interpreters.html?raw";
+import deafblindAccessHtml from "./blog/deafblind-asl-interpreting-effective-access.html?raw";
+
 export const blogPosts = [
   {
     slug: "vri-vs-in-person-asl-interpreting-healthcare",
@@ -88,6 +92,36 @@ export const blogPosts = [
 <li><strong>Inquire about fit:</strong> <a href="https://miqueaslanguagesolutions.com/clients">Contact Miqueas Language Solutions</a></li>
 <li><strong>No commitment required</strong> for an initial consultation about your facility's communication needs.</li>
 </ol>`
+  },
+  {
+    slug: "asl-access-florida-hurricane-prep-guide",
+    title: "ASL Access in the Eye of the Storm: A 2026 Florida Hurricane Prep Guide",
+    excerpt: "A practical emergency-readiness guide for organizations planning ASL access during Florida hurricane season.",
+    publishDate: "2026-06-02",
+    category: "Emergency Preparedness",
+    readTime: "7 min read",
+    featured: false,
+    html: hurricanePrepHtml
+  },
+  {
+    slug: "ai-vs-human-asl-interpreters",
+    title: "AI vs. Human ASL Interpreters: Why Context and Connection Matter Most",
+    excerpt: "Why AI tools cannot replace qualified human ASL interpreters in high-stakes communication access settings.",
+    publishDate: "2026-06-02",
+    category: "AI & Access",
+    readTime: "6 min read",
+    featured: false,
+    html: aiVsHumanHtml
+  },
+  {
+    slug: "deafblind-asl-interpreting-effective-access",
+    title: "Beyond the Visual: Providing Effective ASL Interpreting for the Deaf-Blind Community",
+    excerpt: "A practical guide to DeafBlind interpreting access, tactile communication, environmental information, and readiness.",
+    publishDate: "2026-06-02",
+    category: "DeafBlind Access",
+    readTime: "7 min read",
+    featured: false,
+    html: deafblindAccessHtml
   },
   {
     slug: "why-vri-is-not-always-the-best-fit",
