@@ -6,10 +6,13 @@ import {
   BriefcaseBusiness,
   Building2,
   CalendarCheck2,
+  CalendarDays,
   CheckCircle2,
   ChevronLeft,
   ChevronRight,
   ClipboardList,
+  Clock,
+  FileText,
   FileVideo,
   Globe,
   MonitorSmartphone,
@@ -20,6 +23,7 @@ import {
   Video,
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { formatBlogDate, getPublishedBlogPosts } from "../content/blogPosts";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 18 },
@@ -35,6 +39,8 @@ const serviceCards = [
 
 export default function Home({ palette }) {
   const [activeTestimonial, setActiveTestimonial] = useState(0);
+  const publishedBlogPosts = getPublishedBlogPosts();
+  const featuredArticle = publishedBlogPosts.find((post) => post.featured) || publishedBlogPosts[0];
 
   const stats = [
     ["7+ Years", "Professional interpreting experience across diverse real-world settings"],
@@ -176,6 +182,44 @@ export default function Home({ palette }) {
           </div>
         </div>
       </section>
+
+      {featuredArticle && (
+        <section className="px-5 py-12 md:px-8 md:py-16">
+          <div className="mx-auto max-w-6xl">
+            <motion.article initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} variants={fadeUp} transition={{ duration: 0.45 }} className="overflow-hidden rounded-[2.2rem] border bg-white shadow-xl" style={{ borderColor: palette.border }}>
+              <div className="grid gap-0 lg:grid-cols-[0.8fr_1.2fr]">
+                <div className="flex min-h-[300px] flex-col justify-between bg-[#202020] p-7 text-white md:p-9">
+                  <div>
+                    <div className="mb-5 inline-flex h-12 w-12 items-center justify-center rounded-2xl" style={{ backgroundColor: palette.gold }}>
+                      <FileText size={22} color="#ffffff" />
+                    </div>
+                    <p className="text-xs font-bold uppercase tracking-[0.2em]" style={{ color: palette.gold }}>Featured Article</p>
+                    <h2 className="mt-5 text-3xl font-black leading-tight md:text-4xl">Helpful insight before you book.</h2>
+                  </div>
+                  <div className="mt-8 flex flex-wrap gap-3 text-sm text-white/70">
+                    <span className="inline-flex items-center gap-2"><CalendarDays size={16} style={{ color: palette.gold }} />{formatBlogDate(featuredArticle.publishDate)}</span>
+                    <span className="inline-flex items-center gap-2"><Clock size={16} style={{ color: palette.gold }} />{featuredArticle.readTime}</span>
+                  </div>
+                </div>
+                <div className="flex flex-col justify-center p-7 md:p-9">
+                  <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.gold }}>{featuredArticle.category}</p>
+                  <h2 className="mt-4 text-3xl font-black leading-tight md:text-4xl" style={{ color: palette.charcoal }}>{featuredArticle.title}</h2>
+                  <p className="mt-4 text-lg leading-8 text-[#555]">{featuredArticle.excerpt}</p>
+                  <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+                    <Link to={`/blog/${featuredArticle.slug}`} className="inline-flex w-fit items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-bold text-white shadow-md transition hover:-translate-y-0.5 hover:shadow-lg" style={{ backgroundColor: palette.burgundy }}>
+                      Read Featured Article
+                      <ArrowRight size={17} />
+                    </Link>
+                    <Link to="/blog" className="inline-flex w-fit items-center justify-center rounded-full border bg-white px-6 py-3 text-sm font-bold shadow-sm transition hover:-translate-y-0.5 hover:shadow-md" style={{ borderColor: palette.border, color: palette.charcoal }}>
+                      View All Articles
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </motion.article>
+          </div>
+        </section>
+      )}
 
       <section className="px-5 py-12 md:px-8 md:py-16">
         <div className="mx-auto max-w-6xl rounded-[2.2rem] border bg-[#fafafa] p-6 md:p-8" style={{ borderColor: palette.border }}>
