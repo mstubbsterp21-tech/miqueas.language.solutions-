@@ -17,18 +17,19 @@
 }
 
 :root[data-theme="dark"] {
-  --mls-burgundy: #f08a77;
-  --mls-gold: #f6b84c;
+  /* Keep MLS brand colors intact in dark mode; shift the surfaces, not the brand. */
+  --mls-burgundy: #721100;
+  --mls-gold: #dd7d00;
   --mls-charcoal: #f7f3ef;
-  --mls-white: #11151c;
-  --mls-soft-gray: #1a202b;
-  --mls-border: #303846;
-  --mls-body: #d5d9e1;
-  --mls-page: #0c1017;
-  --mls-card: #141a23;
-  --mls-muted-surface: #1a202b;
-  --mls-dark-surface: #080b10;
-  --mls-muted-text: #c7ccd5;
+  --mls-white: #15100e;
+  --mls-soft-gray: #211714;
+  --mls-border: rgba(221, 125, 0, 0.24);
+  --mls-body: #efe7df;
+  --mls-page: #0f0b0a;
+  --mls-card: #18110f;
+  --mls-muted-surface: #221713;
+  --mls-dark-surface: #0a0706;
+  --mls-muted-text: #cdbfb5;
 }
 
 * {
@@ -47,9 +48,9 @@ body {
 
 body:has(.theme-dark) {
   background:
-    radial-gradient(circle at 0% -20%, rgba(246, 184, 76, 0.08), transparent 45%),
-    radial-gradient(circle at 100% 0%, rgba(240, 138, 119, 0.08), transparent 40%),
-    var(--mls-page);
+    radial-gradient(circle at 0% -20%, rgba(221, 125, 0, 0.16), transparent 42%),
+    radial-gradient(circle at 100% 0%, rgba(114, 17, 0, 0.28), transparent 40%),
+    linear-gradient(180deg, #120c0a 0%, var(--mls-page) 42%, #0a0706 100%);
 }
 
 .theme-dark {
@@ -64,18 +65,20 @@ body:has(.theme-dark) {
 .theme-dark .bg-\[\#fafafa\],
 .theme-dark .bg-\[\#f7f3ef\],
 .theme-dark .bg-\[rgba\(245\,245\,245\,0\.85\)\] {
-  background-color: var(--mls-card) !important;
+  background-color: rgba(24, 17, 15, 0.96) !important;
 }
 
 .theme-dark .bg-black\/\[0\.03\],
 .theme-dark .bg-white\/80,
 .theme-dark .bg-white\/[0\.04\],
 .theme-dark .bg-white\/[0\.06\] {
-  background-color: rgba(255, 255, 255, 0.06) !important;
+  background-color: rgba(221, 125, 0, 0.09) !important;
 }
 
 .theme-dark .bg-\[\#202020\] {
-  background-color: var(--mls-dark-surface) !important;
+  background:
+    radial-gradient(circle at 8% 0%, rgba(221, 125, 0, 0.16), transparent 28%),
+    linear-gradient(135deg, #120c0a, var(--mls-dark-surface) 52%, #1a0f0c) !important;
 }
 
 .theme-dark .border,
@@ -104,7 +107,15 @@ body:has(.theme-dark) {
 .theme-dark .text-white\/65,
 .theme-dark .text-white\/60,
 .theme-dark .text-white\/50 {
-  color: #f7f3ef !important;
+  color: #fff8f0 !important;
+}
+
+.theme-dark .text-\[\#721100\] {
+  color: #ffb199 !important;
+}
+
+.theme-dark .text-\[\#dd7d00\] {
+  color: #ffb23f !important;
 }
 
 .theme-dark .shadow-sm,
@@ -112,7 +123,11 @@ body:has(.theme-dark) {
 .theme-dark .shadow-lg,
 .theme-dark .shadow-xl,
 .theme-dark .shadow-2xl {
-  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.28) !important;
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.34) !important;
+}
+
+.theme-dark a:hover {
+  color: #ffb23f;
 }
 
 .section-shell {
@@ -122,8 +137,21 @@ body:has(.theme-dark) {
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.04);
 }
 
+.theme-dark .section-shell {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.025), transparent),
+    var(--mls-card);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.32);
+}
+
 .brand-band {
   background: linear-gradient(135deg, rgba(114, 17, 0, 0.96), rgba(70, 71, 71, 0.96));
+}
+
+.theme-dark .brand-band {
+  background:
+    linear-gradient(135deg, rgba(114, 17, 0, 0.98), rgba(221, 125, 0, 0.18)),
+    #130c0a;
 }
 
 .btn-primary {
@@ -139,6 +167,18 @@ body:has(.theme-dark) {
   border: 1px solid var(--mls-charcoal);
   color: var(--mls-charcoal);
   background: var(--mls-card);
+}
+
+.theme-dark .btn-primary {
+  background: linear-gradient(135deg, #721100, #8a1d08);
+  color: #ffffff;
+  box-shadow: 0 14px 30px rgba(114, 17, 0, 0.34);
+}
+
+.theme-dark .btn-secondary {
+  border-color: rgba(221, 125, 0, 0.44);
+  background: rgba(221, 125, 0, 0.08);
+  color: #fff4ea;
 }
 
 /* Shared CTA base to keep spacing, type and focus consistent */
@@ -161,6 +201,11 @@ body:has(.theme-dark) {
   outline-offset: 3px;
 }
 
+.theme-dark .btn-primary:focus,
+.theme-dark .btn-secondary:focus {
+  outline-color: rgba(221, 125, 0, 0.32);
+}
+
 .btn-secondary:hover {
   background-color: var(--mls-soft-gray);
 }
@@ -172,8 +217,18 @@ body:has(.theme-dark) {
 .form-checkbox { accent-color: var(--mls-burgundy); border: 1px solid var(--mls-border); }
 .form-error { color: var(--mls-burgundy); }
 
+.theme-dark .form-input { background: #130d0b; color: #fff8f0; }
+.theme-dark .form-input::placeholder { color: #a9968c; }
+.theme-dark .form-note,
+.theme-dark .form-hint { color: var(--mls-body); }
+.theme-dark .form-error { color: #ffb199; }
+
 .blog-html p { color: var(--mls-body) !important; }
 .blog-html h2 { color: var(--mls-charcoal) !important; }
 .blog-html h3, .blog-html a { color: var(--mls-burgundy) !important; }
 .blog-html blockquote { background: var(--mls-muted-surface) !important; border-left-color: var(--mls-gold) !important; }
 .blog-html strong { color: var(--mls-charcoal) !important; }
+
+.theme-dark .blog-html h3,
+.theme-dark .blog-html a { color: #ffb199 !important; }
+.theme-dark .blog-html blockquote { background: rgba(221, 125, 0, 0.08) !important; }
