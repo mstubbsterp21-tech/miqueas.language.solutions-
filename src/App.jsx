@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Routes, Route, Link, Navigate } from "react-router-dom";
 import Home from "./pages/Home";
 import Services from "./pages/Services";
@@ -21,9 +21,9 @@ import InterpreterCommunity from "./pages/InterpreterCommunity";
 import InterpreterNetworkForm from "./components/InterpreterNetworkFormOptional";
 import logo from "./logo.png";
 import { FaInstagram, FaLinkedinIn, FaFacebookF } from "react-icons/fa";
-import { Mail, Phone } from "lucide-react";
+import { Mail, Moon, Phone, Sun } from "lucide-react";
 
-const palette = {
+const lightPalette = {
   burgundy: "#721100",
   gold: "#dd7d00",
   charcoal: "#464747",
@@ -31,6 +31,23 @@ const palette = {
   softGray: "#f5f5f5",
   border: "#e5e5e5",
   body: "#444444",
+};
+
+const darkPalette = {
+  burgundy: "#f08a77",
+  gold: "#f6b84c",
+  charcoal: "#f7f3ef",
+  white: "#11151c",
+  softGray: "#1a202b",
+  border: "#303846",
+  body: "#d5d9e1",
+};
+
+const getInitialTheme = () => {
+  if (typeof window === "undefined") return "light";
+  const savedTheme = window.localStorage.getItem("mls-theme");
+  if (savedTheme === "dark" || savedTheme === "light") return savedTheme;
+  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 };
 
 const flridLogoUrl = "/FRID-Logo-wText-2.png";
@@ -69,7 +86,24 @@ const footerServiceItems = [
   { path: "/services/asl-english-translation", label: "ASL → English Translation" },
 ];
 
-function BrandLockup({ compact = false }) {
+function ThemeToggle({ theme, onToggle, palette, fullWidth = false }) {
+  const isDark = theme === "dark";
+  const Icon = isDark ? Sun : Moon;
+  return (
+    <button
+      type="button"
+      onClick={onToggle}
+      aria-label={`Switch to ${isDark ? "light" : "dark"} mode`}
+      className={`${fullWidth ? "w-full justify-center" : ""} inline-flex items-center gap-2 rounded-2xl border px-4 py-2.5 text-sm font-bold shadow-sm transition hover:-translate-y-0.5 hover:shadow-md`}
+      style={{ borderColor: palette.border, color: palette.charcoal, backgroundColor: palette.white }}
+    >
+      <Icon size={16} style={{ color: palette.gold }} />
+      <span>{isDark ? "Light" : "Dark"}</span>
+    </button>
+  );
+}
+
+function BrandLockup({ palette, compact = false }) {
   return (
     <div className="flex min-w-0 items-center gap-3">
       <img src={logo} alt="Miqueas Language Solutions logo" className={compact ? "h-11 w-auto shrink-0 object-contain sm:h-12" : "h-16 w-auto shrink-0 object-contain"} />
@@ -87,15 +121,27 @@ function BrandLockup({ compact = false }) {
 
 export default function App() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [theme, setTheme] = useState(getInitialTheme);
+  const palette = theme === "dark" ? darkPalette : lightPalette;
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    document.documentElement.style.colorScheme = theme;
+    window.localStorage.setItem("mls-theme", theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme((currentTheme) => (currentTheme === "dark" ? "light" : "dark"));
+  };
 
   return (
-    <div className="min-h-screen overflow-x-hidden bg-white pb-24 text-slate-900 md:pb-0">
+    <div className={`theme-${theme} min-h-screen overflow-x-hidden bg-white pb-24 text-slate-900 transition-colors duration-300 md:pb-0`}>
       <header className="sticky top-0 z-50 bg-white/95 backdrop-blur">
         <div className="border-b border-black/5">
           <div className="mx-auto grid max-w-7xl grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 gap-y-3 px-4 py-4 md:grid-cols-[auto_1fr_auto] md:gap-x-8 md:px-8 md:py-5">
             <Link to="/" className="min-w-0 shrink">
-              <div className="hidden md:block"><BrandLockup /></div>
-              <div className="md:hidden"><BrandLockup compact /></div>
+              <div className="hidden md:block"><BrandLockup palette={palette} /></div>
+              <div className="md:hidden"><BrandLockup palette={palette} compact /></div>
             </Link>
 
             <nav className="hidden items-center justify-center md:flex">
@@ -109,17 +155,21 @@ export default function App() {
             </nav>
 
             <div className="hidden items-center gap-2 md:flex md:self-center">
-              <Link to="/contact" className="rounded-2xl px-4 py-2.5 text-sm font-semibold leading-tight text-white transition hover:-translate-y-0.5" style={{ backgroundColor: palette.burgundy }}>
+              <ThemeToggle theme={theme} onToggle={toggleTheme} palette={palette} />
+              <Link to="/contact" className="rounded-2xl px-4 py-2.5 text-sm font-semibold leading-tight text-white transition hover:-translate-y-0.5" style={{ backgroundColor: lightPalette.burgundy }}>
                 Request an Interpreter
               </Link>
-              <Link to="/join-our-team" className="rounded-2xl px-4 py-2.5 text-sm font-semibold leading-tight text-white transition hover:-translate-y-0.5" style={{ backgroundColor: palette.burgundy }}>
+              <Link to="/join-our-team" className="rounded-2xl px-4 py-2.5 text-sm font-semibold leading-tight text-white transition hover:-translate-y-0.5" style={{ backgroundColor: lightPalette.burgundy }}>
                 Join Our Team
               </Link>
             </div>
 
-            <button className="ml-auto shrink-0 rounded-xl border border-black/10 px-3 py-2 text-lg leading-none md:hidden" onClick={() => setMobileOpen((value) => !value)} aria-label="Toggle menu" type="button">
-              {mobileOpen ? "×" : "☰"}
-            </button>
+            <div className="ml-auto flex items-center gap-2 md:hidden">
+              <ThemeToggle theme={theme} onToggle={toggleTheme} palette={palette} />
+              <button className="shrink-0 rounded-xl border border-black/10 px-3 py-2 text-lg leading-none" onClick={() => setMobileOpen((value) => !value)} aria-label="Toggle menu" type="button" style={{ color: palette.charcoal, borderColor: palette.border, backgroundColor: palette.white }}>
+                {mobileOpen ? "×" : "☰"}
+              </button>
+            </div>
           </div>
         </div>
 
@@ -129,7 +179,7 @@ export default function App() {
               <span>Connect With Us</span>
               <div className="flex items-center gap-2">
                 {socialItems.map(({ href, label, Icon }) => (
-                  <a key={label} href={href} target="_blank" rel="noreferrer" aria-label={label} className="inline-flex h-8 w-8 items-center justify-center rounded-full text-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md" style={{ backgroundColor: palette.gold }}>
+                  <a key={label} href={href} target="_blank" rel="noreferrer" aria-label={label} className="inline-flex h-8 w-8 items-center justify-center rounded-full text-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md" style={{ backgroundColor: lightPalette.gold }}>
                     <Icon size={14} />
                   </a>
                 ))}
@@ -158,12 +208,13 @@ export default function App() {
               ))}
 
               <div className="mt-3 border-t border-black/10 pt-4 text-center">
-                <div className="mb-3 text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.burgundy }}>
+                <ThemeToggle theme={theme} onToggle={toggleTheme} palette={palette} fullWidth />
+                <div className="mb-3 mt-5 text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.burgundy }}>
                   Connect With Us
                 </div>
                 <div className="flex flex-wrap justify-center gap-3">
                   {socialItems.map(({ href, label, Icon }) => (
-                    <a key={label} href={href} target="_blank" rel="noreferrer" aria-label={label} className="inline-flex h-10 w-10 items-center justify-center rounded-full text-white shadow-sm" style={{ backgroundColor: palette.gold }} onClick={() => setMobileOpen(false)}>
+                    <a key={label} href={href} target="_blank" rel="noreferrer" aria-label={label} className="inline-flex h-10 w-10 items-center justify-center rounded-full text-white shadow-sm" style={{ backgroundColor: lightPalette.gold }} onClick={() => setMobileOpen(false)}>
                       <Icon size={17} />
                     </a>
                   ))}
@@ -179,10 +230,10 @@ export default function App() {
                   </a>
                 </div>
                 <div className="mt-4 grid gap-2 sm:grid-cols-2">
-                  <Link to="/contact" className="inline-flex w-full items-center justify-center rounded-2xl px-4 py-3 text-sm font-bold text-white" style={{ backgroundColor: palette.burgundy }} onClick={() => setMobileOpen(false)}>
+                  <Link to="/contact" className="inline-flex w-full items-center justify-center rounded-2xl px-4 py-3 text-sm font-bold text-white" style={{ backgroundColor: lightPalette.burgundy }} onClick={() => setMobileOpen(false)}>
                     Request an Interpreter
                   </Link>
-                  <Link to="/join-our-team" className="inline-flex w-full items-center justify-center rounded-2xl px-4 py-3 text-sm font-bold text-white" style={{ backgroundColor: palette.burgundy }} onClick={() => setMobileOpen(false)}>
+                  <Link to="/join-our-team" className="inline-flex w-full items-center justify-center rounded-2xl px-4 py-3 text-sm font-bold text-white" style={{ backgroundColor: lightPalette.burgundy }} onClick={() => setMobileOpen(false)}>
                     Join Our Team
                   </Link>
                 </div>
@@ -236,7 +287,7 @@ export default function App() {
               <p className="mx-auto max-w-md text-sm leading-7 text-white/75 md:mx-0">
                 Professional ASL/English interpreting and ASL video translation services built around clarity, access, and genuine human connection.
               </p>
-              <Link to="/contact" className="inline-flex rounded-2xl px-5 py-3 text-sm font-bold text-white transition hover:-translate-y-0.5" style={{ backgroundColor: palette.gold }}>
+              <Link to="/contact" className="inline-flex rounded-2xl px-5 py-3 text-sm font-bold text-white transition hover:-translate-y-0.5" style={{ backgroundColor: lightPalette.gold }}>
                 Request Services
               </Link>
             </div>
@@ -268,8 +319,8 @@ export default function App() {
             <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-6">
               <h2 className="mb-4 text-xs font-bold uppercase tracking-[0.22em] text-[#dd7d00]">Contact</h2>
               <div className="space-y-4 text-sm text-white/75">
-                <a href="tel:+13213798010" className="flex items-center justify-center gap-3 transition hover:text-white md:justify-start"><Phone size={17} style={{ color: palette.gold }} /><span>(321) 379-8010</span></a>
-                <a href="mailto:m.stubbs@miqueaslanguagesolutions.com" className="flex items-start justify-center gap-3 transition hover:text-white md:justify-start"><Mail size={17} style={{ color: palette.gold, flexShrink: 0 }} /><span className="break-all text-left">m.stubbs@miqueaslanguagesolutions.com</span></a>
+                <a href="tel:+13213798010" className="flex items-center justify-center gap-3 transition hover:text-white md:justify-start"><Phone size={17} style={{ color: lightPalette.gold }} /><span>(321) 379-8010</span></a>
+                <a href="mailto:m.stubbs@miqueaslanguagesolutions.com" className="flex items-start justify-center gap-3 transition hover:text-white md:justify-start"><Mail size={17} style={{ color: lightPalette.gold, flexShrink: 0 }} /><span className="break-all text-left">m.stubbs@miqueaslanguagesolutions.com</span></a>
                 <div className="flex justify-center gap-3 pt-2">
                   {socialItems.map(({ href, label, Icon }) => (
                     <a key={label} href={href} target="_blank" rel="noreferrer" aria-label={label} className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 text-white transition hover:bg-[#dd7d00]">
