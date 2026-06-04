@@ -72,14 +72,30 @@ function WorkflowTimeline({ steps, palette }) {
 }
 
 function InfoList({ title, items, palette, dark = false }) {
+  const isDarkTheme = palette.white !== "#ffffff";
+  const panelBackground = dark ? "#202020" : palette.white;
+  const panelBorder = dark ? (isDarkTheme ? "rgba(221,125,0,0.24)" : "rgba(255,255,255,0.14)") : palette.border;
+  const titleColor = dark ? "#fff8f0" : palette.charcoal;
+  const itemBackground = dark ? "rgba(255,255,255,0.07)" : isDarkTheme ? "rgba(255,248,240,0.06)" : "#f7f3ef";
+  const itemBorder = dark ? "1px solid rgba(255,255,255,0.12)" : `1px solid ${palette.border}`;
+  const itemTextColor = dark ? "rgba(255,248,240,0.9)" : palette.body;
+
   return (
-    <motion.div initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.25 }} variants={fadeUp} transition={{ duration: 0.45 }} className="h-full rounded-[2rem] border p-6 md:p-8" style={{ borderColor: dark ? "rgba(255,255,255,0.10)" : palette.border, backgroundColor: dark ? "#202020" : palette.white }}>
-      <h3 className="text-2xl font-black" style={{ color: dark ? palette.white : palette.charcoal }}>{title}</h3>
+    <motion.div
+      initial="hidden"
+      whileInView="show"
+      viewport={{ once: true, amount: 0.25 }}
+      variants={fadeUp}
+      transition={{ duration: 0.45 }}
+      className="h-full rounded-[2rem] border p-6 md:p-8"
+      style={{ borderColor: panelBorder, backgroundColor: panelBackground }}
+    >
+      <h3 className="text-2xl font-black" style={{ color: titleColor }}>{title}</h3>
       <div className="mt-5 space-y-3">
         {items.map((item) => (
-          <div key={item} className="flex items-start gap-3 rounded-2xl p-4" style={{ backgroundColor: dark ? "rgba(255,255,255,0.06)" : "#f7f3ef", border: dark ? "1px solid rgba(255,255,255,0.08)" : "none" }}>
+          <div key={item} className="flex items-start gap-3 rounded-2xl p-4" style={{ backgroundColor: itemBackground, border: itemBorder }}>
             <CheckCircle2 size={18} style={{ color: palette.gold, marginTop: 2, flexShrink: 0 }} />
-            <span className="text-sm leading-6" style={{ color: dark ? "rgba(255,255,255,0.82)" : palette.body }}>{item}</span>
+            <span className="text-sm leading-6" style={{ color: itemTextColor }}>{item}</span>
           </div>
         ))}
       </div>
