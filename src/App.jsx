@@ -29,18 +29,18 @@ const lightPalette = {
   charcoal: "#464747",
   white: "#ffffff",
   softGray: "#f5f5f5",
-  border: "#e5e5e5",
+  border: "#d1c6bc",
   body: "#444444",
 };
 
 const darkPalette = {
-  burgundy: "#f08a77",
-  gold: "#f6b84c",
+  burgundy: "#721100",
+  gold: "#dd7d00",
   charcoal: "#f7f3ef",
-  white: "#11151c",
-  softGray: "#1a202b",
-  border: "#303846",
-  body: "#d5d9e1",
+  white: "#15100e",
+  softGray: "#211714",
+  border: "rgba(221, 125, 0, 0.24)",
+  body: "#efe7df",
 };
 
 const getInitialTheme = () => {
