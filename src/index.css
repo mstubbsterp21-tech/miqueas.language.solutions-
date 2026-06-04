@@ -61,18 +61,40 @@ body:has(.theme-dark) {
 .theme-dark header,
 .theme-dark .bg-white,
 .theme-dark .bg-white\/95,
+.theme-dark .bg-white\/90,
+.theme-dark .bg-white\/85,
 .theme-dark .bg-white\/80,
+.theme-dark .bg-white\/75,
+.theme-dark .bg-white\/70,
+.theme-dark .bg-white\/60,
+.theme-dark [class~="bg-white/95"],
+.theme-dark [class~="bg-white/90"],
+.theme-dark [class~="bg-white/85"],
+.theme-dark [class~="bg-white/80"],
+.theme-dark [class~="bg-white/75"],
+.theme-dark [class~="bg-white/70"],
+.theme-dark [class~="bg-white/60"],
 .theme-dark .bg-\[\#fafafa\],
 .theme-dark .bg-\[\#f7f3ef\],
+.theme-dark .bg-\[\#f5f5f5\],
 .theme-dark .bg-\[rgba\(245\,245\,245\,0\.85\)\] {
   background-color: rgba(24, 17, 15, 0.96) !important;
 }
 
 .theme-dark .bg-black\/\[0\.03\],
-.theme-dark .bg-white\/80,
-.theme-dark .bg-white\/[0\.04\],
-.theme-dark .bg-white\/[0\.06\] {
+.theme-dark [class~="bg-black/[0.03]"] {
   background-color: rgba(221, 125, 0, 0.09) !important;
+}
+
+.theme-dark .bg-white\/\[0\.04\],
+.theme-dark .bg-white\/\[0\.06\],
+.theme-dark .bg-white\/\[0\.08\],
+.theme-dark .bg-white\/\[0\.10\],
+.theme-dark [class~="bg-white/[0.04]"],
+.theme-dark [class~="bg-white/[0.06]"],
+.theme-dark [class~="bg-white/[0.08]"],
+.theme-dark [class~="bg-white/[0.10]"] {
+  background-color: rgba(255, 248, 240, 0.06) !important;
 }
 
 .theme-dark .bg-\[\#202020\] {
