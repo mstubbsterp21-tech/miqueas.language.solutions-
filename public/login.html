@@ -1,0 +1,496 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Interpreter Login | Miqueas Language Solutions</title>
+    <meta
+      name="description"
+      content="Prototype interpreter login portal for Miqueas Language Solutions."
+    />
+    <style>
+      :root {
+        --burgundy: #721100;
+        --gold: #dd7d00;
+        --charcoal: #464747;
+        --soft: #f7f3ef;
+        --border: #d1c6bc;
+        --white: #ffffff;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--charcoal);
+        background:
+          radial-gradient(circle at top left, rgba(221, 125, 0, 0.16), transparent 36rem),
+          linear-gradient(135deg, #fffaf5 0%, #f7f3ef 44%, #ffffff 100%);
+      }
+
+      a {
+        color: inherit;
+      }
+
+      .shell {
+        width: min(1120px, calc(100% - 32px));
+        margin: 0 auto;
+        padding: 28px 0 56px;
+      }
+
+      header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        margin-bottom: 44px;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        text-decoration: none;
+      }
+
+      .brand img {
+        height: 58px;
+        width: auto;
+        object-fit: contain;
+      }
+
+      .brand-title {
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        color: var(--charcoal);
+      }
+
+      .brand-tagline {
+        margin-top: 2px;
+        color: var(--burgundy);
+        font-size: 0.86rem;
+        font-weight: 650;
+      }
+
+      .home-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        padding: 10px 16px;
+        background: rgba(255, 255, 255, 0.78);
+        color: var(--burgundy);
+        font-weight: 800;
+        text-decoration: none;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.05fr) minmax(320px, 0.95fr);
+        gap: 34px;
+        align-items: start;
+      }
+
+      .hero,
+      .card,
+      .portal-card {
+        border: 1px solid rgba(114, 17, 0, 0.12);
+        border-radius: 32px;
+        background: rgba(255, 255, 255, 0.86);
+        box-shadow: 0 24px 70px rgba(70, 71, 71, 0.11);
+      }
+
+      .hero {
+        padding: clamp(28px, 5vw, 54px);
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        border-radius: 999px;
+        background: rgba(221, 125, 0, 0.14);
+        color: var(--burgundy);
+        padding: 8px 13px;
+        font-size: 0.75rem;
+        font-weight: 900;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+      }
+
+      h1 {
+        margin: 18px 0 14px;
+        color: var(--burgundy);
+        font-size: clamp(2.15rem, 5vw, 4.2rem);
+        line-height: 0.95;
+        letter-spacing: -0.07em;
+      }
+
+      .lead {
+        max-width: 58ch;
+        color: #5c5652;
+        font-size: 1.05rem;
+        line-height: 1.75;
+      }
+
+      .feature-list {
+        display: grid;
+        gap: 14px;
+        margin-top: 28px;
+      }
+
+      .feature {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+        border: 1px solid rgba(221, 125, 0, 0.18);
+        border-radius: 20px;
+        padding: 15px;
+        background: rgba(255, 250, 245, 0.74);
+      }
+
+      .feature span {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex: 0 0 auto;
+        width: 28px;
+        height: 28px;
+        border-radius: 999px;
+        background: var(--gold);
+        color: white;
+        font-weight: 900;
+      }
+
+      .feature strong {
+        display: block;
+        color: var(--charcoal);
+        margin-bottom: 2px;
+      }
+
+      .feature p {
+        margin: 0;
+        color: #645f5b;
+        line-height: 1.5;
+      }
+
+      .card {
+        padding: 26px;
+        position: sticky;
+        top: 22px;
+      }
+
+      .card h2,
+      .portal-card h2 {
+        margin: 0 0 6px;
+        color: var(--burgundy);
+        font-size: 1.7rem;
+        letter-spacing: -0.04em;
+      }
+
+      .muted {
+        margin: 0 0 22px;
+        color: #6d6660;
+        line-height: 1.55;
+      }
+
+      label {
+        display: block;
+        margin: 16px 0 7px;
+        color: var(--charcoal);
+        font-size: 0.88rem;
+        font-weight: 850;
+      }
+
+      input {
+        width: 100%;
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        padding: 14px 15px;
+        background: #fff;
+        color: var(--charcoal);
+        font: inherit;
+        outline: none;
+      }
+
+      input:focus {
+        border-color: var(--gold);
+        box-shadow: 0 0 0 4px rgba(221, 125, 0, 0.14);
+      }
+
+      .button {
+        width: 100%;
+        margin-top: 20px;
+        border: 0;
+        border-radius: 20px;
+        padding: 14px 18px;
+        background: var(--burgundy);
+        color: white;
+        font: inherit;
+        font-weight: 900;
+        cursor: pointer;
+        transition: transform 160ms ease, box-shadow 160ms ease;
+      }
+
+      .button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 15px 32px rgba(114, 17, 0, 0.2);
+      }
+
+      .secondary-button {
+        background: rgba(221, 125, 0, 0.14);
+        color: var(--burgundy);
+      }
+
+      .demo-note {
+        margin-top: 18px;
+        border-radius: 18px;
+        padding: 14px;
+        background: rgba(70, 71, 71, 0.06);
+        color: #5c5652;
+        font-size: 0.9rem;
+        line-height: 1.55;
+      }
+
+      .error {
+        display: none;
+        margin-top: 14px;
+        border-radius: 16px;
+        padding: 12px;
+        background: #fff2ef;
+        color: #8a1d0d;
+        font-weight: 750;
+      }
+
+      .portal {
+        display: none;
+        margin-top: 34px;
+      }
+
+      .portal-card {
+        padding: 26px;
+      }
+
+      .portal-header {
+        display: flex;
+        justify-content: space-between;
+        gap: 18px;
+        align-items: start;
+        margin-bottom: 22px;
+      }
+
+      .status {
+        display: inline-flex;
+        border-radius: 999px;
+        padding: 8px 12px;
+        background: rgba(221, 125, 0, 0.14);
+        color: var(--burgundy);
+        font-size: 0.78rem;
+        font-weight: 900;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        white-space: nowrap;
+      }
+
+      .dashboard-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 16px;
+      }
+
+      .dash-tile {
+        border: 1px solid rgba(114, 17, 0, 0.12);
+        border-radius: 22px;
+        padding: 18px;
+        background: rgba(255, 250, 245, 0.72);
+      }
+
+      .dash-tile h3 {
+        margin: 0 0 10px;
+        color: var(--charcoal);
+      }
+
+      .dash-tile ul {
+        margin: 0;
+        padding-left: 19px;
+        color: #625b56;
+        line-height: 1.65;
+      }
+
+      @media (max-width: 860px) {
+        header,
+        .portal-header {
+          align-items: stretch;
+          flex-direction: column;
+        }
+
+        .grid,
+        .dashboard-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .card {
+          position: static;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <header>
+        <a class="brand" href="/">
+          <img src="/src/logo.png" alt="Miqueas Language Solutions logo" />
+          <div>
+            <div class="brand-title">Miqueas Language Solutions</div>
+            <div class="brand-tagline">Interpreter Portal Prototype</div>
+          </div>
+        </a>
+        <a class="home-link" href="/">Back to website</a>
+      </header>
+
+      <section class="grid" id="loginView">
+        <div class="hero">
+          <div class="eyebrow">Invite-only access</div>
+          <h1>Interpreter login without touching the live site.</h1>
+          <p class="lead">
+            This branch adds a reviewable interpreter portal concept for MLS. It is intentionally lightweight so the experience can be tested before connecting real authentication, document storage, or database records.
+          </p>
+
+          <div class="feature-list">
+            <div class="feature">
+              <span>1</span>
+              <div>
+                <strong>Centralized onboarding</strong>
+                <p>Interpreters can eventually manage profile details, credentials, rates, availability, and required documents in one place.</p>
+              </div>
+            </div>
+            <div class="feature">
+              <span>2</span>
+              <div>
+                <strong>Confidentiality-aware by design</strong>
+                <p>This prototype avoids storing assignment, consumer, medical, legal, or school-specific details in the front end.</p>
+              </div>
+            </div>
+            <div class="feature">
+              <span>3</span>
+              <div>
+                <strong>Ready for real auth later</strong>
+                <p>The next step would be Clerk or Supabase Auth plus protected storage rules, not homemade password handling.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <form class="card" id="loginForm">
+          <h2>Interpreter Login</h2>
+          <p class="muted">Use the demo credentials below to preview the portal flow.</p>
+
+          <label for="email">Email</label>
+          <input id="email" type="email" autocomplete="email" value="interpreter@miqueaslanguagesolutions.com" required />
+
+          <label for="password">Password</label>
+          <input id="password" type="password" autocomplete="current-password" value="MLSdemo2026!" required />
+
+          <button class="button" type="submit">Sign in to demo portal</button>
+          <div class="error" id="errorMessage">Use interpreter@miqueaslanguagesolutions.com and MLSdemo2026! for this prototype.</div>
+
+          <div class="demo-note">
+            <strong>Prototype note:</strong> This is not production security. It demonstrates the user experience only. Real launch should use Clerk, Supabase Auth, or another managed auth provider.
+          </div>
+        </form>
+      </section>
+
+      <section class="portal" id="portalView" aria-live="polite">
+        <div class="portal-card">
+          <div class="portal-header">
+            <div>
+              <div class="eyebrow">Interpreter dashboard</div>
+              <h2>Welcome back, MLS Interpreter</h2>
+              <p class="muted">Here is the MVP layout for what interpreters would see after signing in.</p>
+            </div>
+            <div>
+              <div class="status">Prototype access</div>
+              <button class="button secondary-button" type="button" id="logoutButton">Sign out</button>
+            </div>
+          </div>
+
+          <div class="dashboard-grid">
+            <article class="dash-tile">
+              <h3>Onboarding Status</h3>
+              <ul>
+                <li>Profile received</li>
+                <li>Credential verification pending</li>
+                <li>W-9 not uploaded</li>
+              </ul>
+            </article>
+            <article class="dash-tile">
+              <h3>Documents</h3>
+              <ul>
+                <li>Résumé</li>
+                <li>Credential proof</li>
+                <li>W-9</li>
+                <li>Liability insurance</li>
+              </ul>
+            </article>
+            <article class="dash-tile">
+              <h3>Availability & Rates</h3>
+              <ul>
+                <li>Morning: 6 AM–12 PM EST</li>
+                <li>Afternoon: 12 PM–6 PM EST</li>
+                <li>Evening: 6 PM–12 AM EST</li>
+                <li>Overnight: 12 AM–6 AM EST</li>
+              </ul>
+            </article>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <script>
+      const demoEmail = "interpreter@miqueaslanguagesolutions.com";
+      const demoPassword = "MLSdemo2026!";
+      const loginView = document.getElementById("loginView");
+      const portalView = document.getElementById("portalView");
+      const loginForm = document.getElementById("loginForm");
+      const errorMessage = document.getElementById("errorMessage");
+      const logoutButton = document.getElementById("logoutButton");
+
+      function showPortal() {
+        loginView.style.display = "none";
+        portalView.style.display = "block";
+      }
+
+      function showLogin() {
+        loginView.style.display = "grid";
+        portalView.style.display = "none";
+      }
+
+      if (window.localStorage.getItem("mls-demo-auth") === "true") {
+        showPortal();
+      }
+
+      loginForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const email = document.getElementById("email").value.trim().toLowerCase();
+        const password = document.getElementById("password").value;
+
+        if (email === demoEmail && password === demoPassword) {
+          window.localStorage.setItem("mls-demo-auth", "true");
+          errorMessage.style.display = "none";
+          showPortal();
+          return;
+        }
+
+        errorMessage.style.display = "block";
+      });
+
+      logoutButton.addEventListener("click", () => {
+        window.localStorage.removeItem("mls-demo-auth");
+        showLogin();
+      });
+    </script>
+  </body>
+</html>
