@@ -10,6 +10,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@clerk/clerk-react": "^5.35.1",
+    "@supabase/supabase-js": "^2.77.0",
     "framer-motion": "^12.38.0",
     "lucide-react": "^1.8.0",
     "openai": "^5.12.2",
