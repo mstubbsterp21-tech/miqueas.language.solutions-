@@ -19,6 +19,13 @@ import Terms from "./pages/Terms";
 import Accessibility from "./pages/Accessibility";
 import InterpreterCommunity from "./pages/InterpreterCommunity";
 import InterpreterNetworkForm from "./components/InterpreterNetworkFormOptional";
+import Login from "./pages/Login";
+import InterpreterPortal from "./pages/InterpreterPortal";
+import AdminInterpreters from "./pages/AdminInterpreters";
+import AuthStatus from "./components/AuthStatus";
+import PortalSetupNotice from "./components/PortalSetupNotice";
+import RequirePortalAuth from "./components/RequirePortalAuth";
+import { isClerkConfigured } from "./lib/env";
 import logo from "./logo.png";
 import { FaInstagram, FaLinkedinIn, FaFacebookF } from "react-icons/fa";
 import { Mail, Moon, Phone, Sun } from "lucide-react";
@@ -119,6 +126,18 @@ function BrandLockup({ palette, compact = false }) {
   );
 }
 
+function InterpreterLoginButton({ palette }) {
+  if (isClerkConfigured) {
+    return <AuthStatus palette={palette} />;
+  }
+
+  return (
+    <Link to="/login" className="rounded-2xl px-4 py-2.5 text-sm font-semibold leading-tight text-white transition hover:-translate-y-0.5" style={{ backgroundColor: lightPalette.burgundy }}>
+      Interpreter Login
+    </Link>
+  );
+}
+
 export default function App() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [theme, setTheme] = useState(getInitialTheme);
@@ -162,6 +181,7 @@ export default function App() {
               <Link to="/join-our-team" className="rounded-2xl px-4 py-2.5 text-sm font-semibold leading-tight text-white transition hover:-translate-y-0.5" style={{ backgroundColor: lightPalette.burgundy }}>
                 Join Our Team
               </Link>
+              <InterpreterLoginButton palette={palette} />
             </div>
 
             <div className="ml-auto flex items-center gap-2 md:hidden">
@@ -236,6 +256,9 @@ export default function App() {
                   <Link to="/join-our-team" className="inline-flex w-full items-center justify-center rounded-2xl px-4 py-3 text-sm font-bold text-white" style={{ backgroundColor: lightPalette.burgundy }} onClick={() => setMobileOpen(false)}>
                     Join Our Team
                   </Link>
+                  <Link to="/login" className="inline-flex w-full items-center justify-center rounded-2xl px-4 py-3 text-sm font-bold text-white sm:col-span-2" style={{ backgroundColor: lightPalette.burgundy }} onClick={() => setMobileOpen(false)}>
+                    Interpreter Login
+                  </Link>
                 </div>
               </div>
             </div>
@@ -256,6 +279,10 @@ export default function App() {
           <Route path="/resources/clients" element={<Navigate to="/clients" replace />} />
           <Route path="/resources/interpreters" element={<Navigate to="/interpreters" replace />} />
           <Route path="/join-our-team" element={<InterpreterNetworkForm palette={palette} />} />
+          <Route path="/login" element={<Login palette={palette} />} />
+          <Route path="/login.html" element={<Navigate to="/login" replace />} />
+          <Route path="/portal" element={isClerkConfigured ? <RequirePortalAuth><InterpreterPortal palette={palette} /></RequirePortalAuth> : <PortalSetupNotice palette={palette} />} />
+          <Route path="/admin/interpreters" element={isClerkConfigured ? <RequirePortalAuth><AdminInterpreters palette={palette} /></RequirePortalAuth> : <PortalSetupNotice palette={palette} />} />
           <Route path="/services" element={<Services palette={palette} />} />
           <Route path="/services/:serviceId" element={<ServiceDetail palette={palette} />} />
           <Route path="/about" element={<About palette={palette} />} />
@@ -312,6 +339,7 @@ export default function App() {
                 <Link to="/interpreters" className="transition hover:text-white">Interpreter Information</Link>
                 <Link to="/deaf-and-hard-of-hearing" className="transition hover:text-white">Deaf & Hard of Hearing</Link>
                 <Link to="/join-our-team" className="transition hover:text-white">Join Our Roster</Link>
+                <Link to="/login" className="transition hover:text-white">Interpreter Login</Link>
                 <Link to="/policies" className="transition hover:text-white">Policies</Link>
               </div>
             </div>
