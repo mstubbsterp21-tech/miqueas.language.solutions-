@@ -72,6 +72,46 @@ export default function ResourcesInterpreters({ palette }) {
 
       <section className="px-5 py-12 md:px-8 md:py-16">
         <div className="mx-auto max-w-6xl">
+          <motion.div initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} variants={fadeUp} transition={{ duration: 0.45 }} className="overflow-hidden rounded-[2.2rem] border shadow-lg" style={{ borderColor: palette.border }}>
+            <div className="grid gap-0 lg:grid-cols-[1.05fr_0.95fr]">
+              <div className="bg-[#202020] p-7 md:p-9">
+                <div className="mb-5 inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-xs font-bold uppercase tracking-[0.16em]" style={{ color: palette.gold }}>
+                  <BadgeCheck size={14} /> Interpreter portal
+                </div>
+                <h2 className="text-3xl font-black leading-tight text-white md:text-5xl">Returning Interpreter?</h2>
+                <p className="mt-5 max-w-2xl text-base leading-8 text-white/75">
+                  Already connected with MLS or finishing onboarding? Use the interpreter portal to review your profile, track document needs, and keep your availability and rate details current.
+                </p>
+                <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+                  <a href="/login.html" className="inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-bold shadow-md transition hover:-translate-y-0.5 hover:shadow-lg" style={goldButton}>
+                    Interpreter Login
+                    <ArrowRight size={17} />
+                  </a>
+                  <Link to="/join-our-team" className="inline-flex items-center justify-center rounded-full border border-white/20 bg-white/10 px-6 py-3 text-sm font-bold text-white transition hover:-translate-y-0.5 hover:bg-white/15">
+                    New to MLS? Apply here
+                  </Link>
+                </div>
+              </div>
+              <div className="grid gap-4 bg-white p-7 md:p-9">
+                <div className="rounded-[1.5rem] border p-5" style={cardStyle}>
+                  <FileSearch size={24} style={{ color: palette.gold }} />
+                  <h3 className="mt-4 text-lg font-black" style={{ color: palette.charcoal }}>Check onboarding items</h3>
+                  <p className="mt-3 text-sm leading-7 text-[#666]">See what MLS still needs, including credentials, W-9, insurance, résumé, screening, or profile updates.</p>
+                </div>
+                <div className="rounded-[1.5rem] border p-5" style={cardStyle}>
+                  <ClipboardCheck size={24} style={{ color: palette.gold }} />
+                  <h3 className="mt-4 text-lg font-black" style={{ color: palette.charcoal }}>Keep your details fresh</h3>
+                  <p className="mt-3 text-sm leading-7 text-[#666]">Update availability windows, assignment preferences, service areas, rates, and contact information as your schedule changes.</p>
+                </div>
+                <p className="text-xs font-medium leading-6 text-[#777]">Portal access is intended for invited or returning interpreters only.</p>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      <section className="px-5 py-12 md:px-8 md:py-16">
+        <div className="mx-auto max-w-6xl">
           <div className="grid gap-5 lg:grid-cols-[1.05fr_0.95fr]">
             <motion.div initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.25 }} variants={fadeUp} transition={{ duration: 0.45 }} className="rounded-[2.2rem] border bg-[#202020] p-7 shadow-sm md:p-9" style={{ borderColor: palette.border }}>
               <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.gold }}>MLS standards</p>
