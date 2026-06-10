@@ -67,7 +67,7 @@ const navItems = [
 const socialItems = [
   { href: "https://www.instagram.com/miqueas.language.solutions/", label: "Instagram", Icon: FaInstagram },
   { href: "https://www.facebook.com/profile.php?id=61573286078153", label: "Facebook", Icon: FaFacebookF },
-  { href: "https://www.linkedin.com/in/micah-stubbs-7a7802145/", label: "LinkedIn", Icon: FaLinkedinIn },
+  { href: "https://www.linkedin.com/company/miqueas-language-solutions/?viewAsMember=true", label: "LinkedIn", Icon: FaLinkedinIn },
 ];
 
 const legalItems = [
