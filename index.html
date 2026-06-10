@@ -69,6 +69,192 @@
       }
     </script>
 
+    <script>
+      (function () {
+        const siteUrl = "https://miqueaslanguagesolutions.com";
+        const defaultDescription = "Miqueas Language Solutions provides professional ASL-English interpreting, video remote interpreting, and ASL video translation services for healthcare, education, business, and community settings in Florida and remotely.";
+        const previewImage = siteUrl + "/preview.png";
+
+        const pageMeta = {
+          "/": {
+            title: "ASL Interpreter Services in Florida | Miqueas Language Solutions",
+            description: defaultDescription,
+          },
+          "/services": {
+            title: "ASL Interpreting & Translation Services | Miqueas Language Solutions",
+            description: "Explore in-person ASL interpreting, video remote interpreting, English-to-ASL translation, and ASL-to-English translation services for organizations and community settings.",
+          },
+          "/services/in-person-interpreting": {
+            title: "In-Person ASL Interpreting Services | Miqueas Language Solutions",
+            description: "Book professional on-site ASL-English interpreting for healthcare, education, legal, business, community, conference, and live event settings.",
+          },
+          "/services/video-remote-interpreting": {
+            title: "Video Remote Interpreting Services | Miqueas Language Solutions",
+            description: "Professional VRI services for telehealth, virtual meetings, remote appointments, and organizations that need clear visual communication access.",
+          },
+          "/services/english-asl-translation": {
+            title: "English to ASL Video Translation | Miqueas Language Solutions",
+            description: "Turn English scripts, documents, policies, training materials, and public information into clear, natural ASL video content.",
+          },
+          "/services/asl-english-translation": {
+            title: "ASL to English Translation Services | Miqueas Language Solutions",
+            description: "Convert ASL video into polished English transcripts, captions, summaries, and documentation-ready written content.",
+          },
+          "/about": {
+            title: "About Miqueas Language Solutions | ASL Access with Professional Judgment",
+            description: "Learn about Miqueas Language Solutions, an ASL-English interpreting and translation company focused on clarity, preparation, and respectful communication access.",
+          },
+          "/blog": {
+            title: "ASL Access Blog | Miqueas Language Solutions",
+            description: "Read practical guidance on ASL interpreting, VRI, healthcare access, DeafBlind access, emergency preparation, and communication accessibility.",
+          },
+          "/clients": {
+            title: "Client Information | Miqueas Language Solutions",
+            description: "Information for organizations requesting ASL-English interpreting, VRI, and ASL translation services through Miqueas Language Solutions.",
+          },
+          "/interpreters": {
+            title: "Interpreter Resources | Miqueas Language Solutions",
+            description: "Resources and information for ASL interpreters, Certified Deaf Interpreters, and professionals interested in joining the MLS interpreter network.",
+          },
+          "/deaf-and-hard-of-hearing": {
+            title: "Deaf & Hard of Hearing Access | Miqueas Language Solutions",
+            description: "Information for Deaf, DeafBlind, hard-of-hearing, and hearing consumers about communication access and interpreting services.",
+          },
+          "/join-our-team": {
+            title: "Join the MLS Interpreter Network | Miqueas Language Solutions",
+            description: "Apply to join the Miqueas Language Solutions network of ASL-English interpreters and Certified Deaf Interpreters.",
+          },
+          "/policies/clients": {
+            title: "Client Policies | Miqueas Language Solutions",
+            description: "Review client policies for scheduling, rates, preparation, cancellation, billing, and communication access expectations.",
+          },
+          "/policies/consumers": {
+            title: "Consumer Access Policies | Miqueas Language Solutions",
+            description: "Review communication access policies for Deaf, DeafBlind, hard-of-hearing, and hearing consumers using MLS interpreting services.",
+          },
+          "/policies/interpreters": {
+            title: "Interpreter Policies | Miqueas Language Solutions",
+            description: "Review MLS interpreter policies for credentials, screenings, professionalism, assignment expectations, and ethical practice.",
+          },
+          "/contact": {
+            title: "Request an ASL Interpreter | Miqueas Language Solutions",
+            description: "Contact Miqueas Language Solutions to request ASL-English interpreting, VRI, or ASL translation services.",
+          },
+          "/privacy": {
+            title: "Privacy Policy | Miqueas Language Solutions",
+            description: "Read the Miqueas Language Solutions privacy policy for information about data collection, forms, communications, and confidentiality.",
+          },
+          "/terms": {
+            title: "Terms & Conditions | Miqueas Language Solutions",
+            description: "Review the terms and conditions for using the Miqueas Language Solutions website and services.",
+          },
+          "/accessibility": {
+            title: "Accessibility Statement | Miqueas Language Solutions",
+            description: "Read the accessibility statement for the Miqueas Language Solutions website and communication access resources.",
+          },
+          "/interpreter-community": {
+            title: "Interpreter Community | Miqueas Language Solutions",
+            description: "Connect with the MLS interpreter community and learn about professional collaboration, support, and ethical interpreting practice.",
+          },
+          "/blog/vri-vs-in-person-asl-interpreting-healthcare": {
+            title: "VRI vs. In-Person ASL Interpreting in Healthcare | Miqueas Language Solutions",
+            description: "Learn when healthcare organizations should use video remote interpreting and when in-person ASL interpreting is the safer, more effective choice.",
+            type: "article",
+          },
+          "/blog/asl-access-florida-hurricane-prep-guide": {
+            title: "ASL Access Florida Hurricane Prep Guide | Miqueas Language Solutions",
+            description: "A practical emergency-readiness guide for organizations planning ASL communication access during Florida hurricane season.",
+            type: "article",
+          },
+          "/blog/ai-vs-human-asl-interpreters": {
+            title: "AI vs. Human ASL Interpreters | Miqueas Language Solutions",
+            description: "Why context, language judgment, and human connection still matter in high-stakes ASL communication access settings.",
+            type: "article",
+          },
+          "/blog/deafblind-asl-interpreting-effective-access": {
+            title: "DeafBlind ASL Interpreting & Effective Access | Miqueas Language Solutions",
+            description: "A practical guide to DeafBlind interpreting access, tactile communication, environmental information, and readiness.",
+            type: "article",
+          },
+          "/blog/why-vri-is-not-always-the-best-fit": {
+            title: "Why VRI Is Not Always the Best Fit | Miqueas Language Solutions",
+            description: "Video Remote Interpreting can be useful, but some situations need on-site support for full communication access.",
+            type: "article",
+          },
+        };
+
+        const redirectCanonicals = {
+          "/consumers": "/deaf-and-hard-of-hearing",
+          "/resources": "/clients",
+          "/resources/clients": "/clients",
+          "/resources/interpreters": "/interpreters",
+          "/policies": "/policies/clients",
+        };
+
+        function normalizePath(pathname) {
+          if (!pathname || pathname === "/") return "/";
+          return pathname.replace(/\/+$/, "") || "/";
+        }
+
+        function absoluteUrl(pathname) {
+          return siteUrl + (pathname === "/" ? "/" : pathname);
+        }
+
+        function setMetaByName(name, content) {
+          let tag = document.head.querySelector(`meta[name="${name}"]`);
+          if (!tag) {
+            tag = document.createElement("meta");
+            tag.setAttribute("name", name);
+            document.head.appendChild(tag);
+          }
+          tag.setAttribute("content", content);
+        }
+
+        function setMetaByProperty(property, content) {
+          let tag = document.head.querySelector(`meta[property="${property}"]`);
+          if (!tag) {
+            tag = document.createElement("meta");
+            tag.setAttribute("property", property);
+            document.head.appendChild(tag);
+          }
+          tag.setAttribute("content", content);
+        }
+
+        function setCanonical(href) {
+          let tag = document.head.querySelector('link[rel="canonical"]');
+          if (!tag) {
+            tag = document.createElement("link");
+            tag.setAttribute("rel", "canonical");
+            document.head.appendChild(tag);
+          }
+          tag.setAttribute("href", href);
+        }
+
+        const path = normalizePath(window.location.pathname);
+        const canonicalPath = redirectCanonicals[path] || path;
+        const meta = pageMeta[canonicalPath] || {
+          title: "Miqueas Language Solutions",
+          description: defaultDescription,
+          noindex: true,
+        };
+        const canonicalUrl = absoluteUrl(canonicalPath);
+        const robotsValue = meta.noindex ? "noindex, follow" : "index, follow";
+
+        document.title = meta.title;
+        setMetaByName("description", meta.description);
+        setMetaByName("robots", robotsValue);
+        setCanonical(canonicalUrl);
+        setMetaByProperty("og:title", meta.title);
+        setMetaByProperty("og:description", meta.description);
+        setMetaByProperty("og:url", canonicalUrl);
+        setMetaByProperty("og:type", meta.type || "website");
+        setMetaByProperty("og:image", previewImage);
+        setMetaByName("twitter:title", meta.title);
+        setMetaByName("twitter:description", meta.description);
+        setMetaByName("twitter:image", previewImage);
+      })();
+    </script>
+
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-NR3K7YQVPL"></script>
     <script>
