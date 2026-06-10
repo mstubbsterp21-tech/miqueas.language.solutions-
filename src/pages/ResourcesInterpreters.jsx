@@ -83,10 +83,10 @@ export default function ResourcesInterpreters({ palette }) {
                   Already connected with MLS or finishing onboarding? Use the interpreter portal to review your profile, track document needs, and keep your availability and rate details current.
                 </p>
                 <div className="mt-7 flex flex-col gap-3 sm:flex-row">
-                  <a href="/login.html" className="inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-bold shadow-md transition hover:-translate-y-0.5 hover:shadow-lg" style={goldButton}>
+                  <Link to="/login" className="inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-bold shadow-md transition hover:-translate-y-0.5 hover:shadow-lg" style={goldButton}>
                     Interpreter Login
                     <ArrowRight size={17} />
-                  </a>
+                  </Link>
                   <Link to="/join-our-team" className="inline-flex items-center justify-center rounded-full border border-white/20 bg-white/10 px-6 py-3 text-sm font-bold text-white transition hover:-translate-y-0.5 hover:bg-white/15">
                     New to MLS? Apply here
                   </Link>
