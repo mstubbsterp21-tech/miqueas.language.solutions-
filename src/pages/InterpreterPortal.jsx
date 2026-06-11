@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSession, useUser } from "@clerk/clerk-react";
-import { AlertCircle, BadgeCheck, CheckCircle2, FileUp, RefreshCcw, Save, UploadCloud } from "lucide-react";
+import { AlertCircle, CheckCircle2, FileUp, RefreshCcw, Save, UploadCloud } from "lucide-react";
 import { PortalSignOutButton } from "../components/AuthStatus";
 import PortalSetupNotice from "../components/PortalSetupNotice";
 import { adminEmails, isSupabaseConfigured } from "../lib/env";
@@ -58,7 +58,7 @@ export default function InterpreterPortal({ palette }) {
   const [file, setFile] = useState(null);
   const [message, setMessage] = useState("");
 
-  const portalSupabase = useMemo(() => createPortalSupabaseClient(session), [session]);
+  const uploadSupabase = useMemo(() => createPortalSupabaseClient(null), []);
   const primaryEmail = user?.primaryEmailAddress?.emailAddress?.toLowerCase() || "";
   const isAdmin = adminEmails.includes(primaryEmail);
 
@@ -69,58 +69,49 @@ export default function InterpreterPortal({ palette }) {
     return ["resume", "w9", "credential_proof", "liability_insurance"].filter((type) => !uploadedTypes.has(type));
   }, [documents]);
 
+  async function portalRequest(action, options = {}) {
+    const token = await session?.getToken();
+    const response = await fetch(`/api/portal?action=${action}`, {
+      method: options.method || "GET",
+      headers: {
+        authorization: `Bearer ${token}`,
+        ...(options.body ? { "content-type": "application/json" } : {}),
+      },
+      body: options.body ? JSON.stringify(options.body) : undefined,
+    });
+
+    const data = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+      throw new Error(data.error || "Portal request failed.");
+    }
+
+    return data;
+  }
+
   useEffect(() => {
-    if (!isLoaded || !user || !session || !isSupabaseConfigured || !portalSupabase) return;
+    if (!isLoaded || !user || !session || !isSupabaseConfigured) return;
 
     let cancelled = false;
 
     async function loadPortal() {
-      setLoading(true);
-      setMessage("");
+      try {
+        setLoading(true);
+        setMessage("");
 
-      const { data: profileData, error: profileError } = await portalSupabase
-        .from("interpreters")
-        .select("*")
-        .eq("clerk_user_id", user.id)
-        .maybeSingle();
-
-      if (cancelled) return;
-
-      if (profileError) {
-        setMessage(`Could not load your profile: ${profileError.message}`);
-        setLoading(false);
-        return;
-      }
-
-      if (profileData) {
-        setProfile({ ...defaultProfile, ...profileData });
-
-        const { data: documentData, error: documentError } = await portalSupabase
-          .from("interpreter_documents")
-          .select("*")
-          .eq("interpreter_id", profileData.id)
-          .order("uploaded_at", { ascending: false });
+        const data = await portalRequest("load");
 
         if (cancelled) return;
 
-        if (documentError) {
-          setMessage(`Profile loaded, but documents could not load: ${documentError.message}`);
-        } else {
-          setDocuments(documentData || []);
+        setProfile({ ...defaultProfile, ...(data.profile || {}) });
+        setDocuments(data.documents || []);
+      } catch (error) {
+        if (!cancelled) {
+          setMessage(`Could not load your profile: ${error.message}`);
         }
-      } else {
-        setProfile({
-          ...defaultProfile,
-          clerk_user_id: user.id,
-          email: primaryEmail,
-          first_name: user.firstName || "",
-          last_name: user.lastName || "",
-          roster_status: "pending_profile",
-          screening_status: "not_started",
-        });
+      } finally {
+        if (!cancelled) setLoading(false);
       }
-
-      setLoading(false);
     }
 
     loadPortal();
@@ -128,7 +119,7 @@ export default function InterpreterPortal({ palette }) {
     return () => {
       cancelled = true;
     };
-  }, [isLoaded, primaryEmail, portalSupabase, session, user]);
+  }, [isLoaded, primaryEmail, session, user]);
 
   if (!isSupabaseConfigured) {
     return <PortalSetupNotice palette={palette} />;
@@ -144,27 +135,19 @@ export default function InterpreterPortal({ palette }) {
     setSaving(true);
     setMessage("");
 
-    const payload = {
-      ...profile,
-      clerk_user_id: user.id,
-      email: primaryEmail,
-      updated_at: new Date().toISOString(),
-    };
+    try {
+      const data = await portalRequest("saveProfile", {
+        method: "POST",
+        body: { profile },
+      });
 
-    const { data, error } = await portalSupabase
-      .from("interpreters")
-      .upsert(payload, { onConflict: "clerk_user_id" })
-      .select()
-      .single();
-
-    if (error) {
-      setMessage(`Profile could not be saved: ${error.message}`);
-    } else {
-      setProfile({ ...defaultProfile, ...data });
+      setProfile({ ...defaultProfile, ...(data.profile || {}) });
       setMessage("Profile saved.");
+    } catch (error) {
+      setMessage(`Profile could not be saved: ${error.message}`);
+    } finally {
+      setSaving(false);
     }
-
-    setSaving(false);
   };
 
   const uploadDocument = async (event) => {
@@ -181,41 +164,37 @@ export default function InterpreterPortal({ palette }) {
     setUploading(true);
     setMessage("");
 
-    const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "-");
-    const path = `${profile.id}/${documentType}/${Date.now()}-${safeName}`;
+    try {
+      const uploadData = await portalRequest("createUploadUrl", {
+        method: "POST",
+        body: { documentType, fileName: file.name },
+      });
 
-    const { error: uploadError } = await portalSupabase.storage
-      .from(interpreterDocumentBucket)
-      .upload(path, file, { upsert: false });
+      const { error: uploadError } = await uploadSupabase.storage
+        .from(interpreterDocumentBucket)
+        .uploadToSignedUrl(uploadData.path, uploadData.token, file);
 
-    if (uploadError) {
-      setMessage(`Upload failed: ${uploadError.message}`);
-      setUploading(false);
-      return;
-    }
+      if (uploadError) {
+        throw uploadError;
+      }
 
-    const { data, error: insertError } = await portalSupabase
-      .from("interpreter_documents")
-      .insert({
-        interpreter_id: profile.id,
-        document_type: documentType,
-        file_name: file.name,
-        storage_path: path,
-        status: "uploaded",
-        uploaded_by: user.id,
-      })
-      .select()
-      .single();
+      const recordData = await portalRequest("recordUpload", {
+        method: "POST",
+        body: {
+          documentType,
+          fileName: file.name,
+          storagePath: uploadData.path,
+        },
+      });
 
-    if (insertError) {
-      setMessage(`File uploaded, but document record failed: ${insertError.message}`);
-    } else {
-      setDocuments((current) => [data, ...current]);
+      setDocuments((current) => [recordData.document, ...current]);
       setFile(null);
       setMessage("Document uploaded.");
+    } catch (error) {
+      setMessage(`Upload failed: ${error.message}`);
+    } finally {
+      setUploading(false);
     }
-
-    setUploading(false);
   };
 
   if (loading) {
