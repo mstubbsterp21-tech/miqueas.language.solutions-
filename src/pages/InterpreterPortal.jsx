@@ -41,19 +41,6 @@ const experienceOptions = [
   "ASL > English Translation",
 ];
 
-const situationOptions = [
-  "Language deprivation or minimal language",
-  "Atypical or non-standard ASL users",
-  "Fast-paced or information-dense communication",
-  "Emotionally charged situations",
-  "Medical or informed-consent settings",
-  "Legal or quasi-legal settings",
-  "Power dynamics such as doctor/patient or employer/employee",
-  "Team interpreting settings",
-  "VRI with technical challenges",
-  "Other",
-];
-
 const availabilityBlocks = [
   "Morning (6AM-12PM EST)",
   "Afternoon (12PM-6PM EST)",
@@ -94,16 +81,12 @@ const defaultProfile = {
   state_license: "",
   state_license_details: "",
   years_experience: "",
-  education_itp: "",
   modalities: "",
   areas_of_experience: "",
-  situations_successfully_navigated: "",
-  challenging_situation_description: "",
   assignment_type_preference: "",
   willing_to_travel: "",
   technical_readiness_confirmed: "",
   professional_liability_insurance: "",
-  comfortable_with_rates: "",
   onsite_rate: "",
   vri_rate: "",
   travel_radius: "",
@@ -247,8 +230,9 @@ export default function InterpreterPortal({ palette }) {
     setMessage("");
 
     const allAvailability = dayFields.map(([, key]) => profile[key]).join(", ");
+    const { onsite_rate, vri_rate, comfortable_with_rates, education_itp, situations_successfully_navigated, challenging_situation_description, ...editableProfile } = profile;
     const profileForSave = {
-      ...profile,
+      ...editableProfile,
       availability_morning: allAvailability.includes("Morning"),
       availability_afternoon: allAvailability.includes("Afternoon"),
       availability_evening: allAvailability.includes("Evening"),
@@ -388,7 +372,6 @@ export default function InterpreterPortal({ palette }) {
                 <Field label="Phone" name="phone" value={profile.phone || ""} onChange={handleChange} />
                 <Field label="City" name="city" value={profile.city || ""} onChange={handleChange} />
                 <Field label="State" name="state" value={profile.state || ""} onChange={handleChange} />
-                <Field label="Current location summary" name="current_location" value={profile.current_location || ""} onChange={handleChange} placeholder="City, State, USA" span />
                 <SelectField label="Preferred contact method" name="preferred_contact_method" value={profile.preferred_contact_method || ""} onChange={handleChange} options={["Email", "Phone", "Text"]} />
                 <SelectField label="Willing to travel?" name="willing_to_travel" value={profile.willing_to_travel || ""} onChange={handleChange} options={["Yes", "No", "Depends on assignment"]} />
                 <Field label="Travel radius" name="travel_radius" value={profile.travel_radius || ""} onChange={handleChange} placeholder="Example: 30 miles, statewide, negotiable" span />
@@ -401,18 +384,15 @@ export default function InterpreterPortal({ palette }) {
                 <SelectField label="Years of experience" name="years_experience" value={profile.years_experience || ""} onChange={handleChange} options={["Less than 1 year", "1-3 years", "4-6 years", "7-10 years", "10+ years"]} />
                 <SelectField label="State license?" name="state_license" value={profile.state_license || ""} onChange={handleChange} options={["Yes", "No", "In progress", "Not applicable"]} />
                 <Field label="State license details" name="state_license_details" value={profile.state_license_details || ""} onChange={handleChange} span />
-                <TextArea label="Education / Interpreter Training Program" name="education_itp" value={profile.education_itp || ""} onChange={handleChange} span />
               </div>
             </PortalSection>
 
             <PortalSection title="Skills & assignment fit" eyebrow="Matching preferences" palette={palette}>
               <CheckboxPills label="Modalities" name="modalities" options={modalityOptions} value={profile.modalities} onToggle={handleToggle} palette={palette} />
               <div className="mt-6"><CheckboxPills label="Areas of experience" name="areas_of_experience" options={experienceOptions} value={profile.areas_of_experience} onToggle={handleToggle} palette={palette} /></div>
-              <div className="mt-6"><CheckboxPills label="Situations successfully navigated" name="situations_successfully_navigated" options={situationOptions} value={profile.situations_successfully_navigated} onToggle={handleToggle} palette={palette} /></div>
               <div className="mt-5 grid gap-4 md:grid-cols-2">
                 <SelectField label="Assignment type preference" name="assignment_type_preference" value={profile.assignment_type_preference || ""} onChange={handleChange} options={["On-site only", "VRI only", "Both", "Depends on setting"]} />
                 <SelectField label="Technical readiness for VRI" name="technical_readiness_confirmed" value={profile.technical_readiness_confirmed || ""} onChange={handleChange} options={["Yes", "No", "Needs discussion"]} />
-                <TextArea label="Notes on challenging situations handled" name="challenging_situation_description" value={profile.challenging_situation_description || ""} onChange={handleChange} span />
               </div>
             </PortalSection>
 
@@ -436,13 +416,15 @@ export default function InterpreterPortal({ palette }) {
               </div>
             </PortalSection>
 
-            <PortalSection title="Rates & subcontractor readiness" eyebrow="Business details" palette={palette}>
+            <PortalSection title="Subcontractor readiness" eyebrow="Business details" palette={palette}>
               <div className="grid gap-4 md:grid-cols-2">
-                <Field label="On-site rate" name="onsite_rate" value={profile.onsite_rate || ""} onChange={handleChange} placeholder="Example: $65/hr, 2-hour minimum" />
-                <Field label="VRI rate" name="vri_rate" value={profile.vri_rate || ""} onChange={handleChange} placeholder="Example: $55/hr, 1-hour minimum" />
                 <SelectField label="Professional liability insurance" name="professional_liability_insurance" value={profile.professional_liability_insurance || ""} onChange={handleChange} options={["Yes", "No", "In progress"]} />
-                <SelectField label="Comfortable discussing MLS assignment rates?" name="comfortable_with_rates" value={profile.comfortable_with_rates || ""} onChange={handleChange} options={["Yes", "No", "Would like to discuss"]} />
+                <ReadOnlyRate label="On-site rate" value={profile.onsite_rate} palette={palette} />
+                <ReadOnlyRate label="VRI rate" value={profile.vri_rate} palette={palette} />
               </div>
+              <p className="mt-4 rounded-2xl bg-black/[0.03] p-4 text-xs leading-5 text-[#666]">
+                Rates are managed by MLS admin after review or rate discussion. Contact MLS directly if your rate details need to be updated.
+              </p>
               <button type="submit" disabled={saving} className="mt-7 inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-bold text-white shadow-md transition hover:-translate-y-0.5 hover:shadow-lg disabled:opacity-60" style={{ backgroundColor: palette.gold }}>
                 <Save size={17} /> {saving ? "Saving..." : "Save matching profile"}
               </button>
@@ -542,12 +524,12 @@ function SelectField({ label, name, value, onChange, options }) {
   );
 }
 
-function TextArea({ label, name, value, onChange, span = false }) {
+function ReadOnlyRate({ label, value, palette }) {
   return (
-    <label className={`block text-sm font-bold text-[#464747] ${span ? "md:col-span-2" : ""}`}>
-      {label}
-      <textarea name={name} value={value || ""} onChange={onChange} rows={4} className="mt-2 w-full rounded-2xl border border-[#d1c6bc] bg-white px-4 py-3 text-sm font-medium text-[#464747] outline-none transition focus:border-[#dd7d00] focus:ring-4 focus:ring-[#dd7d00]/10" />
-    </label>
+    <div className="rounded-2xl border bg-black/[0.02] px-4 py-3" style={{ borderColor: palette.border }}>
+      <div className="text-sm font-bold" style={{ color: palette.charcoal }}>{label}</div>
+      <div className="mt-1 text-sm text-[#666]">{value || "Admin managed"}</div>
+    </div>
   );
 }
 
