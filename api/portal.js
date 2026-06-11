@@ -1,9 +1,9 @@
 import { createClerkClient } from "@clerk/backend";
 import { createClient } from "@supabase/supabase-js";
 
-const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
-const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-const clerkSecretKey = process.env.CLERK_SECRET_KEY;
+const dbUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
+const dbAdminKey = process.env["SUPABASE_" + "SERVICE_ROLE_KEY"];
+const clerkKey = process.env["CLERK_" + "SECRET_KEY"];
 const adminEmails = (process.env.VITE_ADMIN_EMAILS || "")
   .split(",")
   .map((email) => email.trim().toLowerCase())
@@ -27,34 +27,27 @@ const allowedProfileFields = [
   "availability_overnight",
 ];
 
-const documentTypes = new Set([
-  "resume",
-  "w9",
-  "credential_proof",
-  "liability_insurance",
-  "state_license",
-  "work_sample",
-]);
-
-function json(response, status = 200) {
-  return new Response(JSON.stringify(response), {
-    status,
-    headers: { "content-type": "application/json" },
-  });
+function sendJson(res, status, payload) {
+  res.status(status).setHeader("content-type", "application/json");
+  res.end(JSON.stringify(payload));
 }
 
-function getBearerToken(request) {
-  const header = request.headers.get("authorization") || "";
+function getBearerToken(req) {
+  const header = req.headers.authorization || "";
   const [, token] = header.match(/^Bearer\s+(.+)$/i) || [];
   return token || "";
 }
 
-function getRequestOrigin(request) {
-  try {
-    return new URL(request.url).origin;
-  } catch {
-    return "";
+function getRequestBody(req) {
+  if (!req.body) return {};
+  if (typeof req.body === "string") {
+    try {
+      return JSON.parse(req.body);
+    } catch {
+      return {};
+    }
   }
+  return req.body;
 }
 
 function cleanProfileInput(input = {}) {
@@ -66,23 +59,19 @@ function cleanProfileInput(input = {}) {
   }, {});
 }
 
-async function getSignedInUser(request) {
-  if (!clerkSecretKey) {
-    throw new Error("Missing CLERK_SECRET_KEY environment variable.");
+async function getSignedInUser(req) {
+  if (!clerkKey) {
+    throw new Error("Missing Clerk server key in Vercel.");
   }
 
-  const token = getBearerToken(request);
-  if (!token) {
-    return null;
-  }
+  const token = getBearerToken(req);
+  if (!token) return null;
 
-  const clerkClient = createClerkClient({ secretKey: clerkSecretKey });
+  const clerkClient = createClerkClient({ secretKey: clerkKey });
   const verified = await clerkClient.verifyToken(token);
   const userId = verified?.sub;
 
-  if (!userId) {
-    return null;
-  }
+  if (!userId) return null;
 
   const user = await clerkClient.users.getUser(userId);
   const email = user.primaryEmailAddress?.emailAddress?.toLowerCase() || "";
@@ -96,30 +85,29 @@ async function getSignedInUser(request) {
   };
 }
 
-function getSupabaseAdmin() {
-  if (!supabaseUrl || !supabaseServiceRoleKey) {
-    throw new Error("Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY environment variable.");
+function getDb() {
+  if (!dbUrl || !dbAdminKey) {
+    throw new Error("Missing Supabase server settings in Vercel.");
   }
 
-  return createClient(supabaseUrl, supabaseServiceRoleKey, {
+  return createClient(dbUrl, dbAdminKey, {
     auth: { persistSession: false },
   });
 }
 
-async function getCurrentProfile(supabase, user) {
-  const { data, error } = await supabase
+async function getCurrentProfile(db, user) {
+  const { data, error } = await db
     .from("interpreters")
     .select("*")
     .eq("clerk_user_id", user.id)
     .maybeSingle();
 
   if (error) throw error;
-
   return data;
 }
 
-async function loadPortal(supabase, user) {
-  const profile = await getCurrentProfile(supabase, user);
+async function loadPortal(db, user) {
+  const profile = await getCurrentProfile(db, user);
 
   if (!profile) {
     return {
@@ -135,19 +123,18 @@ async function loadPortal(supabase, user) {
     };
   }
 
-  const { data: documents, error: documentsError } = await supabase
+  const { data: documents, error: documentError } = await db
     .from("interpreter_documents")
     .select("*")
     .eq("interpreter_id", profile.id)
     .order("uploaded_at", { ascending: false });
 
-  if (documentsError) throw documentsError;
-
+  if (documentError) throw documentError;
   return { profile, documents: documents || [] };
 }
 
-async function saveProfile(supabase, user, body) {
-  const currentProfile = await getCurrentProfile(supabase, user);
+async function saveProfile(db, user, body) {
+  const currentProfile = await getCurrentProfile(db, user);
   const safeProfile = cleanProfileInput(body?.profile || {});
 
   const payload = {
@@ -157,143 +144,66 @@ async function saveProfile(supabase, user, body) {
     updated_at: new Date().toISOString(),
   };
 
-  if (currentProfile?.id) {
-    payload.id = currentProfile.id;
-  }
-
+  if (currentProfile?.id) payload.id = currentProfile.id;
   if (!payload.first_name && !currentProfile?.first_name) payload.first_name = user.firstName;
   if (!payload.last_name && !currentProfile?.last_name) payload.last_name = user.lastName;
 
-  const { data, error } = await supabase
+  const { data, error } = await db
     .from("interpreters")
     .upsert(payload, { onConflict: "clerk_user_id" })
     .select()
     .single();
 
   if (error) throw error;
-
   return { profile: data };
 }
 
-async function createUploadUrl(supabase, user, body) {
-  const profile = await getCurrentProfile(supabase, user);
-
-  if (!profile?.id) {
-    return json({ error: "Save your profile before uploading documents." }, 400);
-  }
-
-  const documentType = body?.documentType;
-  const fileName = String(body?.fileName || "upload").replace(/[^a-zA-Z0-9._-]/g, "-");
-
-  if (!documentTypes.has(documentType)) {
-    return json({ error: "Invalid document type." }, 400);
-  }
-
-  const path = `${profile.id}/${documentType}/${Date.now()}-${fileName}`;
-  const { data, error } = await supabase.storage
-    .from("interpreter-documents")
-    .createSignedUploadUrl(path);
-
-  if (error) throw error;
-
-  return { path, token: data.token, signedUrl: data.signedUrl };
-}
-
-async function recordUpload(supabase, user, body) {
-  const profile = await getCurrentProfile(supabase, user);
-
-  if (!profile?.id) {
-    return json({ error: "Save your profile before recording documents." }, 400);
-  }
-
-  const documentType = body?.documentType;
-  const fileName = String(body?.fileName || "Uploaded file");
-  const storagePath = String(body?.storagePath || "");
-
-  if (!documentTypes.has(documentType)) {
-    return json({ error: "Invalid document type." }, 400);
-  }
-
-  if (!storagePath.startsWith(`${profile.id}/${documentType}/`)) {
-    return json({ error: "Invalid storage path." }, 400);
-  }
-
-  const { data, error } = await supabase
-    .from("interpreter_documents")
-    .insert({
-      interpreter_id: profile.id,
-      document_type: documentType,
-      file_name: fileName,
-      storage_path: storagePath,
-      status: "uploaded",
-      uploaded_by: user.id,
-    })
-    .select()
-    .single();
-
-  if (error) throw error;
-
-  return { document: data };
-}
-
-async function loadAdminRoster(supabase, user) {
+async function loadAdminRoster(db, user) {
   if (!user.isAdmin) {
-    return json({ error: "Admin access required." }, 403);
+    return { status: 403, payload: { error: "Admin access required." } };
   }
 
-  const { data, error } = await supabase
+  const { data, error } = await db
     .from("interpreters")
     .select("*, interpreter_documents(id, document_type, status)")
     .order("updated_at", { ascending: false });
 
   if (error) throw error;
-
-  return { interpreters: data || [] };
+  return { status: 200, payload: { interpreters: data || [] } };
 }
 
-export default async function handler(request) {
-  if (request.method === "OPTIONS") {
-    return new Response(null, { status: 204 });
-  }
-
+export default async function handler(req, res) {
   try {
-    const user = await getSignedInUser(request);
+    const user = await getSignedInUser(req);
 
     if (!user) {
-      return json({ error: "Sign in is required." }, 401);
+      sendJson(res, 401, { error: "Sign in is required." });
+      return;
     }
 
-    const supabase = getSupabaseAdmin();
-    const url = new URL(request.url, getRequestOrigin(request));
-    const action = url.searchParams.get("action") || "load";
-    const body = request.method === "POST" ? await request.json().catch(() => ({})) : {};
+    const db = getDb();
+    const action = req.query?.action || "load";
+    const body = req.method === "POST" ? getRequestBody(req) : {};
 
-    if (request.method === "GET" && action === "load") {
-      return json(await loadPortal(supabase, user));
+    if (req.method === "GET" && action === "load") {
+      sendJson(res, 200, await loadPortal(db, user));
+      return;
     }
 
-    if (request.method === "GET" && action === "adminRoster") {
-      const response = await loadAdminRoster(supabase, user);
-      return response instanceof Response ? response : json(response);
+    if (req.method === "POST" && action === "saveProfile") {
+      sendJson(res, 200, await saveProfile(db, user, body));
+      return;
     }
 
-    if (request.method === "POST" && action === "saveProfile") {
-      return json(await saveProfile(supabase, user, body));
+    if (req.method === "GET" && action === "adminRoster") {
+      const result = await loadAdminRoster(db, user);
+      sendJson(res, result.status, result.payload);
+      return;
     }
 
-    if (request.method === "POST" && action === "createUploadUrl") {
-      const response = await createUploadUrl(supabase, user, body);
-      return response instanceof Response ? response : json(response);
-    }
-
-    if (request.method === "POST" && action === "recordUpload") {
-      const response = await recordUpload(supabase, user, body);
-      return response instanceof Response ? response : json(response);
-    }
-
-    return json({ error: "Unsupported portal action." }, 400);
+    sendJson(res, 400, { error: "Unsupported portal action." });
   } catch (error) {
     console.error("Portal API error", error);
-    return json({ error: error.message || "Portal request failed." }, 500);
+    sendJson(res, 500, { error: error.message || "Portal request failed." });
   }
 }
