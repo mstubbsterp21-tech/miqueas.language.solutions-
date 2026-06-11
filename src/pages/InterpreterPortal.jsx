@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
-import { useUser } from "@clerk/clerk-react";
+import { useSession, useUser } from "@clerk/clerk-react";
 import { AlertCircle, BadgeCheck, CheckCircle2, FileUp, RefreshCcw, Save, UploadCloud } from "lucide-react";
 import { PortalSignOutButton } from "../components/AuthStatus";
 import PortalSetupNotice from "../components/PortalSetupNotice";
 import { adminEmails, isSupabaseConfigured } from "../lib/env";
-import { interpreterDocumentBucket, supabase } from "../lib/supabaseClient";
+import { createPortalSupabaseClient, interpreterDocumentBucket } from "../lib/supabaseClient";
 
 const documentTypes = [
   { value: "resume", label: "Résumé" },
@@ -48,6 +48,7 @@ function statusPill(status) {
 
 export default function InterpreterPortal({ palette }) {
   const { user, isLoaded } = useUser();
+  const { session } = useSession();
   const [profile, setProfile] = useState(defaultProfile);
   const [documents, setDocuments] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -57,6 +58,7 @@ export default function InterpreterPortal({ palette }) {
   const [file, setFile] = useState(null);
   const [message, setMessage] = useState("");
 
+  const portalSupabase = useMemo(() => createPortalSupabaseClient(session), [session]);
   const primaryEmail = user?.primaryEmailAddress?.emailAddress?.toLowerCase() || "";
   const isAdmin = adminEmails.includes(primaryEmail);
 
@@ -68,17 +70,21 @@ export default function InterpreterPortal({ palette }) {
   }, [documents]);
 
   useEffect(() => {
-    if (!isLoaded || !user || !isSupabaseConfigured || !supabase) return;
+    if (!isLoaded || !user || !session || !isSupabaseConfigured || !portalSupabase) return;
+
+    let cancelled = false;
 
     async function loadPortal() {
       setLoading(true);
       setMessage("");
 
-      const { data: profileData, error: profileError } = await supabase
+      const { data: profileData, error: profileError } = await portalSupabase
         .from("interpreters")
         .select("*")
         .eq("clerk_user_id", user.id)
         .maybeSingle();
+
+      if (cancelled) return;
 
       if (profileError) {
         setMessage(`Could not load your profile: ${profileError.message}`);
@@ -89,11 +95,13 @@ export default function InterpreterPortal({ palette }) {
       if (profileData) {
         setProfile({ ...defaultProfile, ...profileData });
 
-        const { data: documentData, error: documentError } = await supabase
+        const { data: documentData, error: documentError } = await portalSupabase
           .from("interpreter_documents")
           .select("*")
           .eq("interpreter_id", profileData.id)
           .order("uploaded_at", { ascending: false });
+
+        if (cancelled) return;
 
         if (documentError) {
           setMessage(`Profile loaded, but documents could not load: ${documentError.message}`);
@@ -116,7 +124,11 @@ export default function InterpreterPortal({ palette }) {
     }
 
     loadPortal();
-  }, [isLoaded, primaryEmail, user]);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isLoaded, primaryEmail, portalSupabase, session, user]);
 
   if (!isSupabaseConfigured) {
     return <PortalSetupNotice palette={palette} />;
@@ -139,7 +151,7 @@ export default function InterpreterPortal({ palette }) {
       updated_at: new Date().toISOString(),
     };
 
-    const { data, error } = await supabase
+    const { data, error } = await portalSupabase
       .from("interpreters")
       .upsert(payload, { onConflict: "clerk_user_id" })
       .select()
@@ -172,7 +184,7 @@ export default function InterpreterPortal({ palette }) {
     const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "-");
     const path = `${profile.id}/${documentType}/${Date.now()}-${safeName}`;
 
-    const { error: uploadError } = await supabase.storage
+    const { error: uploadError } = await portalSupabase.storage
       .from(interpreterDocumentBucket)
       .upload(path, file, { upsert: false });
 
@@ -182,7 +194,7 @@ export default function InterpreterPortal({ palette }) {
       return;
     }
 
-    const { data, error: insertError } = await supabase
+    const { data, error: insertError } = await portalSupabase
       .from("interpreter_documents")
       .insert({
         interpreter_id: profile.id,
