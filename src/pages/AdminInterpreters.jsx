@@ -6,6 +6,44 @@ import { PortalSignOutButton } from "../components/AuthStatus";
 import PortalSetupNotice from "../components/PortalSetupNotice";
 import { adminEmails, isSupabaseConfigured } from "../lib/env";
 
+const credentialOptions = [
+  "National Interpreter Certification (NIC)",
+  "Certified Deaf Interpreter (CDI)",
+  "Board for Evaluation of Interpreters (BEI)",
+  "Educational Interpreter Performance Assessment (EIPA)",
+  "Uncertified",
+  "Other",
+];
+
+const modalityOptions = [
+  "ASL (American Sign Language)",
+  "PTASL (Pro-Tactile ASL)",
+  "CASE (Conceptually Accurate Signed English)",
+  "Trilingual (ASL, English, Spanish)",
+  "MCE (Manually Coded English)",
+  "Cued Speech",
+  "Other",
+];
+
+const areaOptions = [
+  "Medical",
+  "Legal",
+  "Edu.(K-12)",
+  "Edu.(Post-Secondary)",
+  "Mental Health",
+  "Community / Freelance",
+  "Platform / Conference",
+  "Performance / Arts",
+  "Cruise",
+  "Video Relay Service (VRS)",
+  "Video Remote Interpreting (VRI)",
+  "English > ASL Translation",
+  "ASL > English Translation",
+];
+
+const experienceOptions = ["Less than 1 year", "1-3 years", "4-6 years", "7-10 years", "10+ years"];
+const yesNoOptions = ["Yes", "No"];
+
 const initialNewInterpreter = {
   firstName: "",
   lastName: "",
@@ -13,9 +51,9 @@ const initialNewInterpreter = {
   phone: "",
   city: "",
   state: "",
-  credentials: "",
-  modalities: "",
-  areasOfExperience: "",
+  credentials: [],
+  modalities: [],
+  areasOfExperience: [],
   yearsExperience: "",
   assignmentTypePreference: "",
   willingToTravel: "",
@@ -24,6 +62,10 @@ const initialNewInterpreter = {
   onsiteRate: "",
   vriRate: "",
 };
+
+function joinValues(values) {
+  return Array.isArray(values) ? values.join(", ") : String(values || "");
+}
 
 export default function AdminInterpreters({ palette }) {
   const { user, isLoaded } = useUser();
@@ -104,6 +146,20 @@ export default function AdminInterpreters({ palette }) {
     setNewInterpreter((current) => ({ ...current, [field]: value }));
   };
 
+  const toggleNewInterpreterValue = (field, option) => {
+    setNewInterpreter((current) => {
+      const currentValues = Array.isArray(current[field]) ? current[field] : [];
+      const nextValues = currentValues.includes(option)
+        ? currentValues.filter((item) => item !== option)
+        : [...currentValues, option];
+      return { ...current, [field]: nextValues };
+    });
+  };
+
+  const resetNewInterpreter = () => {
+    setNewInterpreter({ ...initialNewInterpreter, credentials: [], modalities: [], areasOfExperience: [] });
+  };
+
   const saveRates = async (interpreter) => {
     setSavingRateId(interpreter.id);
     setMessage("");
@@ -131,12 +187,18 @@ export default function AdminInterpreters({ palette }) {
     setMessage("");
 
     try {
+      const payload = {
+        ...newInterpreter,
+        credentials: joinValues(newInterpreter.credentials),
+        modalities: joinValues(newInterpreter.modalities),
+        areasOfExperience: joinValues(newInterpreter.areasOfExperience),
+      };
       const data = await portalRequest("adminCreateInterpreter", {
         method: "POST",
-        body: newInterpreter,
+        body: payload,
       });
       setInterpreters((current) => [data.interpreter, ...current]);
-      setNewInterpreter(initialNewInterpreter);
+      resetNewInterpreter();
       setShowAddInterpreter(false);
       setMessage(`${data.interpreter.first_name || "Interpreter"} was added to Clerk and the MLS roster.`);
     } catch (error) {
@@ -184,28 +246,31 @@ export default function AdminInterpreters({ palette }) {
               </button>
             </div>
 
-            <form onSubmit={createInterpreter} className="grid gap-4 md:grid-cols-2">
+            <form onSubmit={createInterpreter} className="grid gap-5 md:grid-cols-2">
               <AdminField label="First name" value={newInterpreter.firstName} onChange={(value) => updateNewInterpreter("firstName", value)} required />
               <AdminField label="Last name" value={newInterpreter.lastName} onChange={(value) => updateNewInterpreter("lastName", value)} required />
               <AdminField label="Email" type="email" value={newInterpreter.email} onChange={(value) => updateNewInterpreter("email", value)} required />
               <AdminField label="Phone" value={newInterpreter.phone} onChange={(value) => updateNewInterpreter("phone", value)} />
               <AdminField label="City" value={newInterpreter.city} onChange={(value) => updateNewInterpreter("city", value)} />
               <AdminField label="State" value={newInterpreter.state} onChange={(value) => updateNewInterpreter("state", value)} />
-              <AdminField label="Credentials" value={newInterpreter.credentials} onChange={(value) => updateNewInterpreter("credentials", value)} placeholder="NIC, BEI, EIPA 4.0, etc." />
-              <AdminField label="Modalities" value={newInterpreter.modalities} onChange={(value) => updateNewInterpreter("modalities", value)} placeholder="ASL, CASE, Trilingual, etc." />
-              <AdminField label="Areas of experience" value={newInterpreter.areasOfExperience} onChange={(value) => updateNewInterpreter("areasOfExperience", value)} placeholder="Medical, legal, VRI, education" span />
-              <AdminField label="Years of experience" value={newInterpreter.yearsExperience} onChange={(value) => updateNewInterpreter("yearsExperience", value)} />
+
+              <CheckboxPanel label="Credentials" options={credentialOptions} values={newInterpreter.credentials} onToggle={(option) => toggleNewInterpreterValue("credentials", option)} palette={palette} />
+              <CheckboxPanel label="Modalities" options={modalityOptions} values={newInterpreter.modalities} onToggle={(option) => toggleNewInterpreterValue("modalities", option)} palette={palette} />
+              <CheckboxPanel label="Areas of experience" options={areaOptions} values={newInterpreter.areasOfExperience} onToggle={(option) => toggleNewInterpreterValue("areasOfExperience", option)} palette={palette} span />
+
+              <RadioPanel label="Years of experience" options={experienceOptions} value={newInterpreter.yearsExperience} onChange={(value) => updateNewInterpreter("yearsExperience", value)} palette={palette} />
               <AdminField label="Assignment preference" value={newInterpreter.assignmentTypePreference} onChange={(value) => updateNewInterpreter("assignmentTypePreference", value)} placeholder="On-site, VRI, both" />
-              <AdminField label="Willing to travel" value={newInterpreter.willingToTravel} onChange={(value) => updateNewInterpreter("willingToTravel", value)} />
-              <AdminField label="VRI technical readiness" value={newInterpreter.technicalReadinessConfirmed} onChange={(value) => updateNewInterpreter("technicalReadinessConfirmed", value)} />
-              <AdminField label="Professional liability insurance" value={newInterpreter.professionalLiabilityInsurance} onChange={(value) => updateNewInterpreter("professionalLiabilityInsurance", value)} />
+              <RadioPanel label="Willing to travel" options={yesNoOptions} value={newInterpreter.willingToTravel} onChange={(value) => updateNewInterpreter("willingToTravel", value)} palette={palette} />
+              <RadioPanel label="VRI ready" options={yesNoOptions} value={newInterpreter.technicalReadinessConfirmed} onChange={(value) => updateNewInterpreter("technicalReadinessConfirmed", value)} palette={palette} />
+              <RadioPanel label="Professional liability insurance" options={yesNoOptions} value={newInterpreter.professionalLiabilityInsurance} onChange={(value) => updateNewInterpreter("professionalLiabilityInsurance", value)} palette={palette} />
+
               <AdminField label="On-site rate" value={newInterpreter.onsiteRate} onChange={(value) => updateNewInterpreter("onsiteRate", value)} placeholder="$65/hr, 2-hour minimum" />
               <AdminField label="VRI rate" value={newInterpreter.vriRate} onChange={(value) => updateNewInterpreter("vriRate", value)} placeholder="$55/hr, 1-hour minimum" />
               <div className="flex flex-wrap gap-3 md:col-span-2">
                 <button type="submit" disabled={creatingInterpreter} className="inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-bold text-white disabled:opacity-60" style={{ backgroundColor: palette.burgundy }}>
                   <Plus size={16} /> {creatingInterpreter ? "Adding..." : "Add to roster"}
                 </button>
-                <button type="button" onClick={() => setNewInterpreter(initialNewInterpreter)} className="rounded-full border px-5 py-3 text-sm font-bold" style={{ borderColor: palette.border, color: palette.charcoal }}>Clear</button>
+                <button type="button" onClick={resetNewInterpreter} className="rounded-full border px-5 py-3 text-sm font-bold" style={{ borderColor: palette.border, color: palette.charcoal }}>Clear</button>
               </div>
             </form>
           </section>
@@ -281,5 +346,50 @@ function AdminField({ label, value, onChange, type = "text", placeholder = "", r
         className="mt-2 w-full rounded-2xl border border-[#d1c6bc] bg-white px-4 py-3 text-sm font-medium text-[#464747] outline-none transition focus:border-[#dd7d00] focus:ring-4 focus:ring-[#dd7d00]/10"
       />
     </label>
+  );
+}
+
+function CheckboxPanel({ label, options, values, onToggle, palette, span = false }) {
+  return (
+    <fieldset className={`rounded-2xl border p-4 ${span ? "md:col-span-2" : ""}`} style={{ borderColor: palette.border }}>
+      <legend className="px-1 text-sm font-black" style={{ color: palette.charcoal }}>{label}</legend>
+      <p className="mb-3 mt-1 text-xs text-[#666]">Check all that apply.</p>
+      <div className="space-y-2">
+        {options.map((option) => (
+          <label key={option} className="flex items-start gap-3 text-sm" style={{ color: palette.charcoal }}>
+            <input
+              type="checkbox"
+              checked={values.includes(option)}
+              onChange={() => onToggle(option)}
+              className="mt-1 h-4 w-4 rounded"
+              style={{ accentColor: palette.burgundy }}
+            />
+            <span>{option}</span>
+          </label>
+        ))}
+      </div>
+    </fieldset>
+  );
+}
+
+function RadioPanel({ label, options, value, onChange, palette }) {
+  return (
+    <fieldset className="rounded-2xl border p-4" style={{ borderColor: palette.border }}>
+      <legend className="px-1 text-sm font-black" style={{ color: palette.charcoal }}>{label}</legend>
+      <div className="mt-2 space-y-2">
+        {options.map((option) => (
+          <label key={option} className="flex items-start gap-3 text-sm" style={{ color: palette.charcoal }}>
+            <input
+              type="radio"
+              checked={value === option}
+              onChange={() => onChange(option)}
+              className="mt-1 h-4 w-4"
+              style={{ accentColor: palette.burgundy }}
+            />
+            <span>{option}</span>
+          </label>
+        ))}
+      </div>
+    </fieldset>
   );
 }
