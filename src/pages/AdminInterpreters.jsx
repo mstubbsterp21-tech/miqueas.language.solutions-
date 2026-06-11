@@ -1,11 +1,10 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useSession, useUser } from "@clerk/clerk-react";
 import { Link } from "react-router-dom";
-import { AlertTriangle, BadgeCheck, RefreshCcw, Search } from "lucide-react";
+import { AlertTriangle, BadgeCheck, RefreshCcw, Save, Search } from "lucide-react";
 import { PortalSignOutButton } from "../components/AuthStatus";
 import PortalSetupNotice from "../components/PortalSetupNotice";
 import { adminEmails, isSupabaseConfigured } from "../lib/env";
-import { createPortalSupabaseClient } from "../lib/supabaseClient";
 
 export default function AdminInterpreters({ palette }) {
   const { user, isLoaded } = useUser();
@@ -14,32 +13,46 @@ export default function AdminInterpreters({ palette }) {
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
   const [message, setMessage] = useState("");
+  const [savingRateId, setSavingRateId] = useState("");
 
-  const portalSupabase = useMemo(() => createPortalSupabaseClient(session), [session]);
   const primaryEmail = user?.primaryEmailAddress?.emailAddress?.toLowerCase() || "";
   const isAdmin = adminEmails.includes(primaryEmail);
   const cardStyle = { borderColor: palette.border, backgroundColor: palette.white };
 
+  async function portalRequest(action, options = {}) {
+    const token = await session?.getToken();
+    const response = await fetch(`/api/portal?action=${action}`, {
+      method: options.method || "GET",
+      headers: {
+        authorization: `Bearer ${token}`,
+        ...(options.body ? { "content-type": "application/json" } : {}),
+      },
+      body: options.body ? JSON.stringify(options.body) : undefined,
+    });
+
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(data.error || "Portal request failed.");
+    return data;
+  }
+
   useEffect(() => {
-    if (!isLoaded || !user || !session || !isSupabaseConfigured || !portalSupabase || !isAdmin) return;
+    if (!isLoaded || !user || !session || !isSupabaseConfigured || !isAdmin) return;
 
     async function loadInterpreters() {
       setLoading(true);
-      const { data, error } = await portalSupabase
-        .from("interpreters")
-        .select("*, interpreter_documents(id, document_type, status)")
-        .order("updated_at", { ascending: false });
-
-      if (error) {
+      setMessage("");
+      try {
+        const data = await portalRequest("adminRoster");
+        setInterpreters(data.interpreters || []);
+      } catch (error) {
         setMessage(`Could not load roster: ${error.message}`);
-      } else {
-        setInterpreters(data || []);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     }
 
     loadInterpreters();
-  }, [isAdmin, isLoaded, portalSupabase, session, user]);
+  }, [isAdmin, isLoaded, session, user]);
 
   if (!isSupabaseConfigured) {
     return <PortalSetupNotice palette={palette} />;
@@ -61,8 +74,33 @@ export default function AdminInterpreters({ palette }) {
     );
   }
 
+  const updateInterpreterField = (id, field, value) => {
+    setInterpreters((current) => current.map((interpreter) => (interpreter.id === id ? { ...interpreter, [field]: value } : interpreter)));
+  };
+
+  const saveRates = async (interpreter) => {
+    setSavingRateId(interpreter.id);
+    setMessage("");
+    try {
+      const data = await portalRequest("adminUpdateRates", {
+        method: "POST",
+        body: {
+          interpreterId: interpreter.id,
+          onsiteRate: interpreter.onsite_rate || "",
+          vriRate: interpreter.vri_rate || "",
+        },
+      });
+      setInterpreters((current) => current.map((item) => (item.id === interpreter.id ? { ...item, ...data.interpreter } : item)));
+      setMessage("Rates updated.");
+    } catch (error) {
+      setMessage(`Could not update rates: ${error.message}`);
+    } finally {
+      setSavingRateId("");
+    }
+  };
+
   const filtered = interpreters.filter((interpreter) => {
-    const haystack = `${interpreter.first_name || ""} ${interpreter.last_name || ""} ${interpreter.email || ""} ${interpreter.city || ""} ${interpreter.state || ""} ${interpreter.credentials || ""}`.toLowerCase();
+    const haystack = `${interpreter.first_name || ""} ${interpreter.last_name || ""} ${interpreter.email || ""} ${interpreter.city || ""} ${interpreter.state || ""} ${interpreter.credentials || ""} ${interpreter.modalities || ""} ${interpreter.areas_of_experience || ""}`.toLowerCase();
     return haystack.includes(query.toLowerCase());
   });
 
@@ -73,7 +111,7 @@ export default function AdminInterpreters({ palette }) {
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.gold }}>MLS admin</p>
             <h1 className="mt-2 text-3xl font-black tracking-tight md:text-5xl" style={{ color: palette.charcoal }}>Interpreter roster</h1>
-            <p className="mt-3 max-w-2xl text-sm leading-7 text-[#5f6368]">Review portal profiles, onboarding status, document counts, credentials, availability, and rates.</p>
+            <p className="mt-3 max-w-2xl text-sm leading-7 text-[#5f6368]">Review matching details, onboarding status, document counts, and admin-managed rates.</p>
           </div>
           <div className="flex flex-wrap gap-3">
             <Link to="/portal" className="rounded-full px-5 py-3 text-sm font-bold text-white shadow-sm" style={{ backgroundColor: palette.burgundy }}>My portal</Link>
@@ -86,7 +124,7 @@ export default function AdminInterpreters({ palette }) {
         <div className="mb-6 rounded-[1.5rem] border bg-white p-4 shadow-sm" style={cardStyle}>
           <label className="flex items-center gap-3 rounded-2xl bg-black/[0.03] px-4 py-3">
             <Search size={18} style={{ color: palette.gold }} />
-            <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search by name, email, location, or credentials" className="w-full bg-transparent text-sm font-semibold outline-none" />
+            <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search by name, email, location, credentials, modality, or experience" className="w-full bg-transparent text-sm font-semibold outline-none" />
           </label>
         </div>
 
@@ -96,32 +134,43 @@ export default function AdminInterpreters({ palette }) {
             <p className="mt-4 font-bold" style={{ color: palette.charcoal }}>Loading roster...</p>
           </div>
         ) : (
-          <div className="overflow-hidden rounded-[2rem] border bg-white shadow-sm" style={{ borderColor: palette.border }}>
-            <div className="hidden grid-cols-[1.2fr_0.8fr_0.8fr_0.7fr_0.7fr_0.7fr] gap-4 border-b bg-black/[0.03] px-5 py-4 text-xs font-black uppercase tracking-[0.12em] text-[#666] md:grid">
-              <div>Interpreter</div>
-              <div>Location</div>
-              <div>Credentials</div>
-              <div>Status</div>
-              <div>Docs</div>
-              <div>Rates</div>
-            </div>
-            <div className="divide-y divide-black/5">
-              {filtered.length === 0 ? (
-                <div className="p-7 text-sm leading-7 text-[#666]">No interpreters match your search.</div>
-              ) : filtered.map((interpreter) => (
-                <article key={interpreter.id} className="grid gap-4 p-5 text-sm md:grid-cols-[1.2fr_0.8fr_0.8fr_0.7fr_0.7fr_0.7fr] md:items-center">
+          <div className="space-y-4">
+            {filtered.length === 0 ? (
+              <div className="rounded-[2rem] border bg-white p-7 text-sm leading-7 text-[#666]" style={cardStyle}>No interpreters match your search.</div>
+            ) : filtered.map((interpreter) => (
+              <article key={interpreter.id} className="rounded-[2rem] border bg-white p-5 shadow-sm" style={{ borderColor: palette.border }}>
+                <div className="grid gap-5 lg:grid-cols-[1.1fr_1fr_0.9fr]">
                   <div>
-                    <div className="font-black" style={{ color: palette.charcoal }}>{interpreter.first_name} {interpreter.last_name}</div>
-                    <div className="mt-1 text-[#666]">{interpreter.email}</div>
+                    <div className="font-black text-xl" style={{ color: palette.charcoal }}>{interpreter.first_name} {interpreter.last_name}</div>
+                    <div className="mt-1 text-sm text-[#666]">{interpreter.email}</div>
+                    <div className="mt-2 text-sm text-[#666]">{interpreter.city || "—"}{interpreter.state ? `, ${interpreter.state}` : ""}</div>
+                    <span className="mt-3 inline-flex rounded-full bg-[#dd7d00]/10 px-3 py-1 text-xs font-black uppercase tracking-[0.08em]" style={{ color: palette.burgundy }}>{(interpreter.roster_status || "pending").replaceAll("_", " ")}</span>
                   </div>
-                  <div className="text-[#666]">{interpreter.city || "—"}{interpreter.state ? `, ${interpreter.state}` : ""}</div>
-                  <div className="text-[#666]">{interpreter.credentials || "—"}</div>
-                  <div><span className="inline-flex rounded-full bg-[#dd7d00]/10 px-3 py-1 text-xs font-black uppercase tracking-[0.08em]" style={{ color: palette.burgundy }}>{(interpreter.roster_status || "pending").replaceAll("_", " ")}</span></div>
-                  <div className="flex items-center gap-2 font-bold text-[#666]"><BadgeCheck size={17} style={{ color: palette.gold }} /> {interpreter.interpreter_documents?.length || 0}</div>
-                  <div className="text-[#666]">Onsite: {interpreter.onsite_rate || "—"}<br />VRI: {interpreter.vri_rate || "—"}</div>
-                </article>
-              ))}
-            </div>
+
+                  <div className="space-y-2 text-sm text-[#666]">
+                    <div><strong style={{ color: palette.charcoal }}>Credentials:</strong> {interpreter.credentials || "—"}</div>
+                    <div><strong style={{ color: palette.charcoal }}>Modalities:</strong> {interpreter.modalities || "—"}</div>
+                    <div><strong style={{ color: palette.charcoal }}>Experience:</strong> {interpreter.areas_of_experience || "—"}</div>
+                    <div className="flex items-center gap-2 font-bold"><BadgeCheck size={17} style={{ color: palette.gold }} /> {interpreter.interpreter_documents?.length || 0} document records</div>
+                  </div>
+
+                  <div className="rounded-2xl border bg-black/[0.02] p-4" style={{ borderColor: palette.border }}>
+                    <div className="text-xs font-black uppercase tracking-[0.12em] text-[#666]">Admin-managed rates</div>
+                    <label className="mt-3 block text-xs font-bold" style={{ color: palette.charcoal }}>
+                      On-site rate
+                      <input value={interpreter.onsite_rate || ""} onChange={(event) => updateInterpreterField(interpreter.id, "onsite_rate", event.target.value)} className="mt-1 w-full rounded-xl border bg-white px-3 py-2 text-sm outline-none" style={{ borderColor: palette.border }} />
+                    </label>
+                    <label className="mt-3 block text-xs font-bold" style={{ color: palette.charcoal }}>
+                      VRI rate
+                      <input value={interpreter.vri_rate || ""} onChange={(event) => updateInterpreterField(interpreter.id, "vri_rate", event.target.value)} className="mt-1 w-full rounded-xl border bg-white px-3 py-2 text-sm outline-none" style={{ borderColor: palette.border }} />
+                    </label>
+                    <button type="button" disabled={savingRateId === interpreter.id} onClick={() => saveRates(interpreter)} className="mt-4 inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-bold text-white disabled:opacity-60" style={{ backgroundColor: palette.burgundy }}>
+                      <Save size={14} /> {savingRateId === interpreter.id ? "Saving..." : "Save rates"}
+                    </button>
+                  </div>
+                </div>
+              </article>
+            ))}
           </div>
         )}
       </div>
