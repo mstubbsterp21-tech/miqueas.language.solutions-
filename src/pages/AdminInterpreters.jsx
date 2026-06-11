@@ -1,10 +1,29 @@
 import { useEffect, useState } from "react";
 import { useSession, useUser } from "@clerk/clerk-react";
 import { Link } from "react-router-dom";
-import { AlertTriangle, BadgeCheck, RefreshCcw, Save, Search } from "lucide-react";
+import { AlertTriangle, BadgeCheck, Plus, RefreshCcw, Save, Search, X } from "lucide-react";
 import { PortalSignOutButton } from "../components/AuthStatus";
 import PortalSetupNotice from "../components/PortalSetupNotice";
 import { adminEmails, isSupabaseConfigured } from "../lib/env";
+
+const initialNewInterpreter = {
+  firstName: "",
+  lastName: "",
+  email: "",
+  phone: "",
+  city: "",
+  state: "",
+  credentials: "",
+  modalities: "",
+  areasOfExperience: "",
+  yearsExperience: "",
+  assignmentTypePreference: "",
+  willingToTravel: "",
+  technicalReadinessConfirmed: "",
+  professionalLiabilityInsurance: "",
+  onsiteRate: "",
+  vriRate: "",
+};
 
 export default function AdminInterpreters({ palette }) {
   const { user, isLoaded } = useUser();
@@ -14,6 +33,9 @@ export default function AdminInterpreters({ palette }) {
   const [query, setQuery] = useState("");
   const [message, setMessage] = useState("");
   const [savingRateId, setSavingRateId] = useState("");
+  const [showAddInterpreter, setShowAddInterpreter] = useState(false);
+  const [creatingInterpreter, setCreatingInterpreter] = useState(false);
+  const [newInterpreter, setNewInterpreter] = useState(initialNewInterpreter);
 
   const primaryEmail = user?.primaryEmailAddress?.emailAddress?.toLowerCase() || "";
   const isAdmin = adminEmails.includes(primaryEmail);
@@ -78,6 +100,10 @@ export default function AdminInterpreters({ palette }) {
     setInterpreters((current) => current.map((interpreter) => (interpreter.id === id ? { ...interpreter, [field]: value } : interpreter)));
   };
 
+  const updateNewInterpreter = (field, value) => {
+    setNewInterpreter((current) => ({ ...current, [field]: value }));
+  };
+
   const saveRates = async (interpreter) => {
     setSavingRateId(interpreter.id);
     setMessage("");
@@ -99,6 +125,27 @@ export default function AdminInterpreters({ palette }) {
     }
   };
 
+  const createInterpreter = async (event) => {
+    event.preventDefault();
+    setCreatingInterpreter(true);
+    setMessage("");
+
+    try {
+      const data = await portalRequest("adminCreateInterpreter", {
+        method: "POST",
+        body: newInterpreter,
+      });
+      setInterpreters((current) => [data.interpreter, ...current]);
+      setNewInterpreter(initialNewInterpreter);
+      setShowAddInterpreter(false);
+      setMessage(`${data.interpreter.first_name || "Interpreter"} was added to Clerk and the MLS roster.`);
+    } catch (error) {
+      setMessage(`Could not add interpreter: ${error.message}`);
+    } finally {
+      setCreatingInterpreter(false);
+    }
+  };
+
   const filtered = interpreters.filter((interpreter) => {
     const haystack = `${interpreter.first_name || ""} ${interpreter.last_name || ""} ${interpreter.email || ""} ${interpreter.city || ""} ${interpreter.state || ""} ${interpreter.credentials || ""} ${interpreter.modalities || ""} ${interpreter.areas_of_experience || ""}`.toLowerCase();
     return haystack.includes(query.toLowerCase());
@@ -114,12 +161,55 @@ export default function AdminInterpreters({ palette }) {
             <p className="mt-3 max-w-2xl text-sm leading-7 text-[#5f6368]">Review matching details, onboarding status, document counts, and admin-managed rates.</p>
           </div>
           <div className="flex flex-wrap gap-3">
+            <button type="button" onClick={() => setShowAddInterpreter(true)} className="inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-bold text-white shadow-sm" style={{ backgroundColor: palette.gold }}>
+              <Plus size={16} /> Add interpreter
+            </button>
             <Link to="/portal" className="rounded-full px-5 py-3 text-sm font-bold text-white shadow-sm" style={{ backgroundColor: palette.burgundy }}>My portal</Link>
             <PortalSignOutButton />
           </div>
         </div>
 
         {message && <div className="mb-6 rounded-2xl border bg-white p-4 text-sm font-semibold text-[#721100]" style={{ borderColor: palette.border }}>{message}</div>}
+
+        {showAddInterpreter && (
+          <section className="mb-6 rounded-[2rem] border bg-white p-6 shadow-sm md:p-8" style={cardStyle}>
+            <div className="mb-5 flex items-start justify-between gap-4">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.gold }}>Add interpreter</p>
+                <h2 className="mt-2 text-2xl font-black" style={{ color: palette.charcoal }}>Create Clerk account + roster profile</h2>
+                <p className="mt-2 text-sm leading-6 text-[#666]">Use this after you have approved or invited an interpreter for the MLS portal.</p>
+              </div>
+              <button type="button" onClick={() => setShowAddInterpreter(false)} className="rounded-full border p-2" style={{ borderColor: palette.border, color: palette.burgundy }} aria-label="Close add interpreter form">
+                <X size={18} />
+              </button>
+            </div>
+
+            <form onSubmit={createInterpreter} className="grid gap-4 md:grid-cols-2">
+              <AdminField label="First name" value={newInterpreter.firstName} onChange={(value) => updateNewInterpreter("firstName", value)} required />
+              <AdminField label="Last name" value={newInterpreter.lastName} onChange={(value) => updateNewInterpreter("lastName", value)} required />
+              <AdminField label="Email" type="email" value={newInterpreter.email} onChange={(value) => updateNewInterpreter("email", value)} required />
+              <AdminField label="Phone" value={newInterpreter.phone} onChange={(value) => updateNewInterpreter("phone", value)} />
+              <AdminField label="City" value={newInterpreter.city} onChange={(value) => updateNewInterpreter("city", value)} />
+              <AdminField label="State" value={newInterpreter.state} onChange={(value) => updateNewInterpreter("state", value)} />
+              <AdminField label="Credentials" value={newInterpreter.credentials} onChange={(value) => updateNewInterpreter("credentials", value)} placeholder="NIC, BEI, EIPA 4.0, etc." />
+              <AdminField label="Modalities" value={newInterpreter.modalities} onChange={(value) => updateNewInterpreter("modalities", value)} placeholder="ASL, CASE, Trilingual, etc." />
+              <AdminField label="Areas of experience" value={newInterpreter.areasOfExperience} onChange={(value) => updateNewInterpreter("areasOfExperience", value)} placeholder="Medical, legal, VRI, education" span />
+              <AdminField label="Years of experience" value={newInterpreter.yearsExperience} onChange={(value) => updateNewInterpreter("yearsExperience", value)} />
+              <AdminField label="Assignment preference" value={newInterpreter.assignmentTypePreference} onChange={(value) => updateNewInterpreter("assignmentTypePreference", value)} placeholder="On-site, VRI, both" />
+              <AdminField label="Willing to travel" value={newInterpreter.willingToTravel} onChange={(value) => updateNewInterpreter("willingToTravel", value)} />
+              <AdminField label="VRI technical readiness" value={newInterpreter.technicalReadinessConfirmed} onChange={(value) => updateNewInterpreter("technicalReadinessConfirmed", value)} />
+              <AdminField label="Professional liability insurance" value={newInterpreter.professionalLiabilityInsurance} onChange={(value) => updateNewInterpreter("professionalLiabilityInsurance", value)} />
+              <AdminField label="On-site rate" value={newInterpreter.onsiteRate} onChange={(value) => updateNewInterpreter("onsiteRate", value)} placeholder="$65/hr, 2-hour minimum" />
+              <AdminField label="VRI rate" value={newInterpreter.vriRate} onChange={(value) => updateNewInterpreter("vriRate", value)} placeholder="$55/hr, 1-hour minimum" />
+              <div className="flex flex-wrap gap-3 md:col-span-2">
+                <button type="submit" disabled={creatingInterpreter} className="inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-bold text-white disabled:opacity-60" style={{ backgroundColor: palette.burgundy }}>
+                  <Plus size={16} /> {creatingInterpreter ? "Adding..." : "Add to roster"}
+                </button>
+                <button type="button" onClick={() => setNewInterpreter(initialNewInterpreter)} className="rounded-full border px-5 py-3 text-sm font-bold" style={{ borderColor: palette.border, color: palette.charcoal }}>Clear</button>
+              </div>
+            </form>
+          </section>
+        )}
 
         <div className="mb-6 rounded-[1.5rem] border bg-white p-4 shadow-sm" style={cardStyle}>
           <label className="flex items-center gap-3 rounded-2xl bg-black/[0.03] px-4 py-3">
@@ -175,5 +265,21 @@ export default function AdminInterpreters({ palette }) {
         )}
       </div>
     </div>
+  );
+}
+
+function AdminField({ label, value, onChange, type = "text", placeholder = "", required = false, span = false }) {
+  return (
+    <label className={`block text-sm font-bold text-[#464747] ${span ? "md:col-span-2" : ""}`}>
+      {label}{required ? " *" : ""}
+      <input
+        type={type}
+        value={value || ""}
+        onChange={(event) => onChange(event.target.value)}
+        required={required}
+        placeholder={placeholder}
+        className="mt-2 w-full rounded-2xl border border-[#d1c6bc] bg-white px-4 py-3 text-sm font-medium text-[#464747] outline-none transition focus:border-[#dd7d00] focus:ring-4 focus:ring-[#dd7d00]/10"
+      />
+    </label>
   );
 }
