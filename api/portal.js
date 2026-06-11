@@ -59,6 +59,11 @@ function cleanProfileInput(input = {}) {
   }, {});
 }
 
+function decodeJwtPayload(token) {
+  const encodedPayload = token.split(".")[1] || "";
+  return JSON.parse(Buffer.from(encodedPayload, "base64url").toString("utf8"));
+}
+
 async function getSignedInUser(req) {
   if (!clerkKey) {
     throw new Error("Missing Clerk server key in Vercel.");
@@ -68,12 +73,13 @@ async function getSignedInUser(req) {
   if (!token) return null;
 
   const clerkClient = createClerkClient({ secretKey: clerkKey });
-  const verified = await clerkClient.verifyToken(token);
-  const userId = verified?.sub;
+  const claims = decodeJwtPayload(token);
 
-  if (!userId) return null;
+  if (!claims?.sid || !claims?.sub) return null;
 
-  const user = await clerkClient.users.getUser(userId);
+  await clerkClient.sessions.verifySession(claims.sid, token);
+
+  const user = await clerkClient.users.getUser(claims.sub);
   const email = user.primaryEmailAddress?.emailAddress?.toLowerCase() || "";
 
   return {
