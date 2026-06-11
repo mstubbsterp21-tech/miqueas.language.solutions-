@@ -1,29 +1,31 @@
-import { useEffect, useState } from "react";
-import { useUser } from "@clerk/clerk-react";
+import { useEffect, useMemo, useState } from "react";
+import { useSession, useUser } from "@clerk/clerk-react";
 import { Link } from "react-router-dom";
 import { AlertTriangle, BadgeCheck, RefreshCcw, Search } from "lucide-react";
 import { PortalSignOutButton } from "../components/AuthStatus";
 import PortalSetupNotice from "../components/PortalSetupNotice";
 import { adminEmails, isSupabaseConfigured } from "../lib/env";
-import { supabase } from "../lib/supabaseClient";
+import { createPortalSupabaseClient } from "../lib/supabaseClient";
 
 export default function AdminInterpreters({ palette }) {
   const { user, isLoaded } = useUser();
+  const { session } = useSession();
   const [interpreters, setInterpreters] = useState([]);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
   const [message, setMessage] = useState("");
 
+  const portalSupabase = useMemo(() => createPortalSupabaseClient(session), [session]);
   const primaryEmail = user?.primaryEmailAddress?.emailAddress?.toLowerCase() || "";
   const isAdmin = adminEmails.includes(primaryEmail);
   const cardStyle = { borderColor: palette.border, backgroundColor: palette.white };
 
   useEffect(() => {
-    if (!isLoaded || !user || !isSupabaseConfigured || !supabase || !isAdmin) return;
+    if (!isLoaded || !user || !session || !isSupabaseConfigured || !portalSupabase || !isAdmin) return;
 
     async function loadInterpreters() {
       setLoading(true);
-      const { data, error } = await supabase
+      const { data, error } = await portalSupabase
         .from("interpreters")
         .select("*, interpreter_documents(id, document_type, status)")
         .order("updated_at", { ascending: false });
@@ -37,7 +39,7 @@ export default function AdminInterpreters({ palette }) {
     }
 
     loadInterpreters();
-  }, [isAdmin, isLoaded, user]);
+  }, [isAdmin, isLoaded, portalSupabase, session, user]);
 
   if (!isSupabaseConfigured) {
     return <PortalSetupNotice palette={palette} />;
