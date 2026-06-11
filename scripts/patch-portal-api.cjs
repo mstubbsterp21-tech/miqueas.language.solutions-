@@ -19,18 +19,12 @@ const expandedFields = `const allowedProfileFields = [
   "state_license",
   "state_license_details",
   "years_experience",
-  "education_itp",
   "modalities",
   "areas_of_experience",
-  "situations_successfully_navigated",
-  "challenging_situation_description",
   "assignment_type_preference",
   "willing_to_travel",
   "technical_readiness_confirmed",
   "professional_liability_insurance",
-  "comfortable_with_rates",
-  "onsite_rate",
-  "vri_rate",
   "travel_radius",
   "availability_sunday",
   "availability_monday",
@@ -107,6 +101,27 @@ async function removePortalDocument(db, user, body) {
   source = source.replace('async function loadAdminRoster', uploadFns + 'async function loadAdminRoster');
 }
 
+if (!source.includes('async function adminUpdateRates')) {
+  const adminRateFn = String.raw`
+async function adminUpdateRates(db, user, body) {
+  if (!user.isAdmin) return { status: 403, payload: { error: "Admin access required." } };
+  const interpreterId = body?.interpreterId;
+  const onsiteRate = String(body?.onsiteRate || "").slice(0, 120);
+  const vriRate = String(body?.vriRate || "").slice(0, 120);
+  const { data, error } = await db
+    .from("interpreters")
+    .update({ onsite_rate: onsiteRate, vri_rate: vriRate, updated_at: new Date().toISOString() })
+    .eq("id", interpreterId)
+    .select()
+    .single();
+  if (error) throw error;
+  return { status: 200, payload: { interpreter: data } };
+}
+
+`;
+  source = source.replace('async function loadAdminRoster', adminRateFn + 'async function loadAdminRoster');
+}
+
 if (!source.includes('action === "createUploadUrl"')) {
   const uploadBranches = String.raw`
     if (req.method === "POST" && action === "createUploadUrl") {
@@ -129,6 +144,18 @@ if (!source.includes('action === "createUploadUrl"')) {
 
 `;
   source = source.replace('    if (req.method === "GET" && action === "adminRoster") {', uploadBranches + '    if (req.method === "GET" && action === "adminRoster") {');
+}
+
+if (!source.includes('action === "adminUpdateRates"')) {
+  const adminRateBranch = String.raw`
+    if (req.method === "POST" && action === "adminUpdateRates") {
+      const result = await adminUpdateRates(db, user, body);
+      sendJson(res, result.status, result.payload);
+      return;
+    }
+
+`;
+  source = source.replace('    if (req.method === "GET" && action === "adminRoster") {', adminRateBranch + '    if (req.method === "GET" && action === "adminRoster") {');
 }
 
 fs.writeFileSync(portalApiPath, source);
