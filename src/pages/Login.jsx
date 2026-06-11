@@ -36,9 +36,7 @@ export default function Login({ palette }) {
         <div className="w-full rounded-[2rem] border bg-white p-4 shadow-lg md:p-6" style={{ borderColor: palette.border }}>
           <div className="flex min-h-[420px] w-full justify-center overflow-visible">
             <SignIn
-              routing="path"
-              path="/login"
-              signUpUrl="/login"
+              routing="hash"
               fallbackRedirectUrl="/portal"
               signUpFallbackRedirectUrl="/portal"
               appearance={{
