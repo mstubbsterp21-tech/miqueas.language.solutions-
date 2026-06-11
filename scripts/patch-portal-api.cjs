@@ -122,6 +122,77 @@ async function adminUpdateRates(db, user, body) {
   source = source.replace('async function loadAdminRoster', adminRateFn + 'async function loadAdminRoster');
 }
 
+if (!source.includes('async function adminCreateInterpreter')) {
+  const adminCreateFn = String.raw`
+async function adminCreateInterpreter(db, user, body) {
+  if (!user.isAdmin) return { status: 403, payload: { error: "Admin access required." } };
+
+  const email = String(body?.email || "").trim().toLowerCase();
+  const firstName = String(body?.firstName || "").trim();
+  const lastName = String(body?.lastName || "").trim();
+
+  if (!email || !firstName || !lastName) {
+    return { status: 400, payload: { error: "First name, last name, and email are required." } };
+  }
+
+  const clerkClient = createClerkClient({ secretKey: clerkKey });
+  let clerkUser;
+  const existingUsers = await clerkClient.users.getUserList({ emailAddress: [email], limit: 1 });
+  const existingUser = existingUsers?.data?.[0];
+
+  if (existingUser) {
+    clerkUser = existingUser;
+  } else {
+    clerkUser = await clerkClient.users.createUser({
+      emailAddress: [email],
+      firstName,
+      lastName,
+      skipPasswordRequirement: true,
+    });
+  }
+
+  try {
+    await clerkClient.invitations.createInvitation({ emailAddress: email, ignoreExisting: true });
+  } catch (invitationError) {
+    console.warn("Clerk invitation was not sent", invitationError);
+  }
+
+  const payload = {
+    clerk_user_id: clerkUser.id,
+    first_name: firstName,
+    last_name: lastName,
+    email,
+    phone: String(body?.phone || "").slice(0, 80),
+    city: String(body?.city || "").slice(0, 120),
+    state: String(body?.state || "").slice(0, 80),
+    credentials: String(body?.credentials || "").slice(0, 500),
+    modalities: String(body?.modalities || "").slice(0, 500),
+    areas_of_experience: String(body?.areasOfExperience || "").slice(0, 800),
+    years_experience: String(body?.yearsExperience || "").slice(0, 120),
+    assignment_type_preference: String(body?.assignmentTypePreference || "").slice(0, 120),
+    willing_to_travel: String(body?.willingToTravel || "").slice(0, 120),
+    technical_readiness_confirmed: String(body?.technicalReadinessConfirmed || "").slice(0, 120),
+    professional_liability_insurance: String(body?.professionalLiabilityInsurance || "").slice(0, 120),
+    onsite_rate: String(body?.onsiteRate || "").slice(0, 120),
+    vri_rate: String(body?.vriRate || "").slice(0, 120),
+    roster_status: "pending_profile",
+    updated_at: new Date().toISOString(),
+  };
+
+  const { data, error } = await db
+    .from("interpreters")
+    .upsert(payload, { onConflict: "clerk_user_id" })
+    .select("*, interpreter_documents(id, document_type, status)")
+    .single();
+
+  if (error) throw error;
+  return { status: 200, payload: { interpreter: data, clerkUserId: clerkUser.id } };
+}
+
+`;
+  source = source.replace('async function loadAdminRoster', adminCreateFn + 'async function loadAdminRoster');
+}
+
 if (!source.includes('action === "createUploadUrl"')) {
   const uploadBranches = String.raw`
     if (req.method === "POST" && action === "createUploadUrl") {
@@ -156,6 +227,18 @@ if (!source.includes('action === "adminUpdateRates"')) {
 
 `;
   source = source.replace('    if (req.method === "GET" && action === "adminRoster") {', adminRateBranch + '    if (req.method === "GET" && action === "adminRoster") {');
+}
+
+if (!source.includes('action === "adminCreateInterpreter"')) {
+  const adminCreateBranch = String.raw`
+    if (req.method === "POST" && action === "adminCreateInterpreter") {
+      const result = await adminCreateInterpreter(db, user, body);
+      sendJson(res, result.status, result.payload);
+      return;
+    }
+
+`;
+  source = source.replace('    if (req.method === "GET" && action === "adminRoster") {', adminCreateBranch + '    if (req.method === "GET" && action === "adminRoster") {');
 }
 
 fs.writeFileSync(portalApiPath, source);
