@@ -1,7 +1,9 @@
-import { SignedIn, SignedOut, SignIn, SignInButton } from "@clerk/clerk-react";
+import { SignIn } from "@clerk/clerk-react";
 import { Link } from "react-router-dom";
 import PortalSetupNotice from "../components/PortalSetupNotice";
 import { isClerkConfigured } from "../lib/env";
+
+const hostedLoginUrl = "https://accounts.miqueaslanguagesolutions.com/sign-in?redirect_url=https%3A%2F%2Fmiqueaslanguagesolutions.com%2Fportal";
 
 export default function Login({ palette }) {
   if (!isClerkConfigured) {
@@ -34,47 +36,34 @@ export default function Login({ palette }) {
         </div>
 
         <div className="w-full rounded-[2rem] border bg-white p-4 shadow-lg md:p-6" style={{ borderColor: palette.border }}>
-          <SignedOut>
-            <div className="mb-4 rounded-2xl bg-[#721100]/5 p-4 text-sm leading-6" style={{ color: palette.charcoal }}>
-              <strong>Having trouble?</strong> Use the secure login button below if the embedded form does not load.
-            </div>
-            <div className="mb-5">
-              <SignInButton mode="redirect" fallbackRedirectUrl="/portal" signUpFallbackRedirectUrl="/portal">
-                <button type="button" className="w-full rounded-2xl px-5 py-3 text-sm font-bold text-white shadow-sm" style={{ backgroundColor: palette.burgundy }}>
-                  Open Secure Login
-                </button>
-              </SignInButton>
-            </div>
-            <div className="flex min-h-[420px] w-full justify-center overflow-visible">
-              <SignIn
-                routing="path"
-                path="/login"
-                fallbackRedirectUrl="/portal"
-                signUpFallbackRedirectUrl="/portal"
-                appearance={{
-                  variables: {
-                    colorPrimary: palette.burgundy,
-                    colorText: palette.charcoal,
-                    borderRadius: "1rem",
-                  },
-                  elements: {
-                    rootBox: "w-full",
-                    cardBox: "w-full",
-                  },
-                }}
-              />
-            </div>
-          </SignedOut>
+          <div className="mb-5 rounded-2xl bg-[#721100]/5 p-4 text-sm leading-6" style={{ color: palette.charcoal }}>
+            <strong>Secure login:</strong> Use the hosted Clerk button first. The embedded form is shown below as a backup.
+          </div>
 
-          <SignedIn>
-            <div className="flex min-h-[420px] flex-col items-center justify-center text-center">
-              <h2 className="text-2xl font-black" style={{ color: palette.charcoal }}>You are signed in.</h2>
-              <p className="mt-3 text-sm leading-6 text-[#666]">Go to your interpreter portal to manage your MLS profile and documents.</p>
-              <Link to="/portal" className="mt-6 rounded-full px-6 py-3 text-sm font-bold text-white shadow-sm" style={{ backgroundColor: palette.burgundy }}>
-                Open Portal
-              </Link>
-            </div>
-          </SignedIn>
+          <a href={hostedLoginUrl} className="mb-6 flex w-full items-center justify-center rounded-2xl px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:-translate-y-0.5" style={{ backgroundColor: palette.burgundy }}>
+            Open Secure Clerk Login
+          </a>
+
+          <div className="flex min-h-[420px] w-full justify-center overflow-visible">
+            <SignIn
+              routing="path"
+              path="/login"
+              signUpUrl="/login"
+              fallbackRedirectUrl="/portal"
+              signUpFallbackRedirectUrl="/portal"
+              appearance={{
+                variables: {
+                  colorPrimary: palette.burgundy,
+                  colorText: palette.charcoal,
+                  borderRadius: "1rem",
+                },
+                elements: {
+                  rootBox: "w-full",
+                  cardBox: "w-full",
+                },
+              }}
+            />
+          </div>
         </div>
       </div>
     </section>
