@@ -3,8 +3,6 @@ import { Link } from "react-router-dom";
 import PortalSetupNotice from "../components/PortalSetupNotice";
 import { isClerkConfigured } from "../lib/env";
 
-const hostedLoginUrl = "https://accounts.miqueaslanguagesolutions.com/sign-in?redirect_url=https%3A%2F%2Fmiqueaslanguagesolutions.com%2Fportal";
-
 export default function Login({ palette }) {
   if (!isClerkConfigured) {
     return <PortalSetupNotice palette={palette} />;
@@ -36,14 +34,6 @@ export default function Login({ palette }) {
         </div>
 
         <div className="w-full rounded-[2rem] border bg-white p-4 shadow-lg md:p-6" style={{ borderColor: palette.border }}>
-          <div className="mb-5 rounded-2xl bg-[#721100]/5 p-4 text-sm leading-6" style={{ color: palette.charcoal }}>
-            <strong>Secure login:</strong> Use the hosted Clerk button first. The embedded form is shown below as a backup.
-          </div>
-
-          <a href={hostedLoginUrl} className="mb-6 flex w-full items-center justify-center rounded-2xl px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:-translate-y-0.5" style={{ backgroundColor: palette.burgundy }}>
-            Open Secure Clerk Login
-          </a>
-
           <div className="flex min-h-[420px] w-full justify-center overflow-visible">
             <SignIn
               routing="path"
