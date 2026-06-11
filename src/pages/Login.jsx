@@ -1,4 +1,5 @@
-import { SignIn } from "@clerk/clerk-react";
+import { SignedIn, SignedOut, SignIn } from "@clerk/clerk-react";
+import { Link } from "react-router-dom";
 import PortalSetupNotice from "../components/PortalSetupNotice";
 import { isClerkConfigured } from "../lib/env";
 
@@ -14,23 +15,49 @@ export default function Login({ palette }) {
         <div>
           <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.gold }}>Interpreter portal</p>
           <h1 className="mt-4 max-w-3xl text-4xl font-black leading-[1.03] tracking-tight md:text-6xl" style={{ color: palette.charcoal }}>
-            Returning Interpreter?
+            Interpreter Login
           </h1>
           <p className="mt-6 max-w-2xl text-lg leading-8 text-[#555]">
-            Sign in to update your MLS profile, upload onboarding documents, and keep your availability, rates, credentials, and service preferences current.
+            Sign in to update your MLS profile, upload onboarding documents, review your admin-managed rates, and keep your assignment-matching details current.
           </p>
           <div className="mt-7 rounded-[1.5rem] border bg-white/80 p-5 text-sm leading-7 shadow-sm backdrop-blur" style={{ borderColor: palette.border, color: palette.charcoal }}>
-            <strong>Access note:</strong> Portal accounts are intended for invited or returning interpreters only. New interpreters should apply through Join Our Team first.
+            <strong>Access note:</strong> Portal accounts are for approved MLS interpreters only. New interpreters should apply through Join Our Team first.
+          </div>
+          <div className="mt-6 flex flex-wrap gap-3">
+            <Link to="/join-our-team" className="rounded-full px-5 py-3 text-sm font-bold text-white shadow-sm" style={{ backgroundColor: palette.burgundy }}>
+              Apply to Join MLS
+            </Link>
+            <Link to="/contact" className="rounded-full border px-5 py-3 text-sm font-bold shadow-sm" style={{ borderColor: palette.border, color: palette.charcoal, backgroundColor: palette.white }}>
+              Need Help?
+            </Link>
           </div>
         </div>
-        <div className="flex justify-center">
-          <SignIn
-            routing="path"
-            path="/login"
-            signUpUrl="/login"
-            fallbackRedirectUrl="/portal"
-            signUpFallbackRedirectUrl="/portal"
-          />
+
+        <div className="flex min-h-[420px] justify-center rounded-[2rem] border bg-white p-4 shadow-lg md:p-6" style={{ borderColor: palette.border }}>
+          <SignedOut>
+            <SignIn
+              routing="hash"
+              fallbackRedirectUrl="/portal"
+              signUpFallbackRedirectUrl="/portal"
+              appearance={{
+                variables: {
+                  colorPrimary: palette.burgundy,
+                  colorText: palette.charcoal,
+                  borderRadius: "1rem",
+                },
+              }}
+            />
+          </SignedOut>
+
+          <SignedIn>
+            <div className="flex max-w-sm flex-col items-center justify-center text-center">
+              <h2 className="text-2xl font-black" style={{ color: palette.charcoal }}>You are signed in.</h2>
+              <p className="mt-3 text-sm leading-6 text-[#666]">Go to your interpreter portal to manage your MLS profile and documents.</p>
+              <Link to="/portal" className="mt-6 rounded-full px-6 py-3 text-sm font-bold text-white shadow-sm" style={{ backgroundColor: palette.burgundy }}>
+                Open Portal
+              </Link>
+            </div>
+          </SignedIn>
         </div>
       </div>
     </section>
