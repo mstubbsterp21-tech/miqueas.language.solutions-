@@ -7,12 +7,50 @@ const oldCall = `await clerkClient.sessions.${['verify', 'Session'].join('')}(cl
 const newCall = `const clerkSession = await clerkClient.sessions.getSession(claims.sid);\n  if (clerkSession?.userId !== claims.sub) return null;`;
 source = source.replace(oldCall, newCall);
 
+const expandedFields = `const allowedProfileFields = [
+  "first_name",
+  "last_name",
+  "phone",
+  "city",
+  "state",
+  "current_location",
+  "preferred_contact_method",
+  "credentials",
+  "state_license",
+  "state_license_details",
+  "years_experience",
+  "education_itp",
+  "modalities",
+  "areas_of_experience",
+  "situations_successfully_navigated",
+  "challenging_situation_description",
+  "assignment_type_preference",
+  "willing_to_travel",
+  "technical_readiness_confirmed",
+  "professional_liability_insurance",
+  "comfortable_with_rates",
+  "onsite_rate",
+  "vri_rate",
+  "travel_radius",
+  "availability_sunday",
+  "availability_monday",
+  "availability_tuesday",
+  "availability_wednesday",
+  "availability_thursday",
+  "availability_friday",
+  "availability_saturday",
+  "availability_morning",
+  "availability_afternoon",
+  "availability_evening",
+  "availability_overnight",
+];`;
+source = source.replace(/const allowedProfileFields = \[[\s\S]*?\];/, expandedFields);
+
 if (!source.includes('async function createUploadUrl')) {
-  const fn = String.raw`
+  const uploadFns = String.raw`
 async function createUploadUrl(db, user, body) {
   const profile = await getCurrentProfile(db, user);
   if (!profile?.id) return { status: 400, payload: { error: "Save your profile before adding files." } };
-
   const rawType = String(body?.documentType || "document");
   const documentType = rawType.replace(/[^a-zA-Z0-9_-]/g, "_").slice(0, 80);
   const cleanName = String(body?.fileName || "file").replace(/[^a-zA-Z0-9._-]/g, "-").slice(0, 180);
@@ -27,36 +65,50 @@ async function createUploadUrl(db, user, body) {
 async function recordUpload(db, user, body) {
   const profile = await getCurrentProfile(db, user);
   if (!profile?.id) return { status: 400, payload: { error: "Save your profile before adding files." } };
-
   const rawType = String(body?.documentType || "document");
   const documentType = rawType.replace(/[^a-zA-Z0-9_-]/g, "_").slice(0, 80);
   const fileName = String(body?.fileName || "Uploaded file").slice(0, 220);
   const storagePath = String(body?.storagePath || "");
+  const replacementId = body?.replaceDocumentId || null;
   const expectedPrefix = profile.id + "/" + documentType + "/";
+  const bucket = "interpreter-" + "documents";
   if (!storagePath.startsWith(expectedPrefix)) return { status: 400, payload: { error: "Invalid storage path." } };
 
-  const { data, error } = await db
-    .from("interpreter_documents")
-    .insert({
-      interpreter_id: profile.id,
-      document_type: documentType,
-      file_name: fileName,
-      storage_path: storagePath,
-      status: "uploaded",
-      uploaded_by: user.id,
-    })
-    .select()
-    .single();
+  if (replacementId) {
+    const { data: existing, error: existingError } = await db.from("interpreter_documents").select("*").eq("id", replacementId).eq("interpreter_id", profile.id).maybeSingle();
+    if (existingError) throw existingError;
+    if (!existing) return { status: 404, payload: { error: "Document record not found." } };
+    if (existing.storage_path) await db.storage.from(bucket).remove([existing.storage_path]);
+    const { data, error } = await db.from("interpreter_documents").update({ file_name: fileName, storage_path: storagePath, status: "uploaded", uploaded_by: user.id, uploaded_at: new Date().toISOString() }).eq("id", existing.id).select().single();
+    if (error) throw error;
+    return { status: 200, payload: { document: data } };
+  }
+
+  const { data, error } = await db.from("interpreter_documents").insert({ interpreter_id: profile.id, document_type: documentType, file_name: fileName, storage_path: storagePath, status: "uploaded", uploaded_by: user.id }).select().single();
   if (error) throw error;
   return { status: 200, payload: { document: data } };
 }
 
+async function removePortalDocument(db, user, body) {
+  const profile = await getCurrentProfile(db, user);
+  if (!profile?.id) return { status: 400, payload: { error: "Save your profile before managing files." } };
+  const documentId = body?.documentId;
+  const bucket = "interpreter-" + "documents";
+  const { data: existing, error: existingError } = await db.from("interpreter_documents").select("*").eq("id", documentId).eq("interpreter_id", profile.id).maybeSingle();
+  if (existingError) throw existingError;
+  if (!existing) return { status: 404, payload: { error: "Document record not found." } };
+  if (existing.storage_path) await db.storage.from(bucket).remove([existing.storage_path]);
+  const { error } = await db.from("interpreter_documents").delete().eq("id", existing.id);
+  if (error) throw error;
+  return { status: 200, payload: { success: true } };
+}
+
 `;
-  source = source.replace('async function loadAdminRoster', fn + 'async function loadAdminRoster');
+  source = source.replace('async function loadAdminRoster', uploadFns + 'async function loadAdminRoster');
 }
 
 if (!source.includes('action === "createUploadUrl"')) {
-  const branch = String.raw`
+  const uploadBranches = String.raw`
     if (req.method === "POST" && action === "createUploadUrl") {
       const result = await createUploadUrl(db, user, body);
       sendJson(res, result.status, result.payload);
@@ -69,8 +121,14 @@ if (!source.includes('action === "createUploadUrl"')) {
       return;
     }
 
+    if (req.method === "POST" && action === "deleteDocument") {
+      const result = await removePortalDocument(db, user, body);
+      sendJson(res, result.status, result.payload);
+      return;
+    }
+
 `;
-  source = source.replace('    if (req.method === "GET" && action === "adminRoster") {', branch + '    if (req.method === "GET" && action === "adminRoster") {');
+  source = source.replace('    if (req.method === "GET" && action === "adminRoster") {', uploadBranches + '    if (req.method === "GET" && action === "adminRoster") {');
 }
 
 fs.writeFileSync(portalApiPath, source);
