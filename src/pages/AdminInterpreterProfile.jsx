@@ -6,8 +6,7 @@ import { PortalSignOutButton } from "../components/AuthStatus";
 import PortalSetupNotice from "../components/PortalSetupNotice";
 import { adminEmails, isSupabaseConfigured } from "../lib/env";
 import { createPortalSupabaseClient, interpreterDocumentBucket } from "../lib/supabaseClient";
-
-const requiredDocumentTypes = ["resume", "w9", "credential_proof", "liability_insurance", "ic_agreement"];
+import { deriveRosterStatus, getDocumentsByType, getOverallProfileCompletion, getRequiredDocumentCompletion, normalizeRosterStatus, requiredDocumentTypes, rosterStatusLabel, rosterStatusOptions } from "../lib/profileCompletion";
 
 const documentTypes = [
   ["resume", "Résumé", "Required before the profile is complete."],
@@ -59,7 +58,6 @@ const profileFields = [
   ["Travel radius", "travel_radius"],
   ["On-site rate", "onsite_rate"],
   ["VRI rate", "vri_rate"],
-  ["Roster status", "roster_status"],
   ["Admin notes", "admin_notes", "textarea"],
 ];
 
@@ -87,38 +85,16 @@ function toggleValue(value, option) {
     : joinValues([...withoutUnavailable, option]);
 }
 
-function statusLabel(value) {
-  return (value || "pending_profile").replaceAll("_", " ");
-}
-
 function formatDate(value) {
   if (!value) return "Not recorded";
   return new Intl.DateTimeFormat("en", { month: "short", day: "numeric", year: "numeric" }).format(new Date(value));
 }
 
 function getEditableProfile(interpreter = {}) {
-  return [...profileFields, ...dayFields.map(([label, field]) => [label, field])].reduce((profile, [, field]) => {
-    profile[field] = interpreter[field] || "";
+  return [...profileFields, ...dayFields.map(([label, field]) => [label, field]), ["Roster status", "roster_status"]].reduce((profile, [, field]) => {
+    profile[field] = field === "roster_status" ? normalizeRosterStatus(interpreter[field]) : interpreter[field] || "";
     return profile;
   }, {});
-}
-
-function requiredDocumentCount(documentsByType = {}) {
-  return requiredDocumentTypes.filter((type) => Boolean(documentsByType[type])).length;
-}
-
-function completionPercent(profile = {}, documentsByType = {}) {
-  const requiredItems = [
-    profile.phone,
-    profile.city || profile.current_location,
-    profile.credentials,
-    profile.modalities,
-    profile.areas_of_experience,
-    profile.assignment_type_preference,
-    dayFields.some(([, field]) => Boolean(profile[field])),
-    requiredDocumentCount(documentsByType) === requiredDocumentTypes.length,
-  ];
-  return Math.round((requiredItems.filter(Boolean).length / requiredItems.length) * 100);
 }
 
 export default function AdminInterpreterProfile({ palette }) {
@@ -183,8 +159,11 @@ export default function AdminInterpreterProfile({ palette }) {
       const data = await portalRequest("adminRoster");
       const found = (data.interpreters || []).find((item) => item.id === interpreterId);
       if (!found) throw new Error("Interpreter profile not found.");
-      setInterpreter(found);
-      setEditProfile(getEditableProfile(found));
+      const documents = found.interpreter_documents || [];
+      const derivedStatus = deriveRosterStatus(found, documents);
+      const hydrated = { ...found, roster_status: derivedStatus };
+      setInterpreter(hydrated);
+      setEditProfile(getEditableProfile(hydrated));
     } catch (error) {
       setMessage(`Could not load interpreter profile: ${error.message}`);
     } finally {
@@ -211,35 +190,38 @@ export default function AdminInterpreterProfile({ palette }) {
     );
   }
 
-  const documentsByType = (interpreter?.interpreter_documents || []).reduce((acc, document) => {
-    acc[document.document_type] = document;
-    return acc;
-  }, {});
-  const completedRequiredDocs = requiredDocumentCount(documentsByType);
-  const adminCompletionPercent = completionPercent(interpreter || {}, documentsByType);
-  const isComplete = adminCompletionPercent === 100;
+  const documents = interpreter?.interpreter_documents || [];
+  const documentsByType = getDocumentsByType(documents);
+  const completion = getOverallProfileCompletion({ ...(interpreter || {}), ...editProfile }, documentsByType);
+  const derivedStatus = deriveRosterStatus({ ...(interpreter || {}), ...editProfile }, documentsByType);
+  const selectedStatus = normalizeRosterStatus(editProfile.roster_status || derivedStatus);
+  const docsComplete = getRequiredDocumentCompletion(documentsByType);
+  const isComplete = completion.isComplete;
 
   const saveProfile = async () => {
     setSaving(true);
     setMessage("");
 
     const allAvailability = dayFields.map(([, key]) => editProfile[key]).join(", ");
-    const profileForSave = {
+    const draftProfile = {
       ...editProfile,
       availability_morning: allAvailability.includes("Morning"),
       availability_afternoon: allAvailability.includes("Afternoon"),
       availability_evening: allAvailability.includes("Evening"),
       availability_overnight: allAvailability.includes("Overnight"),
     };
+    const statusToSave = deriveRosterStatus({ ...(interpreter || {}), ...draftProfile }, documentsByType);
+    const profileForSave = { ...draftProfile, roster_status: statusToSave };
 
     try {
       const data = await portalRequest("adminUpdateInterpreterProfile", {
         method: "POST",
         body: { interpreterId, profile: profileForSave },
       });
-      setInterpreter(data.interpreter);
-      setEditProfile(getEditableProfile(data.interpreter));
-      setMessage("Interpreter profile saved.");
+      const nextInterpreter = { ...data.interpreter, roster_status: deriveRosterStatus(data.interpreter, data.interpreter?.interpreter_documents || documents) };
+      setInterpreter(nextInterpreter);
+      setEditProfile(getEditableProfile(nextInterpreter));
+      setMessage(`Interpreter profile saved. Status is ${rosterStatusLabel(nextInterpreter.roster_status)}.`);
     } catch (error) {
       setMessage(`Could not save profile: ${error.message}`);
     } finally {
@@ -251,18 +233,28 @@ export default function AdminInterpreterProfile({ palette }) {
     setEditProfile((current) => ({ ...current, [field]: value }));
   };
 
+  const updateRosterStatus = (value) => {
+    setEditProfile((current) => ({ ...current, roster_status: value }));
+  };
+
   const handleAvailabilityToggle = (field, block) => {
     setEditProfile((current) => ({ ...current, [field]: toggleValue(current[field], block) }));
   };
 
-  const updateDocument = (document) => {
+  const refreshInterpreterWithDocuments = (nextDocuments) => {
     setInterpreter((current) => {
-      const docs = current?.interpreter_documents || [];
-      const nextDocs = docs.some((item) => item.id === document.id)
-        ? docs.map((item) => (item.id === document.id ? document : item))
-        : [document, ...docs];
-      return { ...current, interpreter_documents: nextDocs };
+      const nextStatus = deriveRosterStatus({ ...(current || {}), ...editProfile }, nextDocuments);
+      setEditProfile((draft) => ({ ...draft, roster_status: nextStatus }));
+      return { ...current, roster_status: nextStatus, interpreter_documents: nextDocuments };
     });
+  };
+
+  const updateDocument = (document) => {
+    const currentDocuments = interpreter?.interpreter_documents || [];
+    const nextDocuments = currentDocuments.some((item) => item.id === document.id)
+      ? currentDocuments.map((item) => (item.id === document.id ? document : item))
+      : [document, ...currentDocuments];
+    refreshInterpreterWithDocuments(nextDocuments);
   };
 
   const openDocument = async (document) => {
@@ -287,11 +279,9 @@ export default function AdminInterpreterProfile({ palette }) {
     setMessage("");
     try {
       const data = await adminFileRequest("drop", { documentId: document.id });
-      setInterpreter((current) => ({
-        ...current,
-        interpreter_documents: (current?.interpreter_documents || []).filter((item) => item.id !== data.documentId),
-      }));
-      setMessage("Document deleted.");
+      const nextDocuments = documents.filter((item) => item.id !== data.documentId);
+      refreshInterpreterWithDocuments(nextDocuments);
+      setMessage("Document deleted. Status recalculated.");
     } catch (error) {
       setMessage(`Could not delete file: ${error.message}`);
     } finally {
@@ -316,7 +306,7 @@ export default function AdminInterpreterProfile({ palette }) {
       const recordData = await adminFileRequest("save", { interpreterId, documentType, fileName: file.name, storagePath: uploadData.path });
       updateDocument(recordData.document);
       setDocumentFiles((current) => ({ ...current, [documentType]: null }));
-      setMessage("Document uploaded.");
+      setMessage("Document uploaded. Status recalculated.");
     } catch (error) {
       setMessage(`Could not upload file: ${error.message}`);
     } finally {
@@ -355,16 +345,16 @@ export default function AdminInterpreterProfile({ palette }) {
                   <h1 className="mt-2 text-3xl font-black md:text-5xl" style={{ color: palette.charcoal }}>{interpreter.first_name} {interpreter.last_name}</h1>
                   <p className="mt-3 text-sm leading-7" style={{ color: bodyText }}>{interpreter.email}</p>
                 </div>
-                <div className="rounded-2xl border px-4 py-3 text-sm font-black" style={{ borderColor: isComplete ? palette.gold : palette.burgundy, backgroundColor: isComplete ? "rgba(221,125,0,0.12)" : "rgba(114,17,0,0.08)", color: palette.burgundy }}>
-                  {isComplete ? "Profile complete" : "Profile incomplete"}
+                <div className="rounded-2xl border px-4 py-3 text-sm font-black" style={{ borderColor: derivedStatus === "active" ? palette.gold : palette.burgundy, backgroundColor: derivedStatus === "active" ? "rgba(221,125,0,0.12)" : "rgba(114,17,0,0.08)", color: palette.burgundy }}>
+                  {rosterStatusLabel(derivedStatus)}
                 </div>
               </div>
 
               <div className="mt-6 grid gap-4 md:grid-cols-4">
-                <StatCard label="Completion" value={`${adminCompletionPercent}%`} palette={palette} mutedText={mutedText} />
-                <StatCard label="Required files" value={`${completedRequiredDocs}/${requiredDocumentTypes.length}`} palette={palette} mutedText={mutedText} />
-                <StatCard label="Uploaded files" value={`${interpreter.interpreter_documents?.length || 0}`} palette={palette} mutedText={mutedText} />
-                <StatCard label="Roster status" value={statusLabel(interpreter.roster_status)} palette={palette} mutedText={mutedText} />
+                <StatCard label="Completion" value={`${completion.percent}%`} helper={`${completion.completed}/${completion.total} complete`} palette={palette} mutedText={mutedText} />
+                <StatCard label="Profile setup" value={`${completion.setup.percent}%`} helper={`${completion.setup.completed}/${completion.setup.total} fields`} palette={palette} mutedText={mutedText} />
+                <StatCard label="Required files" value={`${docsComplete.completed}/${docsComplete.total}`} helper={`${docsComplete.percent}% uploaded`} palette={palette} mutedText={mutedText} />
+                <StatCard label="Roster status" value={rosterStatusLabel(derivedStatus)} helper="Auto-enforced on save" palette={palette} mutedText={mutedText} />
               </div>
             </header>
 
@@ -374,11 +364,29 @@ export default function AdminInterpreterProfile({ palette }) {
                   <div>
                     <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.gold }}>Edit profile</p>
                     <h2 className="mt-2 text-2xl font-black" style={{ color: palette.charcoal }}>Assignment matching details</h2>
-                    <p className="mt-2 text-sm leading-6" style={{ color: bodyText }}>This mirrors the interpreter portal profile fields. You can correct or update the same matching details from the admin side.</p>
+                    <p className="mt-2 text-sm leading-6" style={{ color: bodyText }}>The status toggle is available, but status is auto-enforced: missing required documents means Pending Documentation; complete documents plus complete setup can become Active.</p>
                   </div>
                   <button type="button" disabled={saving} onClick={saveProfile} className="inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-bold text-white disabled:opacity-60" style={{ backgroundColor: palette.gold }}>
                     <Save size={16} /> {saving ? "Saving..." : "Save profile"}
                   </button>
+                </div>
+
+                <div className="mt-6 rounded-2xl border p-5" style={{ borderColor: palette.border, backgroundColor: softPanel }}>
+                  <div className="mb-3 text-sm font-black" style={{ color: palette.charcoal }}>Roster status</div>
+                  <div className="flex flex-wrap gap-2">
+                    {rosterStatusOptions.map(([value, label]) => {
+                      const active = selectedStatus === value;
+                      const blocked = value === "active" && !completion.isComplete;
+                      return (
+                        <button key={value} type="button" disabled={blocked} onClick={() => updateRosterStatus(value)} className="rounded-full border px-4 py-2 text-xs font-black transition disabled:cursor-not-allowed disabled:opacity-50" style={{ borderColor: active ? palette.gold : palette.border, backgroundColor: active ? "rgba(221,125,0,0.12)" : palette.white, color: active ? palette.burgundy : palette.charcoal }}>
+                          {label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <p className="mt-3 text-xs leading-5" style={{ color: mutedText }}>
+                    Current effective status: <strong>{rosterStatusLabel(derivedStatus)}</strong>. Active unlocks only when all setup fields and all required uploads are complete. Missing required documents forces Pending Documentation.
+                  </p>
                 </div>
 
                 <div className="mt-6 grid gap-4 md:grid-cols-2">
@@ -418,7 +426,7 @@ export default function AdminInterpreterProfile({ palette }) {
                 <section className="rounded-[2rem] border p-6 shadow-sm md:p-8" style={cardStyle}>
                   <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.gold }}>Required checklist</p>
                   <h2 className="mt-2 text-2xl font-black" style={{ color: palette.charcoal }}>Profile completion</h2>
-                  <p className="mt-2 text-sm leading-7" style={{ color: bodyText }}>A profile is complete only when required matching details and required uploads are present.</p>
+                  <p className="mt-2 text-sm leading-7" style={{ color: bodyText }}>Completion is calculated from {completion.setup.total} setup fields and {docsComplete.total} required uploads.</p>
                   <div className="mt-5 grid gap-2">
                     {requiredDocumentTypes.map((documentType) => {
                       const documentMeta = documentTypes.find(([value]) => value === documentType);
@@ -487,11 +495,12 @@ export default function AdminInterpreterProfile({ palette }) {
   );
 }
 
-function StatCard({ label, value, palette, mutedText }) {
+function StatCard({ label, value, helper, palette, mutedText }) {
   return (
     <div className="rounded-2xl border p-4" style={{ borderColor: palette.border, backgroundColor: palette.white }}>
       <div className="text-xs font-black uppercase tracking-[0.14em]" style={{ color: mutedText }}>{label}</div>
       <div className="mt-2 text-2xl font-black capitalize" style={{ color: palette.charcoal }}>{value}</div>
+      {helper && <div className="mt-1 text-xs" style={{ color: mutedText }}>{helper}</div>}
     </div>
   );
 }
