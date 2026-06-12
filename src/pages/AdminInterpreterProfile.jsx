@@ -161,6 +161,21 @@ export default function AdminInterpreterProfile({ palette }) {
     return data;
   }
 
+  async function adminFileRequest(mode, body = {}) {
+    const token = await session?.getToken();
+    const response = await fetch("/api/admin-assets", {
+      method: "POST",
+      headers: {
+        authorization: `Bearer ${token}`,
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({ mode, ...body }),
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(data.error || "Admin file request failed.");
+    return data;
+  }
+
   async function loadInterpreter() {
     setLoading(true);
     setMessage("");
@@ -254,7 +269,7 @@ export default function AdminInterpreterProfile({ palette }) {
     setOpeningDocumentId(document.id);
     setMessage("");
     try {
-      const data = await portalRequest("adminCreateDocumentLink", { method: "POST", body: { documentId: document.id } });
+      const data = await adminFileRequest("open", { documentId: document.id });
       if (!data.url) throw new Error("Could not create file link.");
       window.open(data.url, "_blank", "noopener,noreferrer");
     } catch (error) {
@@ -271,7 +286,7 @@ export default function AdminInterpreterProfile({ palette }) {
     setDocumentBusy(document.document_type);
     setMessage("");
     try {
-      const data = await portalRequest("adminRemoveDocument", { method: "POST", body: { documentId: document.id } });
+      const data = await adminFileRequest("drop", { documentId: document.id });
       setInterpreter((current) => ({
         ...current,
         interpreter_documents: (current?.interpreter_documents || []).filter((item) => item.id !== data.documentId),
@@ -293,18 +308,12 @@ export default function AdminInterpreterProfile({ palette }) {
     setDocumentBusy(documentType);
     setMessage("");
     try {
-      const uploadData = await portalRequest("adminCreateDocumentUploadUrl", {
-        method: "POST",
-        body: { interpreterId, documentType, fileName: file.name },
-      });
+      const uploadData = await adminFileRequest("ticket", { interpreterId, documentType, fileName: file.name });
       const { error: uploadError } = await uploadClient.storage
         .from(interpreterDocumentBucket)
         .uploadToSignedUrl(uploadData.path, uploadData.token, file);
       if (uploadError) throw uploadError;
-      const recordData = await portalRequest("adminRecordDocumentUpload", {
-        method: "POST",
-        body: { interpreterId, documentType, fileName: file.name, storagePath: uploadData.path },
-      });
+      const recordData = await adminFileRequest("save", { interpreterId, documentType, fileName: file.name, storagePath: uploadData.path });
       updateDocument(recordData.document);
       setDocumentFiles((current) => ({ ...current, [documentType]: null }));
       setMessage("Document uploaded.");
