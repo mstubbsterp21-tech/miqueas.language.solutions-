@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSession, useUser } from "@clerk/clerk-react";
 import { Link, useParams } from "react-router-dom";
-import { ArrowLeft, AlertCircle, BadgeCheck, CheckCircle2, Download, FileText, RefreshCcw, Save, UploadCloud } from "lucide-react";
+import { ArrowLeft, AlertCircle, BadgeCheck, CheckCircle2, Download, FileText, RefreshCcw, Save, Trash2, UploadCloud } from "lucide-react";
 import { PortalSignOutButton } from "../components/AuthStatus";
 import PortalSetupNotice from "../components/PortalSetupNotice";
 import { adminEmails, isSupabaseConfigured } from "../lib/env";
@@ -264,6 +264,26 @@ export default function AdminInterpreterProfile({ palette }) {
     }
   };
 
+  const removeDocument = async (document) => {
+    if (!document?.id) return;
+    const confirmed = window.confirm(`Delete ${document.file_name || "this document"}? This removes the file from the admin/interpreter portal.`);
+    if (!confirmed) return;
+    setDocumentBusy(document.document_type);
+    setMessage("");
+    try {
+      const data = await portalRequest("adminRemoveDocument", { method: "POST", body: { documentId: document.id } });
+      setInterpreter((current) => ({
+        ...current,
+        interpreter_documents: (current?.interpreter_documents || []).filter((item) => item.id !== data.documentId),
+      }));
+      setMessage("Document deleted.");
+    } catch (error) {
+      setMessage(`Could not delete file: ${error.message}`);
+    } finally {
+      setDocumentBusy("");
+    }
+  };
+
   const uploadDocument = async (documentType) => {
     const file = documentFiles[documentType];
     if (!file) {
@@ -326,7 +346,7 @@ export default function AdminInterpreterProfile({ palette }) {
                   <h1 className="mt-2 text-3xl font-black md:text-5xl" style={{ color: palette.charcoal }}>{interpreter.first_name} {interpreter.last_name}</h1>
                   <p className="mt-3 text-sm leading-7" style={{ color: bodyText }}>{interpreter.email}</p>
                 </div>
-                <div className="rounded-2xl border px-4 py-3 text-sm font-black" style={{ borderColor: isComplete ? palette.gold : palette.burgundy, backgroundColor: isComplete ? "rgba(221,125,0,0.12)" : "rgba(114,17,0,0.08)", color: isComplete ? palette.burgundy : palette.burgundy }}>
+                <div className="rounded-2xl border px-4 py-3 text-sm font-black" style={{ borderColor: isComplete ? palette.gold : palette.burgundy, backgroundColor: isComplete ? "rgba(221,125,0,0.12)" : "rgba(114,17,0,0.08)", color: palette.burgundy }}>
                   {isComplete ? "Profile complete" : "Profile incomplete"}
                 </div>
               </div>
@@ -407,7 +427,7 @@ export default function AdminInterpreterProfile({ palette }) {
                 <section className="rounded-[2rem] border p-6 shadow-sm md:p-8" style={cardStyle}>
                   <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.gold }}>Documents</p>
                   <h2 className="mt-2 text-2xl font-black" style={{ color: palette.charcoal }}>Uploaded files</h2>
-                  <p className="mt-2 text-sm leading-7" style={{ color: bodyText }}>View what the interpreter uploaded, download files, or upload/replace a file as admin.</p>
+                  <p className="mt-2 text-sm leading-7" style={{ color: bodyText }}>View what the interpreter uploaded, download files, upload/replace a file, or delete an uploaded file as admin.</p>
 
                   <div className="mt-6 space-y-4">
                     {documentTypes.map(([documentType, label, description]) => {
@@ -438,6 +458,11 @@ export default function AdminInterpreterProfile({ palette }) {
                             <button type="button" disabled={documentBusy === documentType} onClick={() => uploadDocument(documentType)} className="inline-flex items-center gap-2 rounded-full px-3 py-2 text-xs font-bold text-white disabled:opacity-60" style={{ backgroundColor: document ? palette.gold : palette.burgundy }}>
                               <UploadCloud size={13} /> {documentBusy === documentType ? "Uploading..." : document ? "Replace" : "Upload"}
                             </button>
+                            {document && (
+                              <button type="button" disabled={documentBusy === documentType} onClick={() => removeDocument(document)} className="inline-flex items-center gap-2 rounded-full border px-3 py-2 text-xs font-bold disabled:opacity-60" style={{ borderColor: palette.border, color: palette.burgundy }}>
+                                <Trash2 size={13} /> Delete
+                              </button>
+                            )}
                           </div>
                         </div>
                       );
