@@ -1,16 +1,23 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSession, useUser } from "@clerk/clerk-react";
 import { Link } from "react-router-dom";
-import { AlertTriangle, BadgeCheck, Eye, Plus, RefreshCcw, Search } from "lucide-react";
+import { AlertTriangle, BadgeCheck, Eye, RefreshCcw, Search } from "lucide-react";
 import { PortalSignOutButton } from "../components/AuthStatus";
 import PortalSetupNotice from "../components/PortalSetupNotice";
 import { adminEmails, isSupabaseConfigured } from "../lib/env";
+
+const requiredDocumentTypes = ["resume", "w9", "credential_proof", "liability_insurance", "ic_agreement"];
 
 function statusPill(status) {
   return (status || "pending_profile").replaceAll("_", " ");
 }
 
-function readiness(interpreter = {}) {
+function requiredDocumentCount(interpreter = {}) {
+  const docs = interpreter.interpreter_documents || [];
+  return requiredDocumentTypes.filter((type) => docs.some((doc) => doc.document_type === type)).length;
+}
+
+function completionPercent(interpreter = {}) {
   const required = [
     interpreter.phone,
     interpreter.city || interpreter.current_location,
@@ -19,6 +26,7 @@ function readiness(interpreter = {}) {
     interpreter.areas_of_experience,
     interpreter.assignment_type_preference,
     interpreter.availability_sunday || interpreter.availability_monday || interpreter.availability_tuesday || interpreter.availability_wednesday || interpreter.availability_thursday || interpreter.availability_friday || interpreter.availability_saturday,
+    requiredDocumentCount(interpreter) === requiredDocumentTypes.length,
   ];
   return Math.round((required.filter(Boolean).length / required.length) * 100);
 }
@@ -81,7 +89,8 @@ export default function AdminInterpreters({ palette }) {
   }, [interpreters, query]);
 
   const activeCount = interpreters.filter((interpreter) => interpreter.roster_status === "active").length;
-  const pendingCount = interpreters.filter((interpreter) => interpreter.roster_status !== "active" && interpreter.roster_status !== "removed").length;
+  const incompleteCount = interpreters.filter((interpreter) => interpreter.roster_status !== "removed" && completionPercent(interpreter) < 100).length;
+  const completeCount = interpreters.filter((interpreter) => interpreter.roster_status !== "removed" && completionPercent(interpreter) === 100).length;
 
   if (!isSupabaseConfigured) return <PortalSetupNotice palette={palette} />;
 
@@ -110,7 +119,7 @@ export default function AdminInterpreters({ palette }) {
               <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.gold }}>MLS admin</p>
               <h1 className="mt-2 text-3xl font-black tracking-tight md:text-5xl" style={{ color: palette.charcoal }}>Interpreter roster</h1>
               <p className="mt-3 max-w-3xl text-sm leading-7" style={{ color: bodyText }}>
-                Quick overview of interpreter profiles. Open an interpreter profile to review full details, edit matching information, and manage documents.
+                Quick overview of interpreter profiles. Completion requires matching details plus résumé, W-9, credential proof, liability insurance, and IC Agreement uploads.
               </p>
             </div>
             <div className="flex flex-wrap gap-3">
@@ -122,10 +131,11 @@ export default function AdminInterpreters({ palette }) {
             </div>
           </div>
 
-          <div className="mt-7 grid gap-4 md:grid-cols-3">
+          <div className="mt-7 grid gap-4 md:grid-cols-4">
             <OverviewCard label="Visible roster" value={filtered.length} helper="Current search results" palette={palette} mutedText={mutedText} softPanel={softPanel} />
+            <OverviewCard label="Complete" value={completeCount} helper="100% profile completion" palette={palette} mutedText={mutedText} softPanel={softPanel} />
+            <OverviewCard label="Incomplete" value={incompleteCount} helper="Missing fields or required files" palette={palette} mutedText={mutedText} softPanel={softPanel} />
             <OverviewCard label="Active" value={activeCount} helper="Marked active" palette={palette} mutedText={mutedText} softPanel={softPanel} />
-            <OverviewCard label="Needs review" value={pendingCount} helper="Pending, on hold, or screening" palette={palette} mutedText={mutedText} softPanel={softPanel} />
           </div>
         </header>
 
@@ -149,6 +159,9 @@ export default function AdminInterpreters({ palette }) {
           <div className="grid gap-4 lg:grid-cols-2">
             {filtered.map((interpreter) => {
               const docCount = interpreter.interpreter_documents?.length || 0;
+              const requiredCount = requiredDocumentCount(interpreter);
+              const percent = completionPercent(interpreter);
+              const complete = percent === 100;
               return (
                 <article key={interpreter.id} className="rounded-[2rem] border p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md" style={cardStyle}>
                   <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
@@ -156,6 +169,7 @@ export default function AdminInterpreters({ palette }) {
                       <div className="text-xl font-black" style={{ color: palette.charcoal }}>{interpreter.first_name || "—"} {interpreter.last_name || ""}</div>
                       <div className="mt-1 break-words text-sm" style={{ color: mutedText }}>{interpreter.email || "No email"}</div>
                       <div className="mt-2 text-sm" style={{ color: mutedText }}>{interpreter.city || "—"}{interpreter.state ? `, ${interpreter.state}` : ""}</div>
+                      <span className="mt-3 inline-flex rounded-full px-3 py-1 text-xs font-black uppercase tracking-[0.08em]" style={{ backgroundColor: complete ? "rgba(221,125,0,0.12)" : "rgba(114,17,0,0.08)", color: palette.burgundy }}>{complete ? "Complete" : "Incomplete"}</span>
                     </div>
                     <Link to={`/admin/interpreters/${interpreter.id}`} className="inline-flex shrink-0 items-center justify-center gap-2 rounded-full px-4 py-2.5 text-sm font-bold text-white" style={{ backgroundColor: palette.burgundy }}>
                       <Eye size={15} /> View profile
@@ -163,8 +177,8 @@ export default function AdminInterpreters({ palette }) {
                   </div>
 
                   <div className="mt-5 grid gap-3 sm:grid-cols-3">
-                    <MiniStat label="Readiness" value={`${readiness(interpreter)}%`} palette={palette} mutedText={mutedText} softPanel={softPanel} />
-                    <MiniStat label="Documents" value={docCount} palette={palette} mutedText={mutedText} softPanel={softPanel} />
+                    <MiniStat label="Completion" value={`${percent}%`} palette={palette} mutedText={mutedText} softPanel={softPanel} />
+                    <MiniStat label="Required files" value={`${requiredCount}/${requiredDocumentTypes.length}`} palette={palette} mutedText={mutedText} softPanel={softPanel} />
                     <MiniStat label="Status" value={statusPill(interpreter.roster_status)} palette={palette} mutedText={mutedText} softPanel={softPanel} />
                   </div>
 
@@ -198,7 +212,7 @@ function MiniStat({ label, value, palette, mutedText, softPanel }) {
   return (
     <div className="rounded-2xl border p-3" style={{ borderColor: palette.border, backgroundColor: softPanel }}>
       <div className="text-[10px] font-black uppercase tracking-[0.12em]" style={{ color: mutedText }}>{label}</div>
-      <div className="mt-1 text-sm font-black" style={{ color: palette.charcoal }}>{value}</div>
+      <div className="mt-1 text-sm font-black capitalize" style={{ color: palette.charcoal }}>{value}</div>
     </div>
   );
 }
