@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSession, useUser } from "@clerk/clerk-react";
 import { Link } from "react-router-dom";
-import { AlertTriangle, BadgeCheck, Eye, RefreshCcw, Search } from "lucide-react";
+import { AlertTriangle, BadgeCheck, Eye, RefreshCcw, Search, Trash2 } from "lucide-react";
 import { PortalSignOutButton } from "../components/AuthStatus";
 import PortalSetupNotice from "../components/PortalSetupNotice";
 import { adminEmails, isSupabaseConfigured } from "../lib/env";
@@ -38,6 +38,7 @@ export default function AdminInterpreters({ palette }) {
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
   const [message, setMessage] = useState("");
+  const [deletingId, setDeletingId] = useState("");
 
   const primaryEmail = user?.primaryEmailAddress?.emailAddress?.toLowerCase() || "";
   const isAdmin = adminEmails.includes(primaryEmail);
@@ -50,10 +51,15 @@ export default function AdminInterpreters({ palette }) {
   const softPanel = isDarkMode ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.03)";
   const cardStyle = { borderColor: palette.border, backgroundColor: palette.white };
 
-  async function portalRequest(action) {
+  async function portalRequest(action, options = {}) {
     const token = await session?.getToken();
     const response = await fetch(`/api/portal?action=${action}`, {
-      headers: { authorization: `Bearer ${token}` },
+      method: options.method || "GET",
+      headers: {
+        authorization: `Bearer ${token}`,
+        ...(options.body ? { "content-type": "application/json" } : {}),
+      },
+      body: options.body ? JSON.stringify(options.body) : undefined,
     });
     const data = await response.json().catch(() => ({}));
     if (!response.ok) throw new Error(data.error || "Portal request failed.");
@@ -70,6 +76,27 @@ export default function AdminInterpreters({ palette }) {
       setMessage(`Could not load roster: ${error.message}`);
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function deleteInterpreterProfile(interpreter) {
+    const name = `${interpreter.first_name || ""} ${interpreter.last_name || ""}`.trim() || interpreter.email || "this interpreter";
+    const confirmed = window.confirm(`Delete ${name} from the visible roster? This will remove the profile from the admin roster view, but it will not destroy stored audit/document records.`);
+    if (!confirmed) return;
+
+    setDeletingId(interpreter.id);
+    setMessage("");
+    try {
+      await portalRequest("adminUpdateInterpreterProfile", {
+        method: "POST",
+        body: { interpreterId: interpreter.id, profile: { roster_status: "removed" } },
+      });
+      setInterpreters((current) => current.filter((item) => item.id !== interpreter.id));
+      setMessage(`${name} was removed from the roster.`);
+    } catch (error) {
+      setMessage(`Could not delete profile: ${error.message}`);
+    } finally {
+      setDeletingId("");
     }
   }
 
@@ -139,7 +166,7 @@ export default function AdminInterpreters({ palette }) {
           </div>
         </header>
 
-        {message && <div className="mb-6 rounded-2xl border p-4 text-sm font-semibold" style={{ borderColor: palette.border, backgroundColor: palette.white, color: palette.burgundy }}>{message}</div>}
+        {message && <div className="mb-6 rounded-2xl border p-4 text-sm font-semibold" style={{ borderColor: palette.border, backgroundColor: palette.white, color: message.toLowerCase().includes("could not") ? palette.burgundy : palette.charcoal }}>{message}</div>}
 
         <div className="mb-6 rounded-[1.5rem] border p-4 shadow-sm" style={cardStyle}>
           <label className="flex items-center gap-3 rounded-2xl px-4 py-3" style={{ backgroundColor: softPanel }}>
@@ -171,9 +198,14 @@ export default function AdminInterpreters({ palette }) {
                       <div className="mt-2 text-sm" style={{ color: mutedText }}>{interpreter.city || "—"}{interpreter.state ? `, ${interpreter.state}` : ""}</div>
                       <span className="mt-3 inline-flex rounded-full px-3 py-1 text-xs font-black uppercase tracking-[0.08em]" style={{ backgroundColor: complete ? "rgba(221,125,0,0.12)" : "rgba(114,17,0,0.08)", color: palette.burgundy }}>{complete ? "Complete" : "Incomplete"}</span>
                     </div>
-                    <Link to={`/admin/interpreters/${interpreter.id}`} className="inline-flex shrink-0 items-center justify-center gap-2 rounded-full px-4 py-2.5 text-sm font-bold text-white" style={{ backgroundColor: palette.burgundy }}>
-                      <Eye size={15} /> View profile
-                    </Link>
+                    <div className="flex shrink-0 flex-col gap-2 sm:items-end">
+                      <Link to={`/admin/interpreters/${interpreter.id}`} className="inline-flex items-center justify-center gap-2 rounded-full px-4 py-2.5 text-sm font-bold text-white" style={{ backgroundColor: palette.burgundy }}>
+                        <Eye size={15} /> View profile
+                      </Link>
+                      <button type="button" disabled={deletingId === interpreter.id} onClick={() => deleteInterpreterProfile(interpreter)} className="inline-flex items-center justify-center gap-2 rounded-full border px-4 py-2.5 text-sm font-bold disabled:opacity-60" style={{ borderColor: palette.border, color: palette.burgundy, backgroundColor: palette.white }}>
+                        <Trash2 size={15} /> {deletingId === interpreter.id ? "Deleting..." : "Delete profile"}
+                      </button>
+                    </div>
                   </div>
 
                   <div className="mt-5 grid gap-3 sm:grid-cols-3">
