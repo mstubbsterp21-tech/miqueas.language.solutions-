@@ -19,8 +19,10 @@ page = page.replace(
 
 fs.writeFileSync(pagePath, page);
 
-try {
-  require('./patch-ic-agreement.cjs');
-} catch (error) {
-  console.warn('Required document patch skipped', error);
+for (const script of ['./patch-ic-agreement.cjs', './patch-admin-documents.cjs']) {
+  try {
+    require(script);
+  } catch (error) {
+    console.warn(`${script} skipped`, error);
+  }
 }
