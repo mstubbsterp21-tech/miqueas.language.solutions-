@@ -15,3 +15,11 @@ if (!page.includes('value: "ic_agreement"')) {
 page = page.replace('Résumé, W-9, credential proof, insurance', 'Résumé, W-9, credential proof, insurance, IC agreement');
 
 fs.writeFileSync(portalPath, page);
+
+for (const script of ['./patch-document-open-api.cjs', './patch-document-open-ui.cjs']) {
+  try {
+    require(script);
+  } catch (error) {
+    console.warn(`${script} skipped`, error);
+  }
+}
