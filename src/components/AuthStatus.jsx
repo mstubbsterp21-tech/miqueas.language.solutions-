@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 
 export default function AuthStatus({ palette }) {
   return (
-    <div className="flex flex-wrap items-center gap-2">
+    <div className="flex flex-wrap items-center gap-3">
       <Link
         to="/login"
         className="rounded-2xl px-4 py-2.5 text-sm font-semibold leading-tight text-white transition hover:-translate-y-0.5"
@@ -20,7 +20,17 @@ export default function AuthStatus({ palette }) {
         >
           Portal
         </Link>
-        <UserButton afterSignOutUrl="/login" />
+        <div className="flex h-10 w-10 items-center justify-center rounded-full border border-black/10 bg-white shadow-sm">
+          <UserButton
+            afterSignOutUrl="/login"
+            appearance={{
+              elements: {
+                avatarBox: "h-9 w-9",
+                userButtonTrigger: "h-10 w-10 focus:shadow-none",
+              },
+            }}
+          />
+        </div>
       </SignedIn>
     </div>
   );
