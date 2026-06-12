@@ -19,7 +19,7 @@ page = page.replace(
 
 fs.writeFileSync(pagePath, page);
 
-for (const script of ['./patch-ic-agreement.cjs', './patch-admin-documents.cjs']) {
+for (const script of ['./patch-ic-agreement.cjs', './patch-admin-documents.cjs', './patch-admin-file-actions.cjs']) {
   try {
     require(script);
   } catch (error) {
