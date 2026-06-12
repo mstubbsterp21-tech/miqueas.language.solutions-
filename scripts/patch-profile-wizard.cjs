@@ -51,4 +51,35 @@ if (!source.includes('<ProfileSetupWizard')) {
   );
 }
 
+source = source.replace(
+  '<PortalSection title="Weekly availability" eyebrow="Scheduling" palette={palette}>\n              <div className="space-y-4">',
+  '<PortalSection title="Weekly availability" eyebrow="Scheduling" palette={palette}>\n              <div className="grid gap-3 md:grid-cols-2 2xl:grid-cols-4">'
+);
+source = source.replaceAll(
+  '<div key={key} className="rounded-2xl border bg-black/[0.02] p-4" style={{ borderColor: palette.border }}>',
+  '<div key={key} className="rounded-2xl border bg-black/[0.02] p-3" style={{ borderColor: palette.border }}>'
+);
+source = source.replaceAll(
+  '<div className="mb-3 text-sm font-black" style={{ color: palette.charcoal }}>{day}</div>\n                    <div className="flex flex-wrap gap-2">',
+  '<div className="mb-2 text-sm font-black" style={{ color: palette.charcoal }}>{day}</div>\n                    <div className="grid gap-2 sm:grid-cols-2">'
+);
+
 fs.writeFileSync(portalPagePath, source);
+
+const wizardPath = 'src/components/ProfileSetupWizard.jsx';
+if (fs.existsSync(wizardPath)) {
+  let wizard = fs.readFileSync(wizardPath, 'utf8');
+  wizard = wizard.replace(
+    '<WizardHeading title="When are you generally available?" palette={palette} mutedText={bodyText} />\n              <div className="space-y-4">',
+    '<WizardHeading title="When are you generally available?" palette={palette} mutedText={bodyText} />\n              <div className="grid gap-3 md:grid-cols-2 2xl:grid-cols-4">'
+  );
+  wizard = wizard.replaceAll(
+    '<div key={key} className="rounded-2xl border p-4" style={{ borderColor: palette.border, backgroundColor: softBackground }}>',
+    '<div key={key} className="rounded-2xl border p-3" style={{ borderColor: palette.border, backgroundColor: softBackground }}>'
+  );
+  wizard = wizard.replaceAll(
+    '<div className="mb-3 text-sm font-black" style={{ color: palette.charcoal }}>{day}</div>\n                    <div className="flex flex-wrap gap-2">',
+    '<div className="mb-2 text-sm font-black" style={{ color: palette.charcoal }}>{day}</div>\n                    <div className="grid gap-2 sm:grid-cols-2">'
+  );
+  fs.writeFileSync(wizardPath, wizard);
+}
