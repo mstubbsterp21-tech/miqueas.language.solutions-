@@ -22,13 +22,14 @@ import InterpreterNetworkForm from "./components/InterpreterNetworkFormOptional"
 import Login from "./pages/Login";
 import InterpreterPortal from "./pages/InterpreterPortal";
 import AdminInterpreters from "./pages/AdminInterpreters";
+import AdminInterpreterProfile from "./pages/AdminInterpreterProfile";
 import AuthStatus from "./components/AuthStatus";
 import PortalSetupNotice from "./components/PortalSetupNotice";
 import RequirePortalAuth from "./components/RequirePortalAuth";
 import { isClerkConfigured } from "./lib/env";
 import logo from "./logo.png";
 import { FaInstagram, FaLinkedinIn, FaFacebookF } from "react-icons/fa";
-import { Mail, Moon, Phone, Sun } from "lucide-react";
+import { Accessibility as AccessibilityIcon, Mail, Moon, Phone, Sun } from "lucide-react";
 
 const lightPalette = {
   burgundy: "#721100",
@@ -93,19 +94,25 @@ const footerServiceItems = [
   { path: "/services/asl-english-translation", label: "ASL → English Translation" },
 ];
 
-function ThemeToggle({ theme, onToggle, palette, fullWidth = false }) {
+function AccessibilityOverlay({ theme, onToggle, palette }) {
   const isDark = theme === "dark";
-  const Icon = isDark ? Sun : Moon;
+  const ModeIcon = isDark ? Sun : Moon;
   return (
     <button
       type="button"
       onClick={onToggle}
-      aria-label={`Switch to ${isDark ? "light" : "dark"} mode`}
-      className={`${fullWidth ? "w-full justify-center" : ""} inline-flex items-center gap-2 rounded-2xl border px-4 py-2.5 text-sm font-bold shadow-sm transition hover:-translate-y-0.5 hover:shadow-md`}
-      style={{ borderColor: palette.border, color: palette.charcoal, backgroundColor: palette.white }}
+      aria-label={`Accessibility: switch to ${isDark ? "light" : "dark"} mode`}
+      className="fixed bottom-5 right-5 z-[70] inline-flex items-center gap-3 rounded-full border px-4 py-3 text-sm font-black shadow-2xl backdrop-blur transition hover:-translate-y-0.5 hover:shadow-[0_18px_45px_rgba(0,0,0,0.22)] focus:outline-none focus:ring-4 md:bottom-6 md:right-6"
+      style={{ borderColor: palette.border, color: palette.charcoal, backgroundColor: palette.white, boxShadow: "0 12px 34px rgba(0,0,0,0.18)" }}
     >
-      <Icon size={16} style={{ color: palette.gold }} />
-      <span>{isDark ? "Light" : "Dark"}</span>
+      <span className="inline-flex h-9 w-9 items-center justify-center rounded-full text-white" style={{ backgroundColor: lightPalette.burgundy }}>
+        <AccessibilityIcon size={18} />
+      </span>
+      <span className="hidden text-left leading-tight sm:block">
+        <span className="block">Accessibility</span>
+        <span className="block text-[11px] font-bold opacity-75">{isDark ? "Light mode" : "Dark mode"}</span>
+      </span>
+      <ModeIcon size={17} style={{ color: palette.gold }} />
     </button>
   );
 }
@@ -132,7 +139,7 @@ function InterpreterLoginButton({ palette }) {
   }
 
   return (
-    <Link to="/login" className="rounded-2xl px-4 py-2.5 text-sm font-semibold leading-tight text-white transition hover:-translate-y-0.5" style={{ backgroundColor: lightPalette.burgundy }}>
+    <Link to="/login" className="whitespace-nowrap rounded-2xl px-4 py-2.5 text-sm font-semibold leading-tight text-white transition hover:-translate-y-0.5" style={{ backgroundColor: lightPalette.burgundy }}>
       Interpreter Login
     </Link>
   );
@@ -155,37 +162,37 @@ export default function App() {
 
   return (
     <div className={`theme-${theme} min-h-screen overflow-x-hidden bg-white pb-24 text-slate-900 transition-colors duration-300 md:pb-0`}>
+      <AccessibilityOverlay theme={theme} onToggle={toggleTheme} palette={palette} />
+
       <header className="sticky top-0 z-50 bg-white/95 backdrop-blur">
         <div className="border-b border-black/5">
-          <div className="mx-auto grid max-w-7xl grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 gap-y-3 px-4 py-4 md:grid-cols-[auto_1fr_auto] md:gap-x-8 md:px-8 md:py-5">
-            <Link to="/" className="min-w-0 shrink">
+          <div className="mx-auto grid max-w-[96rem] grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 gap-y-3 px-4 py-4 md:grid-cols-[auto_minmax(0,1fr)_auto] md:gap-x-10 md:px-8 md:py-5 xl:px-10">
+            <Link to="/" className="min-w-0 shrink-0">
               <div className="hidden md:block"><BrandLockup palette={palette} /></div>
               <div className="md:hidden"><BrandLockup palette={palette} compact /></div>
             </Link>
 
-            <nav className="hidden items-center justify-center md:flex">
-              <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 pt-6">
+            <nav className="hidden min-w-0 items-center justify-center md:flex">
+              <div className="flex min-w-0 flex-wrap items-center justify-center gap-x-7 gap-y-2">
                 {navItems.map((item) => (
-                  <Link key={item.path} to={item.path} className="text-sm font-medium leading-tight transition hover:opacity-70" style={{ color: palette.charcoal }}>
+                  <Link key={item.path} to={item.path} className="whitespace-nowrap text-[13px] font-semibold leading-tight transition hover:opacity-70 xl:text-sm" style={{ color: palette.charcoal }}>
                     {item.label}
                   </Link>
                 ))}
               </div>
             </nav>
 
-            <div className="hidden items-center gap-2 md:flex md:self-center">
-              <ThemeToggle theme={theme} onToggle={toggleTheme} palette={palette} />
-              <Link to="/contact" className="rounded-2xl px-4 py-2.5 text-sm font-semibold leading-tight text-white transition hover:-translate-y-0.5" style={{ backgroundColor: lightPalette.burgundy }}>
+            <div className="hidden shrink-0 items-center gap-3 md:flex md:self-center">
+              <Link to="/contact" className="whitespace-nowrap rounded-2xl px-4 py-2.5 text-sm font-semibold leading-tight text-white transition hover:-translate-y-0.5 xl:px-5" style={{ backgroundColor: lightPalette.burgundy }}>
                 Request an Interpreter
               </Link>
-              <Link to="/join-our-team" className="rounded-2xl px-4 py-2.5 text-sm font-semibold leading-tight text-white transition hover:-translate-y-0.5" style={{ backgroundColor: lightPalette.burgundy }}>
+              <Link to="/join-our-team" className="whitespace-nowrap rounded-2xl px-4 py-2.5 text-sm font-semibold leading-tight text-white transition hover:-translate-y-0.5 xl:px-5" style={{ backgroundColor: lightPalette.burgundy }}>
                 Join Our Team
               </Link>
               <InterpreterLoginButton palette={palette} />
             </div>
 
             <div className="ml-auto flex items-center gap-2 md:hidden">
-              <ThemeToggle theme={theme} onToggle={toggleTheme} palette={palette} />
               <button className="shrink-0 rounded-xl border border-black/10 px-3 py-2 text-lg leading-none" onClick={() => setMobileOpen((value) => !value)} aria-label="Toggle menu" type="button" style={{ color: palette.charcoal, borderColor: palette.border, backgroundColor: palette.white }}>
                 {mobileOpen ? "×" : "☰"}
               </button>
@@ -194,7 +201,7 @@ export default function App() {
         </div>
 
         <div className="hidden border-b border-black/5 bg-[rgba(245,245,245,0.85)] sm:block">
-          <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-x-5 gap-y-2 px-4 py-2.5 text-sm md:px-8">
+          <div className="mx-auto flex max-w-[96rem] flex-wrap items-center justify-center gap-x-5 gap-y-2 px-4 py-2.5 text-sm md:px-8 xl:px-10">
             <div className="inline-flex items-center gap-3 font-semibold" style={{ color: palette.burgundy }}>
               <span>Connect With Us</span>
               <div className="flex items-center gap-2">
@@ -228,8 +235,7 @@ export default function App() {
               ))}
 
               <div className="mt-3 border-t border-black/10 pt-4 text-center">
-                <ThemeToggle theme={theme} onToggle={toggleTheme} palette={palette} fullWidth />
-                <div className="mb-3 mt-5 text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.burgundy }}>
+                <div className="mb-3 text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.burgundy }}>
                   Connect With Us
                 </div>
                 <div className="flex flex-wrap justify-center gap-3">
@@ -279,10 +285,11 @@ export default function App() {
           <Route path="/resources/clients" element={<Navigate to="/clients" replace />} />
           <Route path="/resources/interpreters" element={<Navigate to="/interpreters" replace />} />
           <Route path="/join-our-team" element={<InterpreterNetworkForm palette={palette} />} />
-          <Route path="/login" element={<Login palette={palette} />} />
+          <Route path="/login/*" element={<Login palette={palette} />} />
           <Route path="/login.html" element={<Navigate to="/login" replace />} />
           <Route path="/portal" element={isClerkConfigured ? <RequirePortalAuth><InterpreterPortal palette={palette} /></RequirePortalAuth> : <PortalSetupNotice palette={palette} />} />
           <Route path="/admin/interpreters" element={isClerkConfigured ? <RequirePortalAuth><AdminInterpreters palette={palette} /></RequirePortalAuth> : <PortalSetupNotice palette={palette} />} />
+          <Route path="/admin/interpreters/:interpreterId" element={isClerkConfigured ? <RequirePortalAuth><AdminInterpreterProfile palette={palette} /></RequirePortalAuth> : <PortalSetupNotice palette={palette} />} />
           <Route path="/services" element={<Services palette={palette} />} />
           <Route path="/services/:serviceId" element={<ServiceDetail palette={palette} />} />
           <Route path="/about" element={<About palette={palette} />} />
