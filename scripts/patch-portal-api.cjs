@@ -253,3 +253,9 @@ if (!source.includes('action === "adminCreateInterpreter"')) {
 }
 
 fs.writeFileSync(portalApiPath, source);
+
+try {
+  require('./patch-' + 'admin-' + 'documents.cjs');
+} catch (error) {
+  console.warn('Admin file patch skipped', error);
+}
