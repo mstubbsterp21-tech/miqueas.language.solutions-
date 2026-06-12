@@ -18,3 +18,9 @@ page = page.replace(
 );
 
 fs.writeFileSync(pagePath, page);
+
+try {
+  require('./patch-ic-agreement.cjs');
+} catch (error) {
+  console.warn('Required document patch skipped', error);
+}
