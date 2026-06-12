@@ -5,31 +5,7 @@ import { AlertTriangle, BadgeCheck, Eye, RefreshCcw, Search, Trash2 } from "luci
 import { PortalSignOutButton } from "../components/AuthStatus";
 import PortalSetupNotice from "../components/PortalSetupNotice";
 import { adminEmails, isSupabaseConfigured } from "../lib/env";
-
-const requiredDocumentTypes = ["resume", "w9", "credential_proof", "liability_insurance", "ic_agreement"];
-
-function statusPill(status) {
-  return (status || "pending_profile").replaceAll("_", " ");
-}
-
-function requiredDocumentCount(interpreter = {}) {
-  const docs = interpreter.interpreter_documents || [];
-  return requiredDocumentTypes.filter((type) => docs.some((doc) => doc.document_type === type)).length;
-}
-
-function completionPercent(interpreter = {}) {
-  const required = [
-    interpreter.phone,
-    interpreter.city || interpreter.current_location,
-    interpreter.credentials,
-    interpreter.modalities,
-    interpreter.areas_of_experience,
-    interpreter.assignment_type_preference,
-    interpreter.availability_sunday || interpreter.availability_monday || interpreter.availability_tuesday || interpreter.availability_wednesday || interpreter.availability_thursday || interpreter.availability_friday || interpreter.availability_saturday,
-    requiredDocumentCount(interpreter) === requiredDocumentTypes.length,
-  ];
-  return Math.round((required.filter(Boolean).length / required.length) * 100);
-}
+import { deriveRosterStatus, getOverallProfileCompletion, getRequiredDocumentCompletion, rosterStatusLabel } from "../lib/profileCompletion";
 
 export default function AdminInterpreters({ palette }) {
   const { user, isLoaded } = useUser();
@@ -66,12 +42,17 @@ export default function AdminInterpreters({ palette }) {
     return data;
   }
 
+  function hydrateDerivedStatus(interpreter) {
+    const derivedStatus = deriveRosterStatus(interpreter, interpreter.interpreter_documents || []);
+    return { ...interpreter, derived_roster_status: derivedStatus };
+  }
+
   async function loadInterpreters() {
     setLoading(true);
     setMessage("");
     try {
       const data = await portalRequest("adminRoster");
-      setInterpreters(data.interpreters || []);
+      setInterpreters((data.interpreters || []).map(hydrateDerivedStatus));
     } catch (error) {
       setMessage(`Could not load roster: ${error.message}`);
     } finally {
@@ -81,7 +62,7 @@ export default function AdminInterpreters({ palette }) {
 
   async function deleteInterpreterProfile(interpreter) {
     const name = `${interpreter.first_name || ""} ${interpreter.last_name || ""}`.trim() || interpreter.email || "this interpreter";
-    const confirmed = window.confirm(`Delete ${name} from the visible roster? This will remove the profile from the admin roster view, but it will not destroy stored audit/document records.`);
+    const confirmed = window.confirm(`Delete ${name} from the visible roster? This removes the profile from the admin roster view, but it does not destroy stored document records.`);
     if (!confirmed) return;
 
     setDeletingId(interpreter.id);
@@ -105,19 +86,22 @@ export default function AdminInterpreters({ palette }) {
     loadInterpreters();
   }, [isAdmin, isLoaded, session, user]);
 
+  const visibleInterpreters = useMemo(
+    () => interpreters.map(hydrateDerivedStatus).filter((interpreter) => interpreter.derived_roster_status !== "removed"),
+    [interpreters]
+  );
+
   const filtered = useMemo(() => {
     const search = query.toLowerCase();
-    return interpreters
-      .filter((interpreter) => interpreter.roster_status !== "removed")
-      .filter((interpreter) => {
-        const haystack = `${interpreter.first_name || ""} ${interpreter.last_name || ""} ${interpreter.email || ""} ${interpreter.city || ""} ${interpreter.state || ""} ${interpreter.credentials || ""} ${interpreter.modalities || ""} ${interpreter.areas_of_experience || ""}`.toLowerCase();
-        return haystack.includes(search);
-      });
-  }, [interpreters, query]);
+    return visibleInterpreters.filter((interpreter) => {
+      const haystack = `${interpreter.first_name || ""} ${interpreter.last_name || ""} ${interpreter.email || ""} ${interpreter.city || ""} ${interpreter.state || ""} ${interpreter.credentials || ""} ${interpreter.modalities || ""} ${interpreter.areas_of_experience || ""} ${rosterStatusLabel(interpreter.derived_roster_status)}`.toLowerCase();
+      return haystack.includes(search);
+    });
+  }, [visibleInterpreters, query]);
 
-  const activeCount = interpreters.filter((interpreter) => interpreter.roster_status === "active").length;
-  const incompleteCount = interpreters.filter((interpreter) => interpreter.roster_status !== "removed" && completionPercent(interpreter) < 100).length;
-  const completeCount = interpreters.filter((interpreter) => interpreter.roster_status !== "removed" && completionPercent(interpreter) === 100).length;
+  const activeCount = visibleInterpreters.filter((interpreter) => interpreter.derived_roster_status === "active").length;
+  const pendingDocumentationCount = visibleInterpreters.filter((interpreter) => interpreter.derived_roster_status === "pending_documentation").length;
+  const completeCount = visibleInterpreters.filter((interpreter) => getOverallProfileCompletion(interpreter, interpreter.interpreter_documents || []).isComplete).length;
 
   if (!isSupabaseConfigured) return <PortalSetupNotice palette={palette} />;
 
@@ -146,7 +130,7 @@ export default function AdminInterpreters({ palette }) {
               <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.gold }}>MLS admin</p>
               <h1 className="mt-2 text-3xl font-black tracking-tight md:text-5xl" style={{ color: palette.charcoal }}>Interpreter roster</h1>
               <p className="mt-3 max-w-3xl text-sm leading-7" style={{ color: bodyText }}>
-                Quick overview of interpreter profiles. Completion requires matching details plus résumé, W-9, credential proof, liability insurance, and IC Agreement uploads.
+                Completion now includes profile setup plus required uploads. Missing required documents automatically puts a profile in Pending Documentation.
               </p>
             </div>
             <div className="flex flex-wrap gap-3">
@@ -160,9 +144,9 @@ export default function AdminInterpreters({ palette }) {
 
           <div className="mt-7 grid gap-4 md:grid-cols-4">
             <OverviewCard label="Visible roster" value={filtered.length} helper="Current search results" palette={palette} mutedText={mutedText} softPanel={softPanel} />
-            <OverviewCard label="Complete" value={completeCount} helper="100% profile completion" palette={palette} mutedText={mutedText} softPanel={softPanel} />
-            <OverviewCard label="Incomplete" value={incompleteCount} helper="Missing fields or required files" palette={palette} mutedText={mutedText} softPanel={softPanel} />
-            <OverviewCard label="Active" value={activeCount} helper="Marked active" palette={palette} mutedText={mutedText} softPanel={softPanel} />
+            <OverviewCard label="Complete" value={completeCount} helper="Profile + required files" palette={palette} mutedText={mutedText} softPanel={softPanel} />
+            <OverviewCard label="Pending docs" value={pendingDocumentationCount} helper="Missing required uploads" palette={palette} mutedText={mutedText} softPanel={softPanel} />
+            <OverviewCard label="Active" value={activeCount} helper="Ready for assignments" palette={palette} mutedText={mutedText} softPanel={softPanel} />
           </div>
         </header>
 
@@ -171,7 +155,7 @@ export default function AdminInterpreters({ palette }) {
         <div className="mb-6 rounded-[1.5rem] border p-4 shadow-sm" style={cardStyle}>
           <label className="flex items-center gap-3 rounded-2xl px-4 py-3" style={{ backgroundColor: softPanel }}>
             <Search size={18} style={{ color: palette.gold }} />
-            <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search by name, email, location, credentials, modality, or experience" className="w-full bg-transparent text-sm font-semibold outline-none" style={{ color: palette.charcoal }} />
+            <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search by name, email, location, credentials, modality, experience, or status" className="w-full bg-transparent text-sm font-semibold outline-none" style={{ color: palette.charcoal }} />
           </label>
         </div>
 
@@ -186,9 +170,9 @@ export default function AdminInterpreters({ palette }) {
           <div className="grid gap-4 lg:grid-cols-2">
             {filtered.map((interpreter) => {
               const docCount = interpreter.interpreter_documents?.length || 0;
-              const requiredCount = requiredDocumentCount(interpreter);
-              const percent = completionPercent(interpreter);
-              const complete = percent === 100;
+              const docs = getRequiredDocumentCompletion(interpreter.interpreter_documents || []);
+              const completion = getOverallProfileCompletion(interpreter, interpreter.interpreter_documents || []);
+              const status = deriveRosterStatus(interpreter, interpreter.interpreter_documents || []);
               return (
                 <article key={interpreter.id} className="rounded-[2rem] border p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md" style={cardStyle}>
                   <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
@@ -196,7 +180,7 @@ export default function AdminInterpreters({ palette }) {
                       <div className="text-xl font-black" style={{ color: palette.charcoal }}>{interpreter.first_name || "—"} {interpreter.last_name || ""}</div>
                       <div className="mt-1 break-words text-sm" style={{ color: mutedText }}>{interpreter.email || "No email"}</div>
                       <div className="mt-2 text-sm" style={{ color: mutedText }}>{interpreter.city || "—"}{interpreter.state ? `, ${interpreter.state}` : ""}</div>
-                      <span className="mt-3 inline-flex rounded-full px-3 py-1 text-xs font-black uppercase tracking-[0.08em]" style={{ backgroundColor: complete ? "rgba(221,125,0,0.12)" : "rgba(114,17,0,0.08)", color: palette.burgundy }}>{complete ? "Complete" : "Incomplete"}</span>
+                      <span className="mt-3 inline-flex rounded-full px-3 py-1 text-xs font-black uppercase tracking-[0.08em]" style={{ backgroundColor: status === "active" ? "rgba(221,125,0,0.12)" : "rgba(114,17,0,0.08)", color: palette.burgundy }}>{rosterStatusLabel(status)}</span>
                     </div>
                     <div className="flex shrink-0 flex-col gap-2 sm:items-end">
                       <Link to={`/admin/interpreters/${interpreter.id}`} className="inline-flex items-center justify-center gap-2 rounded-full px-4 py-2.5 text-sm font-bold text-white" style={{ backgroundColor: palette.burgundy }}>
@@ -209,9 +193,9 @@ export default function AdminInterpreters({ palette }) {
                   </div>
 
                   <div className="mt-5 grid gap-3 sm:grid-cols-3">
-                    <MiniStat label="Completion" value={`${percent}%`} palette={palette} mutedText={mutedText} softPanel={softPanel} />
-                    <MiniStat label="Required files" value={`${requiredCount}/${requiredDocumentTypes.length}`} palette={palette} mutedText={mutedText} softPanel={softPanel} />
-                    <MiniStat label="Status" value={statusPill(interpreter.roster_status)} palette={palette} mutedText={mutedText} softPanel={softPanel} />
+                    <MiniStat label="Completion" value={`${completion.percent}% (${completion.completed}/${completion.total})`} palette={palette} mutedText={mutedText} softPanel={softPanel} />
+                    <MiniStat label="Required files" value={`${docs.completed}/${docs.total}`} palette={palette} mutedText={mutedText} softPanel={softPanel} />
+                    <MiniStat label="Status" value={rosterStatusLabel(status)} palette={palette} mutedText={mutedText} softPanel={softPanel} />
                   </div>
 
                   <div className="mt-5 space-y-2 text-sm" style={{ color: mutedText }}>
