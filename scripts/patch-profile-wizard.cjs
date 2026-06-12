@@ -64,6 +64,23 @@ source = source.replaceAll(
   '<div className="mb-2 text-sm font-black" style={{ color: palette.charcoal }}>{day}</div>\n                    <div className="grid gap-2 sm:grid-cols-2">'
 );
 
+source = source.replace(
+  '<Save size={17} /> {saving ? "Saving..." : "Save matching profile"}',
+  '<Save size={17} /> {saving ? "Saving..." : "Save Profile"}'
+);
+source = source.replace(
+  'Upload, replace, download, or delete onboarding files. Do not upload assignment-specific, consumer-specific, medical, legal, or educational records.',
+  'Important: Selecting a file does not upload it. Click the Upload button for each document before saving your profile or leaving the page. Do not upload assignment-specific, consumer-specific, medical, legal, or educational records.'
+);
+source = source.replace(
+  'Upload, replace, download, or manage onboarding files. Selected files are submitted when you click Upload or Save profile & selected files. Do not upload assignment-specific, consumer-specific, medical, legal, or educational records.',
+  'Important: Selecting a file does not upload it. Click the Upload button for each document before saving your profile or leaving the page. Do not upload assignment-specific, consumer-specific, medical, legal, or educational records.'
+);
+source = source.replace(
+  'Upload, replace, download, or delete onboarding files.',
+  'Important: Selecting a file does not upload it. Click the Upload button for each document before saving your profile or leaving the page.'
+);
+
 fs.writeFileSync(portalPagePath, source);
 
 const wizardPath = 'src/components/ProfileSetupWizard.jsx';
