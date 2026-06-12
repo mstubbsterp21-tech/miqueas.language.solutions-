@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "prebuild": "node scripts/patch-portal-api.cjs && node scripts/patch-profile-wizard.cjs",
+    "prebuild": "node scripts/patch-portal-api.cjs && node scripts/patch-profile-wizard.cjs && node scripts/patch-admin-profile-edit.cjs",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"
