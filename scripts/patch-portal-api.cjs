@@ -4,12 +4,14 @@ const portalApiPath = 'api/portal.js';
 let source = fs.readFileSync(portalApiPath, 'utf8');
 
 const oldCall = `await clerkClient.sessions.${['verify', 'Session'].join('')}(claims.sid, token);`;
-const newCall = `const clerkSession = await clerkClient.sessions.getSession(claims.sid);\n  if (clerkSession?.userId !== claims.sub) return null;`;
+const newCall = `const clerkSession = await clerkClient.sessions.getSession(claims.sid);
+  if (clerkSession?.userId !== claims.sub) return null;`;
 source = source.replace(oldCall, newCall);
 
 const expandedFields = `const allowedProfileFields = [
   "first_name",
   "last_name",
+  "email",
   "phone",
   "city",
   "state",
@@ -26,6 +28,10 @@ const expandedFields = `const allowedProfileFields = [
   "technical_readiness_confirmed",
   "professional_liability_insurance",
   "travel_radius",
+  "onsite_rate",
+  "vri_rate",
+  "roster_status",
+  "admin_notes",
   "availability_sunday",
   "availability_monday",
   "availability_tuesday",
@@ -39,6 +45,11 @@ const expandedFields = `const allowedProfileFields = [
   "availability_overnight",
 ];`;
 source = source.replace(/const allowedProfileFields = \[[\s\S]*?\];/, expandedFields);
+
+source = source.replaceAll(
+  'interpreter_documents(id, document_type, status)',
+  'interpreter_documents(id, interpreter_id, document_type, file_name, storage_path, status, uploaded_at, uploaded_by)'
+);
 
 if (!source.includes('async function createUploadUrl')) {
   const uploadFns = String.raw`
@@ -182,7 +193,7 @@ async function adminCreateInterpreter(db, user, body) {
   const { data, error } = await db
     .from("interpreters")
     .upsert(payload, { onConflict: "clerk_user_id" })
-    .select("*, interpreter_documents(id, document_type, status)")
+    .select("*, interpreter_documents(id, interpreter_id, document_type, file_name, storage_path, status, uploaded_at, uploaded_by)")
     .single();
 
   if (error) throw error;
