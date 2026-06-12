@@ -19,6 +19,14 @@ page = page.replace(
 
 fs.writeFileSync(pagePath, page);
 
+const portalPath = 'src/pages/InterpreterPortal.jsx';
+if (fs.existsSync(portalPath)) {
+  let portal = fs.readFileSync(portalPath, 'utf8');
+  portal = portal.replaceAll('>Admin roster<', '>Interpreter Roster<');
+  portal = portal.replaceAll('Admin roster', 'Interpreter Roster');
+  fs.writeFileSync(portalPath, portal);
+}
+
 for (const script of ['./patch-ic-agreement.cjs', './patch-admin-documents.cjs', './patch-admin-file-actions.cjs']) {
   try {
     require(script);
