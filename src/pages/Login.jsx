@@ -1,5 +1,5 @@
-import { SignIn } from "@clerk/clerk-react";
-import { Link } from "react-router-dom";
+import { SignIn, SignInButton, SignedIn, SignedOut } from "@clerk/clerk-react";
+import { Link, Navigate } from "react-router-dom";
 import PortalSetupNotice from "../components/PortalSetupNotice";
 import { isClerkConfigured } from "../lib/env";
 
@@ -21,64 +21,88 @@ export default function Login({ palette }) {
   const clerkBorderColor = isDarkMode ? "rgba(221,125,0,0.24)" : "#d1c6bc";
 
   return (
-    <section className="relative overflow-hidden px-5 py-16 md:px-8 md:py-24">
-      <div className="absolute inset-0 -z-10" style={{ background: pageBackground }} />
-      <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(380px,440px)] lg:items-center">
-        <div>
-          <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.gold }}>Interpreter portal</p>
-          <h1 className="mt-4 max-w-3xl text-4xl font-black leading-[1.03] tracking-tight md:text-6xl" style={{ color: palette.charcoal }}>
-            Interpreter Login
-          </h1>
-          <p className="mt-6 max-w-2xl text-lg leading-8" style={{ color: bodyTextColor }}>
-            Sign in to update your MLS profile, upload onboarding documents, review your admin-managed rates, and keep your assignment-matching details current.
-          </p>
-          <div className="mt-7 rounded-[1.5rem] border p-5 text-sm leading-7 shadow-sm backdrop-blur" style={{ borderColor: palette.border, color: bodyTextColor, backgroundColor: noteBackground }}>
-            <strong style={{ color: palette.charcoal }}>Access note:</strong> Portal accounts are for approved MLS interpreters only. New interpreters should apply through Join Our Team first.
-          </div>
-          <div className="mt-6 flex flex-wrap gap-3">
-            <Link to="/join-our-team" className="rounded-full px-5 py-3 text-sm font-bold text-white shadow-sm" style={{ backgroundColor: palette.burgundy }}>
-              Apply to Join MLS
-            </Link>
-            <Link to="/contact" className="rounded-full border px-5 py-3 text-sm font-bold shadow-sm" style={{ borderColor: palette.border, color: palette.charcoal, backgroundColor: palette.white }}>
-              Need Help?
-            </Link>
-          </div>
-        </div>
+    <>
+      <SignedIn>
+        <Navigate to="/portal" replace />
+      </SignedIn>
+      <SignedOut>
+        <section className="relative overflow-hidden px-5 py-16 md:px-8 md:py-24">
+          <div className="absolute inset-0 -z-10" style={{ background: pageBackground }} />
+          <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(380px,440px)] lg:items-center">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.gold }}>Interpreter portal</p>
+              <h1 className="mt-4 max-w-3xl text-4xl font-black leading-[1.03] tracking-tight md:text-6xl" style={{ color: palette.charcoal }}>
+                Interpreter Login
+              </h1>
+              <p className="mt-6 max-w-2xl text-lg leading-8" style={{ color: bodyTextColor }}>
+                Sign in to update your MLS profile, upload onboarding documents, review your admin-managed rates, and keep your assignment-matching details current.
+              </p>
+              <div className="mt-7 rounded-[1.5rem] border p-5 text-sm leading-7 shadow-sm backdrop-blur" style={{ borderColor: palette.border, color: bodyTextColor, backgroundColor: noteBackground }}>
+                <strong style={{ color: palette.charcoal }}>Access note:</strong> Portal accounts are for approved MLS interpreters only. New interpreters should apply through Join Our Team first.
+              </div>
+              <div className="mt-6 flex flex-wrap gap-3">
+                <Link to="/join-our-team" className="rounded-full px-5 py-3 text-sm font-bold text-white shadow-sm" style={{ backgroundColor: palette.burgundy }}>
+                  Apply to Join MLS
+                </Link>
+                <Link to="/contact" className="rounded-full border px-5 py-3 text-sm font-bold shadow-sm" style={{ borderColor: palette.border, color: palette.charcoal, backgroundColor: palette.white }}>
+                  Need Help?
+                </Link>
+              </div>
+            </div>
 
-        <div className="w-full rounded-[2rem] border p-4 shadow-lg md:p-6" style={{ borderColor: palette.border, backgroundColor: loginCardBackground }}>
-          <div className="flex min-h-[420px] w-full justify-center overflow-visible">
-            <SignIn
-              routing="path"
-              path="/login"
-              signUpUrl="/login"
-              fallbackRedirectUrl="/portal"
-              forceRedirectUrl="/portal"
-              signUpFallbackRedirectUrl="/portal"
-              signUpForceRedirectUrl="/portal"
-              appearance={{
-                variables: {
-                  colorPrimary: palette.burgundy,
-                  colorBackground: loginCardBackground,
-                  colorInputBackground: clerkInputBackground,
-                  colorInputText: clerkTextColor,
-                  colorText: clerkTextColor,
-                  colorTextSecondary: clerkSecondaryTextColor,
-                  borderRadius: "1rem",
-                },
-                elements: {
-                  rootBox: "w-full",
-                  cardBox: "w-full shadow-none",
-                  card: "shadow-none",
-                  formFieldInput: "border",
-                },
-                layout: {
-                  logoPlacement: "none",
-                },
-              }}
-            />
+            <div className="w-full rounded-[2rem] border p-4 shadow-lg md:p-6" style={{ borderColor: palette.border, backgroundColor: loginCardBackground }}>
+              <div className="rounded-[1.5rem] border p-4 text-center" style={{ borderColor: clerkBorderColor, backgroundColor: noteBackground }}>
+                <p className="text-sm font-bold" style={{ color: palette.charcoal }}>Having trouble on Safari, iPhone, iPad, or Mac?</p>
+                <p className="mt-2 text-xs leading-5" style={{ color: bodyTextColor }}>
+                  Use the secure redirect login. It works better with Apple browser privacy settings.
+                </p>
+                <SignInButton mode="redirect" forceRedirectUrl="/portal" fallbackRedirectUrl="/portal">
+                  <button type="button" className="mt-4 inline-flex w-full items-center justify-center rounded-full px-5 py-3 text-sm font-black text-white shadow-sm transition hover:-translate-y-0.5" style={{ backgroundColor: palette.burgundy }}>
+                    Continue to Secure Login
+                  </button>
+                </SignInButton>
+              </div>
+
+              <div className="my-5 flex items-center gap-3 text-xs font-bold uppercase tracking-[0.12em]" style={{ color: clerkSecondaryTextColor }}>
+                <span className="h-px flex-1" style={{ backgroundColor: clerkBorderColor }} />
+                Or sign in below
+                <span className="h-px flex-1" style={{ backgroundColor: clerkBorderColor }} />
+              </div>
+
+              <div className="flex min-h-[420px] w-full justify-center overflow-visible">
+                <SignIn
+                  routing="hash"
+                  signUpUrl="/login"
+                  fallbackRedirectUrl="/portal"
+                  forceRedirectUrl="/portal"
+                  signUpFallbackRedirectUrl="/portal"
+                  signUpForceRedirectUrl="/portal"
+                  appearance={{
+                    variables: {
+                      colorPrimary: palette.burgundy,
+                      colorBackground: loginCardBackground,
+                      colorInputBackground: clerkInputBackground,
+                      colorInputText: clerkTextColor,
+                      colorText: clerkTextColor,
+                      colorTextSecondary: clerkSecondaryTextColor,
+                      borderRadius: "1rem",
+                    },
+                    elements: {
+                      rootBox: "w-full",
+                      cardBox: "w-full shadow-none",
+                      card: "shadow-none",
+                      formFieldInput: "border",
+                    },
+                    layout: {
+                      logoPlacement: "none",
+                    },
+                  }}
+                />
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
-    </section>
+        </section>
+      </SignedOut>
+    </>
   );
 }
