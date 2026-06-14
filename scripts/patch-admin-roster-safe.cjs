@@ -27,7 +27,7 @@ if (fs.existsSync(portalPath)) {
   fs.writeFileSync(portalPath, portal);
 }
 
-for (const script of ['./patch-ic-agreement.cjs', './patch-admin-documents.cjs', './patch-admin-file-actions.cjs']) {
+for (const script of ['./patch-vri-blog.cjs', './patch-ic-agreement.cjs', './patch-admin-documents.cjs', './patch-admin-file-actions.cjs']) {
   try {
     require(script);
   } catch (error) {
