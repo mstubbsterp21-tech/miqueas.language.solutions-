@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { ArrowRight, CalendarDays, Clock, FileText } from "lucide-react";
-import { formatBlogDate, getPublishedBlogPosts } from "../content/blogPosts";
+import { formatBlogDate, getPublishedBlogPosts } from "../content/blogPostsLive";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 18 },
@@ -78,7 +78,7 @@ export default function Blog({ palette }) {
                   </div>
                   <Link to={`/blog/${post.slug}`} className="mt-5 inline-flex items-center gap-2 text-sm font-bold transition hover:opacity-75" style={{ color: palette.burgundy }}>
                     Read Article
-                    <ArrowRight size={16} />
+                    <ArrowRight size={15} />
                   </Link>
                 </motion.article>
               ))}
