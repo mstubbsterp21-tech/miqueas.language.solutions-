@@ -1,6 +1,6 @@
 import { Link, Navigate, useParams } from "react-router-dom";
 import { ArrowLeft, CalendarDays, Clock } from "lucide-react";
-import { formatBlogDate, getPublishedBlogPostBySlug } from "../content/blogPosts";
+import { formatBlogDate, getPublishedBlogPostBySlug } from "../content/blogPostsLive";
 
 function renderBlock(block, index, palette) {
   if (block.type === "heading") {
