@@ -4,6 +4,7 @@ import whyVriBestFitPart2Html from "./blog/why-vri-is-not-always-the-best-fit-pa
 import whyVriBestFitPart3Html from "./blog/why-vri-is-not-always-the-best-fit-part3.html?raw";
 import whyVriBestFitPart4Html from "./blog/why-vri-is-not-always-the-best-fit-part4.html?raw";
 import handsUpConferenceHtml from "./blog/asl-healthcare-community-hands-up-conference-2026-orlando.html?raw";
+import juneteenthBlackDeafExcellenceHtml from "./blog/celebrating-black-deaf-excellence-juneteenth-2026-florida.html?raw";
 
 const handsUpConferencePost = {
   slug: "asl-healthcare-community-hands-up-conference-2026-orlando",
@@ -14,6 +15,17 @@ const handsUpConferencePost = {
   readTime: "7 min read",
   featured: true,
   html: handsUpConferenceHtml,
+};
+
+const juneteenthBlackDeafExcellencePost = {
+  slug: "celebrating-black-deaf-excellence-juneteenth-2026-florida",
+  title: "Celebrating Black Deaf Excellence: Reflections on Juneteenth 2026 in Florida",
+  excerpt: "A reflection on Black Deaf Excellence, Juneteenth celebrations in Florida, and why professional ASL communication access matters at cultural events.",
+  publishDate: "2026-06-22",
+  category: "Community Access",
+  readTime: "7 min read",
+  featured: false,
+  html: juneteenthBlackDeafExcellenceHtml,
 };
 
 const updatedVriPost = {
@@ -33,6 +45,7 @@ const removedPostSlugs = new Set(["how-to-prepare-for-an-interpreted-meeting"]);
 
 export const blogPosts = [
   handsUpConferencePost,
+  juneteenthBlackDeafExcellencePost,
   ...baseBlogPosts
     .filter((post) => !removedPostSlugs.has(post.slug))
     .map((post) => ({
