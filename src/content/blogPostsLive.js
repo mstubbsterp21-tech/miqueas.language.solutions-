@@ -5,6 +5,7 @@ import whyVriBestFitPart3Html from "./blog/why-vri-is-not-always-the-best-fit-pa
 import whyVriBestFitPart4Html from "./blog/why-vri-is-not-always-the-best-fit-part4.html?raw";
 import handsUpConferenceHtml from "./blog/asl-healthcare-community-hands-up-conference-2026-orlando.html?raw";
 import juneteenthBlackDeafExcellenceHtml from "./blog/celebrating-black-deaf-excellence-juneteenth-2026-florida.html?raw";
+import summerAccessibilityPlanningHtml from "./blog/summer-school-accessibility-professional-asl-support.html?raw";
 
 const handsUpConferencePost = {
   slug: "asl-healthcare-community-hands-up-conference-2026-orlando",
@@ -28,6 +29,17 @@ const juneteenthBlackDeafExcellencePost = {
   html: juneteenthBlackDeafExcellenceHtml,
 };
 
+const summerAccessibilityPlanningPost = {
+  slug: "summer-school-accessibility-professional-asl-support",
+  title: "Summer School for Accessibility: Why Your Organization Needs Professional ASL Support This Season",
+  excerpt: "Why summer is the right time for organizations to review accessibility plans, ASL support, and professional communication access standards.",
+  publishDate: "2026-06-25",
+  category: "Accessibility Planning",
+  readTime: "8 min read",
+  featured: false,
+  html: summerAccessibilityPlanningHtml,
+};
+
 const updatedVriPost = {
   slug: "why-vri-is-not-always-the-best-fit",
   title: "Why VRI Isn’t Always the Answer: Choosing the Right Access for Every Setting",
@@ -46,6 +58,7 @@ const removedPostSlugs = new Set(["how-to-prepare-for-an-interpreted-meeting"]);
 export const blogPosts = [
   handsUpConferencePost,
   juneteenthBlackDeafExcellencePost,
+  summerAccessibilityPlanningPost,
   ...baseBlogPosts
     .filter((post) => !removedPostSlugs.has(post.slug))
     .map((post) => ({
