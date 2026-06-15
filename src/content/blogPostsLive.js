@@ -3,6 +3,18 @@ import whyVriBestFitHtml from "./blog/why-vri-is-not-always-the-best-fit.html?ra
 import whyVriBestFitPart2Html from "./blog/why-vri-is-not-always-the-best-fit-part2.html?raw";
 import whyVriBestFitPart3Html from "./blog/why-vri-is-not-always-the-best-fit-part3.html?raw";
 import whyVriBestFitPart4Html from "./blog/why-vri-is-not-always-the-best-fit-part4.html?raw";
+import handsUpConferenceHtml from "./blog/asl-healthcare-community-hands-up-conference-2026-orlando.html?raw";
+
+const handsUpConferencePost = {
+  slug: "asl-healthcare-community-hands-up-conference-2026-orlando",
+  title: "ASL, Healthcare, and Community: Navigating the Hands Up Conference 2026 in Orlando",
+  excerpt: "A practical look at communication access, healthcare readiness, and professional ASL interpreting around the Hands Up Conference 2026 in Orlando.",
+  publishDate: "2026-06-15",
+  category: "Healthcare Access",
+  readTime: "7 min read",
+  featured: true,
+  html: handsUpConferenceHtml,
+};
 
 const updatedVriPost = {
   slug: "why-vri-is-not-always-the-best-fit",
@@ -15,9 +27,16 @@ const updatedVriPost = {
   html: [whyVriBestFitHtml, whyVriBestFitPart2Html, whyVriBestFitPart3Html, whyVriBestFitPart4Html].join("\n"),
 };
 
-export const blogPosts = baseBlogPosts.map((post) =>
-  post.slug === updatedVriPost.slug ? updatedVriPost : post
-);
+const postOverrides = new Map([[updatedVriPost.slug, updatedVriPost]]);
+
+export const blogPosts = [
+  handsUpConferencePost,
+  ...baseBlogPosts.map((post) => ({
+    ...post,
+    featured: false,
+    ...(postOverrides.get(post.slug) || {}),
+  })),
+];
 
 const todayInNewYork = () =>
   new Date().toLocaleDateString("en-CA", {
