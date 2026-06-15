@@ -29,13 +29,17 @@ const updatedVriPost = {
 
 const postOverrides = new Map([[updatedVriPost.slug, updatedVriPost]]);
 
+const removedPostSlugs = new Set(["how-to-prepare-for-an-interpreted-meeting"]);
+
 export const blogPosts = [
   handsUpConferencePost,
-  ...baseBlogPosts.map((post) => ({
-    ...post,
-    featured: false,
-    ...(postOverrides.get(post.slug) || {}),
-  })),
+  ...baseBlogPosts
+    .filter((post) => !removedPostSlugs.has(post.slug))
+    .map((post) => ({
+      ...post,
+      featured: false,
+      ...(postOverrides.get(post.slug) || {}),
+    })),
 ];
 
 const todayInNewYork = () =>
