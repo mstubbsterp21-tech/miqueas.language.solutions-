@@ -1,18 +1,52 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSession, useUser } from "@clerk/clerk-react";
 import { Link } from "react-router-dom";
-import { AlertTriangle, BadgeCheck, Eye, LayoutGrid, List, RefreshCcw, Search, Trash2, X } from "lucide-react";
+import { AlertTriangle, BadgeCheck, Eye, LayoutGrid, List, Mail, MessageSquare, Phone, RefreshCcw, Search, Trash2, X } from "lucide-react";
 import { PortalSignOutButton } from "../components/AuthStatus";
 import PortalSetupNotice from "../components/PortalSetupNotice";
 import { adminEmails, isSupabaseConfigured } from "../lib/env";
 import { deriveRosterStatus, getOverallProfileCompletion, getRequiredDocumentCompletion, rosterStatusLabel } from "../lib/profileCompletion";
 
+const JOIN_FORM_CONTACT_OPTIONS = ["Email", "Phone", "Text"];
+const JOIN_FORM_CREDENTIAL_OPTIONS = [
+  "National Interpreter Certification (NIC)",
+  "Certified Deaf Interpreter (CDI)",
+  "Board for Evaluation of Interpreters (BEI)",
+  "Educational Interpreter Performance Assessment (EIPA)",
+  "Uncertified",
+  "Other",
+];
+const JOIN_FORM_MODALITY_OPTIONS = [
+  "ASL (American Sign Language)",
+  "PTASL (Pro-Tactile ASL)",
+  "CASE (Conceptually Accurate Signed English)",
+  "Trilingual (ASL, English, Spanish)",
+  "MCE (Manually Coded English)",
+  "Cued Speech",
+  "Other",
+];
+const JOIN_FORM_EXPERIENCE_OPTIONS = [
+  "Medical",
+  "Legal",
+  "Edu.(K-12)",
+  "Edu.(Post-Secondary)",
+  "Mental Health",
+  "Community / Freelance",
+  "Platform / Conference",
+  "Performance / Arts",
+  "Cruise",
+  "Video Relay Service (VRS)",
+  "Video Remote Interpreting (VRI)",
+  "English > ASL Translation",
+  "ASL > English Translation",
+];
+
 const defaultFilters = {
-  rosterStatus: "all",
-  credential: "all",
-  modality: "all",
-  experience: "all",
-  contactMethod: "all",
+  rosterStatuses: [],
+  credentials: [],
+  modalities: [],
+  experience: [],
+  contactMethods: [],
 };
 
 function safeText(value) {
@@ -34,9 +68,20 @@ function uniqueSorted(values) {
   return Array.from(new Set(values.filter(Boolean))).sort((a, b) => a.localeCompare(b));
 }
 
-function fieldMatchesFilter(fieldValue, selectedValue) {
-  if (selectedValue === "all") return true;
-  return splitOptions(fieldValue).some((item) => item.toLowerCase() === selectedValue.toLowerCase());
+function optionMatchesFieldValue(fieldItem, selectedValue) {
+  const field = safeText(fieldItem).trim().toLowerCase();
+  const selected = safeText(selectedValue).trim().toLowerCase();
+  return field === selected || field.startsWith(`${selected}:`);
+}
+
+function fieldMatchesAnyFilter(fieldValue, selectedValues) {
+  if (!selectedValues.length) return true;
+  const fieldItems = splitOptions(fieldValue);
+  return selectedValues.some((selectedValue) => fieldItems.some((fieldItem) => optionMatchesFieldValue(fieldItem, selectedValue)));
+}
+
+function normalizePhoneNumber(value) {
+  return safeText(value).replace(/[^+\d]/g, "");
 }
 
 function buildExperienceText(interpreter) {
@@ -125,8 +170,14 @@ export default function AdminInterpreters({ palette }) {
     }
   }
 
-  function updateFilter(name, value) {
-    setFilters((current) => ({ ...current, [name]: value }));
+  function toggleFilter(name, value) {
+    setFilters((current) => {
+      const currentValues = current[name] || [];
+      const nextValues = currentValues.includes(value)
+        ? currentValues.filter((item) => item !== value)
+        : [...currentValues, value];
+      return { ...current, [name]: nextValues };
+    });
   }
 
   function clearFilters() {
@@ -144,26 +195,13 @@ export default function AdminInterpreters({ palette }) {
     [interpreters]
   );
 
-  const filterOptions = useMemo(() => {
-    const statusOptions = uniqueSorted(visibleInterpreters.map((interpreter) => rosterStatusLabel(interpreter.derived_roster_status)));
-    const credentialOptions = uniqueSorted(visibleInterpreters.flatMap((interpreter) => splitOptions(interpreter.credentials)));
-    const modalityOptions = uniqueSorted(visibleInterpreters.flatMap((interpreter) => splitOptions(interpreter.modalities)));
-    const experienceOptions = uniqueSorted(
-      visibleInterpreters.flatMap((interpreter) => [
-        ...splitOptions(interpreter.years_experience),
-        ...splitOptions(interpreter.areas_of_experience),
-      ])
-    );
-    const contactMethodOptions = uniqueSorted(visibleInterpreters.map((interpreter) => safeText(interpreter.preferred_contact_method).trim()));
-
-    return {
-      statusOptions,
-      credentialOptions,
-      modalityOptions,
-      experienceOptions,
-      contactMethodOptions,
-    };
-  }, [visibleInterpreters]);
+  const filterOptions = useMemo(() => ({
+    statusOptions: uniqueSorted(visibleInterpreters.map((interpreter) => rosterStatusLabel(interpreter.derived_roster_status))),
+    credentialOptions: JOIN_FORM_CREDENTIAL_OPTIONS,
+    modalityOptions: JOIN_FORM_MODALITY_OPTIONS,
+    experienceOptions: JOIN_FORM_EXPERIENCE_OPTIONS,
+    contactMethodOptions: JOIN_FORM_CONTACT_OPTIONS,
+  }), [visibleInterpreters]);
 
   const filtered = useMemo(() => {
     const search = query.trim().toLowerCase();
@@ -189,16 +227,13 @@ export default function AdminInterpreters({ palette }) {
       ].map(safeText).join(" ").toLowerCase();
 
       const matchesSearch = !search || haystack.includes(search);
-      const matchesStatus = filters.rosterStatus === "all" || statusLabel.toLowerCase() === filters.rosterStatus.toLowerCase();
-      const matchesCredential = fieldMatchesFilter(interpreter.credentials, filters.credential);
-      const matchesModality = fieldMatchesFilter(interpreter.modalities, filters.modality);
-      const matchesExperience =
-        filters.experience === "all" ||
-        fieldMatchesFilter(interpreter.years_experience, filters.experience) ||
-        fieldMatchesFilter(interpreter.areas_of_experience, filters.experience);
-      const matchesContactMethod =
-        filters.contactMethod === "all" ||
-        safeText(interpreter.preferred_contact_method).trim().toLowerCase() === filters.contactMethod.toLowerCase();
+      const matchesStatus =
+        !filters.rosterStatuses.length ||
+        filters.rosterStatuses.some((selectedStatus) => statusLabel.toLowerCase() === selectedStatus.toLowerCase());
+      const matchesCredential = fieldMatchesAnyFilter(interpreter.credentials, filters.credentials);
+      const matchesModality = fieldMatchesAnyFilter(interpreter.modalities, filters.modalities);
+      const matchesExperience = fieldMatchesAnyFilter(interpreter.areas_of_experience, filters.experience);
+      const matchesContactMethod = fieldMatchesAnyFilter(interpreter.preferred_contact_method, filters.contactMethods);
 
       return matchesSearch && matchesStatus && matchesCredential && matchesModality && matchesExperience && matchesContactMethod;
     });
@@ -206,11 +241,11 @@ export default function AdminInterpreters({ palette }) {
 
   const hasActiveFilters =
     query.trim() ||
-    filters.rosterStatus !== "all" ||
-    filters.credential !== "all" ||
-    filters.modality !== "all" ||
-    filters.experience !== "all" ||
-    filters.contactMethod !== "all";
+    filters.rosterStatuses.length ||
+    filters.credentials.length ||
+    filters.modalities.length ||
+    filters.experience.length ||
+    filters.contactMethods.length;
 
   const activeCount = visibleInterpreters.filter((interpreter) => interpreter.derived_roster_status === "active").length;
   const pendingDocumentationCount = visibleInterpreters.filter((interpreter) => interpreter.derived_roster_status === "pending_documentation").length;
@@ -278,12 +313,12 @@ export default function AdminInterpreters({ palette }) {
             </div>
           </div>
 
-          <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-5">
-            <FilterSelect label="Status" value={filters.rosterStatus} onChange={(value) => updateFilter("rosterStatus", value)} options={filterOptions.statusOptions} palette={palette} mutedText={mutedText} softPanel={softPanel} />
-            <FilterSelect label="Credentials" value={filters.credential} onChange={(value) => updateFilter("credential", value)} options={filterOptions.credentialOptions} palette={palette} mutedText={mutedText} softPanel={softPanel} />
-            <FilterSelect label="Modalities" value={filters.modality} onChange={(value) => updateFilter("modality", value)} options={filterOptions.modalityOptions} palette={palette} mutedText={mutedText} softPanel={softPanel} />
-            <FilterSelect label="Experience" value={filters.experience} onChange={(value) => updateFilter("experience", value)} options={filterOptions.experienceOptions} palette={palette} mutedText={mutedText} softPanel={softPanel} />
-            <FilterSelect label="Preferred Contact" value={filters.contactMethod} onChange={(value) => updateFilter("contactMethod", value)} options={filterOptions.contactMethodOptions} palette={palette} mutedText={mutedText} softPanel={softPanel} />
+          <div className="mt-4 grid gap-3 lg:grid-cols-2 xl:grid-cols-5">
+            <FilterCheckboxGroup label="Status" values={filters.rosterStatuses} onToggle={(value) => toggleFilter("rosterStatuses", value)} options={filterOptions.statusOptions} palette={palette} mutedText={mutedText} softPanel={softPanel} />
+            <FilterCheckboxGroup label="Credentials" values={filters.credentials} onToggle={(value) => toggleFilter("credentials", value)} options={filterOptions.credentialOptions} palette={palette} mutedText={mutedText} softPanel={softPanel} />
+            <FilterCheckboxGroup label="Modalities" values={filters.modalities} onToggle={(value) => toggleFilter("modalities", value)} options={filterOptions.modalityOptions} palette={palette} mutedText={mutedText} softPanel={softPanel} />
+            <FilterCheckboxGroup label="Experience" values={filters.experience} onToggle={(value) => toggleFilter("experience", value)} options={filterOptions.experienceOptions} palette={palette} mutedText={mutedText} softPanel={softPanel} />
+            <FilterCheckboxGroup label="Preferred Contact" values={filters.contactMethods} onToggle={(value) => toggleFilter("contactMethods", value)} options={filterOptions.contactMethodOptions} palette={palette} mutedText={mutedText} softPanel={softPanel} />
           </div>
 
           <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -350,7 +385,10 @@ function InterpreterProfileView({ interpreters, palette, mutedText, softPanel, c
 
             <div className="mt-5 space-y-2 text-sm" style={{ color: mutedText }}>
               <div><strong style={{ color: palette.charcoal }}>Phone:</strong> {displayValue(interpreter.phone)}</div>
-              <div><strong style={{ color: palette.charcoal }}>Preferred contact:</strong> {displayValue(interpreter.preferred_contact_method)}</div>
+              <div>
+                <strong style={{ color: palette.charcoal }}>Preferred contact:</strong>
+                <ContactMethodButtons interpreter={interpreter} palette={palette} mutedText={mutedText} />
+              </div>
               <div><strong style={{ color: palette.charcoal }}>Credentials:</strong> {displayValue(interpreter.credentials)}</div>
               <div><strong style={{ color: palette.charcoal }}>Modalities:</strong> {displayValue(interpreter.modalities)}</div>
               <div><strong style={{ color: palette.charcoal }}>Experience:</strong> {buildExperienceText(interpreter)}</div>
@@ -384,7 +422,7 @@ function InterpreterListView({ interpreters, palette, mutedText, cardStyle, tabl
                 <TableCell palette={palette}>{displayValue(interpreter.last_name)}</TableCell>
                 <TableCell palette={palette}><span className="break-words">{displayValue(interpreter.email)}</span></TableCell>
                 <TableCell palette={palette}>{displayValue(interpreter.phone)}</TableCell>
-                <TableCell palette={palette}>{displayValue(interpreter.preferred_contact_method)}</TableCell>
+                <TableCell palette={palette}><ContactMethodButtons interpreter={interpreter} palette={palette} mutedText={mutedText} compact /></TableCell>
                 <TableCell palette={palette}><span className="min-w-44 max-w-72 whitespace-normal">{displayValue(interpreter.credentials)}</span></TableCell>
                 <TableCell palette={palette}><span className="min-w-44 max-w-72 whitespace-normal">{displayValue(interpreter.modalities)}</span></TableCell>
                 <TableCell palette={palette}><span className="min-w-52 max-w-80 whitespace-normal">{buildExperienceText(interpreter)}</span></TableCell>
@@ -403,6 +441,43 @@ function InterpreterListView({ interpreters, palette, mutedText, cardStyle, tabl
           </tbody>
         </table>
       </div>
+    </div>
+  );
+}
+
+function ContactMethodButtons({ interpreter, palette, mutedText, compact = false }) {
+  const methods = splitOptions(interpreter.preferred_contact_method);
+  const email = safeText(interpreter.email).trim();
+  const phone = normalizePhoneNumber(interpreter.phone);
+
+  if (!methods.length) return <span className="ml-2" style={{ color: mutedText }}>—</span>;
+
+  return (
+    <div className={compact ? "flex min-w-36 flex-col gap-2" : "mt-2 flex flex-wrap gap-2"}>
+      {methods.map((method) => {
+        const normalized = method.toLowerCase();
+        const isEmail = normalized.includes("email");
+        const isText = normalized.includes("text");
+        const isPhone = normalized.includes("phone") || normalized.includes("call");
+        const href = isEmail && email ? `mailto:${email}` : isText && phone ? `sms:${phone}` : isPhone && phone ? `tel:${phone}` : "";
+        const Icon = isEmail ? Mail : isText ? MessageSquare : Phone;
+        const label = isEmail ? "Email" : isText ? "Text" : isPhone ? "Call" : method;
+        const disabled = !href;
+
+        if (disabled) {
+          return (
+            <span key={method} className="inline-flex items-center justify-center gap-1.5 rounded-full border px-3 py-2 text-xs font-bold opacity-60" style={{ borderColor: palette.border, color: mutedText, backgroundColor: palette.white }}>
+              <Icon size={13} /> {label}
+            </span>
+          );
+        }
+
+        return (
+          <a key={method} href={href} className="inline-flex items-center justify-center gap-1.5 rounded-full border px-3 py-2 text-xs font-bold transition hover:-translate-y-0.5" style={{ borderColor: palette.border, color: palette.burgundy, backgroundColor: palette.white }}>
+            <Icon size={13} /> {label}
+          </a>
+        );
+      })}
     </div>
   );
 }
@@ -431,17 +506,32 @@ function ViewToggleButton({ active, onClick, Icon, label, palette }) {
   );
 }
 
-function FilterSelect({ label, value, onChange, options, palette, mutedText, softPanel }) {
+function FilterCheckboxGroup({ label, values, onToggle, options, palette, mutedText, softPanel }) {
   return (
-    <label className="block rounded-2xl border px-3 py-2.5" style={{ borderColor: palette.border, backgroundColor: softPanel }}>
-      <span className="block text-[10px] font-black uppercase tracking-[0.12em]" style={{ color: mutedText }}>{label}</span>
-      <select value={value} onChange={(event) => onChange(event.target.value)} className="mt-1 w-full bg-transparent text-sm font-bold outline-none" style={{ color: palette.charcoal }}>
-        <option value="all">All {label}</option>
-        {options.map((option) => (
-          <option key={option} value={option}>{option}</option>
-        ))}
-      </select>
-    </label>
+    <div className="rounded-2xl border p-3" style={{ borderColor: palette.border, backgroundColor: softPanel }}>
+      <div className="flex items-center justify-between gap-3">
+        <span className="text-[10px] font-black uppercase tracking-[0.12em]" style={{ color: mutedText }}>{label}</span>
+        <span className="rounded-full px-2 py-1 text-[10px] font-black" style={{ backgroundColor: values.length ? "rgba(221,125,0,0.14)" : "transparent", color: values.length ? palette.burgundy : mutedText }}>
+          {values.length ? `${values.length} selected` : "Any"}
+        </span>
+      </div>
+      <div className="mt-3 max-h-44 space-y-2 overflow-y-auto pr-1">
+        {options.length ? options.map((option) => (
+          <label key={option} className="flex items-start gap-2 text-xs font-semibold leading-5" style={{ color: palette.charcoal }}>
+            <input
+              type="checkbox"
+              checked={values.includes(option)}
+              onChange={() => onToggle(option)}
+              className="mt-1 h-4 w-4 rounded"
+              style={{ accentColor: palette.burgundy }}
+            />
+            <span>{option}</span>
+          </label>
+        )) : (
+          <p className="text-xs" style={{ color: mutedText }}>No options yet.</p>
+        )}
+      </div>
+    </div>
   );
 }
 
