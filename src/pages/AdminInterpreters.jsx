@@ -68,16 +68,16 @@ function uniqueSorted(values) {
   return Array.from(new Set(values.filter(Boolean))).sort((a, b) => a.localeCompare(b));
 }
 
-function optionMatchesFieldValue(fieldItem, selectedValue) {
-  const field = safeText(fieldItem).trim().toLowerCase();
-  const selected = safeText(selectedValue).trim().toLowerCase();
-  return field === selected || field.startsWith(`${selected}:`);
-}
-
 function fieldMatchesAnyFilter(fieldValue, selectedValues) {
   if (!selectedValues.length) return true;
-  const fieldItems = splitOptions(fieldValue);
-  return selectedValues.some((selectedValue) => fieldItems.some((fieldItem) => optionMatchesFieldValue(fieldItem, selectedValue)));
+  const field = safeText(fieldValue).trim().toLowerCase();
+  if (!field) return false;
+
+  return selectedValues.some((selectedValue) => {
+    const selected = safeText(selectedValue).trim().toLowerCase();
+    if (!selected) return false;
+    return field === selected || field.includes(selected) || field.includes(`${selected}:`);
+  });
 }
 
 function normalizePhoneNumber(value) {
