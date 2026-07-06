@@ -276,6 +276,7 @@ export default function InterpreterRequestForm({ palette = defaultPalette }) {
 
   const handleSubmit = async (e) => {
     if (e) e.preventDefault();
+    if (step !== 7) return;
     if (!validateAllSteps()) return;
 
     setIsSubmitting(true);
@@ -389,7 +390,7 @@ export default function InterpreterRequestForm({ palette = defaultPalette }) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="mx-auto max-w-5xl space-y-6">
+    <div className="mx-auto max-w-5xl space-y-6">
       {step === 1 && (
         <SectionCard step={1} title="Start Your Request" subtitle="Enter your email first so MLS can follow up if more details are needed." palette={p}>
           {renderInput('emailCapture', 'Email Address', 'email', 'name@example.com')}
@@ -514,12 +515,12 @@ export default function InterpreterRequestForm({ palette = defaultPalette }) {
               Continue
             </button>
           ) : (
-            <button type="submit" disabled={isSubmitting} className="rounded-full px-5 py-3 text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-60" style={{ backgroundColor: p.burgundy }}>
+            <button type="button" onClick={handleSubmit} disabled={isSubmitting} className="rounded-full px-5 py-3 text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-60" style={{ backgroundColor: p.burgundy }}>
               {isSubmitting ? 'Submitting...' : 'Submit Request'}
             </button>
           )}
         </div>
       </div>
-    </form>
+    </div>
   );
 }
