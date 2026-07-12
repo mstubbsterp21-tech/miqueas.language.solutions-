@@ -16,6 +16,22 @@ const app = (
   </React.StrictMode>
 );
 
+const hostname = typeof window !== 'undefined' ? window.location.hostname : '';
+const isVercelPreview = hostname.endsWith('.vercel.app') && hostname !== 'miqueas-language-solutions.vercel.app';
+
+const clerkProviderProps = isVercelPreview
+  ? {
+      publishableKey: clerkPublishableKey,
+      isSatellite: true,
+      domain: hostname,
+      signInUrl: 'https://miqueaslanguagesolutions.com/login',
+      signUpUrl: 'https://miqueaslanguagesolutions.com/login',
+      afterSignOutUrl: 'https://miqueaslanguagesolutions.com/login',
+    }
+  : {
+      publishableKey: clerkPublishableKey,
+    };
+
 ReactDOM.createRoot(document.getElementById('root')).render(
-  isClerkConfigured ? <ClerkProvider publishableKey={clerkPublishableKey}>{app}</ClerkProvider> : app,
+  isClerkConfigured ? <ClerkProvider {...clerkProviderProps}>{app}</ClerkProvider> : app,
 );
