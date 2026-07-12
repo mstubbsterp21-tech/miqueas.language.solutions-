@@ -12,5 +12,5 @@ export const createPortalSupabaseClient = (session) => {
 };
 
 export const supabase = createPortalSupabaseClient(null);
-
 export const interpreterDocumentBucket = "interpreter-documents";
+export const clientDocumentBucket = "client-documents";
