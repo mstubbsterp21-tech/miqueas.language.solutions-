@@ -9,7 +9,7 @@ export default function AuthStatus({ palette }) {
         className="rounded-2xl px-4 py-2.5 text-sm font-semibold leading-tight text-white transition hover:-translate-y-0.5"
         style={{ backgroundColor: palette.burgundy }}
       >
-        Interpreter Login
+        Portal Login
       </Link>
 
       <SignedIn>
@@ -18,7 +18,7 @@ export default function AuthStatus({ palette }) {
           className="rounded-2xl px-4 py-2.5 text-sm font-semibold leading-tight text-white transition hover:-translate-y-0.5"
           style={{ backgroundColor: palette.gold }}
         >
-          Portal
+          Open Portal
         </Link>
         <div className="flex h-10 w-10 items-center justify-center rounded-full border border-black/10 bg-white shadow-sm">
           <UserButton
@@ -39,7 +39,7 @@ export default function AuthStatus({ palette }) {
 export function PortalSignOutButton() {
   return (
     <SignOutButton redirectUrl="/login">
-      <button type="button" className="rounded-full border border-black/10 bg-white px-5 py-3 text-sm font-bold text-[#721100] shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+      <button type="button" className="rounded-2xl border border-white/15 bg-white/10 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-white/15">
         Sign out
       </button>
     </SignOutButton>
