@@ -138,7 +138,7 @@ function ViewToggle({ active, onClick, icon: Icon, children, palette }) {
   );
 }
 
-export default function AdminInterpreters({ palette }) {
+export default function AdminInterpreters({ palette, embedded = false }) {
   const { user, isLoaded } = useUser();
   const { session } = useSession();
   const [interpreters, setInterpreters] = useState([]);
@@ -291,8 +291,9 @@ export default function AdminInterpreters({ palette }) {
   }
 
   return (
-    <div className="min-h-screen px-5 py-12 md:px-8" style={{ background }}>
-      <div className="mx-auto max-w-[96rem]">
+    <div className={embedded ? "" : "min-h-screen px-5 py-12 md:px-8"} style={embedded ? undefined : { background }}>
+      <div className={embedded ? "" : "mx-auto max-w-[96rem]"}>
+        {!embedded && (
         <header className="rounded-[2rem] border p-6 shadow-sm md:p-8" style={panel}>
           <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
             <div>
@@ -307,6 +308,7 @@ export default function AdminInterpreters({ palette }) {
             </div>
           </div>
         </header>
+        )}
 
         {message && <div className="mt-5 rounded-2xl border p-4 text-sm font-semibold" style={{ ...panel, color: palette.charcoal }}>{message}</div>}
 
