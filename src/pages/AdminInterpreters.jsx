@@ -2,22 +2,56 @@ import { useEffect, useMemo, useState } from "react";
 import { useSession, useUser } from "@clerk/clerk-react";
 import { Link } from "react-router-dom";
 import {
-  AlertTriangle,
-  ArrowDownAZ,
-  ArrowUpAZ,
-  Eye,
-  LayoutGrid,
-  List,
-  RefreshCcw,
-  Search,
-  SlidersHorizontal,
-  Trash2,
-  X,
+  AlertTriangle, ArrowDownAZ, ArrowUpAZ, Eye, LayoutGrid, List,
+  RefreshCcw, Search, SlidersHorizontal, Trash2, X,
 } from "lucide-react";
 import { PortalSignOutButton } from "../components/AuthStatus";
 import PortalSetupNotice from "../components/PortalSetupNotice";
 import { adminEmails, isSupabaseConfigured } from "../lib/env";
 import { deriveRosterStatus, rosterStatusLabel } from "../lib/profileCompletion";
+
+const FORM_CREDENTIALS = [
+  "National Interpreter Certification (NIC)",
+  "Certified Deaf Interpreter (CDI)",
+  "Board for Evaluation of Interpreters (BEI)",
+  "Educational Interpreter Performance Assessment (EIPA)",
+  "Uncertified",
+  "Other",
+];
+
+const FORM_MODALITIES = [
+  "ASL (American Sign Language)",
+  "PTASL (Pro-Tactile ASL)",
+  "CASE (Conceptually Accurate Signed English)",
+  "Trilingual (ASL, English, Spanish)",
+  "MCE (Manually Coded English)",
+  "Cued Speech",
+  "Other",
+];
+
+const FORM_SETTINGS = [
+  "Medical",
+  "Legal",
+  "Edu.(K-12)",
+  "Edu.(Post-Secondary)",
+  "Mental Health",
+  "Community / Freelance",
+  "Platform / Conference",
+  "Performance / Arts",
+  "Cruise",
+  "Video Relay Service (VRS)",
+  "Video Remote Interpreting (VRI)",
+  "English > ASL Translation",
+  "ASL > English Translation",
+];
+
+const FORM_EXPERIENCE = [
+  "Less than 1 year",
+  "1-3 years",
+  "4-6 years",
+  "7-10 years",
+  "10+ years",
+];
 
 const EMPTY_FILTERS = {
   firstName: "",
@@ -51,17 +85,6 @@ function displayValue(value) {
   return safeText(value) || "—";
 }
 
-function splitValues(value) {
-  return safeText(value)
-    .split(/[,;\n|]+/)
-    .map((item) => item.trim())
-    .filter(Boolean);
-}
-
-function uniqueSorted(values) {
-  return [...new Set(values.flatMap(splitValues).filter(Boolean))].sort((a, b) => a.localeCompare(b));
-}
-
 function parseRate(value) {
   const match = safeText(value).replace(/,/g, "").match(/\d+(?:\.\d+)?/);
   return match ? Number(match[0]) : null;
@@ -87,7 +110,11 @@ function matchesText(value, filter) {
 function matchesSelections(value, selected) {
   if (!selected.length) return true;
   const text = safeText(value).toLowerCase();
-  return selected.every((item) => text.includes(item.toLowerCase()));
+  return selected.every((item) => {
+    const normalized = item.toLowerCase();
+    if (normalized === "other") return text.includes("other:");
+    return text.includes(normalized);
+  });
 }
 
 function getSortValue(interpreter, field, rateType) {
@@ -98,7 +125,7 @@ function getSortValue(interpreter, field, rateType) {
     case "credentials": return safeText(interpreter.credentials).toLowerCase();
     case "modalities": return safeText(interpreter.modalities).toLowerCase();
     case "settings": return safeText(interpreter.areas_of_experience).toLowerCase();
-    case "experience": return parseRate(interpreter.years_experience) ?? safeText(interpreter.years_experience).toLowerCase();
+    case "experience": return FORM_EXPERIENCE.indexOf(safeText(interpreter.years_experience));
     case "rate": return getRate(interpreter, rateType) ?? Number.POSITIVE_INFINITY;
     default: return safeText(interpreter.last_name).toLowerCase();
   }
@@ -108,18 +135,19 @@ function OptionGroup({ label, options, values, onToggle, palette }) {
   return (
     <div className="rounded-2xl border p-4" style={{ borderColor: palette.border, backgroundColor: palette.white }}>
       <div className="text-xs font-black uppercase tracking-[0.12em]" style={{ color: palette.gold }}>{label}</div>
-      <div className="mt-3 max-h-40 space-y-2 overflow-y-auto pr-1">
-        {options.length ? options.map((option) => (
+      <div className="mt-3 max-h-44 space-y-2 overflow-y-auto pr-1">
+        {options.map((option) => (
           <label key={option} className="flex cursor-pointer items-start gap-2 text-sm" style={{ color: palette.charcoal }}>
             <input
               type="checkbox"
               checked={values.includes(option)}
               onChange={() => onToggle(option)}
               className="mt-0.5 h-4 w-4 rounded"
+              style={{ accentColor: palette.burgundy }}
             />
             <span>{option}</span>
           </label>
-        )) : <span className="text-xs opacity-60">No values yet</span>}
+        ))}
       </div>
     </div>
   );
@@ -156,9 +184,7 @@ export default function AdminInterpreters({ palette, embedded = false }) {
   const isDark = palette.white !== "#ffffff";
   const panel = { borderColor: palette.border, backgroundColor: palette.white };
   const muted = isDark ? "#bfaea2" : "#667085";
-  const background = isDark
-    ? "linear-gradient(180deg,#15100e 0%,#211714 100%)"
-    : "linear-gradient(180deg,#fff 0%,#f7f3ef 100%)";
+  const background = isDark ? "linear-gradient(180deg,#15100e 0%,#211714 100%)" : "linear-gradient(180deg,#fff 0%,#f7f3ef 100%)";
 
   async function portalRequest(action, options = {}) {
     const token = await session?.getToken();
@@ -209,13 +235,6 @@ export default function AdminInterpreters({ palette, embedded = false }) {
   useEffect(() => {
     if (isLoaded && user && session && isSupabaseConfigured && isAdmin) loadInterpreters();
   }, [isLoaded, user?.id, session, isAdmin]);
-
-  const options = useMemo(() => ({
-    credentials: uniqueSorted(interpreters.map((item) => item.credentials)),
-    modalities: uniqueSorted(interpreters.map((item) => item.modalities)),
-    settings: uniqueSorted(interpreters.map((item) => item.areas_of_experience)),
-    experience: uniqueSorted(interpreters.map((item) => item.years_experience)),
-  }), [interpreters]);
 
   const filtered = useMemo(() => {
     const min = filters.minRate === "" ? null : Number(filters.minRate);
@@ -294,20 +313,20 @@ export default function AdminInterpreters({ palette, embedded = false }) {
     <div className={embedded ? "" : "min-h-screen px-5 py-12 md:px-8"} style={embedded ? undefined : { background }}>
       <div className={embedded ? "" : "mx-auto max-w-[96rem]"}>
         {!embedded && (
-        <header className="rounded-[2rem] border p-6 shadow-sm md:p-8" style={panel}>
-          <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
-            <div>
-              <p className="text-xs font-black uppercase tracking-[0.18em]" style={{ color: palette.gold }}>MLS admin only</p>
-              <h1 className="mt-2 text-3xl font-black md:text-5xl" style={{ color: palette.charcoal }}>Interpreter Roster</h1>
-              <p className="mt-3 text-sm" style={{ color: muted }}>Filter and sort by name, location, credentials, modalities, settings, experience, and rate.</p>
+          <header className="rounded-[2rem] border p-6 shadow-sm md:p-8" style={panel}>
+            <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+              <div>
+                <p className="text-xs font-black uppercase tracking-[0.18em]" style={{ color: palette.gold }}>MLS admin only</p>
+                <h1 className="mt-2 text-3xl font-black md:text-5xl" style={{ color: palette.charcoal }}>Interpreter Roster</h1>
+                <p className="mt-3 text-sm" style={{ color: muted }}>Filters mirror the Join Our Interpreter Network form.</p>
+              </div>
+              <div className="flex flex-wrap gap-3">
+                <button type="button" onClick={loadInterpreters} className="inline-flex items-center gap-2 rounded-full border px-5 py-3 text-sm font-bold" style={{ borderColor: palette.border, color: palette.charcoal }}><RefreshCcw size={16} /> Refresh</button>
+                <Link to="/portal" className="rounded-full px-5 py-3 text-sm font-bold text-white" style={{ backgroundColor: palette.burgundy }}>My portal</Link>
+                <PortalSignOutButton />
+              </div>
             </div>
-            <div className="flex flex-wrap gap-3">
-              <button type="button" onClick={loadInterpreters} className="inline-flex items-center gap-2 rounded-full border px-5 py-3 text-sm font-bold" style={{ borderColor: palette.border, color: palette.charcoal }}><RefreshCcw size={16} /> Refresh</button>
-              <Link to="/portal" className="rounded-full px-5 py-3 text-sm font-bold text-white" style={{ backgroundColor: palette.burgundy }}>My portal</Link>
-              <PortalSignOutButton />
-            </div>
-          </div>
-        </header>
+          </header>
         )}
 
         {message && <div className="mt-5 rounded-2xl border p-4 text-sm font-semibold" style={{ ...panel, color: palette.charcoal }}>{message}</div>}
@@ -325,7 +344,7 @@ export default function AdminInterpreters({ palette, embedded = false }) {
           </div>
 
           <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-            {[['firstName','First name'],['lastName','Last name'],['location','Location']].map(([key, label]) => (
+            {[["firstName", "First name"], ["lastName", "Last name"], ["location", "Location"]].map(([key, label]) => (
               <label key={key} className="text-xs font-black uppercase tracking-[0.1em]" style={{ color: muted }}>
                 {label}
                 <input value={filters[key]} onChange={(event) => setFilters({ ...filters, [key]: event.target.value })} className="mt-2 w-full rounded-2xl border bg-transparent px-4 py-3 text-sm normal-case tracking-normal outline-none" style={{ borderColor: palette.border, color: palette.charcoal }} />
@@ -345,10 +364,10 @@ export default function AdminInterpreters({ palette, embedded = false }) {
           </div>
 
           <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-            <OptionGroup label="Credentials" options={options.credentials} values={filters.credentials} onToggle={(value) => toggleFilter("credentials", value)} palette={palette} />
-            <OptionGroup label="Modalities" options={options.modalities} values={filters.modalities} onToggle={(value) => toggleFilter("modalities", value)} palette={palette} />
-            <OptionGroup label="Settings" options={options.settings} values={filters.settings} onToggle={(value) => toggleFilter("settings", value)} palette={palette} />
-            <OptionGroup label="Experience" options={options.experience} values={filters.experience} onToggle={(value) => toggleFilter("experience", value)} palette={palette} />
+            <OptionGroup label="Credentials" options={FORM_CREDENTIALS} values={filters.credentials} onToggle={(value) => toggleFilter("credentials", value)} palette={palette} />
+            <OptionGroup label="Modalities" options={FORM_MODALITIES} values={filters.modalities} onToggle={(value) => toggleFilter("modalities", value)} palette={palette} />
+            <OptionGroup label="Settings / Areas of experience" options={FORM_SETTINGS} values={filters.settings} onToggle={(value) => toggleFilter("settings", value)} palette={palette} />
+            <OptionGroup label="Years of experience" options={FORM_EXPERIENCE} values={filters.experience} onToggle={(value) => toggleFilter("experience", value)} palette={palette} />
           </div>
 
           <div className="mt-4 grid gap-4 rounded-2xl border p-4 md:grid-cols-4" style={{ borderColor: palette.border }}>
