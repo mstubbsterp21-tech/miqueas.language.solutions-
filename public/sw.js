@@ -1,5 +1,5 @@
-const CACHE_NAME = "mls-app-v1";
-const APP_SHELL = ["/portal", "/login", "/manifest.webmanifest", "/logo.png"];
+const CACHE_NAME = "mls-app-v2";
+const APP_SHELL = ["/portal", "/login", "/manifest.webmanifest", "/mls-app-icon.svg"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
