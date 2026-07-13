@@ -1,22 +1,24 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { ClerkProvider } from '@clerk/clerk-react';
-import { BrowserRouter } from 'react-router-dom';
+import { BrowserRouter, useLocation } from 'react-router-dom';
 import App from './App';
 import PortalAppRouter from './PortalAppRouter';
 import ScrollToTop from './components/ScrollToTop';
 import { clerkPublishableKey, isClerkConfigured } from './lib/env';
 import './index.css';
 
-const pathname = typeof window !== 'undefined' ? window.location.pathname : '/';
-const isPortalPath = pathname.startsWith('/portal') || pathname.startsWith('/login') || pathname.startsWith('/admin/interpreters');
-const Root = isPortalPath ? PortalAppRouter : App;
+function RootRouter() {
+  const { pathname } = useLocation();
+  const isPortalPath = pathname.startsWith('/portal') || pathname.startsWith('/login') || pathname.startsWith('/admin/interpreters');
+  return isPortalPath ? <PortalAppRouter /> : <App />;
+}
 
 const app = (
   <React.StrictMode>
     <BrowserRouter>
       <ScrollToTop />
-      <Root />
+      <RootRouter />
     </BrowserRouter>
   </React.StrictMode>
 );
