@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">Miqueas Language Solutions app icon</title>
+  <desc id="desc">A burgundy MLS monogram with a gold accent on a warm cream background.</desc>
+  <rect width="512" height="512" rx="112" fill="#f7f3ef"/>
+  <rect x="42" y="42" width="428" height="428" rx="96" fill="#721100"/>
+  <path d="M117 356V156h47l92 112 92-112h47v200h-55V242l-84 101-84-101v114z" fill="#fff"/>
+  <circle cx="391" cy="121" r="35" fill="#dd7d00"/>
+  <path d="M371 121h40M391 101v40" stroke="#fff" stroke-width="12" stroke-linecap="round"/>
+</svg>

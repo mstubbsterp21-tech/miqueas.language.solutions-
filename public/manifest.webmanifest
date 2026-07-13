@@ -1,0 +1,32 @@
+{
+  "name": "Miqueas Language Solutions",
+  "short_name": "MLS",
+  "description": "The operating workspace for Miqueas Language Solutions clients, interpreters, and administrators.",
+  "start_url": "/portal",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f7f3ef",
+  "theme_color": "#721100",
+  "categories": ["business", "productivity"],
+  "icons": [
+    {
+      "src": "/mls-app-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Open MLS Workspace",
+      "short_name": "Workspace",
+      "url": "/portal"
+    },
+    {
+      "name": "Request an Interpreter",
+      "short_name": "Request",
+      "url": "/portal?section=request"
+    }
+  ]
+}

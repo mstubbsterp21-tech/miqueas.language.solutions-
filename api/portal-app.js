@@ -1,0 +1,403 @@
+import { createClerkClient } from "@clerk/backend";
+import { createClient } from "@supabase/supabase-js";
+
+const dbUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
+const dbAdminKey = process.env["SUPABASE_" + "SERVICE_ROLE_KEY"];
+const clerkKey = process.env["CLERK_" + "SECRET_KEY"];
+const adminEmails = (process.env.VITE_ADMIN_EMAILS || "")
+  .split(",")
+  .map((value) => value.trim().toLowerCase())
+  .filter(Boolean);
+
+const assignmentStatuses = new Set(["draft", "pending_confirmation", "confirmed", "completed", "cancelled"]);
+const paymentStatuses = new Set(["not_invoiced", "pending_payment", "paid", "void"]);
+
+function send(res, status, payload) {
+  res.status(status).setHeader("content-type", "application/json");
+  res.end(JSON.stringify(payload));
+}
+
+function readBody(req) {
+  if (!req.body) return {};
+  if (typeof req.body === "string") {
+    try {
+      return JSON.parse(req.body);
+    } catch {
+      return {};
+    }
+  }
+  return req.body;
+}
+
+function bearer(req) {
+  return String(req.headers.authorization || "").match(/^Bearer\s+(.+)$/i)?.[1] || "";
+}
+
+function decode(token) {
+  return JSON.parse(Buffer.from(token.split(".")[1] || "", "base64url").toString("utf8"));
+}
+
+async function signedInUser(req) {
+  const jwt = bearer(req);
+  if (!jwt || !clerkKey) return null;
+  const claims = decode(jwt);
+  if (!claims?.sid || !claims?.sub) return null;
+
+  const clerk = createClerkClient({ secretKey: clerkKey });
+  const session = await clerk.sessions.getSession(claims.sid);
+  if (session?.userId !== claims.sub) return null;
+
+  const record = await clerk.users.getUser(claims.sub);
+  const email = record.primaryEmailAddress?.emailAddress?.toLowerCase() || "";
+  return {
+    id: record.id,
+    email,
+    isAdmin: adminEmails.includes(email),
+    metadataRole: String(record.publicMetadata?.portalRole || "").toLowerCase(),
+  };
+}
+
+function database() {
+  if (!dbUrl || !dbAdminKey) throw new Error("Missing Supabase server settings in Vercel.");
+  return createClient(dbUrl, dbAdminKey, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
+}
+
+async function interpreterFor(db, userId) {
+  const result = await db.from("interpreters").select("*").eq("clerk_user_id", userId).maybeSingle();
+  if (result.error) throw result.error;
+  return result.data;
+}
+
+async function clientFor(db, userId) {
+  const result = await db.from("clients").select("*").eq("clerk_user_id", userId).maybeSingle();
+  if (result.error) throw result.error;
+  return result.data;
+}
+
+async function createNotification(db, recipient, values) {
+  if (!recipient) return null;
+  const result = await db.from("notifications").insert({
+    recipient_clerk_user_id: recipient,
+    category: values.category || "general",
+    title: values.title,
+    body: values.body || null,
+    section: values.section || null,
+    related_type: values.relatedType || null,
+    related_id: values.relatedId || null,
+  }).select().single();
+  if (result.error) throw result.error;
+  return result.data;
+}
+
+async function assignmentAccess(db, user, assignmentId) {
+  const assignmentResult = await db
+    .from("assignments")
+    .select("*, clients(id,clerk_user_id,organization_name,email)")
+    .eq("id", assignmentId)
+    .maybeSingle();
+  if (assignmentResult.error) throw assignmentResult.error;
+  const assignment = assignmentResult.data;
+  if (!assignment) return { allowed: false, assignment: null, role: "" };
+  if (user.isAdmin) return { allowed: true, assignment, role: "admin" };
+
+  const client = await clientFor(db, user.id);
+  if (client?.id === assignment.client_id) return { allowed: true, assignment, role: "client" };
+
+  const interpreter = await interpreterFor(db, user.id);
+  if (interpreter) {
+    const link = await db
+      .from("assignment_interpreters")
+      .select("id")
+      .eq("assignment_id", assignmentId)
+      .eq("interpreter_id", interpreter.id)
+      .maybeSingle();
+    if (link.error) throw link.error;
+    if (link.data) return { allowed: true, assignment, role: "interpreter" };
+  }
+
+  return { allowed: false, assignment, role: "" };
+}
+
+async function loadAssignments(db, user) {
+  const select = "*, clients(id,clerk_user_id,organization_name,primary_contact_name,email), assignment_interpreters(*, interpreters(id,clerk_user_id,first_name,last_name,email,credentials,modalities,current_location,city,state))";
+  if (user.isAdmin) {
+    const result = await db.from("assignments").select(select).order("start_at", { ascending: false });
+    if (result.error) throw result.error;
+    return result.data || [];
+  }
+
+  const client = await clientFor(db, user.id);
+  if (client) {
+    const result = await db.from("assignments").select(select).eq("client_id", client.id).order("start_at", { ascending: false });
+    if (result.error) throw result.error;
+    return result.data || [];
+  }
+
+  const interpreter = await interpreterFor(db, user.id);
+  if (!interpreter) return [];
+  const links = await db
+    .from("assignment_interpreters")
+    .select("*, assignments(*, clients(id,clerk_user_id,organization_name,primary_contact_name,email))")
+    .eq("interpreter_id", interpreter.id)
+    .order("assigned_at", { ascending: false });
+  if (links.error) throw links.error;
+  return (links.data || []).map((link) => ({
+    ...(link.assignments || {}),
+    assignment_interpreters: [{ ...link, interpreters: interpreter }],
+  }));
+}
+
+async function loadApp(db, user) {
+  const assignments = await loadAssignments(db, user);
+  const assignmentIds = assignments.map((item) => item.id).filter(Boolean);
+
+  const [notificationResult, messageResult] = await Promise.all([
+    db.from("notifications").select("*").eq("recipient_clerk_user_id", user.id).order("created_at", { ascending: false }).limit(50),
+    assignmentIds.length
+      ? db.from("assignment_messages").select("*").in("assignment_id", assignmentIds).order("created_at", { ascending: true }).limit(500)
+      : Promise.resolve({ data: [], error: null }),
+  ]);
+  if (notificationResult.error) throw notificationResult.error;
+  if (messageResult.error) throw messageResult.error;
+
+  return {
+    role: user.isAdmin ? "admin" : (await clientFor(db, user.id)) ? "client" : "interpreter",
+    assignments,
+    messages: messageResult.data || [],
+    notifications: notificationResult.data || [],
+    unreadCount: (notificationResult.data || []).filter((item) => !item.is_read).length,
+  };
+}
+
+async function markNotificationRead(db, user, payload) {
+  let query = db.from("notifications")
+    .update({ is_read: true, read_at: new Date().toISOString() })
+    .eq("recipient_clerk_user_id", user.id)
+    .eq("is_read", false);
+  if (payload.notificationId) query = query.eq("id", payload.notificationId);
+  const result = await query.select();
+  if (result.error) throw result.error;
+  return { status: 200, payload: { notifications: result.data || [] } };
+}
+
+async function sendMessage(db, user, payload) {
+  const assignmentId = String(payload.assignmentId || "");
+  const text = String(payload.body || "").trim();
+  if (!assignmentId || !text) return { status: 400, payload: { error: "Choose an assignment and enter a message." } };
+  if (text.length > 4000) return { status: 400, payload: { error: "Messages must be 4,000 characters or fewer." } };
+
+  const access = await assignmentAccess(db, user, assignmentId);
+  if (!access.allowed) return { status: 403, payload: { error: "You do not have access to that assignment conversation." } };
+
+  const insert = await db.from("assignment_messages").insert({
+    assignment_id: assignmentId,
+    sender_clerk_user_id: user.id,
+    sender_role: access.role,
+    body: text,
+  }).select().single();
+  if (insert.error) throw insert.error;
+
+  const links = await db
+    .from("assignment_interpreters")
+    .select("interpreters(clerk_user_id)")
+    .eq("assignment_id", assignmentId);
+  if (links.error) throw links.error;
+
+  const recipients = new Set([
+    access.assignment.clients?.clerk_user_id,
+    ...(links.data || []).map((item) => item.interpreters?.clerk_user_id),
+  ].filter(Boolean));
+  recipients.delete(user.id);
+
+  await Promise.all([...recipients].map((recipient) => createNotification(db, recipient, {
+    category: "message",
+    title: "New assignment message",
+    body: text.slice(0, 180),
+    section: "messages",
+    relatedType: "assignment",
+    relatedId: assignmentId,
+  })));
+
+  return { status: 201, payload: { message: insert.data } };
+}
+
+async function adminAssignInterpreter(db, user, payload) {
+  if (!user.isAdmin) return { status: 403, payload: { error: "Admin access required." } };
+  if (!payload.assignmentId || !payload.interpreterId) return { status: 400, payload: { error: "Assignment and interpreter are required." } };
+
+  const interpreterResult = await db.from("interpreters").select("*").eq("id", payload.interpreterId).maybeSingle();
+  if (interpreterResult.error) throw interpreterResult.error;
+  if (!interpreterResult.data) return { status: 404, payload: { error: "Interpreter not found." } };
+
+  const link = await db.from("assignment_interpreters").upsert({
+    assignment_id: payload.assignmentId,
+    interpreter_id: payload.interpreterId,
+    role: payload.role || "interpreter",
+    status: payload.status || "assigned",
+    agreed_rate: payload.agreedRate || null,
+    notes: payload.notes || null,
+    accepted_at: payload.status === "accepted" ? new Date().toISOString() : null,
+    updated_at: new Date().toISOString(),
+  }, { onConflict: "assignment_id,interpreter_id" }).select().single();
+  if (link.error) throw link.error;
+
+  await createNotification(db, interpreterResult.data.clerk_user_id, {
+    category: "assignment",
+    title: "You were assigned to an MLS assignment",
+    body: "Open your schedule to review the assignment details.",
+    section: "schedule",
+    relatedType: "assignment",
+    relatedId: payload.assignmentId,
+  });
+
+  return { status: 200, payload: { assignmentInterpreter: link.data } };
+}
+
+async function adminRemoveInterpreter(db, user, payload) {
+  if (!user.isAdmin) return { status: 403, payload: { error: "Admin access required." } };
+  const result = await db.from("assignment_interpreters").delete().eq("id", payload.assignmentInterpreterId).select().maybeSingle();
+  if (result.error) throw result.error;
+  return { status: 200, payload: { removed: result.data || null } };
+}
+
+async function adminUpdateAssignment(db, user, payload) {
+  if (!user.isAdmin) return { status: 403, payload: { error: "Admin access required." } };
+  if (!payload.assignmentId) return { status: 400, payload: { error: "Assignment is required." } };
+
+  const updates = { updated_at: new Date().toISOString() };
+  if (payload.status) {
+    if (!assignmentStatuses.has(payload.status)) return { status: 400, payload: { error: "Invalid assignment status." } };
+    updates.status = payload.status;
+    if (payload.status === "confirmed") updates.confirmed_at = new Date().toISOString();
+    if (payload.status === "completed") updates.completed_at = new Date().toISOString();
+  }
+  if (payload.paymentStatus) {
+    if (!paymentStatuses.has(payload.paymentStatus)) return { status: 400, payload: { error: "Invalid payment status." } };
+    updates.payment_status = payload.paymentStatus;
+    if (payload.paymentStatus === "paid") updates.paid_at = new Date().toISOString();
+  }
+  if (Object.prototype.hasOwnProperty.call(payload, "invoiceNumber")) updates.invoice_number = payload.invoiceNumber || null;
+  if (Object.prototype.hasOwnProperty.call(payload, "invoiceAmount")) updates.invoice_amount = payload.invoiceAmount || null;
+  if (Object.prototype.hasOwnProperty.call(payload, "adminNotes")) updates.admin_notes = payload.adminNotes || null;
+
+  const result = await db.from("assignments")
+    .update(updates)
+    .eq("id", payload.assignmentId)
+    .select("*, clients(clerk_user_id,organization_name,email)")
+    .single();
+  if (result.error) throw result.error;
+
+  const changes = [
+    payload.status ? `Status: ${payload.status.replaceAll("_", " ")}` : "",
+    payload.paymentStatus ? `Payment: ${payload.paymentStatus.replaceAll("_", " ")}` : "",
+  ].filter(Boolean).join(" · ");
+  if (changes) {
+    await createNotification(db, result.data.clients?.clerk_user_id, {
+      category: "assignment",
+      title: "Assignment updated",
+      body: changes,
+      section: "assignments",
+      relatedType: "assignment",
+      relatedId: payload.assignmentId,
+    });
+  }
+
+  return { status: 200, payload: { assignment: result.data } };
+}
+
+async function adminAcceptBid(db, user, payload) {
+  if (!user.isAdmin) return { status: 403, payload: { error: "Admin access required." } };
+  const bid = await db.from("assignment_bids")
+    .select("*, interpreters(*), assignment_opportunities(*, assignments(*, clients(clerk_user_id,organization_name,email)))")
+    .eq("id", payload.bidId)
+    .maybeSingle();
+  if (bid.error) throw bid.error;
+  if (!bid.data) return { status: 404, payload: { error: "Bid not found." } };
+
+  const assignmentId = bid.data.assignment_opportunities?.assignment_id;
+  const interpreterId = bid.data.interpreter_id;
+  if (!assignmentId || !interpreterId) return { status: 400, payload: { error: "Bid is missing assignment details." } };
+
+  const [bidUpdate, linkUpdate, assignmentUpdate] = await Promise.all([
+    db.from("assignment_bids").update({ status: "accepted", updated_at: new Date().toISOString() }).eq("id", payload.bidId).select().single(),
+    db.from("assignment_interpreters").upsert({
+      assignment_id: assignmentId,
+      interpreter_id: interpreterId,
+      role: payload.role || "interpreter",
+      status: "accepted",
+      agreed_rate: bid.data.bid_rate || null,
+      accepted_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    }, { onConflict: "assignment_id,interpreter_id" }).select().single(),
+    db.from("assignments").update({ status: "confirmed", confirmed_at: new Date().toISOString(), updated_at: new Date().toISOString() }).eq("id", assignmentId).select().single(),
+  ]);
+  for (const result of [bidUpdate, linkUpdate, assignmentUpdate]) if (result.error) throw result.error;
+
+  await Promise.all([
+    createNotification(db, bid.data.interpreters?.clerk_user_id, {
+      category: "assignment",
+      title: "Your MLS bid was accepted",
+      body: "The assignment is now in your schedule.",
+      section: "schedule",
+      relatedType: "assignment",
+      relatedId: assignmentId,
+    }),
+    createNotification(db, bid.data.assignment_opportunities?.assignments?.clients?.clerk_user_id, {
+      category: "assignment",
+      title: "Interpreter confirmed",
+      body: "MLS has confirmed staffing for your assignment.",
+      section: "assignments",
+      relatedType: "assignment",
+      relatedId: assignmentId,
+    }),
+  ]);
+
+  return { status: 200, payload: { bid: bidUpdate.data, assignmentInterpreter: linkUpdate.data, assignment: assignmentUpdate.data } };
+}
+
+async function notifyDocumentRequest(db, user, payload) {
+  if (!user.isAdmin) return { status: 403, payload: { error: "Admin access required." } };
+  const table = payload.audienceType === "client" ? "clients" : "interpreters";
+  const record = await db.from(table).select("clerk_user_id").eq("id", payload.ownerId).maybeSingle();
+  if (record.error) throw record.error;
+  if (record.data?.clerk_user_id) {
+    await createNotification(db, record.data.clerk_user_id, {
+      category: "document",
+      title: payload.title || "MLS requested a document",
+      body: payload.instructions || "Open your document center to upload the requested file.",
+      section: "documents",
+      relatedType: "document_request",
+      relatedId: payload.requestId || null,
+    });
+  }
+  return { status: 200, payload: { notified: Boolean(record.data?.clerk_user_id) } };
+}
+
+export default async function handler(req, res) {
+  try {
+    const user = await signedInUser(req);
+    if (!user) return send(res, 401, { error: "Sign in is required." });
+    const db = database();
+    const action = String(req.query?.action || "loadApp");
+    const payload = readBody(req);
+
+    if (action === "loadApp") return send(res, 200, await loadApp(db, user));
+
+    let result;
+    if (action === "markNotificationRead") result = await markNotificationRead(db, user, payload);
+    else if (action === "sendMessage") result = await sendMessage(db, user, payload);
+    else if (action === "adminAssignInterpreter") result = await adminAssignInterpreter(db, user, payload);
+    else if (action === "adminRemoveInterpreter") result = await adminRemoveInterpreter(db, user, payload);
+    else if (action === "adminUpdateAssignment") result = await adminUpdateAssignment(db, user, payload);
+    else if (action === "adminAcceptBid") result = await adminAcceptBid(db, user, payload);
+    else if (action === "notifyDocumentRequest") result = await notifyDocumentRequest(db, user, payload);
+    else result = { status: 404, payload: { error: "Unknown app action." } };
+
+    return send(res, result.status, result.payload);
+  } catch (error) {
+    console.error("MLS app API error", error);
+    return send(res, 500, { error: error.message || "MLS app request failed." });
+  }
+}
