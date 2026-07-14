@@ -62,6 +62,10 @@ function present(value) {
   return Boolean(String(value || "").trim());
 }
 
+function validEmail(value) {
+  return /^\S+@\S+\.\S+$/.test(String(value || "").trim());
+}
+
 function splitValues(value) {
   return String(value || "")
     .split(",")
@@ -100,10 +104,16 @@ function interpreterStepErrors(step, draft) {
     const missing = [
       ["first_name", "First name"],
       ["last_name", "Last name"],
+      ["email", "Email"],
       ["phone", "Phone number"],
       ["preferred_contact_method", "Preferred contact method"],
+      ["address_line_1", "Address line 1"],
+      ["city", "City"],
+      ["state", "State"],
+      ["country", "Country"],
+      ["postal_code", "ZIP code"],
     ].filter(([field]) => !present(draft[field])).map(([, label]) => label);
-    if (!present(draft.city) && !present(draft.current_location)) missing.push("Current location");
+    if (present(draft.email) && !validEmail(draft.email)) missing.push("Valid email address");
     return missing;
   }
   if (step === 1) {
@@ -238,12 +248,16 @@ function InterpreterSteps({ step, draft, setDraft }) {
       <div className="grid gap-4 md:grid-cols-2">
         <Field label="First name" required><input className={INPUT} value={draft.first_name || ""} onChange={set("first_name")} /></Field>
         <Field label="Last name" required><input className={INPUT} value={draft.last_name || ""} onChange={set("last_name")} /></Field>
-        <Field label="Email"><input className={INPUT} value={draft.email || ""} disabled /></Field>
+        <Field label="Email" required help="Prefilled from your MLS sign-in. Update it here when MLS should use a different contact email."><input className={INPUT} type="email" required value={draft.email || ""} onChange={set("email")} /></Field>
         <Field label="Phone" required><input className={INPUT} value={draft.phone || ""} onChange={set("phone")} /></Field>
         <Field label="Preferred contact method" required><Select value={draft.preferred_contact_method} onChange={set("preferred_contact_method")} options={["Email", "Phone", "Text"]} /></Field>
-        <Field label="Current location" required help="City and state, metro area, or current country/region."><input className={INPUT} value={draft.current_location || ""} onChange={set("current_location")} placeholder="Example: Orlando, FL" /></Field>
-        <Field label="City"><input className={INPUT} value={draft.city || ""} onChange={set("city")} /></Field>
-        <Field label="State"><input className={INPUT} value={draft.state || ""} onChange={set("state")} /></Field>
+        <div className="hidden md:block" />
+        <Field label="Address line 1" required className="md:col-span-2"><input className={INPUT} value={draft.address_line_1 || ""} onChange={set("address_line_1")} placeholder="Street address" autoComplete="address-line1" /></Field>
+        <Field label="Address line 2" className="md:col-span-2"><input className={INPUT} value={draft.address_line_2 || ""} onChange={set("address_line_2")} placeholder="Apartment, suite, unit, building, floor, etc." autoComplete="address-line2" /></Field>
+        <Field label="City" required><input className={INPUT} value={draft.city || ""} onChange={set("city")} autoComplete="address-level2" /></Field>
+        <Field label="State" required><input className={INPUT} value={draft.state || ""} onChange={set("state")} autoComplete="address-level1" /></Field>
+        <Field label="Country" required><input className={INPUT} value={draft.country || "United States"} onChange={set("country")} autoComplete="country-name" /></Field>
+        <Field label="ZIP" required><input className={INPUT} value={draft.postal_code || ""} onChange={set("postal_code")} autoComplete="postal-code" /></Field>
       </div>
     );
   }
@@ -303,6 +317,7 @@ export default function FirstLoginSetupWizard({ role, profile, user, onComplete 
     ...defaults,
     ...(profile || {}),
     email: profile?.email || user?.email || "",
+    country: profile?.country || defaults.country || "United States",
     first_name: profile?.first_name || user?.firstName || "",
     last_name: profile?.last_name || user?.lastName || "",
     primary_contact_name: profile?.primary_contact_name || [user?.firstName, user?.lastName].filter(Boolean).join(" "),
@@ -357,7 +372,7 @@ export default function FirstLoginSetupWizard({ role, profile, user, onComplete 
         <div className="overflow-hidden rounded-[2rem] border border-white/70 bg-white/92 shadow-2xl backdrop-blur-xl">
           <div className="border-b border-slate-100 bg-[#24130e] px-6 py-8 text-white md:px-10">
             <p className="flex items-center gap-2 text-xs font-black uppercase tracking-[.16em] text-[#f6b34c]"><Sparkles size={15} /> First-time {role} setup</p>
-            <h1 className="mt-3 text-3xl font-black tracking-tight md:text-5xl">Welcome to the MLS app.</h1>
+            <h1 className="mt-3 text-3xl font-black tracking-tight md:text-5xl">Welcome to Miqueas Language Solutions!</h1>
             <p className="mt-3 max-w-3xl text-sm leading-7 text-white/70 md:text-base">Complete your profile before entering the workspace. MLS uses this information to support communication, billing, compliance, and appropriate assignment matching.</p>
             <div className="mt-7"><StepRail steps={steps} step={step} setStep={setStep} /></div>
           </div>
