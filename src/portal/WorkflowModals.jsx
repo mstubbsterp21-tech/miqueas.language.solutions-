@@ -1,8 +1,9 @@
 import {
   AssignmentRequestForm, CourseForm, FeedbackForm,
-  InviteUserForm, OpportunityForm,
+  InviteUserForm,
 } from "./forms";
 import DocumentRequestEmailForm from "./DocumentRequestEmailForm";
+import OpportunityEmailForm from "./OpportunityEmailForm";
 import { Modal } from "./ui";
 
 export default function WorkflowModals({ controller }) {
@@ -10,9 +11,9 @@ export default function WorkflowModals({ controller }) {
     modal, setModal, assignmentDraft, setAssignmentDraft,
     feedbackDraft, setFeedbackDraft, inviteDraft, setInviteDraft,
     courseDraft, setCourseDraft,
-    opportunityDraft, setOpportunityDraft, app, saving,
+    app, saving,
     submitAssignment, submitFeedback, inviteUser,
-    saveCourse, publishOpportunity,
+    saveCourse,
   } = controller;
 
   return (
@@ -37,8 +38,8 @@ export default function WorkflowModals({ controller }) {
         <CourseForm draft={courseDraft} setDraft={setCourseDraft} submit={saveCourse} saving={saving} />
       </Modal>
 
-      <Modal open={modal === "opportunity"} close={() => setModal("")} title="Publish assignment opportunity">
-        <OpportunityForm draft={opportunityDraft} setDraft={setOpportunityDraft} assignments={app?.assignments || []} submit={publishOpportunity} saving={saving} />
+      <Modal open={modal === "opportunity"} close={() => setModal("")} title="Publish assignment opportunity" subtitle="Email only interpreters whose saved availability matches the assignment.">
+        <OpportunityEmailForm controller={controller} />
       </Modal>
     </>
   );
