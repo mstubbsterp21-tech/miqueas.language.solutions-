@@ -111,6 +111,7 @@ export default function useOperationsV2({ enabled = true } = {}) {
     submitExpense: (payload) => run("interpreterSubmitExpense", payload, "Expense submitted."),
     reviewExpense: (expenseId, status, notes = "") => run("adminReviewExpense", { expenseId, status, notes }, `Expense ${status}.`),
     saveAvailability: (payload) => run("interpreterSaveAvailability", payload, "Availability saved."),
+    saveWeeklyAvailability: (payload) => run("interpreterSaveWeeklyAvailability", payload, "Weekly availability saved."),
     deleteAvailability: (availabilityId) => run("interpreterDeleteAvailability", { availabilityId }, "Availability removed."),
     saveCredential: (payload) => run("adminSaveCredential", payload, "Credential record saved."),
     updateOnboarding: (payload) => run("adminUpdateOnboarding", payload, "Onboarding stage updated."),

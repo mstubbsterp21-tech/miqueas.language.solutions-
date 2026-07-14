@@ -5,7 +5,7 @@ import { adminLinkFoundInvoice } from "./_shared/ops-v2-found-invoices.js";
 import { adminLinkFoundContractorPayment } from "./_shared/ops-v2-found-contractors.js";
 import { interpreterSubmitTime, adminReviewTime } from "./_shared/ops-v2-time.js";
 import { interpreterSubmitExpense, adminReviewExpense } from "./_shared/ops-v2-expenses.js";
-import { interpreterSaveAvailability, interpreterDeleteAvailability } from "./_shared/ops-v2-availability.js";
+import { interpreterSaveAvailability, interpreterSaveWeeklyAvailability, interpreterDeleteAvailability } from "./_shared/ops-v2-availability.js";
 import { adminSaveCredential, adminUpdateOnboarding } from "./_shared/ops-v2-compliance.js";
 import { adminLinkBoldSignAgreement } from "./_shared/ops-v2-boldsign.js";
 
@@ -20,6 +20,7 @@ const actions = {
   interpreterSubmitExpense,
   adminReviewExpense,
   interpreterSaveAvailability,
+  interpreterSaveWeeklyAvailability,
   interpreterDeleteAvailability,
   adminSaveCredential,
   adminUpdateOnboarding,
