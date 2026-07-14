@@ -51,6 +51,23 @@ export default function useOperationsV2({ enabled = true } = {}) {
     }
   }, [api, load]);
 
+  const cancelDocumentRequest = useCallback(async (requestId) => {
+    setSaving(true);
+    setError("");
+    try {
+      const result = await api.documentRequestCancel("cancel", "POST", { requestId });
+      setMessage("Document request cancelled.");
+      window.setTimeout(() => setMessage(""), 4500);
+      return result;
+    } catch (actionError) {
+      const text = actionError instanceof Error ? actionError.message : String(actionError);
+      setError(text);
+      throw actionError;
+    } finally {
+      setSaving(false);
+    }
+  }, [api]);
+
   const uploadAgreementFile = useCallback(async ({ assignmentId, clientId, kind, file }) => {
     if (!assignmentId || !clientId || !file) throw new Error("Choose an assignment and file first.");
     setSaving(true);
@@ -116,9 +133,10 @@ export default function useOperationsV2({ enabled = true } = {}) {
     saveCredential: (payload) => run("adminSaveCredential", payload, "Credential record saved."),
     updateOnboarding: (payload) => run("adminUpdateOnboarding", payload, "Onboarding stage updated."),
     linkBoldSignAgreement: (payload) => run("adminLinkBoldSignAgreement", payload, "Manual BoldSign record updated."),
+    cancelDocumentRequest,
     uploadAgreementFile,
     openAgreementDocument,
-  }), [openAgreementDocument, run, uploadAgreementFile]);
+  }), [cancelDocumentRequest, openAgreementDocument, run, uploadAgreementFile]);
 
   return {
     data,
