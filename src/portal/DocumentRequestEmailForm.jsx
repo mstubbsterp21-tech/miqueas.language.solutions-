@@ -49,9 +49,9 @@ export default function DocumentRequestEmailForm({ controller }) {
       } else if (emailResult?.sent) {
         setMessage(`Document request emailed to ${recipientEmail}.`);
       } else if (emailResult?.configured === false) {
-        setMessage("Document request created. Email delivery still needs to be configured in Vercel.");
+        setMessage("Document request created. Connect Gmail in Admin Settings before resending the email.");
       } else {
-        setMessage("Document request created, but the email could not be delivered. You can resend it after correcting the recipient or email settings.");
+        setMessage("Document request created, but the email could not be delivered. You can resend it after correcting the recipient or Gmail connection.");
       }
       window.setTimeout(() => setMessage(""), 5500);
       await load(true);
