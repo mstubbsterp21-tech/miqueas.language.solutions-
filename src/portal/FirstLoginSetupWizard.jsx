@@ -77,9 +77,38 @@ function joinValues(values) {
   return [...new Set(values.filter(Boolean))].join(", ");
 }
 
+function isOtherCredential(value) {
+  return value === "Other" || value.startsWith("Other:");
+}
+
+function optionSelected(value, option) {
+  const selected = splitValues(value);
+  return option === "Other"
+    ? selected.some(isOtherCredential)
+    : selected.includes(option);
+}
+
+function otherCredentialFrom(value) {
+  const saved = splitValues(value).find((item) => item.startsWith("Other:"));
+  return saved ? saved.slice("Other:".length).trim() : "";
+}
+
+function credentialsForSubmission(value, otherCredential) {
+  const selected = splitValues(value).filter((item) => !isOtherCredential(item));
+  if (optionSelected(value, "Other")) {
+    const custom = String(otherCredential || "").trim().replaceAll(",", ";");
+    selected.push(custom ? `Other: ${custom}` : "Other");
+  }
+  return joinValues(selected);
+}
+
 function toggleValue(value, option) {
   const current = splitValues(value);
   if (option === "Unavailable") return current.includes(option) ? "" : option;
+  if (option === "Other") {
+    const selected = current.some(isOtherCredential);
+    return joinValues(selected ? current.filter((item) => !isOtherCredential(item)) : [...current, "Other"]);
+  }
   const available = current.filter((item) => item !== "Unavailable");
   return available.includes(option)
     ? joinValues(available.filter((item) => item !== option))
@@ -117,10 +146,14 @@ function interpreterStepErrors(step, draft) {
     return missing;
   }
   if (step === 1) {
-    return [
+    const missing = [
       ["credentials", "Credentials"],
       ["years_experience", "Years of experience"],
     ].filter(([field]) => !present(draft[field])).map(([, label]) => label);
+    if (optionSelected(draft.credentials, "Other") && !present(draft.other_credential)) {
+      missing.push("Other credential description");
+    }
+    return missing;
   }
   if (step === 2) {
     return [
@@ -164,11 +197,10 @@ function Select({ value, onChange, options, placeholder = "Choose" }) {
 }
 
 function Pills({ options, value, onToggle }) {
-  const selected = splitValues(value);
   return (
     <div className="flex flex-wrap gap-2">
       {options.map((option) => {
-        const active = selected.includes(option);
+        const active = optionSelected(value, option);
         return (
           <button key={option} type="button" onClick={() => onToggle(option)} className={cx("rounded-full border px-3 py-2 text-xs font-black transition", active ? "border-[#dd7d00] bg-[#fff4df] text-[#721100] shadow-sm" : "border-slate-200 bg-white text-slate-600 hover:border-[#dd7d00]/50 hover:text-[#721100]")}>
             {active && <Check size={13} className="mr-1 inline" />}{option}
@@ -242,7 +274,14 @@ function ClientSteps({ step, draft, setDraft }) {
 
 function InterpreterSteps({ step, draft, setDraft }) {
   const set = (field) => (event) => setDraft((current) => ({ ...current, [field]: event.target.value }));
-  const toggle = (field, option) => setDraft((current) => ({ ...current, [field]: toggleValue(current[field], option) }));
+  const toggle = (field, option) => setDraft((current) => {
+    const nextValue = toggleValue(current[field], option);
+    const next = { ...current, [field]: nextValue };
+    if (field === "credentials" && option === "Other" && !optionSelected(nextValue, "Other")) {
+      next.other_credential = "";
+    }
+    return next;
+  });
   if (step === 0) {
     return (
       <div className="grid gap-4 md:grid-cols-2">
@@ -262,9 +301,15 @@ function InterpreterSteps({ step, draft, setDraft }) {
     );
   }
   if (step === 1) {
+    const otherSelected = optionSelected(draft.credentials, "Other");
     return (
       <div className="space-y-7">
         <Field label="Credentials" required help="Select everything that currently applies."><Pills options={CREDENTIAL_OPTIONS} value={draft.credentials} onToggle={(option) => toggle("credentials", option)} /></Field>
+        {otherSelected && (
+          <Field label="Other credential" required help="Enter the credential, certification, qualification, or relevant status not listed above.">
+            <input className={INPUT} value={draft.other_credential || ""} onChange={set("other_credential")} placeholder="Enter other credential" autoFocus />
+          </Field>
+        )}
         <div className="grid gap-4 md:grid-cols-2">
           <Field label="Years of experience" required><Select value={draft.years_experience} onChange={set("years_experience")} options={EXPERIENCE_OPTIONS} /></Field>
           <Field label="State license status"><Select value={draft.state_license} onChange={set("state_license")} options={["Yes", "No", "In progress", "Not applicable"]} /></Field>
@@ -320,6 +365,7 @@ export default function FirstLoginSetupWizard({ role, profile, user, onComplete 
     country: profile?.country || defaults.country || "United States",
     first_name: profile?.first_name || user?.firstName || "",
     last_name: profile?.last_name || user?.lastName || "",
+    other_credential: profile?.other_credential || otherCredentialFrom(profile?.credentials),
     primary_contact_name: profile?.primary_contact_name || [user?.firstName, user?.lastName].filter(Boolean).join(" "),
     billing_email: profile?.billing_email || user?.email || "",
   });
@@ -338,13 +384,20 @@ export default function FirstLoginSetupWizard({ role, profile, user, onComplete 
     setSaving(true);
     setError("");
     try {
+      const profileForSave = role === "interpreter"
+        ? { ...draft, credentials: credentialsForSubmission(draft.credentials, draft.other_credential) }
+        : draft;
       const result = await api.setup("save", "POST", {
         role,
         step: nextStep,
         complete,
-        profile: draft,
+        profile: profileForSave,
       });
-      setDraft((current) => ({ ...current, ...(result.profile || {}) }));
+      setDraft((current) => ({
+        ...current,
+        ...(result.profile || {}),
+        other_credential: current.other_credential || otherCredentialFrom(result.profile?.credentials),
+      }));
       if (complete) onComplete(result.profile);
       else setStep(nextStep);
     } catch (saveError) {
