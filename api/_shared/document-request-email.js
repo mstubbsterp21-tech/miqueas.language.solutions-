@@ -59,14 +59,15 @@ function emailCopy(request, owner, eventType) {
       ? `Reminder: ${request.title} is due soon | MLS`
       : `Document requested: ${request.title} | MLS`;
   const lead = overdue
-    ? `The requested document is now overdue. Please upload it through your secure MLS portal as soon as possible.`
+    ? "The requested document is now overdue. Please upload it through your secure MLS portal as soon as possible."
     : isReminder
-      ? `This is a reminder that MLS is still waiting for the document below.`
-      : `MLS has requested a document from you.`;
+      ? "This is a reminder that MLS is still waiting for the document below."
+      : "MLS has requested a document from you.";
   const instructions = request.instructions || "No additional instructions were provided.";
   const safeTitle = escapeHtml(request.title);
   const safeInstructions = escapeHtml(instructions).replaceAll("\n", "<br>");
   const safeName = escapeHtml(name);
+  const safeHeading = escapeHtml(subject.replace(" | MLS", ""));
 
   const text = [
     `Hello ${name},`,
@@ -90,7 +91,7 @@ function emailCopy(request, owner, eventType) {
   <div style="max-width:640px;margin:0 auto;padding:28px 16px">
     <div style="background:#24130e;color:#fff;border-radius:24px 24px 0 0;padding:28px">
       <div style="font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#f6b34c">Miqueas Language Solutions</div>
-      <h1 style="margin:10px 0 0;font-size:28px;line-height:1.2">${encodeHeader(subject.replace(" | MLS", ""))}</h1>
+      <h1 style="margin:10px 0 0;font-size:28px;line-height:1.2">${safeHeading}</h1>
     </div>
     <div style="background:#fff;border-radius:0 0 24px 24px;padding:28px;box-shadow:0 12px 40px rgba(36,19,14,.10)">
       <p style="font-size:16px;line-height:1.6;margin-top:0">Hello ${safeName},</p>
@@ -111,35 +112,72 @@ function emailCopy(request, owner, eventType) {
   return { subject, text, html };
 }
 
-function readResponse(socket, expectedCodes) {
-  return new Promise((resolve, reject) => {
-    let buffer = "";
-    const timeout = setTimeout(() => cleanup(new Error("SMTP response timed out.")), 12000);
-    function cleanup(error, value) {
-      clearTimeout(timeout);
-      socket.off("data", onData);
-      socket.off("error", onError);
-      if (error) reject(error);
-      else resolve(value);
+function createResponseReader(socket) {
+  let buffer = "";
+  let current = [];
+  const queued = [];
+  const waiters = [];
+  let terminalError = null;
+
+  function flush(response) {
+    const waiter = waiters.shift();
+    if (waiter) waiter.resolve(response);
+    else queued.push(response);
+  }
+
+  function fail(error) {
+    terminalError = error;
+    while (waiters.length) waiters.shift().reject(error);
+  }
+
+  socket.on("data", (chunk) => {
+    buffer += chunk.toString("utf8");
+    const lines = buffer.split(/\r?\n/);
+    buffer = lines.pop() || "";
+    for (const line of lines) {
+      if (!line) continue;
+      current.push(line);
+      if (/^\d{3} /.test(line)) {
+        const code = Number(line.slice(0, 3));
+        flush({ code, text: current.join("\n") });
+        current = [];
+      }
     }
-    function onError(error) { cleanup(error); }
-    function onData(chunk) {
-      buffer += chunk.toString("utf8");
-      const lines = buffer.split(/\r?\n/).filter(Boolean);
-      const final = [...lines].reverse().find((line) => /^\d{3} /.test(line));
-      if (!final) return;
-      const code = Number(final.slice(0, 3));
-      if (!expectedCodes.includes(code)) return cleanup(new Error(`SMTP ${code}: ${final.slice(4)}`));
-      cleanup(null, final);
-    }
-    socket.on("data", onData);
-    socket.once("error", onError);
   });
+  socket.on("error", fail);
+  socket.on("close", () => {
+    if (waiters.length && !terminalError) fail(new Error("SMTP connection closed unexpectedly."));
+  });
+
+  return {
+    next(expectedCodes, timeoutMs = 12000) {
+      const response = queued.shift();
+      if (response) {
+        if (!expectedCodes.includes(response.code)) throw new Error(`SMTP ${response.code}: ${response.text}`);
+        return Promise.resolve(response);
+      }
+      if (terminalError) return Promise.reject(terminalError);
+      return new Promise((resolve, reject) => {
+        const timer = setTimeout(() => reject(new Error("SMTP response timed out.")), timeoutMs);
+        waiters.push({
+          resolve: (value) => {
+            clearTimeout(timer);
+            if (!expectedCodes.includes(value.code)) reject(new Error(`SMTP ${value.code}: ${value.text}`));
+            else resolve(value);
+          },
+          reject: (error) => {
+            clearTimeout(timer);
+            reject(error);
+          },
+        });
+      });
+    },
+  };
 }
 
-async function command(socket, value, expectedCodes) {
+async function command(socket, reader, value, expectedCodes) {
   socket.write(`${value}\r\n`);
-  return readResponse(socket, expectedCodes);
+  return reader.next(expectedCodes);
 }
 
 export async function sendSmtpEmail({ to, subject, text, html }) {
@@ -176,24 +214,26 @@ export async function sendSmtpEmail({ to, subject, text, html }) {
   ].join("\r\n").replace(/\r\n\./g, "\r\n..");
 
   const socket = tls.connect({ host: smtpHost, port: smtpPort, servername: smtpHost, rejectUnauthorized: true });
+  const reader = createResponseReader(socket);
   socket.setTimeout(15000, () => socket.destroy(new Error("SMTP connection timed out.")));
 
   try {
     await new Promise((resolve, reject) => {
+      if (socket.authorized) return resolve();
       socket.once("secureConnect", resolve);
       socket.once("error", reject);
     });
-    await readResponse(socket, [220]);
-    await command(socket, "EHLO miqueaslanguagesolutions.com", [250]);
-    await command(socket, "AUTH LOGIN", [334]);
-    await command(socket, Buffer.from(smtpUser).toString("base64"), [334]);
-    await command(socket, Buffer.from(smtpPass).toString("base64"), [235]);
-    await command(socket, `MAIL FROM:<${fromEmail}>`, [250]);
-    await command(socket, `RCPT TO:<${to}>`, [250, 251]);
-    await command(socket, "DATA", [354]);
+    await reader.next([220]);
+    await command(socket, reader, "EHLO miqueaslanguagesolutions.com", [250]);
+    await command(socket, reader, "AUTH LOGIN", [334]);
+    await command(socket, reader, Buffer.from(smtpUser).toString("base64"), [334]);
+    await command(socket, reader, Buffer.from(smtpPass).toString("base64"), [235]);
+    await command(socket, reader, `MAIL FROM:<${fromEmail}>`, [250]);
+    await command(socket, reader, `RCPT TO:<${to}>`, [250, 251]);
+    await command(socket, reader, "DATA", [354]);
     socket.write(`${message}\r\n.\r\n`);
-    await readResponse(socket, [250]);
-    await command(socket, "QUIT", [221]).catch(() => null);
+    await reader.next([250]);
+    await command(socket, reader, "QUIT", [221]).catch(() => null);
     return { sent: true, status: "sent", messageId };
   } catch (error) {
     return { sent: false, status: "failed", error: error.message || "Email delivery failed." };
