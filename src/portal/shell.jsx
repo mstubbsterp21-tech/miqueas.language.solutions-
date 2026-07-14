@@ -58,7 +58,7 @@ function NavButton({ item, active, onClick }) {
 export default function AppShell({ role, section, setSection, user, unread = 0, refreshing, refresh, children }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const navigation = roleNavigation[role] || roleNavigation.interpreter;
-  const active = navigation.find(([value]) => value === section) || navigation[0];
+  const active = navigation.find(([value]) => value === section) || (section === "notifications" ? ["notifications", "Notifications", Bell] : navigation[0]);
   const mobileNavigation = useMemo(() => navigation.slice(0, 5), [navigation]);
 
   useEffect(() => setMobileOpen(false), [section]);
@@ -94,7 +94,7 @@ export default function AppShell({ role, section, setSection, user, unread = 0, 
             <div className="flex items-center gap-3">
               <button type="button" onClick={() => setMobileOpen(true)} className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#24130e] text-white lg:hidden"><Menu size={20} /></button>
               <div className="min-w-0 flex-1"><p className="text-[10px] font-black uppercase tracking-[.15em] text-[#dd7d00]">{pretty(role)} workspace</p><h1 className="truncate text-xl font-black text-slate-950">{active?.[1] || "MLS"}</h1></div>
-              <button type="button" onClick={() => setSection("home")} className="relative flex h-11 w-11 items-center justify-center rounded-2xl border border-black/5 bg-white text-[#721100] shadow-sm" aria-label="View notifications from home"><Bell size={19} />{unread > 0 && <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-[#dd7d00] px-1 text-[9px] font-black text-white">{unread > 99 ? "99+" : unread}</span>}</button>
+              <button type="button" onClick={() => setSection("notifications")} className="relative flex h-11 w-11 items-center justify-center rounded-2xl border border-black/5 bg-white text-[#721100] shadow-sm" aria-label="Open notifications"><Bell size={19} />{unread > 0 && <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-[#dd7d00] px-1 text-[9px] font-black text-white">{unread > 99 ? "99+" : unread}</span>}</button>
             </div>
           </header>
           <main className="relative p-4 md:p-6 lg:p-8">
