@@ -9,6 +9,12 @@ const smtpPass = process.env.SMTP_PASS || "";
 const fromEmail = process.env.EMAIL_FROM || smtpUser;
 const fromName = process.env.EMAIL_FROM_NAME || "Miqueas Language Solutions";
 const replyTo = process.env.EMAIL_REPLY_TO || fromEmail;
+const brandLogoUrl = process.env.EMAIL_LOGO_URL || "https://miqueaslanguagesolutions.com/logo.png";
+const supportEmail = process.env.EMAIL_SUPPORT_ADDRESS || "m.stubbs@miqueaslanguagesolutions.com";
+const supportPhoneDisplay = process.env.EMAIL_SUPPORT_PHONE || "(321) 379-8010";
+const supportPhoneLink = process.env.EMAIL_SUPPORT_PHONE_LINK || "+13213798010";
+const websiteUrl = process.env.EMAIL_WEBSITE_URL || "https://miqueaslanguagesolutions.com";
+const websiteDisplay = process.env.EMAIL_WEBSITE_DISPLAY || "miqueaslanguagesolutions.com";
 
 export function getEmailConfiguration() {
   return {
@@ -68,6 +74,12 @@ function emailCopy(request, owner, eventType) {
   const safeInstructions = escapeHtml(instructions).replaceAll("\n", "<br>");
   const safeName = escapeHtml(name);
   const safeHeading = escapeHtml(subject.replace(" | MLS", ""));
+  const safeLogoUrl = escapeHtml(brandLogoUrl);
+  const safeSupportEmail = escapeHtml(supportEmail);
+  const safeSupportPhoneDisplay = escapeHtml(supportPhoneDisplay);
+  const safeSupportPhoneLink = escapeHtml(supportPhoneLink);
+  const safeWebsiteUrl = escapeHtml(websiteUrl);
+  const safeWebsiteDisplay = escapeHtml(websiteDisplay);
 
   const text = [
     `Hello ${name},`,
@@ -82,18 +94,58 @@ function emailCopy(request, owner, eventType) {
     "",
     "For privacy and security, please upload the document through the MLS portal rather than replying with an attachment.",
     "",
+    "MLS Portal Support",
+    supportEmail,
+    supportPhoneDisplay,
+    websiteDisplay,
+    "",
     "Miqueas Language Solutions",
     "Bridging Perspectives. Delivering Understanding.",
   ].join("\n");
 
   const html = `<!doctype html>
-<html><body style="margin:0;background:#f7f3ef;font-family:Arial,sans-serif;color:#24130e">
-  <div style="max-width:640px;margin:0 auto;padding:28px 16px">
-    <div style="background:#24130e;color:#fff;border-radius:24px 24px 0 0;padding:28px">
-      <div style="font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#f6b34c">Miqueas Language Solutions</div>
-      <h1 style="margin:10px 0 0;font-size:28px;line-height:1.2">${safeHeading}</h1>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>${safeHeading}</title>
+  <style>
+    @media only screen and (max-width: 600px) {
+      .mls-shell { padding: 16px 8px !important; }
+      .mls-masthead-cell { display: block !important; width: 100% !important; text-align: center !important; }
+      .mls-logo-cell { padding: 0 0 16px !important; }
+      .mls-contact-cell { padding: 0 !important; text-align: center !important; }
+      .mls-heading { font-size: 24px !important; }
+      .mls-content { padding: 22px 18px !important; }
+    }
+  </style>
+</head>
+<body style="margin:0;background:#f7f3ef;font-family:Arial,sans-serif;color:#24130e">
+  <div class="mls-shell" style="max-width:640px;margin:0 auto;padding:28px 16px">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="width:100%;background:#ffffff;border-radius:24px 24px 0 0">
+      <tr>
+        <td style="padding:24px 28px">
+          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="width:100%">
+            <tr>
+              <td class="mls-masthead-cell mls-logo-cell" width="55%" valign="middle" style="width:55%;padding:0 20px 0 0">
+                <img src="${safeLogoUrl}" width="210" alt="Miqueas Language Solutions" style="display:block;width:210px;max-width:100%;height:auto;border:0;margin:0">
+              </td>
+              <td class="mls-masthead-cell mls-contact-cell" width="45%" valign="middle" align="right" style="width:45%;text-align:right;font-size:12px;line-height:1.6;color:#51453f">
+                <div style="font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#721100">MLS Portal Support</div>
+                <a href="mailto:${safeSupportEmail}" style="color:#51453f;text-decoration:none">${safeSupportEmail}</a><br>
+                <a href="tel:${safeSupportPhoneLink}" style="color:#51453f;text-decoration:none">${safeSupportPhoneDisplay}</a><br>
+                <a href="${safeWebsiteUrl}" style="color:#51453f;text-decoration:none">${safeWebsiteDisplay}</a>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+    <div style="background:#24130e;color:#fff;padding:24px 28px">
+      <div style="font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#f6b34c">Document request</div>
+      <h1 class="mls-heading" style="margin:10px 0 0;font-size:28px;line-height:1.2">${safeHeading}</h1>
     </div>
-    <div style="background:#fff;border-radius:0 0 24px 24px;padding:28px;box-shadow:0 12px 40px rgba(36,19,14,.10)">
+    <div class="mls-content" style="background:#fff;border-radius:0 0 24px 24px;padding:28px;box-shadow:0 12px 40px rgba(36,19,14,.10)">
       <p style="font-size:16px;line-height:1.6;margin-top:0">Hello ${safeName},</p>
       <p style="font-size:15px;line-height:1.7;color:#51453f">${escapeHtml(lead)}</p>
       <div style="margin:24px 0;padding:20px;border:1px solid #eadfd8;border-radius:18px;background:#fffaf5">
@@ -107,7 +159,8 @@ function emailCopy(request, owner, eventType) {
       <p style="margin:24px 0 0;font-size:14px;line-height:1.6">Miqueas Language Solutions<br><span style="color:#721100;font-weight:700">Bridging Perspectives. Delivering Understanding.</span></p>
     </div>
   </div>
-</body></html>`;
+</body>
+</html>`;
 
   return { subject, text, html };
 }
