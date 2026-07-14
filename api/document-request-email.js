@@ -40,6 +40,9 @@ async function deliver(db, user, requestId, eventType) {
   const loaded = await loadRequest(db, requestId);
   if (!loaded) return { status: 404, payload: { error: "Document request or recipient was not found." } };
   const { request, owner } = loaded;
+  if (request.status === "cancelled") {
+    return { status: 409, payload: { error: "Cancelled document requests cannot send email or reminders.", request } };
+  }
   const recipientEmail = request.recipient_email || owner.email;
   const recipientName = request.recipient_name || owner.name;
 
