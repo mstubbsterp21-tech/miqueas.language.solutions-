@@ -21,7 +21,10 @@ export default function DocumentRequestEmailForm({ controller }) {
   const [saving, setSaving] = useState(false);
   const sendEmail = draft.sendEmail !== false;
   const records = draft.audienceType === "client" ? workspace.admin?.clients || [] : workspace.admin?.interpreters || [];
-  const documentOptions = draft.audienceType === "client" ? CLIENT_DOCUMENTS : INTERPRETER_DOCUMENTS;
+  const baseDocumentOptions = draft.audienceType === "client" ? CLIENT_DOCUMENTS : INTERPRETER_DOCUMENTS;
+  const documentOptions = baseDocumentOptions.some(([value]) => value === "other")
+    ? baseDocumentOptions.map(([value, label]) => [value, value === "other" ? "Other" : label])
+    : [...baseDocumentOptions, ["other", "Other"]];
   const selected = records.find((record) => record.id === draft.ownerId) || null;
   const recipientEmail = selected?.email || "";
   const recipientName = draft.audienceType === "client"
@@ -33,9 +36,14 @@ export default function DocumentRequestEmailForm({ controller }) {
     setSaving(true);
     setError("");
     try {
-      const requestResult = await api.core("adminCreateDocumentRequest", "POST", draft);
+      const selectedDocumentLabel = documentOptions.find(([value]) => value === draft.documentType)?.[1] || "Document";
+      const requestDraft = {
+        ...draft,
+        title: String(draft.title || "").trim() || selectedDocumentLabel,
+      };
+      const requestResult = await api.core("adminCreateDocumentRequest", "POST", requestDraft);
       const requestId = requestResult.request?.id;
-      await api.app("notifyDocumentRequest", "POST", { ...draft, requestId }).catch(() => null);
+      await api.app("notifyDocumentRequest", "POST", { ...requestDraft, requestId }).catch(() => null);
 
       let emailResult = null;
       if (sendEmail && requestId) {
@@ -91,7 +99,7 @@ export default function DocumentRequestEmailForm({ controller }) {
           {documentOptions.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
         </select>
       </Field>
-      <Field name="Title" required><input className={INPUT} required value={draft.title || ""} onChange={(event) => setDraft({ ...draft, title: event.target.value })} /></Field>
+      <Field name="Title"><input className={INPUT} value={draft.title || ""} placeholder="Optional" onChange={(event) => setDraft({ ...draft, title: event.target.value })} /></Field>
       <Field name="Due date"><input className={INPUT} type="date" value={draft.dueDate || ""} onChange={(event) => setDraft({ ...draft, dueDate: event.target.value })} /></Field>
       <Field name="Instructions"><textarea className={cx(INPUT, "min-h-28")} value={draft.instructions || ""} onChange={(event) => setDraft({ ...draft, instructions: event.target.value })} /></Field>
       <label className="flex items-start gap-3 rounded-2xl border border-slate-200 bg-white p-4 text-sm text-slate-700">
