@@ -3,7 +3,7 @@ import PortalSetupNotice from "../components/PortalSetupNotice";
 import { isSupabaseConfigured } from "../lib/env";
 import AppShell from "../portal/shell";
 import BidModal from "../portal/BidModal";
-import FirstLoginSetupWizard, { needsFirstLoginSetup } from "../portal/FirstLoginSetupWizard";
+import FirstLoginSetupWizard, { needsFirstLoginSetup } from "../portal/ClerkFirstLoginSetupWizard";
 import ProfileModals from "../portal/ProfileModals";
 import WorkflowModals from "../portal/WorkflowModals";
 import useMLSController from "../portal/useMLSController";
