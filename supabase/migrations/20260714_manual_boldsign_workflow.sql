@@ -14,6 +14,14 @@ alter table public.assignment_agreements
     status in ('draft','sent','viewed','signed','declined','expired','void','voided')
   );
 
+alter table public.assignments
+  drop constraint if exists assignments_agreement_status_check;
+
+alter table public.assignments
+  add constraint assignments_agreement_status_check check (
+    agreement_status in ('not_started','draft','sent','viewed','signed','declined','expired','void','voided')
+  );
+
 update public.assignment_agreements
 set manual_workflow = true,
     provider = 'boldsign'
