@@ -36,10 +36,17 @@ export default function DocumentRequestEmailForm({ controller }) {
     setSaving(true);
     setError("");
     try {
+      const customDocumentType = String(draft.customDocumentType || "").trim();
+      if (draft.documentType === "other" && !customDocumentType) {
+        throw new Error("Enter the document type before creating the request.");
+      }
+
       const selectedDocumentLabel = documentOptions.find(([value]) => value === draft.documentType)?.[1] || "Document";
+      const resolvedDocumentType = draft.documentType === "other" ? `other:${customDocumentType}` : draft.documentType;
       const requestDraft = {
         ...draft,
-        title: String(draft.title || "").trim() || selectedDocumentLabel,
+        documentType: resolvedDocumentType,
+        title: String(draft.title || "").trim() || (draft.documentType === "other" ? customDocumentType : selectedDocumentLabel),
       };
       const requestResult = await api.core("adminCreateDocumentRequest", "POST", requestDraft);
       const requestId = requestResult.request?.id;
@@ -73,7 +80,7 @@ export default function DocumentRequestEmailForm({ controller }) {
   return (
     <form onSubmit={submit} className="space-y-4">
       <Field name="Audience">
-        <select className={INPUT} value={draft.audienceType} onChange={(event) => setDraft({ ...draft, audienceType: event.target.value, ownerId: "", documentType: event.target.value === "client" ? "service_agreement" : "resume" })}>
+        <select className={INPUT} value={draft.audienceType} onChange={(event) => setDraft({ ...draft, audienceType: event.target.value, ownerId: "", documentType: event.target.value === "client" ? "service_agreement" : "resume", customDocumentType: "" })}>
           <option value="client">Client</option>
           <option value="interpreter">Interpreter</option>
         </select>
@@ -95,11 +102,16 @@ export default function DocumentRequestEmailForm({ controller }) {
         </div>
       )}
       <Field name="Document type">
-        <select className={INPUT} value={draft.documentType} onChange={(event) => setDraft({ ...draft, documentType: event.target.value })}>
+        <select className={INPUT} value={draft.documentType} onChange={(event) => setDraft({ ...draft, documentType: event.target.value, customDocumentType: event.target.value === "other" ? draft.customDocumentType || "" : "" })}>
           {documentOptions.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
         </select>
       </Field>
-      <Field name="Title"><input className={INPUT} value={draft.title || ""} placeholder="Optional" onChange={(event) => setDraft({ ...draft, title: event.target.value })} /></Field>
+      {draft.documentType === "other" && (
+        <Field name="Other document type" required>
+          <input className={INPUT} required value={draft.customDocumentType || ""} onChange={(event) => setDraft({ ...draft, customDocumentType: event.target.value })} placeholder="Enter the document name" />
+        </Field>
+      )}
+      <Field name="Title"><input className={INPUT} value={draft.title || ""} placeholder="Optional — defaults to the document type" onChange={(event) => setDraft({ ...draft, title: event.target.value })} /></Field>
       <Field name="Due date"><input className={INPUT} type="date" value={draft.dueDate || ""} onChange={(event) => setDraft({ ...draft, dueDate: event.target.value })} /></Field>
       <Field name="Instructions"><textarea className={cx(INPUT, "min-h-28")} value={draft.instructions || ""} onChange={(event) => setDraft({ ...draft, instructions: event.target.value })} /></Field>
       <label className="flex items-start gap-3 rounded-2xl border border-slate-200 bg-white p-4 text-sm text-slate-700">
