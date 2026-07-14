@@ -1,5 +1,5 @@
 import { database, send } from "./_shared/ops-v2-core.js";
-import { getEmailConfiguration } from "./_shared/document-request-email.js";
+import { getGmailStatus } from "./_shared/gmail-oauth.js";
 import { deliver } from "./document-request-email.js";
 
 function authorized(req) {
@@ -10,11 +10,18 @@ function authorized(req) {
 export default async function handler(req, res) {
   try {
     if (!authorized(req)) return send(res, 401, { error: "Cron authorization failed." });
-    if (!getEmailConfiguration().configured) {
-      return send(res, 200, { configured: false, processed: 0, message: "SMTP delivery is not configured." });
-    }
 
     const db = database();
+    const gmail = await getGmailStatus(db);
+    if (!gmail.connected) {
+      return send(res, 200, {
+        configured: false,
+        connected: false,
+        processed: 0,
+        message: "Gmail is not connected in MLS Settings.",
+      });
+    }
+
     const now = new Date();
     const today = now.toISOString().slice(0, 10);
     const pending = await db
@@ -41,6 +48,8 @@ export default async function handler(req, res) {
 
     return send(res, 200, {
       configured: true,
+      connected: true,
+      provider: "gmail",
       processed: results.length,
       sent: results.filter((item) => item.status === "sent").length,
       results,
