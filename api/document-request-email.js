@@ -2,9 +2,8 @@ import { audit, database, readBody, send, signedInUser } from "./_shared/ops-v2-
 import {
   calculateNextReminder,
   createDocumentRequestEmail,
-  getEmailConfiguration,
-  sendSmtpEmail,
 } from "./_shared/document-request-email.js";
+import { getGmailStatus, sendGmailEmail } from "./_shared/gmail-oauth.js";
 
 async function loadRequest(db, requestId) {
   const request = await db.from("document_requests").select("*").eq("id", requestId).maybeSingle();
@@ -65,7 +64,7 @@ async function deliver(db, user, requestId, eventType) {
   }
 
   const email = createDocumentRequestEmail({ ...request, recipient_email: recipientEmail, recipient_name: recipientName }, owner, eventType);
-  const delivery = await sendSmtpEmail({ to: recipientEmail, ...email });
+  const delivery = await sendGmailEmail(db, { to: recipientEmail, ...email });
   const now = new Date().toISOString();
   const isReminder = ["due_reminder", "overdue_reminder"].includes(eventType);
   const updates = {
@@ -110,11 +109,13 @@ async function deliver(db, user, requestId, eventType) {
     after: update.data,
   });
 
+  const gmail = await getGmailStatus(db);
   return {
     status: 200,
     payload: {
       sent: delivery.sent,
-      configured: getEmailConfiguration().configured,
+      configured: gmail.connected,
+      provider: "gmail",
       emailStatus: delivery.status,
       error: delivery.error || null,
       request: update.data,
