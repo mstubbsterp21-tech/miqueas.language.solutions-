@@ -6,6 +6,11 @@ import {
   sendGmailTest,
 } from "./_shared/gmail-oauth.js";
 
+const gmailAuditContext = {
+  provider: "gmail",
+  integrationKey: "primary",
+};
+
 export default async function handler(req, res) {
   try {
     const user = await signedInUser(req);
@@ -24,8 +29,8 @@ export default async function handler(req, res) {
       await audit(db, user, {
         action: "gmail.oauth_started",
         entityType: "integration",
-        entityId: "gmail",
         summary: "Gmail authorization started",
+        after: gmailAuditContext,
       });
       return send(res, 200, authorization);
     }
@@ -35,8 +40,8 @@ export default async function handler(req, res) {
       await audit(db, user, {
         action: delivery.sent ? "gmail.test_sent" : "gmail.test_failed",
         entityType: "integration",
-        entityId: "gmail",
         summary: delivery.sent ? `Test email sent to ${delivery.to}` : delivery.error,
+        after: { ...gmailAuditContext, recipient: delivery.to, sent: delivery.sent },
       });
       return send(res, delivery.sent ? 200 : 400, delivery);
     }
@@ -47,8 +52,8 @@ export default async function handler(req, res) {
       await audit(db, user, {
         action: "gmail.disconnected",
         entityType: "integration",
-        entityId: "gmail",
         summary: "Gmail connection removed",
+        after: gmailAuditContext,
       });
       return send(res, 200, result);
     }
