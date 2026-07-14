@@ -1,11 +1,56 @@
 import { useMemo, useState } from "react";
-import { CalendarDays, CircleDollarSign, ClipboardCheck, Clock3, MapPin, Plus, Receipt, ShieldCheck } from "lucide-react";
-import { Badge, Card, EmptyState, Field, Hero, INPUT, Metric, SectionHeader, formatDate, formatMoney } from "../ui";
+import { Ban, CalendarDays, Check, CircleDollarSign, ClipboardCheck, Clock3, MapPin, ShieldCheck } from "lucide-react";
+import { Badge, Card, EmptyState, Field, Hero, INPUT, Metric, SectionHeader, cx, formatDate, formatMoney } from "../ui";
 import { ActionButton, AssignmentRow, LoadingPanel, SelectField } from "./shared";
 
 const emptyTime = { assignmentId: "", actualStartAt: "", actualEndAt: "", breakMinutes: 0, notes: "" };
 const emptyExpense = { assignmentId: "", expenseType: "mileage", amount: "", mileage: "", description: "" };
-const emptyAvailability = { startAt: "", endAt: "", availabilityType: "available", notes: "" };
+const emptyUnavailable = { startAt: "", endAt: "", availabilityType: "unavailable", notes: "" };
+const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+const BY_DAY = ["SU", "MO", "TU", "WE", "TH", "FR", "SA"];
+const BLOCKS = [
+  { key: "overnight", label: "Overnight", helper: "12 AM–6 AM", start: [0, 0], end: [6, 0] },
+  { key: "morning", label: "Morning", helper: "6 AM–12 PM", start: [6, 0], end: [12, 0] },
+  { key: "afternoon", label: "Afternoon", helper: "12 PM–6 PM", start: [12, 0], end: [18, 0] },
+  { key: "evening", label: "Evening", helper: "6 PM–12 AM", start: [18, 0], end: [23, 59] },
+];
+
+function weeklyRule(item) {
+  return String(item?.recurrence_rule || "").includes("X-MLS-BLOCK=");
+}
+
+function parseWeekly(records, profile) {
+  const grid = {};
+  records.filter(weeklyRule).forEach((item) => {
+    const day = BY_DAY.findIndex((value) => String(item.recurrence_rule).includes(`BYDAY=${value}`));
+    const block = BLOCKS.find((value) => String(item.recurrence_rule).includes(`X-MLS-BLOCK=${value.key}`));
+    if (day >= 0 && block) grid[`${day}:${block.key}`] = item.availability_type;
+  });
+  if (Object.keys(grid).length) return grid;
+  DAYS.forEach((day, weekday) => {
+    const value = String(profile?.[`availability_${day.toLowerCase()}`] || "");
+    BLOCKS.forEach((block) => {
+      const blockMentioned = value.toLowerCase().includes(block.label.toLowerCase());
+      if (value.toLowerCase().includes(`unavailable: ${block.label.toLowerCase()}`) || value.trim().toLowerCase() === "unavailable") grid[`${weekday}:${block.key}`] = "unavailable";
+      else if (blockMentioned) grid[`${weekday}:${block.key}`] = "available";
+    });
+  });
+  return grid;
+}
+
+function occurrence(weekday, block) {
+  const start = new Date();
+  const delta = (weekday - start.getDay() + 7) % 7;
+  start.setDate(start.getDate() + delta);
+  start.setHours(block.start[0], block.start[1], 0, 0);
+  const end = new Date(start);
+  end.setHours(block.end[0], block.end[1], 0, 0);
+  if (end.getTime() <= Date.now()) {
+    start.setDate(start.getDate() + 7);
+    end.setDate(end.getDate() + 7);
+  }
+  return { startAt: start.toISOString(), endAt: end.toISOString() };
+}
 
 function Home({ workspace, operations, app, v2, actions }) {
   const profile = workspace.interpreter?.profile || {};
@@ -24,15 +69,13 @@ function Home({ workspace, operations, app, v2, actions }) {
   );
 }
 
-function Work({ workspace, operations, app, v2, actions, saving }) {
+function Work({ operations, app, v2, actions, saving }) {
   const assignments = app?.assignments || [];
   const [time, setTime] = useState(emptyTime);
   const [expense, setExpense] = useState(emptyExpense);
   const assignmentOptions = useMemo(() => assignments.map((item) => ({ value: item.id, label: `${item.service_type} · ${formatDate(item.start_at)}` })), [assignments]);
-
   async function submitTime(event) { event.preventDefault(); await actions.submitTime(time); setTime(emptyTime); }
   async function submitExpense(event) { event.preventDefault(); await actions.submitExpense(expense); setExpense(emptyExpense); }
-
   return (
     <div className="space-y-6">
       <Hero eyebrow="Work center" title="Assigned work, bids, time, expenses, and pay status." text="Complete the operational parts of an assignment here. Found remains the payment system; MLS displays the linked status and record." />
@@ -49,16 +92,53 @@ function Work({ workspace, operations, app, v2, actions, saving }) {
   );
 }
 
-function Schedule({ app, v2, actions, saving }) {
+function Schedule({ workspace, app, v2, actions, saving }) {
   const assignments = app?.assignments || [];
-  const [draft, setDraft] = useState(emptyAvailability);
-  async function save(event) { event.preventDefault(); await actions.saveAvailability(draft); setDraft(emptyAvailability); }
+  const profile = workspace.interpreter?.profile || {};
+  const availability = v2?.availability || [];
+  const [weekly, setWeekly] = useState(() => parseWeekly(availability, profile));
+  const [unavailable, setUnavailable] = useState(emptyUnavailable);
+  const timeZone = profile.availability_timezone || Intl.DateTimeFormat().resolvedOptions().timeZone || "America/New_York";
+  const oneTime = availability.filter((item) => !weeklyRule(item));
+
+  function choose(weekday, block, type) {
+    const key = `${weekday}:${block}`;
+    setWeekly((current) => ({ ...current, [key]: current[key] === type ? "" : type }));
+  }
+
+  async function saveWeekly() {
+    const windows = [];
+    DAYS.forEach((_, weekday) => BLOCKS.forEach((block) => {
+      const availabilityType = weekly[`${weekday}:${block.key}`];
+      if (!availabilityType) return;
+      windows.push({ weekday, byDay: BY_DAY[weekday], block: block.key, availabilityType, ...occurrence(weekday, block) });
+    }));
+    await actions.saveWeeklyAvailability({ timeZone, windows });
+  }
+
+  async function saveUnavailable(event) {
+    event.preventDefault();
+    await actions.saveAvailability(unavailable);
+    setUnavailable(emptyUnavailable);
+  }
+
   return (
     <div className="space-y-6">
-      <Hero eyebrow="Schedule and availability" title="Tell MLS when you can work and see what is booked." text="Availability records support future matching and conflict checks. Assigned work remains visible beside your open windows." />
+      <Hero eyebrow="Schedule and availability" title="Tell MLS when you can work and when you cannot." text="Weekly available windows improve matching. Weekly or one-time unavailable windows prevent opportunity email blasts when the assignment overlaps that time." />
+      <Card>
+        <SectionHeader eyebrow="Weekly schedule" title="Select your regular available and unavailable windows." text={`Times are saved in ${timeZone}. Choose Available, Unavailable, or leave a window blank.`} />
+        <div className="mt-5 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-900"><strong>Unavailable takes priority.</strong> MLS will not email you a new assignment opportunity that overlaps an unavailable window. The opportunity can still remain visible in your Work center.</div>
+        <div className="mt-5 overflow-x-auto">
+          <div className="min-w-[980px] space-y-3">
+            <div className="grid grid-cols-[150px_repeat(4,minmax(180px,1fr))] gap-3"> <div />{BLOCKS.map((block) => <div key={block.key} className="rounded-2xl bg-slate-100 p-3 text-center"><p className="text-sm font-black text-slate-900">{block.label}</p><p className="text-xs text-slate-500">{block.helper}</p></div>)}</div>
+            {DAYS.map((day, weekday) => <div key={day} className="grid grid-cols-[150px_repeat(4,minmax(180px,1fr))] gap-3"><div className="flex items-center rounded-2xl bg-[#721100] px-4 font-black text-white">{day}</div>{BLOCKS.map((block) => { const selected = weekly[`${weekday}:${block.key}`]; return <div key={block.key} className="grid grid-cols-2 gap-2 rounded-2xl border border-slate-200 bg-white p-2"><button type="button" onClick={() => choose(weekday, block.key, "available")} className={cx("rounded-xl px-2 py-2 text-xs font-black transition", selected === "available" ? "bg-emerald-600 text-white" : "bg-emerald-50 text-emerald-800 hover:bg-emerald-100")}><Check size={13} className="mr-1 inline" />Available</button><button type="button" onClick={() => choose(weekday, block.key, "unavailable")} className={cx("rounded-xl px-2 py-2 text-xs font-black transition", selected === "unavailable" ? "bg-rose-600 text-white" : "bg-rose-50 text-rose-800 hover:bg-rose-100")}><Ban size={13} className="mr-1 inline" />Unavailable</button></div>; })}</div>)}
+          </div>
+        </div>
+        <div className="mt-6 flex justify-end"><ActionButton onClick={saveWeekly} disabled={saving}>Save weekly schedule</ActionButton></div>
+      </Card>
       <div className="grid gap-5 xl:grid-cols-[.8fr_1.2fr]">
-        <Card><SectionHeader eyebrow="Availability" title="Add time window" text="Add available, preferred, unavailable, or tentative periods." /><form onSubmit={save} className="mt-6 grid gap-4"><Field name="Start" required><input className={INPUT} type="datetime-local" value={draft.startAt} onChange={(event) => setDraft({ ...draft, startAt: event.target.value })} /></Field><Field name="End" required><input className={INPUT} type="datetime-local" value={draft.endAt} onChange={(event) => setDraft({ ...draft, endAt: event.target.value })} /></Field><Field name="Type"><SelectField value={draft.availabilityType} onChange={(event) => setDraft({ ...draft, availabilityType: event.target.value })} options={["available", "preferred", "unavailable", "tentative"]} /></Field><Field name="Notes"><textarea className={INPUT} rows={3} value={draft.notes} onChange={(event) => setDraft({ ...draft, notes: event.target.value })} /></Field><ActionButton type="submit" disabled={saving || !draft.startAt || !draft.endAt}>Save availability</ActionButton></form></Card>
-        <Card><SectionHeader eyebrow="Calendar" title="Availability and assignments" text="Your upcoming work and declared availability." /><div className="mt-5 space-y-3">{(v2?.availability || []).map((item) => <div key={item.id} className="flex items-start gap-3 rounded-2xl bg-slate-50 p-4"><span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#721100]/10 text-[#721100]"><MapPin size={17} /></span><div className="min-w-0 flex-1"><p className="font-black">{formatDate(item.start_at)} – {formatDate(item.end_at)}</p><p className="mt-1 text-xs text-slate-500">{item.notes || "No notes"}</p></div><div className="flex flex-col items-end gap-2"><Badge value={item.availability_type} /><button type="button" onClick={() => actions.deleteAvailability(item.id)} className="text-xs font-black text-rose-600">Remove</button></div></div>)}{assignments.map((item) => <AssignmentRow key={item.id} assignment={item} onOpen={actions.openAssignment} />)}{!(v2?.availability || []).length && !assignments.length && <EmptyState icon={CalendarDays} title="Schedule is empty" text="Add availability or accept an assignment." />}</div></Card>
+        <Card><SectionHeader eyebrow="Time off / conflicts" title="Add one-time unavailable period" text="Use this for appointments, travel, vacation, or any specific dates when you do not want opportunity emails." /><form onSubmit={saveUnavailable} className="mt-6 grid gap-4"><Field name="Start" required><input className={INPUT} type="datetime-local" value={unavailable.startAt} onChange={(event) => setUnavailable({ ...unavailable, startAt: event.target.value })} /></Field><Field name="End" required><input className={INPUT} type="datetime-local" value={unavailable.endAt} onChange={(event) => setUnavailable({ ...unavailable, endAt: event.target.value })} /></Field><Field name="Notes"><textarea className={INPUT} rows={3} value={unavailable.notes} onChange={(event) => setUnavailable({ ...unavailable, notes: event.target.value })} /></Field><ActionButton type="submit" disabled={saving || !unavailable.startAt || !unavailable.endAt}>Save unavailable period</ActionButton></form></Card>
+        <Card><SectionHeader eyebrow="Calendar" title="Unavailable periods and assignments" text="Remove an unavailable period when it no longer applies." /><div className="mt-5 space-y-3">{oneTime.map((item) => <div key={item.id} className="flex items-start gap-3 rounded-2xl bg-slate-50 p-4"><span className="flex h-10 w-10 items-center justify-center rounded-xl bg-rose-100 text-rose-700"><MapPin size={17} /></span><div className="min-w-0 flex-1"><p className="font-black">{formatDate(item.start_at)} – {formatDate(item.end_at)}</p><p className="mt-1 text-xs text-slate-500">{item.notes || "No notes"}</p></div><div className="flex flex-col items-end gap-2"><Badge value={item.availability_type} /><button type="button" onClick={() => actions.deleteAvailability(item.id)} className="text-xs font-black text-rose-600">Remove</button></div></div>)}{assignments.map((item) => <AssignmentRow key={item.id} assignment={item} onOpen={actions.openAssignment} />)}{!oneTime.length && !assignments.length && <EmptyState icon={CalendarDays} title="Schedule is empty" text="Save weekly availability, add time off, or accept an assignment." />}</div></Card>
       </div>
     </div>
   );
@@ -67,7 +147,7 @@ function Schedule({ app, v2, actions, saving }) {
 export default function InterpreterV2Workspace({ section, workspace, operations, app, v2, loading, saving, actions }) {
   if (loading && !v2) return <LoadingPanel />;
   if (section === "home") return <Home workspace={workspace} operations={operations} app={app} v2={v2} actions={actions} />;
-  if (section === "work") return <Work workspace={workspace} operations={operations} app={app} v2={v2} actions={actions} saving={saving} />;
-  if (section === "schedule") return <Schedule app={app} v2={v2} actions={actions} saving={saving} />;
+  if (section === "work") return <Work operations={operations} app={app} v2={v2} actions={actions} saving={saving} />;
+  if (section === "schedule") return <Schedule workspace={workspace} app={app} v2={v2} actions={actions} saving={saving} />;
   return null;
 }
