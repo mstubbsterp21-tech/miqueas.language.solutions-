@@ -18,5 +18,6 @@ export function createMLSApi(session) {
     core: (action, method = "GET", body) => request("/api/portal", action, method, body),
     operations: (action, method = "GET", body) => request("/api/portal-operations", action, method, body),
     app: (action, method = "GET", body) => request("/api/portal-app", action, method, body),
+    operationsV2: (action, method = "GET", body) => request("/api/operations-v2", action, method, body),
   };
 }

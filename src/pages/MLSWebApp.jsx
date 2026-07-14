@@ -6,13 +6,54 @@ import BidModal from "../portal/BidModal";
 import ProfileModals from "../portal/ProfileModals";
 import WorkflowModals from "../portal/WorkflowModals";
 import useMLSController from "../portal/useMLSController";
+import useOperationsV2 from "../portal/useOperationsV2";
 import { EmptyState, Toast } from "../portal/ui";
-import {
-  AdminWorkspace, ClientWorkspace, InterpreterWorkspace,
-} from "../portal/views";
+import { AdminWorkspace, ClientWorkspace, InterpreterWorkspace } from "../portal/views";
+import AdminV2Workspace from "../portal/v2/admin";
+import ClientV2Workspace from "../portal/v2/client";
+import InterpreterV2Workspace from "../portal/v2/interpreter";
+
+const allowedSections = {
+  admin: new Set(["home", "assignments", "people", "finance", "compliance", "reports", "settings", "notifications"]),
+  client: new Set(["home", "requests", "assignments", "billing", "documents", "profile", "notifications"]),
+  interpreter: new Set(["home", "work", "schedule", "documents", "learning", "profile", "notifications"]),
+};
+
+const legacySectionMap = {
+  admin: {
+    overview: "home",
+    schedule: "assignments",
+    clients: "people",
+    interpreters: "people",
+    documents: "compliance",
+    training: "compliance",
+    bids: "assignments",
+    messages: "assignments",
+    feedback: "reports",
+  },
+  client: {
+    overview: "home",
+    request: "requests",
+    schedule: "assignments",
+    messages: "assignments",
+    feedback: "assignments",
+  },
+  interpreter: {
+    overview: "home",
+    opportunities: "work",
+    training: "learning",
+    messages: "work",
+  },
+};
+
+function normalizeSection(role, section) {
+  const mapped = legacySectionMap[role]?.[section] || section;
+  return allowedSections[role]?.has(mapped) ? mapped : "home";
+}
 
 export default function MLSWebApp() {
   const controller = useMLSController();
+  const v2 = useOperationsV2();
   const {
     isLoaded, workspace, operations, app, role, section, setSection,
     loading, refreshing, busyDoc, message, error, setMessage, setError,
@@ -36,57 +77,80 @@ export default function MLSWebApp() {
   if (!workspace || !app) {
     return (
       <div className="flex min-h-[100dvh] items-center justify-center bg-[#f7f3ef] p-5">
-        <EmptyState
-          icon={AlertCircle}
-          title="Workspace unavailable"
-          text={error || "Refresh the app and try again."}
-        />
+        <EmptyState icon={AlertCircle} title="Workspace unavailable" text={error || "Refresh the app and try again."} />
       </div>
     );
   }
+
+  const activeSection = normalizeSection(role, section);
+  const combinedActions = { ...actions, ...v2.actions };
+  const refreshAll = () => Promise.allSettled([load(true), v2.load(true)]);
+
+  const legacyClientSection = activeSection === "notifications" ? "notifications" : activeSection;
+  const legacyInterpreterSection = activeSection === "learning" ? "training" : activeSection;
 
   return (
     <>
       <AppShell
         role={role}
-        section={section}
+        section={activeSection}
         setSection={setSection}
         user={workspace.user}
         unread={app.unreadCount || 0}
-        refreshing={refreshing}
-        refresh={() => load(true)}
+        refreshing={refreshing || v2.loading}
+        refresh={refreshAll}
       >
         {message && <Toast message={message} dismiss={() => setMessage("")} />}
         {error && <Toast message={error} type="error" dismiss={() => setError("")} />}
+        {v2.message && <Toast message={v2.message} dismiss={() => v2.setMessage("")} />}
+        {v2.error && <Toast message={v2.error} type="error" dismiss={() => v2.setError("")} />}
 
-        {role === "admin" && (
-          <AdminWorkspace
-            section={section}
+        {role === "admin" && activeSection !== "notifications" && (
+          <AdminV2Workspace
+            section={activeSection}
             workspace={workspace}
             operations={operations}
             app={app}
-            actions={actions}
+            v2={v2.data}
+            loading={v2.loading}
+            saving={v2.saving}
+            actions={combinedActions}
           />
         )}
-        {role === "client" && (
-          <ClientWorkspace
-            section={section}
+        {role === "admin" && activeSection === "notifications" && (
+          <AdminWorkspace section="notifications" workspace={workspace} operations={operations} app={app} actions={combinedActions} />
+        )}
+
+        {role === "client" && ["home", "requests", "assignments", "billing"].includes(activeSection) && (
+          <ClientV2Workspace
+            section={activeSection}
             workspace={workspace}
             operations={operations}
             app={app}
-            actions={actions}
-            busyDoc={busyDoc}
+            v2={v2.data}
+            loading={v2.loading}
+            saving={v2.saving}
+            actions={combinedActions}
           />
         )}
-        {role === "interpreter" && (
-          <InterpreterWorkspace
-            section={section}
+        {role === "client" && ["documents", "profile", "notifications"].includes(activeSection) && (
+          <ClientWorkspace section={legacyClientSection} workspace={workspace} operations={operations} app={app} actions={combinedActions} busyDoc={busyDoc} />
+        )}
+
+        {role === "interpreter" && ["home", "work", "schedule"].includes(activeSection) && (
+          <InterpreterV2Workspace
+            section={activeSection}
             workspace={workspace}
             operations={operations}
             app={app}
-            actions={actions}
-            busyDoc={busyDoc}
+            v2={v2.data}
+            loading={v2.loading}
+            saving={v2.saving}
+            actions={combinedActions}
           />
+        )}
+        {role === "interpreter" && ["documents", "learning", "profile", "notifications"].includes(activeSection) && (
+          <InterpreterWorkspace section={legacyInterpreterSection} workspace={workspace} operations={operations} app={app} actions={combinedActions} busyDoc={busyDoc} />
         )}
       </AppShell>
 
