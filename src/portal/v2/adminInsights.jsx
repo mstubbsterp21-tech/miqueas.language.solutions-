@@ -1,4 +1,5 @@
 import { Activity, BarChart3, CircleDollarSign, FileSignature, Landmark, ShieldCheck, Timer, Users } from "lucide-react";
+import GmailIntegrationCard from "../GmailIntegrationCard";
 import { Badge, Card, EmptyState, Hero, Metric, SectionHeader, formatDate, formatMoney, pretty } from "../ui";
 import { LoadingPanel } from "./shared";
 
@@ -69,7 +70,10 @@ export function AdminSettingsV2({ v2, loading }) {
   return (
     <div className="space-y-6">
       <Hero eyebrow="Settings" title="One app, connected to the systems MLS already trusts." text="Integration settings define where each record lives and prevent duplicate sources of truth." />
-      <div className="grid gap-5 xl:grid-cols-3">{cards.map(({ key, icon: Icon, name, description, status, note }) => <Card key={key}><div className="flex items-start justify-between gap-3"><span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#721100]/10 text-[#721100]"><Icon size={21} /></span><Badge value={status} /></div><h2 className="mt-5 text-xl font-black text-slate-950">{name}</h2><p className="mt-2 text-sm leading-6 text-slate-600">{description}</p><p className="mt-4 rounded-2xl bg-slate-50 p-4 text-xs leading-5 text-slate-500">{note}</p></Card>)}</div>
+      <div className="grid gap-5 xl:grid-cols-2">
+        <GmailIntegrationCard />
+        {cards.map(({ key, icon: Icon, name, description, status, note }) => <Card key={key}><div className="flex items-start justify-between gap-3"><span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#721100]/10 text-[#721100]"><Icon size={21} /></span><Badge value={status} /></div><h2 className="mt-5 text-xl font-black text-slate-950">{name}</h2><p className="mt-2 text-sm leading-6 text-slate-600">{description}</p><p className="mt-4 rounded-2xl bg-slate-50 p-4 text-xs leading-5 text-slate-500">{note}</p></Card>)}
+      </div>
       <Card><SectionHeader eyebrow="Security model" title="Server-controlled access" text="Browser users cannot query operational tables directly. Authenticated server endpoints enforce role access, and significant changes create audit events." /><div className="mt-5 grid gap-3 md:grid-cols-3">{["Clerk identity and role checks", "Supabase RLS with browser grants revoked", "Audit history for operational changes"].map((item) => <div key={item} className="rounded-2xl bg-emerald-50 p-4 text-sm font-black text-emerald-800">✓ {item}</div>)}</div></Card>
     </div>
   );
