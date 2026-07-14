@@ -102,19 +102,6 @@ async function deliver(db, user, requestId, eventType) {
     triggered_by: user?.id || "cron",
   });
 
-  if (delivery.sent && owner.clerkUserId) {
-    const notification = await db.from("notifications").insert({
-      recipient_clerk_user_id: owner.clerkUserId,
-      category: "document",
-      title: isReminder ? `Reminder: ${request.title}` : `Document requested: ${request.title}`,
-      body: request.due_date ? `Due ${request.due_date}. Upload it securely in Documents.` : "Upload it securely in Documents.",
-      section: "documents",
-      related_type: "document_request",
-      related_id: request.id,
-    });
-    if (notification.error) throw notification.error;
-  }
-
   await audit(db, user || { id: "cron", metadataRole: "system", isAdmin: true }, {
     action: delivery.sent ? `document_request_email.${eventType}_sent` : `document_request_email.${delivery.status}`,
     entityType: "document_request",
