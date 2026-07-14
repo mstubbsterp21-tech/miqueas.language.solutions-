@@ -1,16 +1,17 @@
 import {
-  AssignmentRequestForm, CourseForm, DocumentRequestForm, FeedbackForm,
+  AssignmentRequestForm, CourseForm, FeedbackForm,
   InviteUserForm, OpportunityForm,
 } from "./forms";
+import DocumentRequestEmailForm from "./DocumentRequestEmailForm";
 import { Modal } from "./ui";
 
 export default function WorkflowModals({ controller }) {
   const {
     modal, setModal, assignmentDraft, setAssignmentDraft,
     feedbackDraft, setFeedbackDraft, inviteDraft, setInviteDraft,
-    documentRequestDraft, setDocumentRequestDraft, courseDraft, setCourseDraft,
-    opportunityDraft, setOpportunityDraft, workspace, app, saving,
-    submitAssignment, submitFeedback, inviteUser, createDocumentRequest,
+    courseDraft, setCourseDraft,
+    opportunityDraft, setOpportunityDraft, app, saving,
+    submitAssignment, submitFeedback, inviteUser,
     saveCourse, publishOpportunity,
   } = controller;
 
@@ -28,8 +29,8 @@ export default function WorkflowModals({ controller }) {
         <InviteUserForm draft={inviteDraft} setDraft={setInviteDraft} submit={inviteUser} saving={saving} />
       </Modal>
 
-      <Modal open={modal === "documentRequest"} close={() => setModal("")} title="Request a document">
-        <DocumentRequestForm draft={documentRequestDraft} setDraft={setDocumentRequestDraft} workspace={workspace} submit={createDocumentRequest} saving={saving} />
+      <Modal open={modal === "documentRequest"} close={() => setModal("")} title="Request a document" subtitle="Create the portal request and email the recipient in one step.">
+        <DocumentRequestEmailForm controller={controller} />
       </Modal>
 
       <Modal open={modal === "course"} close={() => setModal("")} title="Training course">
