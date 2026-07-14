@@ -1,6 +1,6 @@
 import { Activity, BarChart3, CircleDollarSign, FileSignature, Landmark, ShieldCheck, Timer, Users } from "lucide-react";
 import { Badge, Card, EmptyState, Hero, Metric, SectionHeader, formatDate, formatMoney, pretty } from "../ui";
-import { ExternalRecordLink, LoadingPanel } from "./shared";
+import { LoadingPanel } from "./shared";
 
 export function AdminReportsV2({ workspace, app, v2 }) {
   const assignments = app?.assignments || workspace.admin?.assignments || [];
@@ -39,11 +39,31 @@ export function AdminReportsV2({ workspace, app, v2 }) {
 export function AdminSettingsV2({ v2, loading }) {
   if (loading && !v2) return <LoadingPanel />;
   const settings = new Map((v2?.integrations || []).map((item) => [item.integration_key, item]));
-  const boldsign = v2?.integrationCapabilities?.boldsign || {};
   const cards = [
-    { key: "found", icon: Landmark, name: "Found Business Banking", description: "Source of truth for client invoices, contractor payments, income, and expense tracking.", status: "active", note: "Reference-and-reconciliation mode. MLS does not move money or duplicate Found bookkeeping." },
-    { key: "boldsign", icon: FileSignature, name: "BoldSign", description: "Source of truth for service agreements and contractor signatures.", status: boldsign.apiConfigured && boldsign.templateConfigured ? "active" : "setup_required", note: boldsign.apiConfigured ? "API key detected. Add the MLS template ID to enable automated sending." : "Add the BoldSign API key and MLS template ID in Vercel environment settings." },
-    { key: "google_drive", icon: ShieldCheck, name: "Google Drive archive", description: "Long-term archive for executed agreements, final invoices, and agency records.", status: settings.get("google_drive")?.is_enabled ? "active" : "planned", note: "Operational uploads remain in secure Supabase Storage. Drive is used for internal archival, not client navigation." },
+    {
+      key: "found",
+      icon: Landmark,
+      name: "Found Business Banking",
+      description: "Source of truth for client invoices, contractor payments, income, and expense tracking.",
+      status: "active",
+      note: "Reference-and-reconciliation mode. MLS does not move money or duplicate Found bookkeeping.",
+    },
+    {
+      key: "boldsign",
+      icon: FileSignature,
+      name: "BoldSign",
+      description: "Source of truth for electronic signatures and executed service agreements.",
+      status: "active",
+      note: "Manual workflow active. Create and send agreements in BoldSign, then paste the signing link, update the status, and upload the completed PDF and audit trail in MLS. No API plan or API key is required.",
+    },
+    {
+      key: "google_drive",
+      icon: ShieldCheck,
+      name: "Google Drive archive",
+      description: "Long-term archive for executed agreements, final invoices, and agency records.",
+      status: settings.get("google_drive")?.is_enabled ? "active" : "planned",
+      note: "Operational uploads remain in secure Supabase Storage. Drive is used for internal archival, not client navigation.",
+    },
   ];
 
   return (

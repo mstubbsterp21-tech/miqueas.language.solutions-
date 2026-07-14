@@ -1,10 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSession } from "@clerk/clerk-react";
+import { createPortalSupabaseClient } from "../lib/supabaseClient";
 import { createMLSApi } from "./api";
 
 export default function useOperationsV2({ enabled = true } = {}) {
   const { session } = useSession();
   const api = useMemo(() => createMLSApi(session), [session]);
+  const storage = useMemo(() => createPortalSupabaseClient(null), []);
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -49,6 +51,55 @@ export default function useOperationsV2({ enabled = true } = {}) {
     }
   }, [api, load]);
 
+  const uploadAgreementFile = useCallback(async ({ assignmentId, clientId, kind, file }) => {
+    if (!assignmentId || !clientId || !file) throw new Error("Choose an assignment and file first.");
+    setSaving(true);
+    setError("");
+    try {
+      const documentType = `${kind}_${assignmentId}`;
+      const signed = await api.core("createUploadUrl", "POST", {
+        audienceType: "client",
+        ownerId: clientId,
+        documentType,
+        fileName: file.name,
+        fileSize: file.size,
+      });
+      const upload = await storage.storage.from(signed.bucket).uploadToSignedUrl(signed.path, signed.token, file);
+      if (upload.error) throw upload.error;
+      const recorded = await api.core("recordUpload", "POST", {
+        audienceType: "client",
+        ownerId: clientId,
+        documentType,
+        fileName: file.name,
+        storagePath: signed.path,
+      });
+      return recorded.document;
+    } catch (uploadError) {
+      const text = uploadError instanceof Error ? uploadError.message : String(uploadError);
+      setError(text);
+      throw uploadError;
+    } finally {
+      setSaving(false);
+    }
+  }, [api, storage]);
+
+  const openAgreementDocument = useCallback(async ({ clientId, documentId }) => {
+    if (!clientId || !documentId) return;
+    setError("");
+    try {
+      const result = await api.core("createDocumentOpenLink", "POST", {
+        audienceType: "client",
+        ownerId: clientId,
+        documentId,
+      });
+      window.open(result.url, "_blank", "noopener,noreferrer");
+    } catch (openError) {
+      const text = openError instanceof Error ? openError.message : String(openError);
+      setError(text);
+      throw openError;
+    }
+  }, [api]);
+
   const actions = useMemo(() => ({
     createQuote: (payload) => run("adminCreateQuote", payload, "Quote saved."),
     sendQuote: (quoteId) => run("adminSendQuote", { quoteId }, "Quote sent to the client."),
@@ -63,8 +114,10 @@ export default function useOperationsV2({ enabled = true } = {}) {
     deleteAvailability: (availabilityId) => run("interpreterDeleteAvailability", { availabilityId }, "Availability removed."),
     saveCredential: (payload) => run("adminSaveCredential", payload, "Credential record saved."),
     updateOnboarding: (payload) => run("adminUpdateOnboarding", payload, "Onboarding stage updated."),
-    linkBoldSignAgreement: (payload) => run("adminLinkBoldSignAgreement", payload, "BoldSign agreement linked."),
-  }), [run]);
+    linkBoldSignAgreement: (payload) => run("adminLinkBoldSignAgreement", payload, "Manual BoldSign record updated."),
+    uploadAgreementFile,
+    openAgreementDocument,
+  }), [openAgreementDocument, run, uploadAgreementFile]);
 
   return {
     data,
