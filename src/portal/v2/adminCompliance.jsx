@@ -1,21 +1,37 @@
-import { useMemo, useState } from "react";
-import { GraduationCap, ShieldCheck, UserCheck } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { FileText, GraduationCap, ShieldCheck, UserCheck, XCircle } from "lucide-react";
 import { Badge, Card, EmptyState, Field, Hero, INPUT, SectionHeader, formatDate } from "../ui";
 import { ActionButton, SelectField } from "./shared";
 
 const emptyCredential = { interpreterId: "", credentialType: "certification", credentialName: "", credentialNumber: "", issuer: "", issuedOn: "", expiresOn: "", verificationStatus: "pending", notes: "" };
 const emptyOnboarding = { interpreterId: "", stage: "application", status: "active", assignedReviewer: "", dueDate: "", score: "", recommendation: "", notes: "" };
+const cancellableRequestStatuses = new Set(["requested", "viewed", "overdue"]);
 
 export default function AdminComplianceV2({ workspace, operations, v2, actions, saving }) {
+  const clients = workspace.admin?.clients || [];
   const interpreters = (workspace.admin?.interpreters || []).filter((item) => item.roster_status !== "removed");
   const [credential, setCredential] = useState(emptyCredential);
   const [onboarding, setOnboarding] = useState(emptyOnboarding);
+  const [documentRequests, setDocumentRequests] = useState(workspace.admin?.documentRequests || []);
   const interpreterOptions = useMemo(() => interpreters.map((item) => ({ value: item.id, label: `${item.first_name || ""} ${item.last_name || ""}`.trim() || item.email })), [interpreters]);
   const credentials = v2?.credentials || [];
   const pipelines = v2?.onboarding || [];
   const now = Date.now();
   const expiring = credentials.filter((item) => item.expires_on && new Date(item.expires_on).getTime() <= now + 90 * 864e5);
   const courses = operations?.admin?.courses || [];
+
+  useEffect(() => {
+    setDocumentRequests(workspace.admin?.documentRequests || []);
+  }, [workspace.admin?.documentRequests]);
+
+  function requestRecipient(request) {
+    if (request.audience_type === "client") {
+      const client = clients.find((item) => item.id === request.client_id);
+      return client?.organization_name || client?.primary_contact_name || client?.email || "Client";
+    }
+    const interpreter = interpreters.find((item) => item.id === request.interpreter_id);
+    return `${interpreter?.first_name || ""} ${interpreter?.last_name || ""}`.trim() || interpreter?.email || "Interpreter";
+  }
 
   async function saveCredential(event) {
     event.preventDefault();
@@ -29,9 +45,49 @@ export default function AdminComplianceV2({ workspace, operations, v2, actions, 
     setOnboarding(emptyOnboarding);
   }
 
+  async function cancelRequest(request) {
+    const confirmed = window.confirm("Cancel this document request? The recipient will no longer be able to submit documents through this request.");
+    if (!confirmed) return;
+    const result = await actions.cancelDocumentRequest(request.id);
+    if (result?.request) {
+      setDocumentRequests((current) => current.map((item) => item.id === result.request.id ? result.request : item));
+    }
+  }
+
   return (
     <div className="space-y-6">
       <Hero eyebrow="Compliance" title="Credentials, onboarding, screenings, documents, and training." text="Track the entire interpreter readiness pipeline with dates, reviewers, status, notes, and an audit history instead of relying on scattered folders and email." actions={<ActionButton tone="gold" onClick={actions.openDocumentRequest}>Request document</ActionButton>} />
+      <Card>
+        <SectionHeader eyebrow="Documents" title="Admin document center" text={`${documentRequests.length} document request${documentRequests.length === 1 ? "" : "s"} across client and interpreter accounts.`} action={<ActionButton onClick={actions.openDocumentRequest}>New request</ActionButton>} />
+        <div className="mt-6 grid gap-3 lg:grid-cols-2">
+          {documentRequests.map((request) => (
+            <div key={request.id} className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+              <div className="flex items-start gap-3">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#721100]/10 text-[#721100]"><FileText size={17} /></span>
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <p className="truncate font-black text-slate-950">{request.title}</p>
+                      <p className="mt-1 text-xs text-slate-500">{requestRecipient(request)} · Due {request.due_date || "not set"}</p>
+                    </div>
+                    <Badge value={request.status} />
+                  </div>
+                  <p className="mt-3 text-sm leading-6 text-slate-600">{request.instructions || "No additional instructions."}</p>
+                  {request.status === "cancelled" && (
+                    <p className="mt-3 text-xs font-bold text-rose-700">Cancelled {request.cancelled_at ? formatDate(request.cancelled_at) : ""}{request.cancelled_by_email ? ` by ${request.cancelled_by_email}` : ""}</p>
+                  )}
+                  {cancellableRequestStatuses.has(request.status) && (
+                    <button type="button" disabled={saving} onClick={() => cancelRequest(request)} className="mt-4 inline-flex items-center gap-2 rounded-xl border border-rose-300 bg-white px-3 py-2 text-xs font-black text-rose-700 transition hover:bg-rose-50 disabled:cursor-not-allowed disabled:opacity-50">
+                      <XCircle size={14} /> Cancel request
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          ))}
+          {!documentRequests.length && <EmptyState icon={FileText} title="No document requests" text="Create a request when a client or interpreter file is needed." />}
+        </div>
+      </Card>
       <div className="grid gap-5 xl:grid-cols-2">
         <Card>
           <SectionHeader eyebrow="Credential record" title="Add or verify credential" text="Store structured credential information and expiration dates alongside the uploaded file." />
