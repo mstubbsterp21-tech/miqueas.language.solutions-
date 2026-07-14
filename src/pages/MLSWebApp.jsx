@@ -3,6 +3,7 @@ import PortalSetupNotice from "../components/PortalSetupNotice";
 import { isSupabaseConfigured } from "../lib/env";
 import AppShell from "../portal/shell";
 import BidModal from "../portal/BidModal";
+import FirstLoginSetupWizard, { needsFirstLoginSetup } from "../portal/FirstLoginSetupWizard";
 import ProfileModals from "../portal/ProfileModals";
 import WorkflowModals from "../portal/WorkflowModals";
 import useMLSController from "../portal/useMLSController";
@@ -57,7 +58,7 @@ export default function MLSWebApp() {
   const {
     isLoaded, workspace, operations, app, role, section, setSection,
     loading, refreshing, busyDoc, message, error, setMessage, setError,
-    load, actions,
+    load, actions, setModal,
   } = controller;
 
   if (!isSupabaseConfigured) return <PortalSetupNotice />;
@@ -79,6 +80,21 @@ export default function MLSWebApp() {
       <div className="flex min-h-[100dvh] items-center justify-center bg-[#f7f3ef] p-5">
         <EmptyState icon={AlertCircle} title="Workspace unavailable" text={error || "Refresh the app and try again."} />
       </div>
+    );
+  }
+
+  if (needsFirstLoginSetup(role, workspace)) {
+    const profile = role === "client" ? workspace.client?.profile : workspace.interpreter?.profile;
+    return (
+      <FirstLoginSetupWizard
+        role={role}
+        profile={profile}
+        user={workspace.user}
+        onComplete={async () => {
+          setModal("");
+          await Promise.allSettled([load(true), v2.load(true)]);
+        }}
+      />
     );
   }
 
