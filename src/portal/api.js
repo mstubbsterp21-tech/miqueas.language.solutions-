@@ -20,5 +20,6 @@ export function createMLSApi(session) {
     app: (action, method = "GET", body) => request("/api/portal-app", action, method, body),
     operationsV2: (action, method = "GET", body) => request("/api/operations-v2", action, method, body),
     setup: (action = "save", method = "POST", body) => request("/api/first-login-setup", action, method, body),
+    documentRequestEmail: (action = "send", method = "POST", body) => request("/api/document-request-email", action, method, body),
   };
 }
