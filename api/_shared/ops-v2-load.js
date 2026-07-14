@@ -25,10 +25,7 @@ async function loadAdmin(db) {
     credentials, availability, onboarding, auditEvents, integrations,
     integrationCapabilities: {
       found: { mode: "reference_and_manual_sync", apiAvailable: false },
-      boldsign: {
-        apiConfigured: Boolean(process.env.BOLDSIGN_API_KEY),
-        templateConfigured: Boolean(process.env.BOLDSIGN_SERVICE_AGREEMENT_TEMPLATE_ID),
-      },
+      boldsign: { mode: "manual", apiRequired: false, enabled: true },
       googleDrive: { configured: false },
     },
   };
