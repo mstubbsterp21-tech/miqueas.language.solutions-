@@ -30,10 +30,14 @@ const clientFields = [
 const interpreterFields = [
   "first_name",
   "last_name",
+  "email",
   "phone",
+  "address_line_1",
+  "address_line_2",
   "city",
   "state",
-  "current_location",
+  "postal_code",
+  "country",
   "preferred_contact_method",
   "credentials",
   "state_license",
@@ -78,6 +82,10 @@ function present(value) {
   return Boolean(String(value || "").trim());
 }
 
+function validEmail(value) {
+  return /^\S+@\S+\.\S+$/.test(String(value || "").trim());
+}
+
 function clientMissing(profile) {
   const required = [
     ["organization_name", "Organization name"],
@@ -90,12 +98,17 @@ function clientMissing(profile) {
 }
 
 function interpreterMissing(profile) {
-  const missing = [];
   const required = [
     ["first_name", "First name"],
     ["last_name", "Last name"],
+    ["email", "Email"],
     ["phone", "Phone number"],
     ["preferred_contact_method", "Preferred contact method"],
+    ["address_line_1", "Address line 1"],
+    ["city", "City"],
+    ["state", "State"],
+    ["country", "Country"],
+    ["postal_code", "ZIP code"],
     ["credentials", "Credentials"],
     ["years_experience", "Years of experience"],
     ["modalities", "Modalities"],
@@ -105,10 +118,7 @@ function interpreterMissing(profile) {
     ["technical_readiness_confirmed", "VRI readiness"],
     ["professional_liability_insurance", "Professional liability insurance status"],
   ];
-  for (const [field, label] of required) {
-    if (!present(profile[field])) missing.push(label);
-  }
-  if (!present(profile.city) && !present(profile.current_location)) missing.push("Current location");
+  const missing = required.filter(([field]) => !present(profile[field])).map(([, label]) => label);
   if (!dayFields.some((field) => present(profile[field]))) missing.push("Weekly availability");
   return missing;
 }
@@ -184,16 +194,25 @@ async function saveInterpreterSetup(db, user, body) {
     email: user.email,
     first_name: user.firstName || "",
     last_name: user.lastName || "",
+    country: "United States",
     roster_status: "pending_profile",
     screening_status: "not_started",
   };
+  const submittedEmail = Object.prototype.hasOwnProperty.call(incoming, "email")
+    ? incoming.email
+    : base.email || user.email;
   const merged = {
     ...base,
     ...incoming,
-    email: user.email,
+    email: String(submittedEmail || "").trim().toLowerCase(),
+    country: incoming.country || base.country || "United States",
     first_name: incoming.first_name || base.first_name || user.firstName || "",
     last_name: incoming.last_name || base.last_name || user.lastName || "",
   };
+  if (present(merged.email) && !validEmail(merged.email)) {
+    return { status: 400, payload: { error: "Enter a valid email address." } };
+  }
+
   const complete = Boolean(body.complete);
   const missing = complete ? interpreterMissing(merged) : [];
   if (missing.length) {
@@ -204,7 +223,8 @@ async function saveInterpreterSetup(db, user, body) {
     ...incoming,
     ...availabilityFlags(merged),
     clerk_user_id: user.id,
-    email: user.email,
+    email: merged.email,
+    country: merged.country,
     first_name: merged.first_name,
     last_name: merged.last_name,
     setup_started_at: base.setup_started_at || now,
