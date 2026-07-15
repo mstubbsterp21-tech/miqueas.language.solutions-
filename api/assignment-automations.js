@@ -91,7 +91,15 @@ export default async function handler(req, res) {
       else if (action === "recordDocumentUpload") documentResult = await recordAssignmentDocumentUpload(db, user, assignment, body);
       else if (action === "openDocument") documentResult = await openAssignmentDocument(db, user, assignment, body);
       else if (action === "archiveDocument") documentResult = await archiveAssignmentDocument(db, user, assignment, body);
-      else documentResult = await updateAssignmentDocumentVisibility(db, user, assignment, body);
+      else {
+        const visibilityBody = {
+          ...body,
+          interpreterId: body.visibility === "specific_interpreter"
+            ? body.interpreterId || assignment.assignment_interpreters?.[0]?.interpreter_id || null
+            : null,
+        };
+        documentResult = await updateAssignmentDocumentVisibility(db, user, assignment, visibilityBody);
+      }
       return send(res, documentResult.status, documentResult.payload);
     }
 
