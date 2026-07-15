@@ -1,4 +1,5 @@
 import { Building2, CircleDollarSign, ClipboardCheck, ShieldCheck, Users } from "lucide-react";
+import GmailIntegrationCard from "../GmailIntegrationCard";
 import { Card, Hero, Metric, SectionHeader } from "../ui";
 import { ActionButton, AssignmentRow, WorkflowList } from "./shared";
 
@@ -25,6 +26,9 @@ export default function AdminHomeV2({ workspace, app, v2, actions }) {
   return (
     <div className="space-y-6">
       <Hero eyebrow="MLS command center" title="Run the full agency workflow from one place." text="Requests, staffing, client approval, BoldSign agreements, Found records, contractor work, compliance, and quality stay attached to the people and assignments they belong to." actions={<><ActionButton tone="gold" onClick={() => actions.go("assignments")}>Open pipeline</ActionButton><ActionButton tone="soft" onClick={actions.openInvite}>Invite user</ActionButton></>} />
+      <section aria-label="Google Workspace connection">
+        <GmailIntegrationCard />
+      </section>
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">{metrics.map((item) => <Metric key={item.name} {...item} />)}</div>
       <div className="grid gap-5 xl:grid-cols-2">
         <WorkflowList eyebrow="Needs action" title="Assignment pipeline" text="Requests and active jobs that have not reached a closed state." items={active.slice(0, 7)} emptyTitle="Pipeline is clear" emptyText="New requests will appear here." renderItem={(assignment) => <AssignmentRow key={assignment.id} assignment={assignment} onOpen={actions.openAssignment} detail={`${assignment.quote_status?.replaceAll("_", " ") || "No quote"} · ${assignment.agreement_status?.replaceAll("_", " ") || "No agreement"}`} />} />
