@@ -4,10 +4,12 @@ import { isSupabaseConfigured } from "../lib/env";
 import AppShell from "../portal/shell";
 import BidModal from "../portal/BidModal";
 import FirstLoginSetupWizard, { needsFirstLoginSetup } from "../portal/ClerkFirstLoginSetupWizard";
+import PortalRoleSelection from "../portal/PortalRoleSelection";
 import ProfileModals from "../portal/ProfileModals";
 import WorkflowModals from "../portal/WorkflowModals";
 import useMLSController from "../portal/useMLSController";
 import useOperationsV2 from "../portal/useOperationsV2";
+import usePortalRoleSelection from "../portal/usePortalRoleSelection";
 import { EmptyState, Toast } from "../portal/ui";
 import { AdminWorkspace, ClientWorkspace, InterpreterWorkspace } from "../portal/views";
 import AdminV2Workspace from "../portal/v2/admin";
@@ -52,6 +54,18 @@ function normalizeSection(role, section) {
   return allowedSections[role]?.has(mapped) ? mapped : "home";
 }
 
+function PortalLoading({ title = "Opening the MLS app", text = "Loading your secure workspace." }) {
+  return (
+    <div className="flex min-h-[100dvh] items-center justify-center bg-[#f7f3ef] p-5">
+      <div className="rounded-[2rem] bg-white p-12 text-center shadow-2xl">
+        <Loader2 className="mx-auto animate-spin text-[#721100]" size={34} />
+        <h1 className="mt-5 text-2xl font-black">{title}</h1>
+        <p className="mt-2 text-sm text-slate-500">{text}</p>
+      </div>
+    </div>
+  );
+}
+
 export default function MLSWebApp() {
   const controller = useMLSController();
   const v2 = useOperationsV2();
@@ -60,26 +74,39 @@ export default function MLSWebApp() {
     loading, refreshing, busyDoc, message, error, setMessage, setError,
     load, actions, setModal,
   } = controller;
+  const roleSelection = usePortalRoleSelection({
+    enabled: Boolean(isLoaded && workspace && !workspace.user?.isAdmin),
+  });
 
   if (!isSupabaseConfigured) return <PortalSetupNotice />;
 
-  if (!isLoaded || loading) {
-    return (
-      <div className="flex min-h-[100dvh] items-center justify-center bg-[#f7f3ef] p-5">
-        <div className="rounded-[2rem] bg-white p-12 text-center shadow-2xl">
-          <Loader2 className="mx-auto animate-spin text-[#721100]" size={34} />
-          <h1 className="mt-5 text-2xl font-black">Opening the MLS app</h1>
-          <p className="mt-2 text-sm text-slate-500">Loading your secure workspace.</p>
-        </div>
-      </div>
-    );
-  }
+  if (!isLoaded || loading) return <PortalLoading />;
 
   if (!workspace || !app) {
     return (
       <div className="flex min-h-[100dvh] items-center justify-center bg-[#f7f3ef] p-5">
         <EmptyState icon={AlertCircle} title="Workspace unavailable" text={error || "Refresh the app and try again."} />
       </div>
+    );
+  }
+
+  if (!workspace.user?.isAdmin && roleSelection.loading) {
+    return <PortalLoading title="Checking your account type" text="Preparing the correct MLS profile setup." />;
+  }
+
+  if (!workspace.user?.isAdmin && roleSelection.selectionRequired) {
+    return (
+      <PortalRoleSelection
+        user={workspace.user}
+        saving={roleSelection.saving}
+        error={roleSelection.error}
+        onSelect={async (selectedRole) => {
+          await roleSelection.selectRole(selectedRole);
+          setModal("");
+          await Promise.allSettled([load(true), v2.load(true)]);
+          await roleSelection.load();
+        }}
+      />
     );
   }
 
