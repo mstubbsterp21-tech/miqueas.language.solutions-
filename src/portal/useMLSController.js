@@ -65,6 +65,15 @@ export default function useMLSController() {
     setMessage("");
   }
 
+  async function runAssignmentAutomation(action, payload) {
+    try {
+      return await api.automations(action, "POST", payload);
+    } catch (automationError) {
+      console.warn(`MLS assignment automation ${action} failed`, automationError);
+      return { error: automationError instanceof Error ? automationError.message : String(automationError) };
+    }
+  }
+
   function setSection(next) {
     setSectionState(next);
     const url = new URL(window.location.href);
@@ -161,10 +170,12 @@ export default function useMLSController() {
     event.preventDefault();
     setSaving(true);
     try {
-      await api.core("createAssignment", "POST", { assignment: assignmentDraft });
+      const result = await api.core("createAssignment", "POST", { assignment: assignmentDraft });
+      await runAssignmentAutomation("requestCreated", { assignmentId: result.assignment.id });
+      window.dispatchEvent(new CustomEvent("mls:assignment-created", { detail: { assignmentId: result.assignment.id } }));
       setAssignmentDraft(EMPTY_ASSIGNMENT);
       setModal("");
-      flash("Interpreter request submitted.");
+      flash("Interpreter request submitted and added to MLS Open Assignments.");
       await load(true);
       setSection("assignments");
     } catch (submitError) {
@@ -336,12 +347,22 @@ export default function useMLSController() {
 
   async function updateAssignment(assignment, patch) {
     try {
-      await api.app("adminUpdateAssignment", "POST", { assignmentId: assignment.id, ...patch });
+      const result = await api.app("adminUpdateAssignment", "POST", { assignmentId: assignment.id, ...patch });
+      if (patch.status === "confirmed") {
+        await runAssignmentAutomation("confirmed", { assignmentId: result.assignment.id });
+      }
       flash("Assignment updated.");
       await load(true);
     } catch (assignmentError) {
       fail(assignmentError);
     }
+  }
+
+  async function syncAssignmentAutomation(assignment) {
+    const result = await runAssignmentAutomation("syncAssignment", { assignmentId: assignment.id });
+    if (result.error) return fail(result.error);
+    flash("Calendar, Drive, and email automation refreshed.");
+    await load(true);
   }
 
   async function assignInterpreter(payload) {
@@ -367,7 +388,10 @@ export default function useMLSController() {
 
   async function acceptBid(bid) {
     try {
-      await api.app("adminAcceptBid", "POST", { bidId: bid.id });
+      const result = await api.app("adminAcceptBid", "POST", { bidId: bid.id });
+      if (result.assignment?.id) {
+        await runAssignmentAutomation("confirmed", { assignmentId: result.assignment.id });
+      }
       flash("Bid accepted and assignment confirmed.");
       await load(true);
     } catch (bidError) {
@@ -377,7 +401,10 @@ export default function useMLSController() {
 
   async function sendMessage(assignmentId, body) {
     try {
-      await api.app("sendMessage", "POST", { assignmentId, body });
+      const result = await api.app("sendMessage", "POST", { assignmentId, body });
+      if (result.message?.id) {
+        await runAssignmentAutomation("messageEmail", { messageId: result.message.id });
+      }
       await load(true);
     } catch (messageError) {
       fail(messageError);
@@ -429,6 +456,7 @@ export default function useMLSController() {
     sendMessage,
     markNotificationRead,
     updateAssignment,
+    syncAssignmentAutomation,
     assignInterpreter,
     removeInterpreter,
     upload: uploadDocument,

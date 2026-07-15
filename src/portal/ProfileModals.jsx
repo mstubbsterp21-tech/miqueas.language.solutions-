@@ -1,6 +1,7 @@
 import { ClientProfileForm, InterpreterProfileForm } from "./forms";
 import { Modal } from "./ui";
-import { AccountDetail, AssignmentDetail } from "./views";
+import { AccountDetail } from "./views";
+import { AssignmentDetail } from "./AssignmentDetail";
 
 export default function ProfileModals({ controller }) {
   const {

@@ -1,3 +1,4 @@
+import { createClerkClient } from "@clerk/backend";
 import {
   audit,
   clientFor,
@@ -7,6 +8,9 @@ import {
   send,
   signedInUser,
 } from "./_shared/ops-v2-core.js";
+
+const clerkKey = process.env["CLERK_" + "SECRET_KEY"];
+const allowedRoles = new Set(["client", "interpreter"]);
 
 const clientFields = [
   "organization_name",
@@ -130,6 +134,77 @@ function availabilityFlags(profile) {
     availability_afternoon: text.includes("Afternoon"),
     availability_evening: text.includes("Evening"),
     availability_overnight: text.includes("Overnight"),
+  };
+}
+
+function resolvedRole(user, client, interpreter) {
+  if (allowedRoles.has(user.metadataRole)) return user.metadataRole;
+  if (client && !interpreter) return "client";
+  if (interpreter && !client) return "interpreter";
+  return "";
+}
+
+async function roleStatus(db, user) {
+  if (user.isAdmin) {
+    return { role: "admin", selectionRequired: false, locked: true };
+  }
+  const [client, interpreter] = await Promise.all([
+    clientFor(db, user.id),
+    interpreterFor(db, user.id),
+  ]);
+  const role = resolvedRole(user, client, interpreter);
+  return {
+    role: role || null,
+    selectionRequired: !role && !client && !interpreter,
+    locked: Boolean(role || client || interpreter),
+  };
+}
+
+async function selectRole(db, user, body) {
+  if (user.isAdmin) return { status: 403, payload: { error: "Administrator accounts do not choose a client or interpreter role." } };
+  const requestedRole = String(body.role || "").trim().toLowerCase();
+  if (!allowedRoles.has(requestedRole)) {
+    return { status: 400, payload: { error: "Choose either Client or Interpreter." } };
+  }
+  if (!clerkKey) return { status: 500, payload: { error: "Clerk server settings are incomplete." } };
+
+  const [client, interpreter] = await Promise.all([
+    clientFor(db, user.id),
+    interpreterFor(db, user.id),
+  ]);
+  const role = resolvedRole(user, client, interpreter);
+  if (client && requestedRole !== "client") {
+    return { status: 409, payload: { error: "This account already has a client profile. Contact MLS Portal Support to change the account type." } };
+  }
+  if (interpreter && requestedRole !== "interpreter") {
+    return { status: 409, payload: { error: "This account already has an interpreter profile. Contact MLS Portal Support to change the account type." } };
+  }
+  if (role && role !== requestedRole) {
+    return { status: 409, payload: { error: `This account is already registered as ${role}. Contact MLS Portal Support to change it.` } };
+  }
+
+  const clerk = createClerkClient({ secretKey: clerkKey });
+  await clerk.users.updateUserMetadata(user.id, {
+    publicMetadata: { portalRole: requestedRole },
+  });
+
+  const preference = await db.from("portal_preferences").upsert({
+    clerk_user_id: user.id,
+    default_portal: requestedRole,
+    updated_at: new Date().toISOString(),
+  }, { onConflict: "clerk_user_id" });
+  if (preference.error) throw preference.error;
+
+  await audit(db, { ...user, metadataRole: requestedRole }, {
+    action: "portal.role_selected",
+    entityType: "portal_user",
+    summary: `Selected ${requestedRole} portal`,
+    after: { role: requestedRole, source: "first_login" },
+  });
+
+  return {
+    status: 200,
+    payload: { role: requestedRole, selectionRequired: false, locked: true },
   };
 }
 
@@ -260,15 +335,25 @@ export default async function handler(req, res) {
   try {
     const user = await signedInUser(req);
     if (!user) return send(res, 401, { error: "Sign in is required." });
+    const db = database();
+    const action = String(req.query?.action || "");
+
+    if (req.method === "GET" && action === "roleStatus") {
+      return send(res, 200, await roleStatus(db, user));
+    }
+    if (req.method === "POST" && action === "selectRole") {
+      const result = await selectRole(db, user, readBody(req));
+      return send(res, result.status, result.payload);
+    }
+
     if (user.isAdmin) return send(res, 403, { error: "Administrator accounts do not use first-login setup." });
     if (req.method !== "POST") return send(res, 405, { error: "Use POST for setup changes." });
 
     const body = readBody(req);
     const requestedRole = body.role === "client" ? "client" : "interpreter";
-    const actualRole = user.metadataRole || ((await clientFor(database(), user.id)) ? "client" : "interpreter");
+    const actualRole = user.metadataRole || ((await clientFor(db, user.id)) ? "client" : "interpreter");
     if (requestedRole !== actualRole) return send(res, 403, { error: "This setup wizard does not match your account role." });
 
-    const db = database();
     const result = requestedRole === "client"
       ? await saveClientSetup(db, user, body)
       : await saveInterpreterSetup(db, user, body);

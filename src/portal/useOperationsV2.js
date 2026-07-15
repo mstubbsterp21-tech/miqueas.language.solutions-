@@ -31,6 +31,13 @@ export default function useOperationsV2({ enabled = true } = {}) {
     load();
   }, [load]);
 
+  useEffect(() => {
+    if (!enabled) return undefined;
+    const refresh = () => load(true);
+    window.addEventListener("mls:assignment-created", refresh);
+    return () => window.removeEventListener("mls:assignment-created", refresh);
+  }, [enabled, load]);
+
   const run = useCallback(async (action, payload, successText) => {
     setSaving(true);
     setError("");
