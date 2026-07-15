@@ -8,6 +8,12 @@ import { interpreterSubmitExpense, adminReviewExpense } from "./_shared/ops-v2-e
 import { interpreterSaveAvailability, interpreterSaveWeeklyAvailability, interpreterDeleteAvailability } from "./_shared/ops-v2-availability.js";
 import { adminSaveCredential, adminUpdateOnboarding } from "./_shared/ops-v2-compliance.js";
 import { adminLinkBoldSignAgreement } from "./_shared/ops-v2-boldsign.js";
+import {
+  saveProfileCustomization,
+  createProfileMediaUploadUrl,
+  recordProfileMediaUpload,
+  removeProfileMedia,
+} from "./_shared/ops-v2-profiles.js";
 
 const actions = {
   adminCreateQuote,
@@ -25,6 +31,10 @@ const actions = {
   adminSaveCredential,
   adminUpdateOnboarding,
   adminLinkBoldSignAgreement,
+  saveProfileCustomization,
+  createProfileMediaUploadUrl,
+  recordProfileMediaUpload,
+  removeProfileMedia,
 };
 
 export default async function handler(req, res) {

@@ -1,12 +1,14 @@
 import { clientFor, interpreterFor } from "./ops-v2-core.js";
+import { loadProfileCustomizationCollection, loadProfileCustomizationForRecord } from "./ops-v2-profiles.js";
 
 async function unwrap(results) {
   for (const result of results) if (result.error) throw result.error;
   return results.map((result) => result.data || []);
 }
 
-async function loadAdmin(db) {
-  const [quotes, invoices, agreements, times, expenses, credentials, availability, onboarding, auditEvents, integrations] = await unwrap(await Promise.all([
+async function loadAdmin(db, user) {
+  const personalInterpreter = await interpreterFor(db, user.id);
+  const [quotes, invoices, agreements, times, expenses, credentials, availability, onboarding, auditEvents, integrations, profileCustomizations, personalProfileCustomization] = await Promise.all([
     db.from("quotes").select("*, quote_items(*), clients(id,organization_name,email), assignments(id,service_type,start_at,lifecycle_status)").order("created_at", { ascending: false }),
     db.from("invoices").select("*, invoice_items(*), payments(*), clients(id,organization_name,email), assignments(id,service_type,start_at,lifecycle_status), quotes(id,quote_number)").order("created_at", { ascending: false }),
     db.from("assignment_agreements").select("*, clients(id,organization_name,email), assignments(id,service_type,start_at,lifecycle_status)").order("created_at", { ascending: false }),
@@ -17,12 +19,28 @@ async function loadAdmin(db) {
     db.from("interpreter_onboarding").select("*, interpreters(id,first_name,last_name,email,roster_status,screening_status,w9_status,insurance_status)").order("updated_at", { ascending: false }),
     db.from("audit_events").select("*").order("created_at", { ascending: false }).limit(250),
     db.from("integration_settings").select("*").order("integration_key"),
-  ]));
+    loadProfileCustomizationCollection(db),
+    loadProfileCustomizationForRecord(db, "interpreter", personalInterpreter),
+  ]);
+
+  const databaseResults = [quotes, invoices, agreements, times, expenses, credentials, availability, onboarding, auditEvents, integrations];
+  for (const result of databaseResults) if (result.error) throw result.error;
 
   return {
     role: "admin",
-    quotes, invoices, agreements, timeEntries: times, expenses,
-    credentials, availability, onboarding, auditEvents, integrations,
+    quotes: quotes.data || [],
+    invoices: invoices.data || [],
+    agreements: agreements.data || [],
+    timeEntries: times.data || [],
+    expenses: expenses.data || [],
+    credentials: credentials.data || [],
+    availability: availability.data || [],
+    onboarding: onboarding.data || [],
+    auditEvents: auditEvents.data || [],
+    integrations: integrations.data || [],
+    profileCustomizations,
+    personalProfileCustomization,
+    personalInterpreter,
     integrationCapabilities: {
       found: { mode: "reference_and_manual_sync", apiAvailable: false },
       boldsign: { mode: "manual", apiRequired: false, enabled: true },
@@ -33,50 +51,62 @@ async function loadAdmin(db) {
 
 async function loadClient(db, user) {
   const client = await clientFor(db, user.id);
-  if (!client) return { role: "client", quotes: [], invoices: [], agreements: [], timeEntries: [] };
+  if (!client) return { role: "client", quotes: [], invoices: [], agreements: [], timeEntries: [], profileCustomization: null };
 
   const assignmentIdsResult = await db.from("assignments").select("id").eq("client_id", client.id);
   if (assignmentIdsResult.error) throw assignmentIdsResult.error;
   const assignmentIds = (assignmentIdsResult.data || []).map((item) => item.id);
 
-  const [quotes, invoices, agreements, times] = await unwrap(await Promise.all([
+  const [quotes, invoices, agreements, times, profileCustomization] = await Promise.all([
     db.from("quotes").select("*, quote_items(*), assignments(id,service_type,start_at,lifecycle_status)").eq("client_id", client.id).order("created_at", { ascending: false }),
     db.from("invoices").select("*, invoice_items(*), payments(*), assignments(id,service_type,start_at,lifecycle_status)").eq("client_id", client.id).order("created_at", { ascending: false }),
     db.from("assignment_agreements").select("*, assignments(id,service_type,start_at,lifecycle_status)").eq("client_id", client.id).order("created_at", { ascending: false }),
     assignmentIds.length
       ? db.from("time_entries").select("*, interpreters(id,first_name,last_name,email), assignments(id,service_type,start_at)").in("assignment_id", assignmentIds).order("created_at", { ascending: false })
       : Promise.resolve({ data: [], error: null }),
-  ]));
+    loadProfileCustomizationForRecord(db, "client", client),
+  ]);
+  for (const result of [quotes, invoices, agreements, times]) if (result.error) throw result.error;
 
-  return { role: "client", quotes, invoices, agreements, timeEntries: times };
+  return {
+    role: "client",
+    quotes: quotes.data || [],
+    invoices: invoices.data || [],
+    agreements: agreements.data || [],
+    timeEntries: times.data || [],
+    profileCustomization,
+  };
 }
 
 async function loadInterpreter(db, user) {
   const interpreter = await interpreterFor(db, user.id);
-  if (!interpreter) return { role: "interpreter", timeEntries: [], expenses: [], credentials: [], availability: [], onboarding: null, payments: [] };
+  if (!interpreter) return { role: "interpreter", timeEntries: [], expenses: [], credentials: [], availability: [], onboarding: null, payments: [], profileCustomization: null };
 
-  const [times, expenses, credentials, availability, onboardingRows, payments] = await unwrap(await Promise.all([
+  const [times, expenses, credentials, availability, onboardingRows, payments, profileCustomization] = await Promise.all([
     db.from("time_entries").select("*, assignments(id,service_type,start_at,end_at,delivery_mode,location_name,city,state)").eq("interpreter_id", interpreter.id).order("created_at", { ascending: false }),
     db.from("expenses").select("*, assignments(id,service_type,start_at)").eq("interpreter_id", interpreter.id).order("created_at", { ascending: false }),
     db.from("interpreter_credentials").select("*").eq("interpreter_id", interpreter.id).order("expires_on", { ascending: true, nullsFirst: false }),
     db.from("interpreter_availability").select("*").eq("interpreter_id", interpreter.id).order("start_at", { ascending: true }),
     db.from("interpreter_onboarding").select("*").eq("interpreter_id", interpreter.id),
     db.from("assignment_interpreters").select("*, assignments(id,service_type,start_at)").eq("interpreter_id", interpreter.id).order("assigned_at", { ascending: false }),
-  ]));
+    loadProfileCustomizationForRecord(db, "interpreter", interpreter),
+  ]);
+  for (const result of [times, expenses, credentials, availability, onboardingRows, payments]) if (result.error) throw result.error;
 
   return {
     role: "interpreter",
-    timeEntries: times,
-    expenses,
-    credentials,
-    availability,
-    onboarding: onboardingRows[0] || null,
-    payments,
+    timeEntries: times.data || [],
+    expenses: expenses.data || [],
+    credentials: credentials.data || [],
+    availability: availability.data || [],
+    onboarding: (onboardingRows.data || [])[0] || null,
+    payments: payments.data || [],
+    profileCustomization,
   };
 }
 
 export async function loadOperationsV2(db, user) {
-  if (user.isAdmin) return loadAdmin(db);
+  if (user.isAdmin) return loadAdmin(db, user);
   const client = await clientFor(db, user.id);
   return client ? loadClient(db, user) : loadInterpreter(db, user);
 }

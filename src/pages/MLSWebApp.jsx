@@ -6,6 +6,7 @@ import BidModal from "../portal/BidModal";
 import FirstLoginSetupWizard, { needsFirstLoginSetup } from "../portal/ClerkFirstLoginSetupWizard";
 import PortalRoleSelection from "../portal/PortalRoleSelection";
 import ProfileModals from "../portal/ProfileModals";
+import ProfileStudio from "../portal/ProfileStudio";
 import WorkflowModals from "../portal/WorkflowModals";
 import useMLSController from "../portal/useMLSController";
 import useOperationsV2 from "../portal/useOperationsV2";
@@ -17,7 +18,7 @@ import ClientV2Workspace from "../portal/v2/client";
 import InterpreterV2Workspace from "../portal/v2/interpreter";
 
 const allowedSections = {
-  admin: new Set(["home", "assignments", "people", "finance", "compliance", "reports", "settings", "notifications"]),
+  admin: new Set(["home", "assignments", "people", "finance", "compliance", "reports", "profile", "settings", "notifications"]),
   client: new Set(["home", "requests", "assignments", "billing", "documents", "profile", "notifications"]),
   interpreter: new Set(["home", "work", "schedule", "documents", "learning", "profile", "notifications"]),
 };
@@ -128,6 +129,7 @@ export default function MLSWebApp() {
   const activeSection = normalizeSection(role, section);
   const combinedActions = { ...actions, ...v2.actions };
   const refreshAll = () => Promise.allSettled([load(true), v2.load(true)]);
+  const personalization = role === "admin" ? v2.data?.personalProfileCustomization : v2.data?.profileCustomization;
 
   const legacyClientSection = activeSection === "notifications" ? "notifications" : activeSection;
   const legacyInterpreterSection = activeSection === "learning" ? "training" : activeSection;
@@ -139,6 +141,7 @@ export default function MLSWebApp() {
         section={activeSection}
         setSection={setSection}
         user={workspace.user}
+        personalization={personalization}
         unread={app.unreadCount || 0}
         refreshing={refreshing || v2.loading}
         refresh={refreshAll}
@@ -176,7 +179,16 @@ export default function MLSWebApp() {
             actions={combinedActions}
           />
         )}
-        {role === "client" && ["documents", "profile", "notifications"].includes(activeSection) && (
+        {role === "client" && activeSection === "profile" && (
+          <ProfileStudio
+            profileType="client"
+            profile={workspace.client?.profile || {}}
+            customization={v2.data?.profileCustomization}
+            actions={combinedActions}
+            ownerId={workspace.client?.profile?.id}
+          />
+        )}
+        {role === "client" && ["documents", "notifications"].includes(activeSection) && (
           <ClientWorkspace section={legacyClientSection} workspace={workspace} operations={operations} app={app} actions={combinedActions} busyDoc={busyDoc} />
         )}
 
@@ -192,12 +204,21 @@ export default function MLSWebApp() {
             actions={combinedActions}
           />
         )}
-        {role === "interpreter" && ["documents", "learning", "profile", "notifications"].includes(activeSection) && (
+        {role === "interpreter" && activeSection === "profile" && (
+          <ProfileStudio
+            profileType="interpreter"
+            profile={workspace.interpreter?.profile || {}}
+            customization={v2.data?.profileCustomization}
+            actions={combinedActions}
+            ownerId={workspace.interpreter?.profile?.id}
+          />
+        )}
+        {role === "interpreter" && ["documents", "learning", "notifications"].includes(activeSection) && (
           <InterpreterWorkspace section={legacyInterpreterSection} workspace={workspace} operations={operations} app={app} actions={combinedActions} busyDoc={busyDoc} />
         )}
       </AppShell>
 
-      <ProfileModals controller={controller} />
+      <ProfileModals controller={controller} v2={v2.data} profileActions={combinedActions} />
       <WorkflowModals controller={controller} />
       <BidModal controller={controller} />
     </>
