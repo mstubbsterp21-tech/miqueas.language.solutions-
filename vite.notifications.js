@@ -51,19 +51,7 @@ function patchController(code) {
   }
 
   async function notificationMutation(action, payload = {}) {
-    const token = await session?.getToken();
-    if (!token) throw new Error("Your session expired. Sign in again to manage notifications.");
-    const response = await fetch(\`/api/notification-actions?action=\${encodeURIComponent(action)}\`, {
-      method: "POST",
-      headers: {
-        Authorization: \`Bearer \${token}\`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
-    });
-    const result = await response.json().catch(() => ({}));
-    if (!response.ok) throw new Error(result.error || "Notification action failed.");
-    return result;
+    return api.app(action, "POST", payload);
   }
 
   async function setNotificationReadState(notificationId, isRead) {
@@ -74,7 +62,7 @@ function patchController(code) {
         : item
     )));
     try {
-      await notificationMutation("setReadState", {
+      await notificationMutation("setNotificationReadState", {
         ...(notificationId ? { notificationId } : {}),
         isRead,
       });
@@ -96,7 +84,7 @@ function patchController(code) {
     if (!notificationId) return;
     updateNotificationList((notifications) => notifications.filter((item) => item.id !== notificationId));
     try {
-      await notificationMutation("clear", { notificationId });
+      await notificationMutation("clearNotifications", { notificationId });
     } catch (notificationError) {
       fail(notificationError);
       await load(true);
@@ -109,7 +97,7 @@ function patchController(code) {
       ? notifications.filter((item) => !selected.has(item.id))
       : []);
     try {
-      await notificationMutation("clear", selected.size ? { notificationIds: [...selected] } : {});
+      await notificationMutation("clearNotifications", selected.size ? { notificationIds: [...selected] } : {});
     } catch (notificationError) {
       fail(notificationError);
       await load(true);
