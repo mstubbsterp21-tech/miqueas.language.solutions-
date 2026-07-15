@@ -15,6 +15,10 @@ export default function ProfileModals({ controller, v2, profileActions }) {
   const accountCustomization = (v2?.profileCustomizations || []).find((item) => (
     accountType === "client" ? item.client_id === accountRecord?.id : item.interpreter_id === accountRecord?.id
   ));
+  const accountProfileActions = {
+    ...combinedActions,
+    openProfile: () => accountRecord && actions.editAccount(accountType, accountRecord),
+  };
 
   return (
     <>
@@ -34,7 +38,7 @@ export default function ProfileModals({ controller, v2, profileActions }) {
             profileType={accountType || "interpreter"}
             profile={accountRecord || {}}
             customization={accountCustomization}
-            actions={combinedActions}
+            actions={accountProfileActions}
             ownerId={accountRecord?.id}
           />
           <AccountDetail type={accountType} record={accountRecord} workspace={workspace} actions={actions} busyDoc={busyDoc} />
