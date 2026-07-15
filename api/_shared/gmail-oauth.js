@@ -5,14 +5,27 @@ const clientSecret = process.env.GOOGLE_GMAIL_CLIENT_SECRET || "";
 const redirectUri = process.env.GOOGLE_GMAIL_REDIRECT_URI || "https://miqueaslanguagesolutions.com/api/google/gmail/callback";
 const senderEmail = String(process.env.GOOGLE_GMAIL_SENDER || "").trim().toLowerCase();
 const senderName = process.env.EMAIL_FROM_NAME || "Miqueas Language Solutions";
-const gmailScope = "https://www.googleapis.com/auth/gmail.send";
+
+export const gmailScope = "https://www.googleapis.com/auth/gmail.send";
+export const calendarScope = "https://www.googleapis.com/auth/calendar";
+export const driveScope = "https://www.googleapis.com/auth/drive.file";
 const identityScopes = ["openid", "email"];
+const workspaceScopes = [gmailScope, calendarScope, driveScope];
 
 function encodeHeader(value) {
   const text = String(value || "");
   return /^[\x20-\x7E]*$/.test(text)
     ? text
     : `=?UTF-8?B?${Buffer.from(text, "utf8").toString("base64")}?=`;
+}
+
+function scopeSet(value) {
+  return new Set(String(value || "").split(/\s+/).map((scope) => scope.trim()).filter(Boolean));
+}
+
+function missingScopes(value, required) {
+  const granted = scopeSet(value);
+  return required.filter((scope) => !granted.has(scope));
 }
 
 function gmailEnvironment() {
@@ -27,14 +40,14 @@ function gmailEnvironment() {
     redirectUri,
     senderEmail,
     senderName,
-    scope: gmailScope,
+    scopes: workspaceScopes,
   };
 }
 
 async function readIntegration(db) {
   const result = await db
     .from("gmail_integrations")
-    .select("id,google_email,scope,status,connected_by_clerk_user_id,connected_at,updated_at,last_test_at,last_error")
+    .select("id,google_email,scope,status,connected_by_clerk_user_id,connected_at,updated_at,last_test_at,last_error,calendar_id,calendar_summary,drive_root_folder_id,drive_root_folder_url,workspace_last_verified_at")
     .eq("id", "primary")
     .maybeSingle();
   if (result.error) throw result.error;
@@ -49,27 +62,38 @@ export async function getGmailStatus(db) {
     && senderEmail
     && integration.google_email.toLowerCase() === senderEmail,
   );
+  const gmailMissing = missingScopes(integration?.scope, [gmailScope]);
+  const workspaceMissing = missingScopes(integration?.scope, workspaceScopes);
+  const baseConnected = Boolean(environment.configured && integration?.status === "connected" && senderMatches);
   return {
-    provider: "gmail",
+    provider: "google_workspace",
     environmentConfigured: environment.configured,
     missingEnvironmentVariables: environment.missing,
     sender: senderEmail,
     redirectUri,
-    connected: Boolean(environment.configured && integration?.status === "connected" && senderMatches),
+    connected: Boolean(baseConnected && gmailMissing.length === 0),
+    workspaceConnected: Boolean(baseConnected && workspaceMissing.length === 0),
     status: integration?.status || "not_connected",
     email: integration?.google_email || null,
     scope: integration?.scope || gmailScope,
+    requiredScopes: workspaceScopes,
+    missingScopes: workspaceMissing,
     connectedAt: integration?.connected_at || null,
     lastTestAt: integration?.last_test_at || null,
     lastError: integration?.last_error || null,
     senderMatches,
+    calendarId: integration?.calendar_id || null,
+    calendarSummary: integration?.calendar_summary || null,
+    driveRootFolderId: integration?.drive_root_folder_id || null,
+    driveRootFolderUrl: integration?.drive_root_folder_url || null,
+    workspaceLastVerifiedAt: integration?.workspace_last_verified_at || null,
   };
 }
 
 export async function createGmailAuthorization(db, user) {
   const environment = gmailEnvironment();
   if (!environment.configured) {
-    throw new Error(`Gmail OAuth is missing: ${environment.missing.join(", ")}.`);
+    throw new Error(`Google Workspace OAuth is missing: ${environment.missing.join(", ")}.`);
   }
 
   const now = new Date();
@@ -88,7 +112,7 @@ export async function createGmailAuthorization(db, user) {
   url.searchParams.set("client_id", clientId);
   url.searchParams.set("redirect_uri", redirectUri);
   url.searchParams.set("response_type", "code");
-  url.searchParams.set("scope", [...identityScopes, gmailScope].join(" "));
+  url.searchParams.set("scope", [...identityScopes, ...workspaceScopes].join(" "));
   url.searchParams.set("access_type", "offline");
   url.searchParams.set("prompt", "consent");
   url.searchParams.set("include_granted_scopes", "true");
@@ -114,7 +138,7 @@ async function exchangeCode(code) {
     throw new Error(data.error_description || data.error || "Google did not accept the authorization code.");
   }
   if (!data.refresh_token) {
-    throw new Error("Google did not return a refresh token. Reconnect Gmail and approve access again.");
+    throw new Error("Google did not return a refresh token. Reconnect Google Workspace and approve access again.");
   }
   return data;
 }
@@ -132,7 +156,7 @@ async function googleIdentity(accessToken) {
 
 export async function completeGmailAuthorization(db, { code, state }) {
   const environment = gmailEnvironment();
-  if (!environment.configured) throw new Error("Gmail OAuth environment variables are incomplete.");
+  if (!environment.configured) throw new Error("Google Workspace OAuth environment variables are incomplete.");
   if (!code || !state) throw new Error("Google did not return a complete authorization response.");
 
   const stateResult = await db.from("gmail_oauth_states").select("*").eq("state", state).maybeSingle();
@@ -140,7 +164,7 @@ export async function completeGmailAuthorization(db, { code, state }) {
   const stateRow = stateResult.data;
   const now = new Date();
   if (!stateRow || stateRow.used_at || new Date(stateRow.expires_at).getTime() <= now.getTime()) {
-    throw new Error("This Gmail authorization request is invalid or expired. Start the connection again from MLS Settings.");
+    throw new Error("This Google Workspace authorization request is invalid or expired. Start the connection again from MLS Settings.");
   }
 
   const claimed = await db
@@ -151,7 +175,7 @@ export async function completeGmailAuthorization(db, { code, state }) {
     .select("*")
     .maybeSingle();
   if (claimed.error) throw claimed.error;
-  if (!claimed.data) throw new Error("This Gmail authorization request was already used.");
+  if (!claimed.data) throw new Error("This Google Workspace authorization request was already used.");
 
   const tokens = await exchangeCode(code);
   const identity = await googleIdentity(tokens.access_token);
@@ -167,31 +191,45 @@ export async function completeGmailAuthorization(db, { code, state }) {
   const stored = await db.rpc("mls_store_gmail_refresh_token", {
     p_refresh_token: tokens.refresh_token,
     p_google_email: identity.email,
-    p_scope: tokens.scope || gmailScope,
+    p_scope: tokens.scope || workspaceScopes.join(" "),
     p_connected_by: stateRow.admin_clerk_user_id,
   });
   if (stored.error) throw stored.error;
 
+  await db.from("gmail_integrations").update({
+    workspace_last_verified_at: now.toISOString(),
+    last_error: null,
+    updated_at: now.toISOString(),
+  }).eq("id", "primary");
+
   return {
     email: identity.email,
-    scope: tokens.scope || gmailScope,
+    scope: tokens.scope || workspaceScopes.join(" "),
     connectedBy: stateRow.admin_clerk_user_id,
   };
 }
 
-async function refreshAccessToken(db) {
+async function refreshAccessToken(db, requiredScopes = [gmailScope]) {
   const status = await getGmailStatus(db);
   if (!status.environmentConfigured) {
-    return { error: `Gmail OAuth is missing: ${status.missingEnvironmentVariables.join(", ")}.`, status: "not_configured" };
+    return { error: `Google Workspace OAuth is missing: ${status.missingEnvironmentVariables.join(", ")}.`, status: "not_configured" };
   }
   if (!status.connected) {
-    return { error: "Gmail is not connected in MLS Settings.", status: "not_configured" };
+    return { error: "Google Workspace is not connected in MLS Settings.", status: "not_configured" };
+  }
+  const missing = missingScopes(status.scope, requiredScopes);
+  if (missing.length) {
+    return {
+      error: "Reconnect Google Workspace in MLS Settings to approve Calendar and Drive access.",
+      status: "not_configured",
+      missingScopes: missing,
+    };
   }
 
   const tokenResult = await db.rpc("mls_get_gmail_refresh_token");
   if (tokenResult.error) throw tokenResult.error;
   if (!tokenResult.data) {
-    return { error: "The Gmail refresh token is unavailable. Reconnect Gmail in MLS Settings.", status: "not_configured" };
+    return { error: "The Google refresh token is unavailable. Reconnect Google Workspace in MLS Settings.", status: "not_configured" };
   }
 
   const response = await fetch("https://oauth2.googleapis.com/token", {
@@ -206,7 +244,7 @@ async function refreshAccessToken(db) {
   });
   const data = await response.json().catch(() => ({}));
   if (!response.ok || !data.access_token) {
-    const message = data.error_description || data.error || "Google could not refresh Gmail access.";
+    const message = data.error_description || data.error || "Google could not refresh Workspace access.";
     await db.from("gmail_integrations").update({
       status: "error",
       last_error: message,
@@ -214,7 +252,11 @@ async function refreshAccessToken(db) {
     }).eq("id", "primary");
     return { error: message, status: "failed" };
   }
-  return { accessToken: data.access_token, status: "ready" };
+  return { accessToken: data.access_token, status: "ready", scope: status.scope };
+}
+
+export async function getGoogleWorkspaceAccessToken(db, requiredScopes = []) {
+  return refreshAccessToken(db, requiredScopes.length ? requiredScopes : workspaceScopes);
 }
 
 function buildRawMessage({ to, subject, text, html }) {
@@ -228,7 +270,7 @@ function buildRawMessage({ to, subject, text, html }) {
     `Date: ${new Date().toUTCString()}`,
     `Message-ID: ${messageId}`,
     "MIME-Version: 1.0",
-    `Content-Type: multipart/alternative; boundary=\"${boundary}\"`,
+    `Content-Type: multipart/alternative; boundary="${boundary}"`,
     "",
     `--${boundary}`,
     "Content-Type: text/plain; charset=UTF-8",
@@ -250,8 +292,8 @@ function buildRawMessage({ to, subject, text, html }) {
   };
 }
 
-export async function sendGmailEmail(db, { to, subject, text, html }) {
-  const access = await refreshAccessToken(db);
+export async function sendGmailEmail(db, { to, subject, text, html, threadId = null }) {
+  const access = await refreshAccessToken(db, [gmailScope]);
   if (!access.accessToken) {
     return { sent: false, status: access.status || "failed", error: access.error || "Gmail access is unavailable." };
   }
@@ -263,7 +305,10 @@ export async function sendGmailEmail(db, { to, subject, text, html }) {
       authorization: `Bearer ${access.accessToken}`,
       "content-type": "application/json",
     },
-    body: JSON.stringify({ raw: message.raw }),
+    body: JSON.stringify({
+      raw: message.raw,
+      ...(threadId ? { threadId } : {}),
+    }),
   });
   const data = await response.json().catch(() => ({}));
   if (!response.ok || !data.id) {
@@ -280,20 +325,25 @@ export async function sendGmailEmail(db, { to, subject, text, html }) {
     last_error: null,
     updated_at: new Date().toISOString(),
   }).eq("id", "primary");
-  return { sent: true, status: "sent", messageId: data.id || message.messageId, threadId: data.threadId || null };
+  return {
+    sent: true,
+    status: "sent",
+    messageId: data.id || message.messageId,
+    threadId: data.threadId || threadId || null,
+  };
 }
 
 export async function sendGmailTest(db, user) {
   const target = user.email || senderEmail;
   const text = [
-    "Gmail is connected to the Miqueas Language Solutions portal.",
+    "Google Workspace is connected to the Miqueas Language Solutions portal.",
     "",
-    "This test confirms that MLS can send document-request notifications through the Gmail API.",
+    "This confirms that MLS can send portal email through Gmail. Calendar and Drive permissions are also checked in MLS Settings.",
   ].join("\n");
-  const html = `<!doctype html><html><body style="font-family:Arial,sans-serif;background:#f7f3ef;padding:24px;color:#24130e"><div style="max-width:600px;margin:auto;background:#fff;padding:28px;border-radius:20px"><p style="font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#dd7d00">Miqueas Language Solutions</p><h1>Gmail connection successful</h1><p style="line-height:1.7;color:#51453f">This test confirms that MLS can send document-request notifications through the Gmail API.</p></div></body></html>`;
+  const html = `<!doctype html><html><body style="font-family:Arial,sans-serif;background:#f7f3ef;padding:24px;color:#24130e"><div style="max-width:600px;margin:auto;background:#fff;padding:28px;border-radius:20px"><p style="font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#dd7d00">Miqueas Language Solutions</p><h1>Google Workspace connection successful</h1><p style="line-height:1.7;color:#51453f">MLS can send portal email through Gmail. Calendar and Drive permissions are also available for assignment automation.</p></div></body></html>`;
   const delivery = await sendGmailEmail(db, {
     to: target,
-    subject: "MLS Gmail connection test",
+    subject: "MLS Google Workspace connection test",
     text,
     html,
   });
@@ -317,5 +367,13 @@ export async function disconnectGmail(db) {
   }
   const deleted = await db.rpc("mls_delete_gmail_refresh_token");
   if (deleted.error) throw deleted.error;
+  await db.from("gmail_integrations").update({
+    calendar_id: null,
+    calendar_summary: null,
+    drive_root_folder_id: null,
+    drive_root_folder_url: null,
+    workspace_last_verified_at: null,
+    updated_at: new Date().toISOString(),
+  }).eq("id", "primary");
   return { disconnected: true };
 }
