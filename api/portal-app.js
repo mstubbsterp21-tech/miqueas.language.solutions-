@@ -171,13 +171,42 @@ async function loadApp(db, user) {
   };
 }
 
-async function markNotificationRead(db, user, payload) {
+function selectedNotificationIds(payload) {
+  const values = [
+    ...(Array.isArray(payload.notificationIds) ? payload.notificationIds : []),
+    payload.notificationId,
+  ];
+  return [...new Set(values.map((value) => String(value || "").trim()).filter(Boolean))].slice(0, 100);
+}
+
+function applyNotificationSelection(query, ids) {
+  if (!ids.length) return query;
+  return ids.length === 1 ? query.eq("id", ids[0]) : query.in("id", ids);
+}
+
+async function setNotificationReadState(db, user, payload) {
+  const ids = selectedNotificationIds(payload);
+  const isRead = payload.isRead !== false;
   let query = db.from("notifications")
-    .update({ is_read: true, read_at: new Date().toISOString() })
-    .eq("recipient_clerk_user_id", user.id)
-    .eq("is_read", false);
-  if (payload.notificationId) query = query.eq("id", payload.notificationId);
-  const result = await query.select();
+    .update({ is_read: isRead, read_at: isRead ? new Date().toISOString() : null })
+    .eq("recipient_clerk_user_id", user.id);
+  query = applyNotificationSelection(query, ids);
+  const result = await query.select("id,is_read,read_at");
+  if (result.error) throw result.error;
+  return { status: 200, payload: { notifications: result.data || [] } };
+}
+
+async function markNotificationRead(db, user, payload) {
+  return setNotificationReadState(db, user, { ...payload, isRead: true });
+}
+
+async function clearNotifications(db, user, payload) {
+  const ids = selectedNotificationIds(payload);
+  let query = db.from("notifications")
+    .delete()
+    .eq("recipient_clerk_user_id", user.id);
+  query = applyNotificationSelection(query, ids);
+  const result = await query.select("id");
   if (result.error) throw result.error;
   return { status: 200, payload: { notifications: result.data || [] } };
 }
@@ -387,6 +416,8 @@ export default async function handler(req, res) {
 
     let result;
     if (action === "markNotificationRead") result = await markNotificationRead(db, user, payload);
+    else if (action === "setNotificationReadState") result = await setNotificationReadState(db, user, payload);
+    else if (action === "clearNotifications") result = await clearNotifications(db, user, payload);
     else if (action === "sendMessage") result = await sendMessage(db, user, payload);
     else if (action === "adminAssignInterpreter") result = await adminAssignInterpreter(db, user, payload);
     else if (action === "adminRemoveInterpreter") result = await adminRemoveInterpreter(db, user, payload);
