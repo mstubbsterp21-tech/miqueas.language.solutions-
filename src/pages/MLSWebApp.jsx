@@ -218,7 +218,7 @@ export default function MLSWebApp() {
         )}
       </AppShell>
 
-      <ProfileModals controller={controller} />
+      <ProfileModals controller={controller} v2={v2.data} profileActions={combinedActions} />
       <WorkflowModals controller={controller} />
       <BidModal controller={controller} />
     </>
