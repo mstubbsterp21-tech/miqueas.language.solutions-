@@ -1,6 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSession } from "@clerk/clerk-react";
-import { CheckCircle2, Loader2, Mail, PlugZap, RefreshCw, Send, Unplug } from "lucide-react";
+import {
+  CalendarDays, CheckCircle2, FolderOpen, Loader2, Mail, PlugZap,
+  RefreshCw, Send, Unplug,
+} from "lucide-react";
 import { createMLSApi } from "./api";
 import { Badge, Card, formatDate } from "./ui";
 
@@ -34,8 +37,8 @@ export default function GmailIntegrationCard() {
     const params = new URLSearchParams(window.location.search);
     const result = params.get("gmail");
     const detail = params.get("gmail_message");
-    if (result === "connected") setMessage(detail || "Gmail connected successfully.");
-    if (result === "error") setError(detail || "Gmail authorization was not completed.");
+    if (result === "connected") setMessage(detail || "Google Workspace connected successfully.");
+    if (result === "error") setError(detail || "Google Workspace authorization was not completed.");
     if (result) {
       params.delete("gmail");
       params.delete("gmail_message");
@@ -73,13 +76,13 @@ export default function GmailIntegrationCard() {
   }
 
   async function disconnect() {
-    if (!window.confirm("Disconnect Gmail from the MLS portal? Document-request emails and reminders will stop until Gmail is reconnected.")) return;
+    if (!window.confirm("Disconnect Google Workspace from MLS Portal? Assignment emails, calendar sync, Drive folders, document-request emails, and reminders will stop until it is reconnected.")) return;
     setBusy("disconnect");
     setError("");
     setMessage("");
     try {
       await api.gmailOAuth("disconnect", "POST", {});
-      setMessage("Gmail disconnected.");
+      setMessage("Google Workspace disconnected.");
       await load();
     } catch (disconnectError) {
       setError(disconnectError instanceof Error ? disconnectError.message : String(disconnectError));
@@ -88,27 +91,52 @@ export default function GmailIntegrationCard() {
     }
   }
 
-  const connected = Boolean(status?.connected);
-  const badge = connected ? "active" : status?.environmentConfigured ? "not connected" : "setup required";
+  const gmailConnected = Boolean(status?.connected);
+  const workspaceConnected = Boolean(status?.workspaceConnected);
+  const badge = workspaceConnected
+    ? "active"
+    : gmailConnected
+      ? "reconnect required"
+      : status?.environmentConfigured
+        ? "not connected"
+        : "setup required";
 
   return (
     <Card>
       <div className="flex items-start justify-between gap-3">
-        <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#721100]/10 text-[#721100]"><Mail size={21} /></span>
+        <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#721100]/10 text-[#721100]"><PlugZap size={21} /></span>
         <Badge value={badge} />
       </div>
-      <h2 className="mt-5 text-xl font-black text-slate-950">Gmail</h2>
-      <p className="mt-2 text-sm leading-6 text-slate-600">Sends document requests and reminders from the MLS business Gmail account through Google’s send-only API.</p>
+      <h2 className="mt-5 text-xl font-black text-slate-950">Google Workspace</h2>
+      <p className="mt-2 text-sm leading-6 text-slate-600">
+        Connects Gmail, the MLS Assignments calendar, and MLS assignment folders in Google Drive.
+      </p>
+
+      <div className="mt-5 grid gap-3 sm:grid-cols-3">
+        {[
+          [Mail, "Gmail", gmailConnected ? "Email delivery ready" : "Not connected"],
+          [CalendarDays, "Calendar", status?.calendarSummary || (workspaceConnected ? "Created on first sync" : "Reconnect required")],
+          [FolderOpen, "Drive", status?.driveRootFolderId ? "MLS Assignments folder ready" : (workspaceConnected ? "Created on first sync" : "Reconnect required")],
+        ].map(([Icon, label, detail]) => (
+          <div key={label} className="rounded-2xl bg-slate-50 p-4">
+            <Icon size={18} className="text-[#721100]" />
+            <p className="mt-3 text-sm font-black text-slate-900">{label}</p>
+            <p className="mt-1 text-xs leading-5 text-slate-500">{detail}</p>
+          </div>
+        ))}
+      </div>
 
       {loading ? (
-        <div className="mt-4 flex items-center gap-2 rounded-2xl bg-slate-50 p-4 text-sm text-slate-500"><Loader2 size={16} className="animate-spin" /> Checking Gmail connection…</div>
+        <div className="mt-4 flex items-center gap-2 rounded-2xl bg-slate-50 p-4 text-sm text-slate-500"><Loader2 size={16} className="animate-spin" /> Checking Google Workspace connection…</div>
       ) : (
         <div className="mt-4 space-y-3 rounded-2xl bg-slate-50 p-4 text-xs leading-5 text-slate-600">
           <p><strong>Sender:</strong> {status?.sender || "Not configured"}</p>
           <p><strong>Connected account:</strong> {status?.email || "None"}</p>
           {status?.connectedAt && <p><strong>Connected:</strong> {formatDate(status.connectedAt)}</p>}
-          {status?.lastTestAt && <p><strong>Last test:</strong> {formatDate(status.lastTestAt)}</p>}
+          {status?.workspaceLastVerifiedAt && <p><strong>Workspace verified:</strong> {formatDate(status.workspaceLastVerifiedAt)}</p>}
+          {status?.lastTestAt && <p><strong>Last email test:</strong> {formatDate(status.lastTestAt)}</p>}
           {!status?.environmentConfigured && <p className="font-bold text-amber-700">Missing Vercel settings: {(status?.missingEnvironmentVariables || []).join(", ")}</p>}
+          {status?.missingScopes?.length > 0 && <p className="font-bold text-amber-700">Reconnect once to approve Calendar and Drive access.</p>}
           {status?.lastError && <p className="font-bold text-rose-700">Last error: {status.lastError}</p>}
         </div>
       )}
@@ -117,9 +145,9 @@ export default function GmailIntegrationCard() {
       {error && <div className="mt-4 rounded-2xl border border-rose-200 bg-rose-50 p-4 text-xs font-bold leading-5 text-rose-700">{error}</div>}
 
       <div className="mt-5 flex flex-wrap gap-2">
-        {!connected ? (
+        {!workspaceConnected ? (
           <button type="button" onClick={connect} disabled={Boolean(busy) || loading || status?.environmentConfigured === false} className="inline-flex items-center gap-2 rounded-2xl bg-[#721100] px-4 py-3 text-sm font-black text-white disabled:opacity-50">
-            {busy === "connect" ? <Loader2 size={16} className="animate-spin" /> : <PlugZap size={16} />} Connect Gmail
+            {busy === "connect" ? <Loader2 size={16} className="animate-spin" /> : <PlugZap size={16} />} {gmailConnected ? "Reconnect Google Workspace" : "Connect Google Workspace"}
           </button>
         ) : (
           <>
