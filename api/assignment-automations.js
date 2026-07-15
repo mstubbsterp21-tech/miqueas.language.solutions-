@@ -10,10 +10,18 @@ import {
   runRequestAutomation,
   sendAssignmentMessageEmails,
 } from "./_shared/assignment-automations.js";
+import {
+  archiveAssignmentDocument,
+  createAssignmentDocumentUploadUrl,
+  listAssignmentDocuments,
+  openAssignmentDocument,
+  recordAssignmentDocumentUpload,
+  updateAssignmentDocumentVisibility,
+} from "./_shared/assignment-documents.js";
 
 async function assignmentFor(db, assignmentId) {
   const result = await db.from("assignments")
-    .select("*, clients(id,clerk_user_id,organization_name,primary_contact_name,email,billing_email), assignment_interpreters(id,status,role,interpreters(id,clerk_user_id,first_name,last_name,email))")
+    .select("*, clients(id,clerk_user_id,organization_name,primary_contact_name,email,billing_email), assignment_interpreters(id,interpreter_id,status,role,interpreters(id,clerk_user_id,first_name,last_name,email))")
     .eq("id", assignmentId)
     .maybeSingle();
   if (result.error) throw result.error;
@@ -25,6 +33,15 @@ function canViewAssignment(user, assignment) {
   if (assignment?.clients?.clerk_user_id === user.id) return true;
   return (assignment?.assignment_interpreters || []).some((link) => link.interpreters?.clerk_user_id === user.id);
 }
+
+const documentActions = new Set([
+  "listDocuments",
+  "createDocumentUploadUrl",
+  "recordDocumentUpload",
+  "openDocument",
+  "archiveDocument",
+  "updateDocumentVisibility",
+]);
 
 export default async function handler(req, res) {
   try {
@@ -65,6 +82,17 @@ export default async function handler(req, res) {
     if (!assignment) return send(res, 404, { error: "Assignment not found." });
     if (!canViewAssignment(user, assignment)) {
       return send(res, 403, { error: "Assignment access is required." });
+    }
+
+    if (documentActions.has(action)) {
+      let documentResult;
+      if (action === "listDocuments") documentResult = await listAssignmentDocuments(db, user, assignment);
+      else if (action === "createDocumentUploadUrl") documentResult = await createAssignmentDocumentUploadUrl(db, user, assignment, body);
+      else if (action === "recordDocumentUpload") documentResult = await recordAssignmentDocumentUpload(db, user, assignment, body);
+      else if (action === "openDocument") documentResult = await openAssignmentDocument(db, user, assignment, body);
+      else if (action === "archiveDocument") documentResult = await archiveAssignmentDocument(db, user, assignment, body);
+      else documentResult = await updateAssignmentDocumentVisibility(db, user, assignment, body);
+      return send(res, documentResult.status, documentResult.payload);
     }
 
     let result;
