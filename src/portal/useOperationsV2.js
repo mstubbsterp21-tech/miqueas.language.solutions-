@@ -107,6 +107,39 @@ export default function useOperationsV2({ enabled = true } = {}) {
     }
   }, [api, storage]);
 
+  const uploadProfileMedia = useCallback(async ({ profileType, ownerId, mediaType, file }) => {
+    if (!profileType || !mediaType || !file) throw new Error("Choose a profile image first.");
+    setSaving(true);
+    setError("");
+    try {
+      const signed = await api.operationsV2("createProfileMediaUploadUrl", "POST", {
+        profileType,
+        ownerId: ownerId || null,
+        mediaType,
+        fileName: file.name,
+        fileSize: file.size,
+      });
+      const upload = await storage.storage.from(signed.bucket).uploadToSignedUrl(signed.path, signed.token, file);
+      if (upload.error) throw upload.error;
+      const recorded = await api.operationsV2("recordProfileMediaUpload", "POST", {
+        profileType,
+        ownerId: ownerId || null,
+        mediaType,
+        storagePath: signed.path,
+      });
+      setMessage(`${mediaType === "avatar" ? "Profile picture" : "Banner"} updated.`);
+      window.setTimeout(() => setMessage(""), 4500);
+      await load(true);
+      return recorded.customization;
+    } catch (uploadError) {
+      const text = uploadError instanceof Error ? uploadError.message : String(uploadError);
+      setError(text);
+      throw uploadError;
+    } finally {
+      setSaving(false);
+    }
+  }, [api, load, storage]);
+
   const openAgreementDocument = useCallback(async ({ clientId, documentId }) => {
     if (!clientId || !documentId) return;
     setError("");
@@ -140,10 +173,13 @@ export default function useOperationsV2({ enabled = true } = {}) {
     saveCredential: (payload) => run("adminSaveCredential", payload, "Credential record saved."),
     updateOnboarding: (payload) => run("adminUpdateOnboarding", payload, "Onboarding stage updated."),
     linkBoldSignAgreement: (payload) => run("adminLinkBoldSignAgreement", payload, "Manual BoldSign record updated."),
+    saveProfileCustomization: (payload) => run("saveProfileCustomization", payload, "Profile design saved."),
+    uploadProfileMedia,
+    removeProfileMedia: (payload) => run("removeProfileMedia", payload, `${payload.mediaType === "avatar" ? "Profile picture" : "Banner"} removed.`),
     cancelDocumentRequest,
     uploadAgreementFile,
     openAgreementDocument,
-  }), [cancelDocumentRequest, openAgreementDocument, run, uploadAgreementFile]);
+  }), [cancelDocumentRequest, openAgreementDocument, run, uploadAgreementFile, uploadProfileMedia]);
 
   return {
     data,
