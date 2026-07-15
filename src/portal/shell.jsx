@@ -94,6 +94,7 @@ export default function AppShell({ role, section, setSection, user, unread = 0, 
             <div className="flex items-center gap-3">
               <button type="button" onClick={() => setMobileOpen(true)} className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#24130e] text-white lg:hidden"><Menu size={20} /></button>
               <div className="min-w-0 flex-1"><p className="text-[10px] font-black uppercase tracking-[.15em] text-[#dd7d00]">{pretty(role)} workspace</p><h1 className="truncate text-xl font-black text-slate-950">{active?.[1] || "MLS"}</h1></div>
+              {role === "admin" && <button type="button" onClick={() => setSection("settings")} className={cx("flex h-11 w-11 items-center justify-center rounded-2xl border shadow-sm transition", section === "settings" ? "border-[#721100] bg-[#721100] text-white" : "border-black/5 bg-white text-[#721100] hover:border-[#721100]/30")} aria-label="Open admin settings" title="Admin settings"><Settings2 size={19} /></button>}
               <button type="button" onClick={() => setSection("notifications")} className="relative flex h-11 w-11 items-center justify-center rounded-2xl border border-black/5 bg-white text-[#721100] shadow-sm" aria-label="Open notifications"><Bell size={19} />{unread > 0 && <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-[#dd7d00] px-1 text-[9px] font-black text-white">{unread > 99 ? "99+" : unread}</span>}</button>
             </div>
           </header>
