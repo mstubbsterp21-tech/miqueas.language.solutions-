@@ -1,9 +1,9 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
+import portalDocumentControls from './vite.portal-documents.js'
 
-// Vite configuration with React and Tailwind CSS plugins.
-// See https://vitejs.dev/config/ for more details.
+// Vite configuration with React, Tailwind CSS, and MLS portal document controls.
 export default defineConfig({
-  plugins: [react(), tailwindcss()],
+  plugins: [portalDocumentControls(), react(), tailwindcss()],
 })
