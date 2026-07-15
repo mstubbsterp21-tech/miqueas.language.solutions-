@@ -153,12 +153,67 @@ export function DocumentCard({ type, title, document, request, busy, upload, ope
   return (
     <motion.div layout whileHover={{ y: -2 }} className="rounded-[1.5rem] border border-slate-200 bg-white p-5 shadow-sm transition hover:border-[#dd7d00]/40 hover:shadow-lg">
       <div className="flex items-start justify-between gap-3">
-        <div className="flex min-w-0 gap-3"><span className={cx("flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl", document ? "bg-emerald-50 text-emerald-700" : "bg-slate-100 text-slate-500")}>{document ? <FileCheck2 size={20} /> : <FileText size={20} />}</span><div className="min-w-0"><h3 className="font-black text-slate-900">{request?.title || title}</h3>{request?.instructions && <p className="mt-1 text-xs leading-5 text-slate-500">{request.instructions}</p>}</div></div>
+        <div className="flex min-w-0 gap-3">
+          <span className={cx(
+            "flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl",
+            document ? "bg-emerald-50 text-emerald-700" : "bg-slate-100 text-slate-500",
+          )}>
+            {document ? <FileCheck2 size={20} /> : <FileText size={20} />}
+          </span>
+          <div className="min-w-0">
+            <h3 className="font-black text-slate-900">{request?.title || title}</h3>
+            {request?.instructions && <p className="mt-1 text-xs leading-5 text-slate-500">{request.instructions}</p>}
+          </div>
+        </div>
         {request?.status && <Badge value={request.status} />}
       </div>
-      {document && <div className="mt-4 rounded-2xl bg-slate-50 px-4 py-3"><p className="truncate text-sm font-bold text-slate-700">{document.file_name}</p><p className="mt-1 text-xs text-slate-400">Uploaded {formatDate(document.uploaded_at)}</p></div>}
-      {!readOnly && <div className="mt-4 rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-4 text-center" onDragOver={(event) => event.preventDefault()} onDrop={(event) => { event.preventDefault(); accept(event.dataTransfer.files?.[0]); }}><input ref={inputRef} type="file" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" className="hidden" onChange={(event) => { accept(event.target.files?.[0]); event.target.value = ""; }} /><button type="button" disabled={busy === type} onClick={() => inputRef.current?.click()} className="inline-flex items-center gap-2 text-sm font-black text-[#721100] disabled:opacity-50">{busy === type ? <Loader2 className="animate-spin" size={16} /> : <UploadCloud size={16} />}{document ? "Replace file" : "Choose or drop a file"}</button><p className="mt-1 text-[11px] text-slate-400">PDF, Word, PNG, or JPG · 15 MB max</p></div>}
-      {document && <div className="mt-4 flex flex-wrap gap-2"><button type="button" onClick={() => open?.(document)} className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-3 py-2 text-xs font-black text-slate-600"><Download size={14} /> Open</button>{!readOnly && <button type="button" onClick={() => remove?.(document)} className="inline-flex items-center gap-2 rounded-xl bg-rose-50 px-3 py-2 text-xs font-black text-rose-700"><Trash2 size={14} /> Delete</button>}</div>}
+
+      {document && (
+        <div className="mt-4 rounded-2xl bg-slate-50 px-4 py-3">
+          <p className="truncate text-sm font-bold text-slate-700">{document.file_name}</p>
+          <p className="mt-1 text-xs text-slate-400">Uploaded {formatDate(document.uploaded_at)}</p>
+        </div>
+      )}
+
+      {!readOnly && (
+        <div
+          className="mt-4 rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-4 text-center"
+          onDragOver={(event) => event.preventDefault()}
+          onDrop={(event) => {
+            event.preventDefault();
+            accept(event.dataTransfer.files?.[0]);
+          }}
+        >
+          <input
+            ref={inputRef}
+            type="file"
+            accept=".pdf,.doc,.docx,.png,.jpg,.jpeg"
+            className="hidden"
+            onChange={(event) => {
+              accept(event.target.files?.[0]);
+              event.target.value = "";
+            }}
+          />
+          <button type="button" disabled={busy === type} onClick={() => inputRef.current?.click()} className="inline-flex items-center gap-2 text-sm font-black text-[#721100] disabled:opacity-50">
+            {busy === type ? <Loader2 className="animate-spin" size={16} /> : <UploadCloud size={16} />}
+            {document ? "Replace file" : "Choose or drop a file"}
+          </button>
+          <p className="mt-1 text-[11px] text-slate-400">PDF, Word, PNG, or JPG · 15 MB max</p>
+        </div>
+      )}
+
+      {document && (
+        <div className="mt-4 flex flex-wrap gap-2">
+          <button type="button" onClick={() => open?.(document)} className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-3 py-2 text-xs font-black text-slate-600">
+            <Download size={14} /> Open
+          </button>
+          {!readOnly && (
+            <button type="button" onClick={() => remove?.(document)} className="inline-flex items-center gap-2 rounded-xl bg-rose-50 px-3 py-2 text-xs font-black text-rose-700">
+              <Trash2 size={14} /> Delete
+            </button>
+          )}
+        </div>
+      )}
     </motion.div>
   );
 }
