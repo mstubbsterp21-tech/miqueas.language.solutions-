@@ -4,6 +4,7 @@ import AdminPeopleV2 from "./adminPeople";
 import AdminFinanceV2 from "./adminFinance";
 import AdminComplianceV2 from "./adminCompliance";
 import { AdminReportsV2, AdminSettingsV2 } from "./adminInsights";
+import CommunicationsCenter from "../CommunicationsCenter";
 import ProfileStudio from "../ProfileStudio";
 import { LoadingPanel } from "./shared";
 
@@ -11,6 +12,7 @@ export default function AdminV2Workspace({ section, workspace, operations, app, 
   if (loading && !v2) return <LoadingPanel />;
   if (section === "home") return <AdminHomeV2 workspace={workspace} app={app} v2={v2} actions={actions} />;
   if (section === "assignments") return <AdminAssignmentsV2 workspace={workspace} app={app} v2={v2} actions={actions} />;
+  if (section === "communications") return <CommunicationsCenter workspace={workspace} onRefresh={actions.refreshPortal} />;
   if (section === "people") return <AdminPeopleV2 workspace={workspace} v2={v2} actions={actions} />;
   if (section === "finance") return <AdminFinanceV2 workspace={workspace} app={app} v2={v2} actions={actions} saving={saving} />;
   if (section === "compliance") return <AdminComplianceV2 workspace={workspace} operations={operations} v2={v2} actions={actions} saving={saving} />;
