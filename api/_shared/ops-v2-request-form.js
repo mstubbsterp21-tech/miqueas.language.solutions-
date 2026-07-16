@@ -37,6 +37,16 @@ async function existingClient(db, user, clientId) {
   return result.data;
 }
 
+async function duplicateClientForEmail(db, email) {
+  const [primary, billing] = await Promise.all([
+    db.from("clients").select("id,organization_name,primary_contact_name,email").eq("email", email).limit(1).maybeSingle(),
+    db.from("clients").select("id,organization_name,primary_contact_name,email").eq("billing_email", email).limit(1).maybeSingle(),
+  ]);
+  if (primary.error) throw primary.error;
+  if (billing.error) throw billing.error;
+  return primary.data || billing.data || null;
+}
+
 async function createNewClient(db, user, request = {}, assignment = {}) {
   if (!user.isAdmin) return { status: 403, error: "Only MLS administrators can create a new client from an assignment." };
   const email = String(request.contactEmail || request.emailCapture || "").trim().toLowerCase();
@@ -50,16 +60,11 @@ async function createNewClient(db, user, request = {}, assignment = {}) {
     return { status: 400, error: "Complete the new client’s contact and billing information before creating the assignment." };
   }
 
-  const duplicate = await db.from("clients")
-    .select("id,organization_name,primary_contact_name,email")
-    .ilike("email", email)
-    .limit(1)
-    .maybeSingle();
-  if (duplicate.error) throw duplicate.error;
-  if (duplicate.data) {
+  const duplicate = await duplicateClientForEmail(db, email);
+  if (duplicate) {
     return {
       status: 409,
-      error: `${duplicate.data.organization_name || duplicate.data.primary_contact_name || email} already exists in the client roster. Choose Existing client instead.`,
+      error: `${duplicate.organization_name || duplicate.primary_contact_name || email} already exists in the client roster. Choose Existing client instead.`,
     };
   }
 
