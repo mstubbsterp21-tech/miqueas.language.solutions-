@@ -1,2 +1,0 @@
--- Navigation badges use existing portal notification and learning data.
--- No database changes are required for this release.
