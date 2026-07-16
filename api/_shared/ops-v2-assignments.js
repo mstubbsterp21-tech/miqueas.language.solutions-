@@ -59,10 +59,11 @@ export async function adminUpdateFullAssignment(db, user, payload) {
 }
 
 export async function adminSyncAssignmentWorkspaceRecord(db, user, payload) {
-  if (!user.isAdmin) return { status: 403, payload: { error: "Admin access required." } };
   if (!payload.assignmentId) return { status: 400, payload: { error: "Assignment is required." } };
   const record = await assignmentRecord(db, payload.assignmentId);
   if (!record) return { status: 404, payload: { error: "Assignment not found." } };
+  const ownsAssignment = record.clients?.clerk_user_id === user.id;
+  if (!user.isAdmin && !ownsAssignment) return { status: 403, payload: { error: "Only MLS admins or the requesting client can sync this assignment record." } };
   const workspace = await syncAssignmentWorkspaceRecord(db, record);
   if (workspace.status === "failed") return { status: 502, payload: { error: workspace.error, workspace } };
   await audit(db, user, {
