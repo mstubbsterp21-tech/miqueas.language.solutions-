@@ -18,11 +18,17 @@ async function request(session, endpoint, action, method = "GET", body) {
   return data;
 }
 
+function appRequest(session, action, method, body) {
+  if (action === "adminUpdateAssignment") return request(session, "/api/assignment-admin", "update", method, body);
+  if (action === "adminDeleteAssignment") return request(session, "/api/assignment-admin", "delete", method, body);
+  return request(session, "/api/portal-app", action, method, body);
+}
+
 export function createMLSApi(session) {
   return {
     core: (action, method, body) => request(session, "/api/portal", action, method, body),
     operations: (action, method, body) => request(session, "/api/portal-operations", action, method, body),
-    app: (action, method, body) => request(session, "/api/portal-app", action, method, body),
+    app: (action, method, body) => appRequest(session, action, method, body),
     operationsV2: (action, method, body) => request(session, "/api/operations-v2", action, method, body),
     assignmentAdmin: (action, method = "POST", body) => request(session, "/api/assignment-admin", action, method, body),
     communications: (action = "loadCommunications", method = "GET", body) => request(session, "/api/communications", action, method, body),
