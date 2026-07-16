@@ -10,6 +10,7 @@ import { adminSaveCredential, adminUpdateOnboarding } from "./_shared/ops-v2-com
 import { adminLinkBoldSignAgreement } from "./_shared/ops-v2-boldsign.js";
 import { adminUpdateFullAssignment, adminSyncAssignmentWorkspaceRecord, adminDeleteAssignment } from "./_shared/ops-v2-assignments.js";
 import { adminAssignInterpreterWithNotifications, adminRemoveInterpreterWithNotifications } from "./_shared/ops-v2-assignment-team.js";
+import { saveInterpreterProfileDetails, adminUpdateInterpreterProfileDetails } from "./_shared/ops-v2-interpreter-profile.js";
 import { adminUpdateInterpreterRates } from "./_shared/ops-v2-rates.js";
 import { portalDeviceStatus, beginPortalDeviceVerification, verifyPortalDevice, interpreterNetworkPrefill } from "./_shared/ops-v2-security-prefill.js";
 import {
@@ -57,6 +58,8 @@ const actions = {
   adminDeleteAssignment,
   adminAssignInterpreter: adminAssignInterpreterWithNotifications,
   adminRemoveInterpreter: adminRemoveInterpreterWithNotifications,
+  saveInterpreterProfileDetails,
+  adminUpdateInterpreterProfileDetails,
   adminUpdateInterpreterRates,
   interpreterNetworkPrefill,
   createConversation: createCommunicationConversation,
