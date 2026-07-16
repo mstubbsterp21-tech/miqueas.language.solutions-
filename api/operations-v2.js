@@ -12,6 +12,7 @@ import { adminUpdateFullAssignment, adminSyncAssignmentWorkspaceRecord, adminDel
 import { adminAssignInterpreterWithNotifications, adminRemoveInterpreterWithNotifications } from "./_shared/ops-v2-assignment-team.js";
 import { saveInterpreterProfileDetails, adminUpdateInterpreterProfileDetails } from "./_shared/ops-v2-interpreter-profile.js";
 import { adminUpdateInterpreterRates } from "./_shared/ops-v2-rates.js";
+import { createRequestAssignment } from "./_shared/ops-v2-request-form.js";
 import { portalDeviceStatus, beginPortalDeviceVerification, verifyPortalDevice, interpreterNetworkPrefill } from "./_shared/ops-v2-security-prefill.js";
 import {
   loadCommunications,
@@ -61,6 +62,7 @@ const actions = {
   saveInterpreterProfileDetails,
   adminUpdateInterpreterProfileDetails,
   adminUpdateInterpreterRates,
+  createRequestAssignment,
   interpreterNetworkPrefill,
   createConversation: createCommunicationConversation,
   createCommunicationUploadUrl: createAuthorizedCommunicationUpload,

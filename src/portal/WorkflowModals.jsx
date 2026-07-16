@@ -1,25 +1,29 @@
 import {
-  AssignmentRequestForm, CourseForm, FeedbackForm,
+  CourseForm, FeedbackForm,
   InviteUserForm,
 } from "./forms";
 import DocumentRequestEmailForm from "./DocumentRequestEmailForm";
 import OpportunityEmailForm from "./OpportunityEmailForm";
+import PortalInterpreterRequestForm from "./PortalInterpreterRequestForm";
 import { Modal } from "./ui";
 
-export default function WorkflowModals({ controller }) {
+export default function WorkflowModals({ controller, actions }) {
   const {
-    modal, setModal, assignmentDraft, setAssignmentDraft,
+    modal, setModal,
     feedbackDraft, setFeedbackDraft, inviteDraft, setInviteDraft,
     courseDraft, setCourseDraft,
-    app, saving,
-    submitAssignment, submitFeedback, inviteUser,
+    app, workspace, saving,
+    submitFeedback, inviteUser,
     saveCourse,
   } = controller;
+  const client = workspace?.client?.profile || null;
 
   return (
     <>
-      <Modal open={modal === "request"} close={() => setModal("")} title="Request an interpreter" subtitle="Submit one complete request to the MLS staffing pipeline." wide>
-        <AssignmentRequestForm draft={assignmentDraft} setDraft={setAssignmentDraft} submit={submitAssignment} saving={saving} />
+      <Modal open={modal === "request"} close={() => setModal("")} title="Request an interpreter" subtitle="Complete the same Interpreter Request form available on the MLS website." wide>
+        {client
+          ? <PortalInterpreterRequestForm key={client.id || client.email} client={client} source="client_portal" onSubmit={(assignment) => actions.createAssignment({ assignment })} />
+          : <div className="rounded-[1.5rem] border border-dashed border-slate-300 bg-slate-50 p-8 text-center text-sm font-bold text-slate-500">Complete your client profile before submitting an Interpreter Request.</div>}
       </Modal>
 
       <Modal open={modal === "feedback"} close={() => setModal("")} title="Share feedback">
