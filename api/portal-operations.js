@@ -63,6 +63,93 @@ async function clientFor(database, user) {
   return result.data;
 }
 
+async function countRows(database, table, column, value) {
+  const result = await database.from(table).select("id", { count: "exact", head: true }).eq(column, value);
+  if (result.error) throw result.error;
+  return result.count || 0;
+}
+
+async function removeStoragePaths(database, bucket, paths) {
+  const uniquePaths = [...new Set((paths || []).filter(Boolean))];
+  if (!uniquePaths.length) return;
+  const result = await database.storage.from(bucket).remove(uniquePaths);
+  if (result.error) throw result.error;
+}
+
+function profileLabel(profileType, record) {
+  if (profileType === "client") return record.organization_name || record.primary_contact_name || record.email || "Client profile";
+  return `${record.first_name || ""} ${record.last_name || ""}`.trim() || record.email || "Interpreter profile";
+}
+
+async function adminDeleteProfile(database, user, payload) {
+  if (!user.isAdmin) return { status: 403, payload: { error: "Admin access required." } };
+  const profileType = payload?.profileType === "client" ? "client" : payload?.profileType === "interpreter" ? "interpreter" : "";
+  const profileId = String(payload?.profileId || "").trim();
+  if (!profileType || !profileId) return { status: 400, payload: { error: "Choose a client or interpreter profile to delete." } };
+  if (payload?.confirmation !== "DELETE") return { status: 400, payload: { error: "Type DELETE to confirm permanent profile deletion." } };
+
+  const table = profileType === "client" ? "clients" : "interpreters";
+  const ownerColumn = profileType === "client" ? "client_id" : "interpreter_id";
+  const recordResult = await database.from(table).select("*").eq("id", profileId).maybeSingle();
+  if (recordResult.error) throw recordResult.error;
+  const record = recordResult.data;
+  if (!record) return { status: 404, payload: { error: `${profileType === "client" ? "Client" : "Interpreter"} profile not found.` } };
+  if (record.clerk_user_id === user.id) return { status: 409, payload: { error: "Your own admin interpreter profile cannot be deleted from the People directory." } };
+
+  const blockers = profileType === "client"
+    ? [
+      ["assignments", await countRows(database, "assignments", "client_id", profileId)],
+      ["feedback records", await countRows(database, "client_feedback", "client_id", profileId)],
+    ]
+    : [
+      ["assignment records", await countRows(database, "assignment_interpreters", "interpreter_id", profileId)],
+      ["assignment bids", await countRows(database, "assignment_bids", "interpreter_id", profileId)],
+      ["time entries", await countRows(database, "time_entries", "interpreter_id", profileId)],
+      ["expense records", await countRows(database, "expenses", "interpreter_id", profileId)],
+    ];
+  const activeBlockers = blockers.filter(([, count]) => count > 0);
+  if (activeBlockers.length) {
+    const details = activeBlockers.map(([label, count]) => `${count} ${label}`).join(", ");
+    return {
+      status: 409,
+      payload: {
+        error: `This profile cannot be permanently deleted because MLS must retain ${details}. Use Edit account details and set the profile to Inactive instead.`,
+        blockers: Object.fromEntries(activeBlockers),
+      },
+    };
+  }
+
+  const documentTable = profileType === "client" ? "client_documents" : "interpreter_documents";
+  const documentBucket = profileType === "client" ? "client-documents" : "interpreter-documents";
+  const [documentResult, customizationResult] = await Promise.all([
+    database.from(documentTable).select("storage_path").eq(ownerColumn, profileId),
+    database.from("profile_customizations").select("avatar_path,banner_path").eq(ownerColumn, profileId).maybeSingle(),
+  ]);
+  if (documentResult.error) throw documentResult.error;
+  if (customizationResult.error) throw customizationResult.error;
+
+  await removeStoragePaths(database, documentBucket, (documentResult.data || []).map((item) => item.storage_path));
+  await removeStoragePaths(database, "profile-media", [customizationResult.data?.avatar_path, customizationResult.data?.banner_path]);
+
+  const label = profileLabel(profileType, record);
+  const auditResult = await database.from("audit_events").insert({
+    actor_clerk_user_id: user.id,
+    actor_role: "admin",
+    action: `${profileType}_profile_deleted`,
+    entity_type: profileType,
+    entity_id: record.id,
+    summary: `${label} permanently deleted from the MLS Portal`,
+    before_data: record,
+    after_data: { deleted: true },
+  });
+  if (auditResult.error) throw auditResult.error;
+
+  const deleteResult = await database.from(table).delete().eq("id", profileId);
+  if (deleteResult.error) throw deleteResult.error;
+
+  return { status: 200, payload: { deletedId: profileId, profileType, label } };
+}
+
 async function loadOperations(database, user) {
   const [interpreter, client] = await Promise.all([interpreterFor(database, user), clientFor(database, user)]);
   const response = { training: [], opportunities: [], bids: [], feedback: [], admin: null };
@@ -226,6 +313,7 @@ export default async function handler(req, res) {
     else if (action === "adminSaveCourse") result = await adminSaveCourse(database, user, payload);
     else if (action === "adminPublishOpportunity") result = await adminPublishOpportunity(database, user, payload);
     else if (action === "adminUpdateBid") result = await adminUpdateBid(database, user, payload);
+    else if (action === "adminDeleteProfile") result = await adminDeleteProfile(database, user, payload);
     else result = { status: 404, payload: { error: "Unknown operation." } };
     return send(res, result.status, result.payload);
   } catch (error) {
