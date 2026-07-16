@@ -19,6 +19,9 @@ async function request(session, endpoint, action, method = "GET", body) {
 }
 
 async function coreRequest(session, action, method, body) {
+  if (action === "createAssignment") {
+    return request(session, "/api/operations-v2", "createRequestAssignment", method, body);
+  }
   if (action === "saveInterpreterProfile") {
     return request(session, "/api/operations-v2", "saveInterpreterProfileDetails", method, body);
   }
