@@ -26,6 +26,13 @@ import {
   removeProfileMedia,
 } from "./_shared/ops-v2-profiles.js";
 
+async function createAuthorizedCommunicationUpload(db, user, payload) {
+  if (payload?.context === "announcement" && !user.isAdmin) {
+    return { status: 403, payload: { error: "Admin access is required to upload announcement attachments." } };
+  }
+  return createCommunicationUploadUrl(db, user, payload);
+}
+
 const actions = {
   adminCreateQuote,
   adminSendQuote,
@@ -46,8 +53,8 @@ const actions = {
   adminSyncAssignmentWorkspaceRecord,
   adminDeleteAssignment,
   createConversation: createCommunicationConversation,
-  createCommunicationUploadUrl,
-  createUploadUrl: createCommunicationUploadUrl,
+  createCommunicationUploadUrl: createAuthorizedCommunicationUpload,
+  createUploadUrl: createAuthorizedCommunicationUpload,
   sendDirectMessage: sendPortalDirectMessage,
   publishAnnouncement: publishPortalAnnouncement,
   markAnnouncementRead: markPortalAnnouncementRead,
