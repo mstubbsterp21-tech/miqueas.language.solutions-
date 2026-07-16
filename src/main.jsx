@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client';
 import { ClerkProvider } from '@clerk/clerk-react';
 import { BrowserRouter, useLocation } from 'react-router-dom';
 import App from './App';
-import PortalAppRouter from './PortalAppRouter';
+import PortalAppRouterHub from './PortalAppRouterHub';
 import ScrollToTop from './components/ScrollToTop';
 import { clerkPublishableKey, isClerkConfigured } from './lib/env';
 import './index.css';
@@ -11,7 +11,7 @@ import './index.css';
 function RootRouter() {
   const { pathname } = useLocation();
   const isPortalPath = pathname.startsWith('/portal') || pathname.startsWith('/login') || pathname.startsWith('/admin/interpreters');
-  return isPortalPath ? <PortalAppRouter /> : <App />;
+  return isPortalPath ? <PortalAppRouterHub /> : <App />;
 }
 
 const app = (
