@@ -24,6 +24,18 @@ function appRequest(session, action, method, body) {
   return request(session, "/api/portal-app", action, method, body);
 }
 
+async function assignmentAutomationRequest(session, action, method, body) {
+  if (action === "deleteAssignment") {
+    return request(session, "/api/assignment-workspace-sync", "deleteRecords", method, body);
+  }
+  const result = await request(session, "/api/assignment-automations", action, method, body);
+  if (["requestCreated", "confirmed", "syncAssignment"].includes(action) && body?.assignmentId) {
+    const workspace = await request(session, "/api/assignment-workspace-sync", "syncRecord", "POST", { assignmentId: body.assignmentId });
+    return { ...result, workspaceRecord: workspace.workspace };
+  }
+  return result;
+}
+
 export function createMLSApi(session) {
   return {
     core: (action, method, body) => request(session, "/api/portal", action, method, body),
@@ -41,7 +53,7 @@ export function createMLSApi(session) {
       method,
       body,
     ),
-    automations: (action, method = "POST", body) => request(session, "/api/assignment-automations", action, method, body),
+    automations: (action, method = "POST", body) => assignmentAutomationRequest(session, action, method, body),
     documentRequestEmail: (action, method = "POST", body) => request(session, "/api/document-request-email", action, method, body),
     documentRequestCancel: (action = "cancel", method = "POST", body) => request(session, "/api/document-request-cancel", action, method, body),
     opportunityEmail: (action, method = "POST", body) => request(session, "/api/opportunity-email", action, method, body),
