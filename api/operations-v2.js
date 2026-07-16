@@ -8,7 +8,7 @@ import { interpreterSubmitExpense, adminReviewExpense } from "./_shared/ops-v2-e
 import { interpreterSaveAvailability, interpreterSaveWeeklyAvailability, interpreterDeleteAvailability } from "./_shared/ops-v2-availability.js";
 import { adminSaveCredential, adminUpdateOnboarding } from "./_shared/ops-v2-compliance.js";
 import { adminLinkBoldSignAgreement } from "./_shared/ops-v2-boldsign.js";
-import { adminUpdateFullAssignment, adminDeleteAssignment } from "./_shared/ops-v2-assignments.js";
+import { adminUpdateFullAssignment, adminSyncAssignmentWorkspaceRecord, adminDeleteAssignment } from "./_shared/ops-v2-assignments.js";
 import {
   loadCommunications,
   createCommunicationConversation,
@@ -43,6 +43,7 @@ const actions = {
   adminUpdateOnboarding,
   adminLinkBoldSignAgreement,
   adminUpdateFullAssignment,
+  adminSyncAssignmentWorkspaceRecord,
   adminDeleteAssignment,
   createConversation: createCommunicationConversation,
   createCommunicationUploadUrl,
