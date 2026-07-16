@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { CalendarPlus, Check, Loader2, MapPin, MonitorPlay, Pencil, Trash2, Users } from "lucide-react";
+import { Building2, CalendarPlus, Check, Loader2, MapPin, MonitorPlay, Pencil, Trash2, UserPlus, Users } from "lucide-react";
 import { EMPTY_ASSIGNMENT } from "./forms";
 import PortalInterpreterRequestForm from "./PortalInterpreterRequestForm";
 import { Field, INPUT, Modal, cx } from "./ui";
@@ -66,19 +66,42 @@ function AssignmentForm({ assignment, clients, actions, close }) {
   </form>;
 }
 
+function ClientPathChoice({ value, onChange }) {
+  const choices = [
+    { value: "existing", icon: Building2, title: "Existing client", text: "Select a saved MLS client. Their contact, billing, and communication preferences will be used automatically." },
+    { value: "new", icon: UserPlus, title: "New client", text: "Create the client profile and assignment together, starting with complete contact and billing details." },
+  ];
+  return <div className="grid gap-4 md:grid-cols-2">{choices.map(({ value: optionValue, icon: Icon, title, text }) => <button key={optionValue} type="button" onClick={() => onChange(optionValue)} className={cx("rounded-[1.5rem] border p-5 text-left transition", value === optionValue ? "border-[#dd7d00] bg-[#fff6e8] shadow-md" : "border-slate-200 bg-white hover:border-[#dd7d00]/50")}><span className={cx("flex h-11 w-11 items-center justify-center rounded-2xl", value === optionValue ? "bg-[#721100] text-white" : "bg-slate-100 text-slate-600")}><Icon size={20} /></span><p className="mt-4 text-base font-black text-slate-950">{title}</p><p className="mt-2 text-sm leading-6 text-slate-500">{text}</p></button>)}</div>;
+}
+
 export function NewAssignmentControl({ clients, actions }) {
   const [open, setOpen] = useState(false);
+  const [clientMode, setClientMode] = useState("");
   const [clientId, setClientId] = useState("");
   const client = (clients || []).find((item) => item.id === clientId) || null;
 
   function close() {
     setOpen(false);
+    setClientMode("");
     setClientId("");
   }
 
-  return <><button type="button" onClick={() => setOpen(true)} className="inline-flex items-center gap-2 rounded-2xl bg-[#dd7d00] px-4 py-3 text-sm font-black text-white"><CalendarPlus size={16} />New assignment</button><Modal open={open} close={close} title="Create assignment" subtitle="Choose the client, then complete the same Interpreter Request form used on the MLS website." wide>
-    <div className="mb-6 rounded-[1.5rem] border border-slate-200 bg-white p-5"><Field name="Portal client" required><select className={INPUT} required value={clientId} onChange={(event) => setClientId(event.target.value)}><option value="">Choose a client</option>{(clients || []).map((item) => <option key={item.id} value={item.id}>{item.organization_name || item.primary_contact_name || item.email}</option>)}</select></Field></div>
-    {client ? <PortalInterpreterRequestForm key={client.id} client={client} source="admin_portal" onSubmit={(assignment) => actions.createAssignment({ clientId: client.id, assignment })} /> : <div className="rounded-[1.5rem] border border-dashed border-slate-300 bg-slate-50 p-8 text-center text-sm font-bold text-slate-500">Choose a client to open the Interpreter Request form.</div>}
+  function changeMode(mode) {
+    setClientMode(mode);
+    setClientId("");
+  }
+
+  return <><button type="button" onClick={() => setOpen(true)} className="inline-flex items-center gap-2 rounded-2xl bg-[#dd7d00] px-4 py-3 text-sm font-black text-white"><CalendarPlus size={16} />New assignment</button><Modal open={open} close={close} title="Create assignment" subtitle="Begin by choosing whether MLS is working with a new or existing client." wide>
+    {!clientMode && <div className="space-y-5"><div className="rounded-[1.5rem] border border-slate-200 bg-slate-50 p-5"><p className="text-sm font-black text-slate-950">Who is this assignment for?</p><p className="mt-1 text-sm leading-6 text-slate-500">This choice controls whether the form starts with client setup or goes directly to assignment details.</p></div><ClientPathChoice value={clientMode} onChange={changeMode} /></div>}
+
+    {clientMode && <div className="mb-5 flex items-center justify-between gap-4 rounded-[1.25rem] border border-slate-200 bg-slate-50 p-4"><div><p className="text-xs font-black uppercase tracking-[.12em] text-[#dd7d00]">Client path</p><p className="mt-1 text-sm font-black text-slate-950">{clientMode === "existing" ? "Existing client" : "New client"}</p></div><button type="button" onClick={() => changeMode("")} className="rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-black text-[#721100]">Change</button></div>}
+
+    {clientMode === "existing" && <>
+      <div className="mb-6 rounded-[1.5rem] border border-slate-200 bg-white p-5"><Field name="Existing client" required><select className={INPUT} required value={clientId} onChange={(event) => setClientId(event.target.value)}><option value="">Choose a client</option>{(clients || []).map((item) => <option key={item.id} value={item.id}>{item.organization_name || item.primary_contact_name || item.email}</option>)}</select></Field></div>
+      {client ? <PortalInterpreterRequestForm key={client.id} client={client} existingClient source="admin_portal" onSubmit={(assignment) => actions.createAssignment({ clientMode: "existing", clientId: client.id, assignment })} /> : <div className="rounded-[1.5rem] border border-dashed border-slate-300 bg-slate-50 p-8 text-center text-sm font-bold text-slate-500">Choose an existing client to begin with Assignment Details.</div>}
+    </>}
+
+    {clientMode === "new" && <PortalInterpreterRequestForm key="new-client" client={null} existingClient={false} source="admin_portal" onSubmit={(assignment, request) => actions.createAssignment({ clientMode: "new", newClient: request, assignment })} />}
   </Modal></>;
 }
 
