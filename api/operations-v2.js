@@ -15,15 +15,18 @@ import { adminUpdateInterpreterRates } from "./_shared/ops-v2-rates.js";
 import { createRequestAssignment } from "./_shared/ops-v2-request-form.js";
 import { portalDeviceStatus, beginPortalDeviceVerification, verifyPortalDevice, interpreterNetworkPrefill } from "./_shared/ops-v2-security-prefill.js";
 import {
-  loadCommunications,
   createCommunicationConversation,
   createCommunicationUploadUrl,
-  sendPortalDirectMessage,
   publishPortalAnnouncement,
   markPortalAnnouncementRead,
   openCommunicationAttachment,
   deletePortalAnnouncement,
 } from "./_shared/ops-v2-communications.js";
+import {
+  loadCommunicationsWithMentions,
+  renamePortalConversation,
+  sendPortalMessageWithMentions,
+} from "./_shared/ops-v2-conversation-features.js";
 import {
   saveProfileCustomization,
   createProfileMediaUploadUrl,
@@ -65,9 +68,10 @@ const actions = {
   createRequestAssignment,
   interpreterNetworkPrefill,
   createConversation: createCommunicationConversation,
+  renameConversation: renamePortalConversation,
   createCommunicationUploadUrl: createAuthorizedCommunicationUpload,
   createUploadUrl: createAuthorizedCommunicationUpload,
-  sendDirectMessage: sendPortalDirectMessage,
+  sendDirectMessage: sendPortalMessageWithMentions,
   publishAnnouncement: publishPortalAnnouncement,
   markAnnouncementRead: markPortalAnnouncementRead,
   openCommunicationAttachment,
@@ -98,7 +102,7 @@ export default async function handler(req, res) {
       return send(res, result.status, result.payload);
     }
     if (action === "loadOperationsV2") return send(res, 200, await loadOperationsV2(db, user));
-    if (action === "loadCommunications") return send(res, 200, await loadCommunications(db, user));
+    if (action === "loadCommunications") return send(res, 200, await loadCommunicationsWithMentions(db, user));
     const fn = actions[action];
     if (!fn) return send(res, 404, { error: "Unknown operations v2 action." });
     const result = await fn(db, user, readBody(req));
