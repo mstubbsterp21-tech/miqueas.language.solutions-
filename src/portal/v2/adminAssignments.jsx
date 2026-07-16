@@ -1,4 +1,5 @@
 import { CalendarDays } from "lucide-react";
+import { NewAssignmentControl } from "../AssignmentAdminControls";
 import { Card, EmptyState, Hero, SectionHeader } from "../ui";
 import { ActionButton, AssignmentRow } from "./shared";
 
@@ -21,6 +22,7 @@ function assignmentDetail(assignment, quote, agreement) {
 
 export default function AdminAssignmentsV2({ workspace, app, v2, actions }) {
   const assignments = app?.assignments || workspace.admin?.assignments || [];
+  const clients = workspace.admin?.clients || [];
   const quoteByAssignment = new Map((v2?.quotes || []).map((item) => [item.assignment_id, item]));
   const agreementByAssignment = new Map((v2?.agreements || []).map((item) => [item.assignment_id, item]));
   const openAssignments = assignments.filter((assignment) => !closedLifecycle.has(assignment.lifecycle_status) && !closedStatus.has(assignment.status));
@@ -39,14 +41,14 @@ export default function AdminAssignmentsV2({ workspace, app, v2, actions }) {
 
   return (
     <div className="space-y-6">
-      <Hero eyebrow="Assignment lifecycle" title="Open Assignments" text="New client requests appear here immediately. Open a record to manage review, staffing, confirmation, messages, documents, Calendar, Drive, and billing." actions={<ActionButton tone="gold" onClick={actions.openOpportunity}>Publish opportunity</ActionButton>} />
+      <Hero eyebrow="Assignment lifecycle" title="Open Assignments" text="Create, edit, staff, sync, cancel, close, or safely delete assignments from one workspace." actions={<div className="flex flex-wrap gap-3"><NewAssignmentControl clients={clients} actions={actions} /><ActionButton tone="soft" onClick={actions.openOpportunity}>Publish opportunity</ActionButton></div>} />
       <Card>
         <SectionHeader eyebrow="Pipeline" title="Lifecycle stages" text="A request advances through approval, staffing, service delivery, verification, invoicing, payment, and closeout." />
         <div className="mt-5 flex gap-2 overflow-x-auto pb-2">{lifecycleStages.map((status) => <span key={status} className="whitespace-nowrap rounded-full border border-slate-200 bg-slate-50 px-3 py-2 text-[10px] font-black uppercase tracking-[.08em] text-slate-600">{status.replaceAll("_", " ")}</span>)}</div>
       </Card>
       <div className="space-y-3">
         {rows(openAssignments)}
-        {!openAssignments.length && <EmptyState icon={CalendarDays} title="No open assignments" text="Client requests will appear here as soon as they submit the request form." />}
+        {!openAssignments.length && <EmptyState icon={CalendarDays} title="No open assignments" text="Create an assignment or wait for a client request." />}
       </div>
       {closedAssignments.length > 0 && (
         <Card>
