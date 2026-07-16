@@ -92,10 +92,10 @@ export default function useOperationsV2({ enabled = true } = {}) {
     return updated;
   }, "Assignment updated and synced to Google Workspace."), [api, runAssignment]);
 
-  const deleteAssignment = useCallback((assignment, confirmation = "") => runAssignment(async () => {
-    await api.automations("deleteAssignment", "POST", { assignmentId: assignment.id, confirmation });
-    return api.app("adminDeleteAssignment", "POST", { assignmentId: assignment.id, confirmation });
-  }, "Assignment deleted from MLS Portal and Google Workspace."), [api, runAssignment]);
+  const deleteAssignment = useCallback((assignment, confirmation = "") => runAssignment(
+    () => api.app("adminDeleteAssignment", "POST", { assignmentId: assignment.id, confirmation }),
+    "Assignment deleted from MLS Portal and Google Workspace.",
+  ), [api, runAssignment]);
 
   const cancelDocumentRequest = useCallback(async (requestId) => {
     setSaving(true);
