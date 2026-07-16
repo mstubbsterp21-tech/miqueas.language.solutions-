@@ -10,6 +10,7 @@ import { adminSaveCredential, adminUpdateOnboarding } from "./_shared/ops-v2-com
 import { adminLinkBoldSignAgreement } from "./_shared/ops-v2-boldsign.js";
 import { adminUpdateFullAssignment, adminSyncAssignmentWorkspaceRecord, adminDeleteAssignment } from "./_shared/ops-v2-assignments.js";
 import { adminAssignInterpreterWithNotifications, adminRemoveInterpreterWithNotifications } from "./_shared/ops-v2-assignment-team.js";
+import { portalDeviceStatus, beginPortalDeviceVerification, verifyPortalDevice, interpreterNetworkPrefill } from "./_shared/ops-v2-security-prefill.js";
 import {
   loadCommunications,
   createCommunicationConversation,
@@ -55,6 +56,7 @@ const actions = {
   adminDeleteAssignment,
   adminAssignInterpreter: adminAssignInterpreterWithNotifications,
   adminRemoveInterpreter: adminRemoveInterpreterWithNotifications,
+  interpreterNetworkPrefill,
   createConversation: createCommunicationConversation,
   createCommunicationUploadUrl: createAuthorizedCommunicationUpload,
   createUploadUrl: createAuthorizedCommunicationUpload,
@@ -76,6 +78,18 @@ export default async function handler(req, res) {
     if (!user) return send(res, 401, { error: "Sign in is required." });
     const db = database();
     const action = String(req.query?.action || "loadOperationsV2");
+    if (action === "deviceStatus") {
+      const result = await portalDeviceStatus(db, user, req);
+      return send(res, result.status, result.payload);
+    }
+    if (action === "beginDeviceVerification") {
+      const result = await beginPortalDeviceVerification(db, user, req, res, readBody(req));
+      return send(res, result.status, result.payload);
+    }
+    if (action === "verifyDevice") {
+      const result = await verifyPortalDevice(db, user, req, res, readBody(req));
+      return send(res, result.status, result.payload);
+    }
     if (action === "loadOperationsV2") return send(res, 200, await loadOperationsV2(db, user));
     if (action === "loadCommunications") return send(res, 200, await loadCommunications(db, user));
     const fn = actions[action];
