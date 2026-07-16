@@ -5,6 +5,8 @@ import AppShell from "../portal/shell";
 import BidModal from "../portal/BidModal";
 import CommunicationsCenter from "../portal/CommunicationsCenter";
 import FirstLoginSetupWizard, { needsFirstLoginSetup } from "../portal/ClerkFirstLoginSetupWizard";
+import PortalHomeSnapshot from "../portal/PortalHomeSnapshot";
+import PortalRealtimeBridge from "../portal/PortalRealtimeBridge";
 import PortalRoleSelection from "../portal/PortalRoleSelection";
 import ProfileMessageShortcut from "../portal/ProfileMessageShortcut";
 import ProfileModals from "../portal/ProfileModals";
@@ -54,9 +56,7 @@ export default function MLSWebAppHub() {
   if (!isLoaded || loading) return <PortalLoading />;
   if (!workspace || !app) return <div className="flex min-h-[100dvh] items-center justify-center bg-[#f7f3ef] p-5"><EmptyState icon={AlertCircle} title="Workspace unavailable" text={error || "Refresh the app and try again."} /></div>;
   if (!workspace.user?.isAdmin && roleSelection.loading) return <PortalLoading title="Checking your account type" text="Preparing the correct MLS profile setup." />;
-  if (!workspace.user?.isAdmin && roleSelection.selectionRequired) {
-    return <PortalRoleSelection user={workspace.user} saving={roleSelection.saving} error={roleSelection.error} onSelect={async (selectedRole) => { await roleSelection.selectRole(selectedRole); setModal(""); await Promise.allSettled([load(true), v2.load(true)]); await roleSelection.load(); }} />;
-  }
+  if (!workspace.user?.isAdmin && roleSelection.selectionRequired) return <PortalRoleSelection user={workspace.user} saving={roleSelection.saving} error={roleSelection.error} onSelect={async (selectedRole) => { await roleSelection.selectRole(selectedRole); setModal(""); await Promise.allSettled([load(true), v2.load(true)]); await roleSelection.load(); }} />;
   if (needsFirstLoginSetup(role, workspace)) {
     const profile = role === "client" ? workspace.client?.profile : workspace.interpreter?.profile;
     return <FirstLoginSetupWizard role={role} profile={profile} user={workspace.user} onComplete={async () => { setModal(""); await Promise.allSettled([load(true), v2.load(true)]); }} />;
@@ -69,40 +69,31 @@ export default function MLSWebAppHub() {
   const legacyClientSection = activeSection === "notifications" ? "notifications" : activeSection;
   const legacyInterpreterSection = activeSection === "learning" ? "training" : activeSection;
 
-  return (
-    <>
-      <AppShell role={role} section={activeSection} setSection={setSection} user={workspace.user} personalization={personalization} unread={app.unreadCount || 0} refreshing={refreshing || v2.loading} refresh={refreshAll}>
-        {message && <Toast message={message} dismiss={() => setMessage("")} />}
-        {error && <Toast message={error} type="error" dismiss={() => setError("")} />}
-        {v2.message && <Toast message={v2.message} dismiss={() => v2.setMessage("")} />}
-        {v2.error && <Toast message={v2.error} type="error" dismiss={() => v2.setError("")} />}
+  return <>
+    <PortalRealtimeBridge topic={v2.data?.realtimeTopic} refresh={refreshAll} />
+    <AppShell role={role} section={activeSection} setSection={setSection} user={workspace.user} personalization={personalization} unread={app.unreadCount || 0} refreshing={refreshing || v2.loading} refresh={refreshAll}>
+      {message && <Toast message={message} dismiss={() => setMessage("")} />}
+      {error && <Toast message={error} type="error" dismiss={() => setError("")} />}
+      {v2.message && <Toast message={v2.message} dismiss={() => v2.setMessage("")} />}
+      {v2.error && <Toast message={v2.error} type="error" dismiss={() => v2.setError("")} />}
 
-        {role === "admin" && activeSection !== "notifications" && <AdminV2Workspace section={activeSection} workspace={workspace} operations={operations} app={app} v2={v2.data} loading={v2.loading} saving={v2.saving} actions={combinedActions} />}
-        {role === "admin" && activeSection === "notifications" && <AdminWorkspace section="notifications" workspace={workspace} operations={operations} app={app} actions={combinedActions} />}
+      {activeSection === "home" && <PortalHomeSnapshot role={role} workspace={workspace} operations={operations} app={app} v2={v2.data} actions={combinedActions} />}
 
-        {role === "client" && ["home", "requests", "assignments", "communications", "billing"].includes(activeSection) && <ClientV2Workspace section={activeSection} workspace={workspace} operations={operations} app={app} v2={v2.data} loading={v2.loading} saving={v2.saving} actions={combinedActions} />}
-        {role === "client" && activeSection === "profile" && (
-          <div className="space-y-6">
-            <ProfileMessageShortcut profileType="client" profile={workspace.client?.profile || {}} selfService onNavigate={setSection} />
-            <ProfileStudio profileType="client" profile={workspace.client?.profile || {}} customization={v2.data?.profileCustomization} actions={combinedActions} ownerId={workspace.client?.profile?.id} />
-          </div>
-        )}
-        {role === "client" && ["documents", "notifications"].includes(activeSection) && <ClientWorkspace section={legacyClientSection} workspace={workspace} operations={operations} app={app} actions={combinedActions} busyDoc={busyDoc} />}
+      {role === "admin" && !["home", "notifications"].includes(activeSection) && <AdminV2Workspace section={activeSection} workspace={workspace} operations={operations} app={app} v2={v2.data} loading={v2.loading} saving={v2.saving} actions={combinedActions} />}
+      {role === "admin" && activeSection === "notifications" && <AdminWorkspace section="notifications" workspace={workspace} operations={operations} app={app} actions={combinedActions} />}
 
-        {role === "interpreter" && ["home", "work", "schedule"].includes(activeSection) && <InterpreterV2Workspace section={activeSection} workspace={workspace} operations={operations} app={app} v2={v2.data} loading={v2.loading} saving={v2.saving} actions={combinedActions} />}
-        {role === "interpreter" && activeSection === "communications" && <CommunicationsCenter workspace={workspace} onRefresh={refreshAll} />}
-        {role === "interpreter" && activeSection === "profile" && (
-          <div className="space-y-6">
-            <ProfileMessageShortcut profileType="interpreter" profile={workspace.interpreter?.profile || {}} selfService onNavigate={setSection} />
-            <ProfileStudio profileType="interpreter" profile={workspace.interpreter?.profile || {}} customization={v2.data?.profileCustomization} actions={combinedActions} ownerId={workspace.interpreter?.profile?.id} />
-          </div>
-        )}
-        {role === "interpreter" && ["documents", "learning", "notifications"].includes(activeSection) && <InterpreterWorkspace section={legacyInterpreterSection} workspace={workspace} operations={operations} app={app} actions={combinedActions} busyDoc={busyDoc} />}
-      </AppShell>
+      {role === "client" && ["requests", "assignments", "communications", "billing"].includes(activeSection) && <ClientV2Workspace section={activeSection} workspace={workspace} operations={operations} app={app} v2={v2.data} loading={v2.loading} saving={v2.saving} actions={combinedActions} />}
+      {role === "client" && activeSection === "profile" && <div className="space-y-6"><ProfileMessageShortcut profileType="client" profile={workspace.client?.profile || {}} selfService onNavigate={setSection} /><ProfileStudio profileType="client" profile={workspace.client?.profile || {}} customization={v2.data?.profileCustomization} actions={combinedActions} ownerId={workspace.client?.profile?.id} /></div>}
+      {role === "client" && ["documents", "notifications"].includes(activeSection) && <ClientWorkspace section={legacyClientSection} workspace={workspace} operations={operations} app={app} actions={combinedActions} busyDoc={busyDoc} />}
 
-      <ProfileModals controller={controller} v2={v2.data} profileActions={combinedActions} />
-      <WorkflowModals controller={controller} />
-      <BidModal controller={controller} />
-    </>
-  );
+      {role === "interpreter" && ["work", "schedule"].includes(activeSection) && <InterpreterV2Workspace section={activeSection} workspace={workspace} operations={operations} app={app} v2={v2.data} loading={v2.loading} saving={v2.saving} actions={combinedActions} />}
+      {role === "interpreter" && activeSection === "communications" && <CommunicationsCenter workspace={workspace} onRefresh={refreshAll} />}
+      {role === "interpreter" && activeSection === "profile" && <div className="space-y-6"><ProfileMessageShortcut profileType="interpreter" profile={workspace.interpreter?.profile || {}} selfService onNavigate={setSection} /><ProfileStudio profileType="interpreter" profile={workspace.interpreter?.profile || {}} customization={v2.data?.profileCustomization} actions={combinedActions} ownerId={workspace.interpreter?.profile?.id} /></div>}
+      {role === "interpreter" && ["documents", "learning", "notifications"].includes(activeSection) && <InterpreterWorkspace section={legacyInterpreterSection} workspace={workspace} operations={operations} app={app} actions={combinedActions} busyDoc={busyDoc} />}
+    </AppShell>
+
+    <ProfileModals controller={controller} v2={v2.data} profileActions={combinedActions} />
+    <WorkflowModals controller={controller} />
+    <BidModal controller={controller} />
+  </>;
 }

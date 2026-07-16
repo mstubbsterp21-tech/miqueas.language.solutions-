@@ -1,13 +1,13 @@
 import { audit, database, readBody, send, signedInUser } from "./_shared/ops-v2-core.js";
 import {
-  createGmailAuthorization,
   disconnectGmail,
   getGmailStatus,
   sendGmailTest,
 } from "./_shared/gmail-oauth.js";
+import { createExpandedWorkspaceAuthorization } from "./_shared/workspace-oauth-extension.js";
 
 const gmailAuditContext = {
-  provider: "gmail",
+  provider: "google_workspace",
   integrationKey: "primary",
 };
 
@@ -25,11 +25,11 @@ export default async function handler(req, res) {
     }
 
     if (req.method === "GET" && action === "connect") {
-      const authorization = await createGmailAuthorization(db, user);
+      const authorization = await createExpandedWorkspaceAuthorization(db, user);
       await audit(db, user, {
-        action: "gmail.oauth_started",
+        action: "google_workspace.oauth_started",
         entityType: "integration",
-        summary: "Gmail authorization started",
+        summary: "Google Workspace authorization started",
         after: gmailAuditContext,
       });
       return send(res, 200, authorization);
@@ -50,17 +50,17 @@ export default async function handler(req, res) {
       readBody(req);
       const result = await disconnectGmail(db);
       await audit(db, user, {
-        action: "gmail.disconnected",
+        action: "google_workspace.disconnected",
         entityType: "integration",
-        summary: "Gmail connection removed",
+        summary: "Google Workspace connection removed",
         after: gmailAuditContext,
       });
       return send(res, 200, result);
     }
 
-    return send(res, 405, { error: "Unsupported Gmail action." });
+    return send(res, 405, { error: "Unsupported Google Workspace action." });
   } catch (error) {
-    console.error("MLS Gmail OAuth error", error);
-    return send(res, 500, { error: error.message || "Gmail could not be updated." });
+    console.error("MLS Google Workspace OAuth error", error);
+    return send(res, 500, { error: error.message || "Google Workspace could not be updated." });
   }
 }

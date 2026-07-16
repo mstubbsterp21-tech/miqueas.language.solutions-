@@ -7,6 +7,7 @@ import PortalAppRouterHub from './PortalAppRouterHub';
 import ScrollToTop from './components/ScrollToTop';
 import { clerkPublishableKey, isClerkConfigured } from './lib/env';
 import './index.css';
+import './portal/portal-theme.css';
 
 function RootRouter() {
   const { pathname } = useLocation();
