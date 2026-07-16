@@ -3,6 +3,7 @@ import { getGoogleWorkspaceAccessToken, gmailScope } from "./gmail-oauth.js";
 
 const senderEmail = String(process.env.GOOGLE_GMAIL_SENDER || "").trim().toLowerCase();
 const senderName = process.env.EMAIL_FROM_NAME || "Miqueas Language Solutions";
+const maxAttachmentBytes = 18 * 1024 * 1024;
 
 function encodeHeader(value) {
   const text = String(value || "");
@@ -15,6 +16,11 @@ function wrapBase64(value) {
 
 function safeFileName(value) {
   return String(value || "attachment").replace(/[\r\n"]/g, "-").slice(0, 140);
+}
+
+function attachmentSize(attachment) {
+  const content = Buffer.isBuffer(attachment?.content) ? attachment.content : Buffer.from(attachment?.content || "");
+  return content.byteLength;
 }
 
 function buildRawMessage({ to, subject, text, html, attachments = [] }) {
@@ -66,10 +72,17 @@ function buildRawMessage({ to, subject, text, html, attachments = [] }) {
 }
 
 export async function sendGmailEmailWithAttachments(db, { to, subject, text, html, attachments = [], threadId = null }) {
+  const recipient = String(to || "").trim().toLowerCase();
+  if (!recipient) return { sent: false, status: "skipped", error: "Recipient email is unavailable." };
+  if (recipient === senderEmail) return { sent: false, status: "skipped", error: "The sending admin is excluded from their own announcement email." };
+  const totalAttachmentBytes = attachments.reduce((sum, attachment) => sum + attachmentSize(attachment), 0);
+  if (totalAttachmentBytes > maxAttachmentBytes) {
+    return { sent: false, status: "failed", error: "Email attachments must total 18 MB or less. The portal message and files are still available inside MLS Portal." };
+  }
   const access = await getGoogleWorkspaceAccessToken(db, [gmailScope]);
   if (!access.accessToken) return { sent: false, status: access.status || "failed", error: access.error || "Gmail access is unavailable." };
   if (!senderEmail) return { sent: false, status: "not_configured", error: "GOOGLE_GMAIL_SENDER is not configured." };
-  const message = buildRawMessage({ to, subject, text, html, attachments });
+  const message = buildRawMessage({ to: recipient, subject, text, html, attachments });
   const response = await fetch("https://gmail.googleapis.com/gmail/v1/users/me/messages/send", {
     method: "POST",
     headers: { authorization: `Bearer ${access.accessToken}`, "content-type": "application/json" },
