@@ -18,6 +18,17 @@ async function request(session, endpoint, action, method = "GET", body) {
   return data;
 }
 
+async function coreRequest(session, action, method, body) {
+  if (action !== "adminUpdateInterpreterProfile") return request(session, "/api/portal", action, method, body);
+  const result = await request(session, "/api/portal", action, method, body);
+  await request(session, "/api/operations-v2", "adminUpdateInterpreterRates", "POST", {
+    interpreterId: body?.interpreterId,
+    onsiteRate: body?.profile?.onsite_rate || "",
+    vriRate: body?.profile?.vri_rate || "",
+  });
+  return result;
+}
+
 function appRequest(session, action, method, body) {
   if (action === "adminUpdateAssignment") return request(session, "/api/operations-v2", "adminUpdateFullAssignment", method, body);
   if (action === "adminDeleteAssignment") return request(session, "/api/operations-v2", "adminDeleteAssignment", method, body);
@@ -36,7 +47,7 @@ async function assignmentAutomationRequest(session, action, method, body) {
 
 export function createMLSApi(session) {
   return {
-    core: (action, method, body) => request(session, "/api/portal", action, method, body),
+    core: (action, method, body) => coreRequest(session, action, method, body),
     operations: (action, method, body) => request(session, "/api/portal-operations", action, method, body),
     app: (action, method, body) => appRequest(session, action, method, body),
     operationsV2: (action, method, body) => request(session, "/api/operations-v2", action, method, body),
