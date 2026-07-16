@@ -19,18 +19,15 @@ async function request(session, endpoint, action, method = "GET", body) {
 }
 
 function appRequest(session, action, method, body) {
-  if (action === "adminUpdateAssignment") return request(session, "/api/assignment-admin", "update", method, body);
-  if (action === "adminDeleteAssignment") return request(session, "/api/assignment-admin", "delete", method, body);
+  if (action === "adminUpdateAssignment") return request(session, "/api/operations-v2", "adminUpdateFullAssignment", method, body);
+  if (action === "adminDeleteAssignment") return request(session, "/api/operations-v2", "adminDeleteAssignment", method, body);
   return request(session, "/api/portal-app", action, method, body);
 }
 
 async function assignmentAutomationRequest(session, action, method, body) {
-  if (action === "deleteAssignment") {
-    return request(session, "/api/assignment-workspace-sync", "deleteRecords", method, body);
-  }
   const result = await request(session, "/api/assignment-automations", action, method, body);
   if (["requestCreated", "confirmed", "syncAssignment"].includes(action) && body?.assignmentId) {
-    const workspace = await request(session, "/api/assignment-workspace-sync", "syncRecord", "POST", { assignmentId: body.assignmentId });
+    const workspace = await request(session, "/api/operations-v2", "adminSyncAssignmentWorkspaceRecord", "POST", { assignmentId: body.assignmentId });
     return { ...result, workspaceRecord: workspace.workspace };
   }
   return result;
@@ -42,9 +39,13 @@ export function createMLSApi(session) {
     operations: (action, method, body) => request(session, "/api/portal-operations", action, method, body),
     app: (action, method, body) => appRequest(session, action, method, body),
     operationsV2: (action, method, body) => request(session, "/api/operations-v2", action, method, body),
-    assignmentAdmin: (action, method = "POST", body) => request(session, "/api/assignment-admin", action, method, body),
-    assignmentWorkspace: (action, method = "POST", body) => request(session, "/api/assignment-workspace-sync", action, method, body),
-    communications: (action = "loadCommunications", method = "GET", body) => request(session, "/api/communications", action, method, body),
+    communications: (action = "loadCommunications", method = "GET", body) => request(
+      session,
+      "/api/operations-v2",
+      action === "createUploadUrl" ? "createCommunicationUploadUrl" : action === "openAttachment" ? "openCommunicationAttachment" : action,
+      method,
+      body,
+    ),
     setup: (role, body) => request(session, "/api/first-login-setup", role, "POST", body),
     role: (action = "status", method = "GET", body) => request(
       session,
