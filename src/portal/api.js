@@ -19,14 +19,19 @@ async function request(session, endpoint, action, method = "GET", body) {
 }
 
 async function coreRequest(session, action, method, body) {
-  if (action !== "adminUpdateInterpreterProfile") return request(session, "/api/portal", action, method, body);
-  const result = await request(session, "/api/portal", action, method, body);
-  await request(session, "/api/operations-v2", "adminUpdateInterpreterRates", "POST", {
-    interpreterId: body?.interpreterId,
-    onsiteRate: body?.profile?.onsite_rate || "",
-    vriRate: body?.profile?.vri_rate || "",
-  });
-  return result;
+  if (action === "saveInterpreterProfile") {
+    return request(session, "/api/operations-v2", "saveInterpreterProfileDetails", method, body);
+  }
+  if (action === "adminUpdateInterpreterProfile") {
+    const result = await request(session, "/api/operations-v2", "adminUpdateInterpreterProfileDetails", method, body);
+    await request(session, "/api/operations-v2", "adminUpdateInterpreterRates", "POST", {
+      interpreterId: body?.interpreterId,
+      onsiteRate: body?.profile?.onsite_rate || "",
+      vriRate: body?.profile?.vri_rate || "",
+    });
+    return result;
+  }
+  return request(session, "/api/portal", action, method, body);
 }
 
 function appRequest(session, action, method, body) {
