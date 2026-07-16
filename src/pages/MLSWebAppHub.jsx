@@ -1,3 +1,5 @@
+import { useEffect, useMemo, useRef } from "react";
+import { useSession } from "@clerk/clerk-react";
 import { AlertCircle, Loader2 } from "lucide-react";
 import PortalSetupNotice from "../components/PortalSetupNotice";
 import { isSupabaseConfigured } from "../lib/env";
@@ -42,7 +44,16 @@ function PortalLoading({ title = "Opening the MLS app", text = "Loading your sec
   return <div className="flex min-h-[100dvh] items-center justify-center bg-[#f7f3ef] p-5"><div className="rounded-[2rem] bg-white p-12 text-center shadow-2xl"><Loader2 className="mx-auto animate-spin text-[#721100]" size={34} /><h1 className="mt-5 text-2xl font-black">{title}</h1><p className="mt-2 text-sm text-slate-500">{text}</p></div></div>;
 }
 
+function communicationAlert(notification) {
+  return notification.section === "communications" || ["message", "mention", "announcement"].includes(notification.category);
+}
+
+function learningAlert(notification) {
+  return ["learning", "training"].includes(notification.section) || notification.category === "training";
+}
+
 export default function MLSWebAppHub() {
+  const { session } = useSession();
   const controller = useMLSController();
   const v2 = useOperationsV2();
   const {
@@ -51,6 +62,63 @@ export default function MLSWebAppHub() {
     load, actions, setModal,
   } = controller;
   const roleSelection = usePortalRoleSelection({ enabled: Boolean(isLoaded && workspace && !workspace.user?.isAdmin) });
+  const activeSection = normalizeSection(role, section);
+  const markingRead = useRef(new Set());
+
+  const unreadNotifications = useMemo(
+    () => (app?.notifications || []).filter((item) => !item.is_read),
+    [app?.notifications],
+  );
+  const communicationNotifications = useMemo(
+    () => unreadNotifications.filter(communicationAlert),
+    [unreadNotifications],
+  );
+  const learningNotifications = useMemo(
+    () => unreadNotifications.filter(learningAlert),
+    [unreadNotifications],
+  );
+  const pendingLearning = useMemo(
+    () => role === "interpreter"
+      ? (operations?.training || []).filter((course) => course.progress?.status !== "completed").length
+      : 0,
+    [operations?.training, role],
+  );
+  const navBadges = useMemo(() => ({
+    communications: communicationNotifications.length,
+    ...(role === "interpreter" ? { learning: Math.max(pendingLearning, learningNotifications.length) } : {}),
+  }), [communicationNotifications.length, learningNotifications.length, pendingLearning, role]);
+
+  useEffect(() => {
+    if (!session || !app) return;
+    const candidates = activeSection === "communications"
+      ? communicationNotifications
+      : activeSection === "learning"
+        ? learningNotifications
+        : [];
+    const ids = candidates.map((item) => item.id).filter((id) => id && !markingRead.current.has(id));
+    if (!ids.length) return;
+    ids.forEach((id) => markingRead.current.add(id));
+
+    let cancelled = false;
+    (async () => {
+      try {
+        const bearer = await session.getToken();
+        const response = await fetch("/api/portal-app?action=markNotificationRead", {
+          method: "POST",
+          headers: { Authorization: `Bearer ${bearer}`, "Content-Type": "application/json" },
+          body: JSON.stringify({ notificationIds: ids }),
+        });
+        if (!response.ok) throw new Error(`Notification update failed (${response.status}).`);
+        if (!cancelled) await load(true);
+      } catch (readError) {
+        console.warn("MLS notification acknowledgement failed", readError);
+      } finally {
+        ids.forEach((id) => markingRead.current.delete(id));
+      }
+    })();
+
+    return () => { cancelled = true; };
+  }, [activeSection, app, communicationNotifications, learningNotifications, session]);
 
   if (!isSupabaseConfigured) return <PortalSetupNotice />;
   if (!isLoaded || loading) return <PortalLoading />;
@@ -62,7 +130,6 @@ export default function MLSWebAppHub() {
     return <FirstLoginSetupWizard role={role} profile={profile} user={workspace.user} onComplete={async () => { setModal(""); await Promise.allSettled([load(true), v2.load(true)]); }} />;
   }
 
-  const activeSection = normalizeSection(role, section);
   const refreshAll = () => Promise.allSettled([load(true), v2.load(true)]);
   const combinedActions = { ...actions, ...v2.actions, refreshPortal: refreshAll };
   const personalization = role === "admin" ? v2.data?.personalProfileCustomization : v2.data?.profileCustomization;
@@ -71,7 +138,7 @@ export default function MLSWebAppHub() {
 
   return <>
     <PortalRealtimeBridge topic={v2.data?.realtimeTopic} refresh={refreshAll} />
-    <AppShell role={role} section={activeSection} setSection={setSection} user={workspace.user} personalization={personalization} unread={app.unreadCount || 0} refreshing={refreshing || v2.loading} refresh={refreshAll}>
+    <AppShell role={role} section={activeSection} setSection={setSection} user={workspace.user} personalization={personalization} unread={app.unreadCount || 0} navBadges={navBadges} refreshing={refreshing || v2.loading} refresh={refreshAll}>
       {message && <Toast message={message} dismiss={() => setMessage("")} />}
       {error && <Toast message={error} type="error" dismiss={() => setError("")} />}
       {v2.message && <Toast message={v2.message} dismiss={() => v2.setMessage("")} />}
