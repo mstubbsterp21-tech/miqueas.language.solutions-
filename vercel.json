@@ -10,6 +10,10 @@
   ],
   "rewrites": [
     {
+      "source": "/api/communications",
+      "destination": "/api/operations-v2"
+    },
+    {
       "source": "/api/(.*)",
       "destination": "/api/$1"
     },
