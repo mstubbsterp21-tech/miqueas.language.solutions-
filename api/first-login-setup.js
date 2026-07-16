@@ -138,9 +138,11 @@ function availabilityFlags(profile) {
 }
 
 function resolvedRole(user, client, interpreter) {
-  if (allowedRoles.has(user.metadataRole)) return user.metadataRole;
+  // Existing database membership is authoritative. Clerk metadata can be stale
+  // when an account was pre-created, converted, or previously used for testing.
   if (client && !interpreter) return "client";
   if (interpreter && !client) return "interpreter";
+  if (allowedRoles.has(user.metadataRole)) return user.metadataRole;
   return "";
 }
 
@@ -351,7 +353,12 @@ export default async function handler(req, res) {
 
     const body = readBody(req);
     const requestedRole = body.role === "client" ? "client" : "interpreter";
-    const actualRole = user.metadataRole || ((await clientFor(db, user.id)) ? "client" : "interpreter");
+    const [client, interpreter] = await Promise.all([
+      clientFor(db, user.id),
+      interpreterFor(db, user.id),
+    ]);
+    const actualRole = resolvedRole(user, client, interpreter);
+    if (!actualRole) return send(res, 409, { error: "Choose your account role before continuing setup." });
     if (requestedRole !== actualRole) return send(res, 403, { error: "This setup wizard does not match your account role." });
 
     const result = requestedRole === "client"
