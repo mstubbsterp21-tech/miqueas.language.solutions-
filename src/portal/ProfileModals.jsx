@@ -4,6 +4,7 @@ import { AlertTriangle, Loader2, Trash2 } from "lucide-react";
 import { ClientProfileForm, InterpreterProfileForm } from "./forms";
 import { Modal } from "./ui";
 import ProfileStudio from "./ProfileStudio";
+import ProfileMessageShortcut from "./ProfileMessageShortcut";
 import { AccountDetail } from "./views";
 import { AssignmentDetail } from "./AssignmentDetail";
 
@@ -15,7 +16,7 @@ export default function ProfileModals({ controller, v2, profileActions }) {
     modal, setModal, profileType, clientDraft, setClientDraft,
     interpreterDraft, setInterpreterDraft, selectedAssignment,
     accountType, accountRecord, workspace, role, saving, busyDoc,
-    actions, saveProfile, load, setMessage, setError,
+    actions, saveProfile, load, setMessage, setError, setSection,
   } = controller;
   const combinedActions = profileActions || actions;
   const accountCustomization = (v2?.profileCustomizations || []).find((item) => (
@@ -81,6 +82,18 @@ export default function ProfileModals({ controller, v2, profileActions }) {
 
       <Modal open={modal === "account"} close={() => { setDeleteError(""); setModal(""); }} title={accountType === "client" ? "Client account" : "Interpreter profile"} wide>
         <div className="space-y-6">
+          {role === "admin" && accountRecord?.id && (
+            <ProfileMessageShortcut
+              profileType={accountType || "interpreter"}
+              profile={accountRecord}
+              targetClerkUserId={accountRecord.clerk_user_id || ""}
+              onNavigate={() => {
+                setModal("");
+                setSection("communications");
+              }}
+            />
+          )}
+
           <ProfileStudio
             profileType={accountType || "interpreter"}
             profile={accountRecord || {}}

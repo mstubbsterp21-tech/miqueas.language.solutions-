@@ -6,6 +6,7 @@ import BidModal from "../portal/BidModal";
 import CommunicationsCenter from "../portal/CommunicationsCenter";
 import FirstLoginSetupWizard, { needsFirstLoginSetup } from "../portal/ClerkFirstLoginSetupWizard";
 import PortalRoleSelection from "../portal/PortalRoleSelection";
+import ProfileMessageShortcut from "../portal/ProfileMessageShortcut";
 import ProfileModals from "../portal/ProfileModals";
 import ProfileStudio from "../portal/ProfileStudio";
 import WorkflowModals from "../portal/WorkflowModals";
@@ -80,12 +81,22 @@ export default function MLSWebAppHub() {
         {role === "admin" && activeSection === "notifications" && <AdminWorkspace section="notifications" workspace={workspace} operations={operations} app={app} actions={combinedActions} />}
 
         {role === "client" && ["home", "requests", "assignments", "communications", "billing"].includes(activeSection) && <ClientV2Workspace section={activeSection} workspace={workspace} operations={operations} app={app} v2={v2.data} loading={v2.loading} saving={v2.saving} actions={combinedActions} />}
-        {role === "client" && activeSection === "profile" && <ProfileStudio profileType="client" profile={workspace.client?.profile || {}} customization={v2.data?.profileCustomization} actions={combinedActions} ownerId={workspace.client?.profile?.id} />}
+        {role === "client" && activeSection === "profile" && (
+          <div className="space-y-6">
+            <ProfileMessageShortcut profileType="client" profile={workspace.client?.profile || {}} selfService onNavigate={setSection} />
+            <ProfileStudio profileType="client" profile={workspace.client?.profile || {}} customization={v2.data?.profileCustomization} actions={combinedActions} ownerId={workspace.client?.profile?.id} />
+          </div>
+        )}
         {role === "client" && ["documents", "notifications"].includes(activeSection) && <ClientWorkspace section={legacyClientSection} workspace={workspace} operations={operations} app={app} actions={combinedActions} busyDoc={busyDoc} />}
 
         {role === "interpreter" && ["home", "work", "schedule"].includes(activeSection) && <InterpreterV2Workspace section={activeSection} workspace={workspace} operations={operations} app={app} v2={v2.data} loading={v2.loading} saving={v2.saving} actions={combinedActions} />}
         {role === "interpreter" && activeSection === "communications" && <CommunicationsCenter workspace={workspace} onRefresh={refreshAll} />}
-        {role === "interpreter" && activeSection === "profile" && <ProfileStudio profileType="interpreter" profile={workspace.interpreter?.profile || {}} customization={v2.data?.profileCustomization} actions={combinedActions} ownerId={workspace.interpreter?.profile?.id} />}
+        {role === "interpreter" && activeSection === "profile" && (
+          <div className="space-y-6">
+            <ProfileMessageShortcut profileType="interpreter" profile={workspace.interpreter?.profile || {}} selfService onNavigate={setSection} />
+            <ProfileStudio profileType="interpreter" profile={workspace.interpreter?.profile || {}} customization={v2.data?.profileCustomization} actions={combinedActions} ownerId={workspace.interpreter?.profile?.id} />
+          </div>
+        )}
         {role === "interpreter" && ["documents", "learning", "notifications"].includes(activeSection) && <InterpreterWorkspace section={legacyInterpreterSection} workspace={workspace} operations={operations} app={app} actions={combinedActions} busyDoc={busyDoc} />}
       </AppShell>
 
