@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import {
   BarChart3, Bell, BookOpen, Building2, CalendarDays, ChevronRight,
   CircleDollarSign, ClipboardCheck, FileText, LayoutDashboard, Menu,
-  RefreshCcw, Settings2, ShieldCheck, UserRound, Users, X,
+  MessageSquare, RefreshCcw, Settings2, ShieldCheck, UserRound, Users, X,
 } from "lucide-react";
 import { PortalSignOutButton } from "../components/AuthStatus";
 import logo from "../logo.png";
@@ -13,6 +13,7 @@ const roleNavigation = {
   admin: [
     ["home", "Home", LayoutDashboard],
     ["assignments", "Assignments", ClipboardCheck],
+    ["communications", "Communications", MessageSquare],
     ["people", "People", Users],
     ["finance", "Finance", CircleDollarSign],
     ["compliance", "Compliance", ShieldCheck],
@@ -24,6 +25,7 @@ const roleNavigation = {
     ["home", "Home", LayoutDashboard],
     ["requests", "Requests", ClipboardCheck],
     ["assignments", "Assignments", CalendarDays],
+    ["communications", "Messages", MessageSquare],
     ["billing", "Billing", CircleDollarSign],
     ["documents", "Documents", FileText],
     ["profile", "Profile", Building2],
@@ -31,6 +33,7 @@ const roleNavigation = {
   interpreter: [
     ["home", "Home", LayoutDashboard],
     ["work", "Work", ClipboardCheck],
+    ["communications", "Messages", MessageSquare],
     ["schedule", "Schedule", CalendarDays],
     ["documents", "Documents", FileText],
     ["learning", "Learning", BookOpen],

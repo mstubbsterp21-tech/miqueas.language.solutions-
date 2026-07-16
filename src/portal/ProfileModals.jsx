@@ -70,7 +70,13 @@ export default function ProfileModals({ controller, v2, profileActions }) {
       </Modal>
 
       <Modal open={modal === "assignment"} close={() => setModal("")} title="Assignment" wide>
-        <AssignmentDetail assignment={selectedAssignment} role={role} interpreters={(workspace?.admin?.interpreters || []).filter((item) => item.roster_status !== "removed")} actions={actions} />
+        <AssignmentDetail
+          assignment={selectedAssignment}
+          role={role}
+          clients={workspace?.admin?.clients || []}
+          interpreters={(workspace?.admin?.interpreters || []).filter((item) => item.roster_status !== "removed")}
+          actions={combinedActions}
+        />
       </Modal>
 
       <Modal open={modal === "account"} close={() => { setDeleteError(""); setModal(""); }} title={accountType === "client" ? "Client account" : "Interpreter profile"} wide>

@@ -1,4 +1,5 @@
 import { Building2, CalendarDays, CircleDollarSign, ClipboardCheck, FileSignature, Plus } from "lucide-react";
+import CommunicationsCenter from "../CommunicationsCenter";
 import { Badge, Card, EmptyState, Hero, Metric, SectionHeader, formatDate, formatMoney } from "../ui";
 import { ActionButton, AssignmentRow, ExternalRecordLink, LoadingPanel } from "./shared";
 
@@ -66,6 +67,7 @@ export default function ClientV2Workspace({ section, workspace, app, v2, loading
   if (section === "home") return <ClientHome workspace={workspace} app={app} v2={v2} actions={actions} />;
   if (section === "requests") return <ClientRequests v2={v2} actions={actions} saving={saving} />;
   if (section === "assignments") return <ClientAssignments workspace={workspace} app={app} actions={actions} />;
+  if (section === "communications") return <CommunicationsCenter workspace={workspace} onRefresh={actions.refreshPortal} />;
   if (section === "billing") return <ClientBilling v2={v2} />;
   return null;
 }

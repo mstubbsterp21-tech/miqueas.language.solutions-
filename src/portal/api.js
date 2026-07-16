@@ -18,12 +18,34 @@ async function request(session, endpoint, action, method = "GET", body) {
   return data;
 }
 
+function appRequest(session, action, method, body) {
+  if (action === "adminUpdateAssignment") return request(session, "/api/operations-v2", "adminUpdateFullAssignment", method, body);
+  if (action === "adminDeleteAssignment") return request(session, "/api/operations-v2", "adminDeleteAssignment", method, body);
+  return request(session, "/api/portal-app", action, method, body);
+}
+
+async function assignmentAutomationRequest(session, action, method, body) {
+  const result = await request(session, "/api/assignment-automations", action, method, body);
+  if (["requestCreated", "confirmed", "syncAssignment"].includes(action) && body?.assignmentId) {
+    const workspace = await request(session, "/api/operations-v2", "adminSyncAssignmentWorkspaceRecord", "POST", { assignmentId: body.assignmentId });
+    return { ...result, workspaceRecord: workspace.workspace };
+  }
+  return result;
+}
+
 export function createMLSApi(session) {
   return {
     core: (action, method, body) => request(session, "/api/portal", action, method, body),
     operations: (action, method, body) => request(session, "/api/portal-operations", action, method, body),
-    app: (action, method, body) => request(session, "/api/portal-app", action, method, body),
+    app: (action, method, body) => appRequest(session, action, method, body),
     operationsV2: (action, method, body) => request(session, "/api/operations-v2", action, method, body),
+    communications: (action = "loadCommunications", method = "GET", body) => request(
+      session,
+      "/api/operations-v2",
+      action === "createUploadUrl" ? "createCommunicationUploadUrl" : action === "openAttachment" ? "openCommunicationAttachment" : action,
+      method,
+      body,
+    ),
     setup: (role, body) => request(session, "/api/first-login-setup", role, "POST", body),
     role: (action = "status", method = "GET", body) => request(
       session,
@@ -32,7 +54,7 @@ export function createMLSApi(session) {
       method,
       body,
     ),
-    automations: (action, method = "POST", body) => request(session, "/api/assignment-automations", action, method, body),
+    automations: (action, method = "POST", body) => assignmentAutomationRequest(session, action, method, body),
     documentRequestEmail: (action, method = "POST", body) => request(session, "/api/document-request-email", action, method, body),
     documentRequestCancel: (action = "cancel", method = "POST", body) => request(session, "/api/document-request-cancel", action, method, body),
     opportunityEmail: (action, method = "POST", body) => request(session, "/api/opportunity-email", action, method, body),
