@@ -1,6 +1,7 @@
+import ExistingClientInterpreterRequestForm from "../components/ExistingClientInterpreterRequestForm";
 import InterpreterRequestFormShared from "../components/InterpreterRequestFormShared";
 
-function addressFromClient(client = {}) {
+function assembledAddress(client = {}) {
   return [
     client.address_line_1,
     client.address_line_2,
@@ -9,18 +10,34 @@ function addressFromClient(client = {}) {
   ].filter(Boolean).join("\n");
 }
 
-function initialValuesFromClient(client = {}) {
-  const address = addressFromClient(client);
+function preferredService(client = {}) {
+  const service = String(client.default_service_type || "").toLowerCase();
+  const delivery = String(client.default_delivery_mode || "").toLowerCase();
+  if (service.includes("english") && service.includes("asl") && service.includes("translation")) return "ASL Video Translation (English → ASL)";
+  if (service.includes("asl") && service.includes("english") && service.includes("translation")) return "ASL Content Translation (ASL → English)";
+  if (delivery.includes("vri") || delivery.includes("virtual") || service.includes("video remote")) return "Video Remote Interpreting";
+  if (delivery.includes("on-site") || delivery.includes("onsite") || service.includes("interpreting")) return "In-Person Interpreting";
+  return "";
+}
+
+export function initialValuesFromClient(client = {}) {
+  const physicalAddress = client.physical_address_text || assembledAddress(client);
+  const billingAddress = client.billing_address_text || physicalAddress;
   const email = client.billing_email || client.email || "";
+  const savedPreferences = String(client.communication_preferences || "").trim();
+  const cdiPreference = /certified deaf interpreter|\bcdi\b/i.test(`${client.default_service_type || ""} ${savedPreferences}`);
   return {
     emailCapture: email,
     fullName: client.primary_contact_name || "",
     organizationName: client.organization_name || "",
-    physicalAddress: address,
-    billingSameAsPhysical: Boolean(address),
-    billingAddress: address,
+    physicalAddress,
+    billingSameAsPhysical: Boolean(physicalAddress && billingAddress === physicalAddress),
+    billingAddress,
     contactEmail: email,
     phoneNumber: client.phone || client.billing_phone || "",
+    serviceNeeded: preferredService(client),
+    communicationNotes: savedPreferences,
+    cdiOrAdditionalSupportNeeded: cdiPreference ? "Yes" : "",
   };
 }
 
@@ -74,20 +91,27 @@ export function portalAssignmentFromRequest(request, source = "client_portal") {
   };
 }
 
-export default function PortalInterpreterRequestForm({ client, source = "client_portal", onSubmit }) {
-  const initialValues = initialValuesFromClient(client);
+export default function PortalInterpreterRequestForm({
+  client,
+  source = "client_portal",
+  onSubmit,
+  existingClient = Boolean(client?.id),
+}) {
+  const initialValues = initialValuesFromClient(client || {});
 
   async function submit(request) {
     const assignment = portalAssignmentFromRequest(request, source);
     await onSubmit(assignment, request);
   }
 
-  return (
-    <InterpreterRequestFormShared
-      initialValues={initialValues}
-      onSubmitRequest={submit}
-      successTitle="Request Submitted"
-      successMessage="Your request has been added to the MLS Portal and is ready for review."
-    />
-  );
+  const props = {
+    initialValues,
+    onSubmitRequest: submit,
+    successTitle: "Request Submitted",
+    successMessage: "Your request has been added to the MLS Portal and is ready for review.",
+  };
+
+  return existingClient
+    ? <ExistingClientInterpreterRequestForm {...props} />
+    : <InterpreterRequestFormShared {...props} />;
 }
