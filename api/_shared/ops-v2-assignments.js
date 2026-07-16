@@ -95,8 +95,13 @@ export async function adminDeleteAssignment(db, user, payload) {
     return { status: 409, payload: { error: `This assignment cannot be permanently deleted because MLS must retain ${details}. Cancel or close the assignment instead.` } };
   }
   const workspace = await removeAssignmentWorkspaceRecords(db, record);
-  const workspaceFailures = [workspace.calendar, workspace.drive].filter((item) => item.status === "failed");
-  if (workspaceFailures.length) return { status: 502, payload: { error: `Google Workspace cleanup failed: ${workspaceFailures.map((item) => item.error).join(" | ")}`, workspace } };
+  const workspaceFailures = [
+    record.google_calendar_event_id && ["failed", "not_configured"].includes(workspace.calendar?.status) ? workspace.calendar : null,
+    record.drive_folder_id && ["failed", "not_configured"].includes(workspace.drive?.status) ? workspace.drive : null,
+  ].filter(Boolean);
+  if (workspaceFailures.length) {
+    return { status: 502, payload: { error: `Google Workspace cleanup must succeed before this assignment can be deleted: ${workspaceFailures.map((item) => item.error || item.status).join(" | ")}`, workspace } };
+  }
   const documents = await db.from("assignment_documents").select("storage_path").eq("assignment_id", payload.assignmentId);
   if (documents.error) throw documents.error;
   const paths = (documents.data || []).map((item) => item.storage_path).filter(Boolean);
