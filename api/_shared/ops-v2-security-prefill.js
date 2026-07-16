@@ -166,6 +166,42 @@ function mappedPrefill(headers, row) {
   };
 }
 
+function present(value) {
+  return value !== null && value !== undefined && String(value).trim() !== "";
+}
+
+async function persistPrefill(db, user, prefill) {
+  const current = await db.from("interpreters").select("*").eq("clerk_user_id", user.id).maybeSingle();
+  if (current.error) throw current.error;
+  const existing = current.data || {};
+  const fillable = [
+    "first_name", "last_name", "phone", "current_location", "city", "state", "postal_code", "preferred_contact_method",
+    "credentials", "state_license", "state_license_details", "years_experience", "education_itp", "modalities", "areas_of_experience",
+    "situations_successfully_navigated", "challenging_situation_description", "assignment_type_preference", "willing_to_travel",
+    "technical_readiness_confirmed", "professional_liability_insurance", "comfortable_with_rates", "travel_radius",
+    "availability_sunday", "availability_monday", "availability_tuesday", "availability_wednesday", "availability_thursday", "availability_friday", "availability_saturday",
+  ];
+  const values = fillable.reduce((result, field) => {
+    if (!present(existing[field]) && present(prefill[field])) result[field] = prefill[field];
+    return result;
+  }, {});
+  values.network_submission_id = prefill.network_submission_id || existing.network_submission_id || null;
+  values.network_submission_synced_at = new Date().toISOString();
+  values.clerk_user_id = user.id;
+  values.email = user.email;
+  values.first_name = values.first_name || existing.first_name || user.firstName || "";
+  values.last_name = values.last_name || existing.last_name || user.lastName || "";
+  values.country = existing.country || "United States";
+  values.updated_at = new Date().toISOString();
+  if (!current.data) {
+    values.roster_status = "pending_profile";
+    values.screening_status = "not_started";
+  }
+  const saved = await db.from("interpreters").upsert(values, { onConflict: "clerk_user_id" }).select().single();
+  if (saved.error) throw saved.error;
+  return saved.data;
+}
+
 export async function interpreterNetworkPrefill(db, user) {
   if (user.isAdmin || user.metadataRole === "client") return { status: 403, payload: { error: "Interpreter access required." } };
   const access = await getGoogleWorkspaceAccessToken(db, [sheetsReadonlyScope]);
@@ -181,5 +217,6 @@ export async function interpreterNetworkPrefill(db, user) {
   const matches = rows.slice(1).filter((row) => String(row[emailIndex] || "").trim().toLowerCase() === user.email);
   if (!matches.length) return { status: 200, payload: { matched: false } };
   const prefill = mappedPrefill(headers, matches[matches.length - 1]);
-  return { status: 200, payload: { matched: true, source: "MLS Interpreter Network form", prefill } };
+  const profile = await persistPrefill(db, user, prefill);
+  return { status: 200, payload: { matched: true, source: "MLS Interpreter Network form", prefill: profile } };
 }
