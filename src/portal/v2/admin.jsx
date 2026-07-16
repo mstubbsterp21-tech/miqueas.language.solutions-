@@ -1,6 +1,6 @@
 import AdminHomeV2 from "./adminHome";
 import AdminAssignmentsV2 from "./adminAssignments";
-import AdminPeopleV2 from "./adminPeople";
+import AdminPeopleV2 from "./adminPeopleLean";
 import AdminFinanceV2 from "./adminFinance";
 import AdminComplianceV2 from "./adminCompliance";
 import { AdminReportsV2, AdminSettingsV2 } from "./adminInsights";
