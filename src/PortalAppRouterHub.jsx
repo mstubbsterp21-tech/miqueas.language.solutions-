@@ -4,6 +4,7 @@ import Login from "./pages/Login";
 import MLSWebAppHub from "./pages/MLSWebAppHub";
 import PortalSetupNotice from "./components/PortalSetupNotice";
 import RequirePortalAuth from "./components/RequirePortalAuth";
+import PortalSecurityGate from "./portal/PortalSecurityGate";
 import { isClerkConfigured } from "./lib/env";
 
 const appPalette = {
@@ -42,13 +43,11 @@ export default function PortalAppRouterHub() {
     document.documentElement.style.backgroundColor = "#f7f3ef";
   }, []);
 
-  return (
-    <Routes>
-      <Route path="/login/*" element={<Login palette={appPalette} />} />
-      <Route path="/portal" element={isClerkConfigured ? <RequirePortalAuth><MLSWebAppHub /></RequirePortalAuth> : <PortalSetupNotice palette={appPalette} />} />
-      <Route path="/admin/interpreters" element={<Navigate to="/portal?section=people" replace />} />
-      <Route path="/admin/interpreters/:interpreterId" element={<Navigate to="/portal?section=people" replace />} />
-      <Route path="*" element={<Navigate to="/portal" replace />} />
-    </Routes>
-  );
+  return <Routes>
+    <Route path="/login/*" element={<Login palette={appPalette} />} />
+    <Route path="/portal" element={isClerkConfigured ? <RequirePortalAuth><PortalSecurityGate><MLSWebAppHub /></PortalSecurityGate></RequirePortalAuth> : <PortalSetupNotice palette={appPalette} />} />
+    <Route path="/admin/interpreters" element={<Navigate to="/portal?section=people" replace />} />
+    <Route path="/admin/interpreters/:interpreterId" element={<Navigate to="/portal?section=people" replace />} />
+    <Route path="*" element={<Navigate to="/portal" replace />} />
+  </Routes>;
 }
