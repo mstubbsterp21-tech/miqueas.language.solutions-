@@ -13,8 +13,8 @@ function assembledAddress(client = {}) {
 function preferredService(client = {}) {
   const service = String(client.default_service_type || "").toLowerCase();
   const delivery = String(client.default_delivery_mode || "").toLowerCase();
-  if (service.includes("english") && service.includes("asl") && service.includes("translation")) return "ASL Video Translation (English → ASL)";
-  if (service.includes("asl") && service.includes("english") && service.includes("translation")) return "ASL Content Translation (ASL → English)";
+  if (service.includes("content translation") || service.includes("asl → english") || service.includes("asl > english")) return "ASL Content Translation (ASL → English)";
+  if (service.includes("video translation") || service.includes("english → asl") || service.includes("english > asl")) return "ASL Video Translation (English → ASL)";
   if (delivery.includes("vri") || delivery.includes("virtual") || service.includes("video remote")) return "Video Remote Interpreting";
   if (delivery.includes("on-site") || delivery.includes("onsite") || service.includes("interpreting")) return "In-Person Interpreting";
   return "";
