@@ -1,6 +1,7 @@
+import ExistingClientInterpreterRequestForm from "../components/ExistingClientInterpreterRequestForm";
 import InterpreterRequestFormShared from "../components/InterpreterRequestFormShared";
 
-function addressFromClient(client = {}) {
+function assembledAddress(client = {}) {
   return [
     client.address_line_1,
     client.address_line_2,
@@ -9,18 +10,58 @@ function addressFromClient(client = {}) {
   ].filter(Boolean).join("\n");
 }
 
-function initialValuesFromClient(client = {}) {
-  const address = addressFromClient(client);
+function preferredService(client = {}) {
+  const service = String(client.default_service_type || "").toLowerCase();
+  const delivery = String(client.default_delivery_mode || "").toLowerCase();
+  if (service.includes("content translation") || service.includes("asl → english") || service.includes("asl > english")) return "ASL Content Translation (ASL → English)";
+  if (service.includes("video translation") || service.includes("english → asl") || service.includes("english > asl")) return "ASL Video Translation (English → ASL)";
+  if (delivery.includes("vri") || delivery.includes("virtual") || service.includes("video remote")) return "Video Remote Interpreting";
+  if (delivery.includes("on-site") || delivery.includes("onsite") || service.includes("interpreting")) return "In-Person Interpreting";
+  return "";
+}
+
+function savedCommunicationStyles(text = "") {
+  const rules = [
+    [/\bptasl\b|pro[- ]?tactile/i, "PTASL (Pro-Tactile ASL)"],
+    [/\bcase\b|conceptually accurate signed english/i, "CASE (Conceptually Accurate Signed English)"],
+    [/\bmce\b|manually coded english/i, "MCE (Manually Coded English)"],
+    [/cued speech/i, "Cued Speech"],
+    [/\basl\b|american sign language/i, "ASL (American Sign Language)"],
+  ];
+  return rules.filter(([pattern]) => pattern.test(text)).map(([, label]) => label);
+}
+
+function savedAdditionalConsiderations(text = "") {
+  const rules = [
+    [/deafblind/i, "DeafBlind"],
+    [/low vision/i, "Low Vision"],
+    [/low mobility|mobility/i, "Low Mobility"],
+    [/language still developing|language development|non-standard language/i, "Language still developing / non-standard language use"],
+    [/foreign sign|foreign sign language/i, "Uses a foreign sign language"],
+  ];
+  return rules.filter(([pattern]) => pattern.test(text)).map(([, label]) => label);
+}
+
+export function initialValuesFromClient(client = {}) {
+  const physicalAddress = client.physical_address_text || assembledAddress(client);
+  const billingAddress = client.billing_address_text || physicalAddress;
   const email = client.billing_email || client.email || "";
+  const savedPreferences = String(client.communication_preferences || "").trim();
+  const cdiPreference = /certified deaf interpreter|\bcdi\b/i.test(`${client.default_service_type || ""} ${savedPreferences}`);
   return {
     emailCapture: email,
     fullName: client.primary_contact_name || "",
     organizationName: client.organization_name || "",
-    physicalAddress: address,
-    billingSameAsPhysical: Boolean(address),
-    billingAddress: address,
+    physicalAddress,
+    billingSameAsPhysical: Boolean(physicalAddress && billingAddress === physicalAddress),
+    billingAddress,
     contactEmail: email,
     phoneNumber: client.phone || client.billing_phone || "",
+    serviceNeeded: preferredService(client),
+    communicationStyles: savedCommunicationStyles(savedPreferences),
+    additionalConsiderations: savedAdditionalConsiderations(savedPreferences),
+    communicationNotes: savedPreferences,
+    cdiOrAdditionalSupportNeeded: cdiPreference ? "Yes" : "",
   };
 }
 
@@ -74,20 +115,27 @@ export function portalAssignmentFromRequest(request, source = "client_portal") {
   };
 }
 
-export default function PortalInterpreterRequestForm({ client, source = "client_portal", onSubmit }) {
-  const initialValues = initialValuesFromClient(client);
+export default function PortalInterpreterRequestForm({
+  client,
+  source = "client_portal",
+  onSubmit,
+  existingClient = Boolean(client?.id),
+}) {
+  const initialValues = initialValuesFromClient(client || {});
 
   async function submit(request) {
     const assignment = portalAssignmentFromRequest(request, source);
     await onSubmit(assignment, request);
   }
 
-  return (
-    <InterpreterRequestFormShared
-      initialValues={initialValues}
-      onSubmitRequest={submit}
-      successTitle="Request Submitted"
-      successMessage="Your request has been added to the MLS Portal and is ready for review."
-    />
-  );
+  const props = {
+    initialValues,
+    onSubmitRequest: submit,
+    successTitle: "Request Submitted",
+    successMessage: "Your request has been added to the MLS Portal and is ready for review.",
+  };
+
+  return existingClient
+    ? <ExistingClientInterpreterRequestForm {...props} />
+    : <InterpreterRequestFormShared {...props} />;
 }
