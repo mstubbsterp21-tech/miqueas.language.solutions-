@@ -1,5 +1,5 @@
 import { audit } from "./ops-v2-core.js";
-import { removeAssignmentWorkspaceRecords } from "./assignment-workspace-records.js";
+import { removeAssignmentWorkspaceRecords, syncAssignmentWorkspaceRecord } from "./assignment-workspace-records.js";
 
 const editableFields = [
   "service_type", "delivery_mode", "start_at", "end_at", "timezone", "location_name",
@@ -58,13 +58,29 @@ export async function adminUpdateFullAssignment(db, user, payload) {
   return { status: 200, payload: { assignment: result.data } };
 }
 
+export async function adminSyncAssignmentWorkspaceRecord(db, user, payload) {
+  if (!user.isAdmin) return { status: 403, payload: { error: "Admin access required." } };
+  if (!payload.assignmentId) return { status: 400, payload: { error: "Assignment is required." } };
+  const record = await assignmentRecord(db, payload.assignmentId);
+  if (!record) return { status: 404, payload: { error: "Assignment not found." } };
+  const workspace = await syncAssignmentWorkspaceRecord(db, record);
+  if (workspace.status === "failed") return { status: 502, payload: { error: workspace.error, workspace } };
+  await audit(db, user, {
+    action: "assignment.workspace_record_synced",
+    entityType: "assignment",
+    entityId: record.id,
+    summary: "Full assignment record synced to Google Drive",
+    after: workspace,
+  });
+  return { status: 200, payload: { assignmentId: record.id, workspace } };
+}
+
 export async function adminDeleteAssignment(db, user, payload) {
   if (!user.isAdmin) return { status: 403, payload: { error: "Admin access required." } };
   if (!payload.assignmentId) return { status: 400, payload: { error: "Assignment is required." } };
   if (payload.confirmation !== "DELETE") return { status: 400, payload: { error: "Type DELETE to confirm permanent assignment deletion." } };
   const record = await assignmentRecord(db, payload.assignmentId);
   if (!record) return { status: 404, payload: { error: "Assignment not found." } };
-
   const blockers = [
     ["staffing records", await countRows(db, "assignment_interpreters", "assignment_id", payload.assignmentId)],
     ["quotes", await countRows(db, "quotes", "assignment_id", payload.assignmentId)],
@@ -77,13 +93,9 @@ export async function adminDeleteAssignment(db, user, payload) {
     const details = blockers.map(([label, count]) => `${count} ${label}`).join(", ");
     return { status: 409, payload: { error: `This assignment cannot be permanently deleted because MLS must retain ${details}. Cancel or close the assignment instead.` } };
   }
-
   const workspace = await removeAssignmentWorkspaceRecords(db, record);
   const workspaceFailures = [workspace.calendar, workspace.drive].filter((item) => item.status === "failed");
-  if (workspaceFailures.length) {
-    return { status: 502, payload: { error: `Google Workspace cleanup failed: ${workspaceFailures.map((item) => item.error).join(" | ")}`, workspace } };
-  }
-
+  if (workspaceFailures.length) return { status: 502, payload: { error: `Google Workspace cleanup failed: ${workspaceFailures.map((item) => item.error).join(" | ")}`, workspace } };
   const documents = await db.from("assignment_documents").select("storage_path").eq("assignment_id", payload.assignmentId);
   if (documents.error) throw documents.error;
   const paths = (documents.data || []).map((item) => item.storage_path).filter(Boolean);
@@ -91,7 +103,6 @@ export async function adminDeleteAssignment(db, user, payload) {
     const removed = await db.storage.from("assignment-documents").remove(paths);
     if (removed.error) throw removed.error;
   }
-
   await audit(db, user, {
     action: "assignment.deleted",
     entityType: "assignment",
