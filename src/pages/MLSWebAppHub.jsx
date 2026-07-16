@@ -93,7 +93,7 @@ export default function MLSWebAppHub() {
     </AppShell>
 
     <ProfileModals controller={controller} v2={v2.data} profileActions={combinedActions} />
-    <WorkflowModals controller={controller} />
+    <WorkflowModals controller={controller} actions={combinedActions} />
     <BidModal controller={controller} />
   </>;
 }
