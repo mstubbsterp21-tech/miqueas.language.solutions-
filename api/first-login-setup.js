@@ -138,8 +138,6 @@ function availabilityFlags(profile) {
 }
 
 function resolvedRole(user, client, interpreter) {
-  // Existing database membership is authoritative. Clerk metadata can be stale
-  // when an account was pre-created, converted, or previously used for testing.
   if (client && !interpreter) return "client";
   if (interpreter && !client) return "interpreter";
   if (allowedRoles.has(user.metadataRole)) return user.metadataRole;
@@ -163,26 +161,44 @@ async function roleStatus(db, user) {
 }
 
 async function selectRole(db, user, body) {
-  if (user.isAdmin) return { status: 403, payload: { error: "Administrator accounts do not choose a client or interpreter role." } };
+  if (user.isAdmin) {
+    return {
+      status: 403,
+      payload: { error: "Administrator accounts do not choose a client or interpreter role." },
+    };
+  }
+
   const requestedRole = String(body.role || "").trim().toLowerCase();
   if (!allowedRoles.has(requestedRole)) {
     return { status: 400, payload: { error: "Choose either Client or Interpreter." } };
   }
-  if (!clerkKey) return { status: 500, payload: { error: "Clerk server settings are incomplete." } };
+  if (!clerkKey) {
+    return { status: 500, payload: { error: "Clerk server settings are incomplete." } };
+  }
 
   const [client, interpreter] = await Promise.all([
     clientFor(db, user.id),
     interpreterFor(db, user.id),
   ]);
   const role = resolvedRole(user, client, interpreter);
+
   if (client && requestedRole !== "client") {
-    return { status: 409, payload: { error: "This account already has a client profile. Contact MLS Portal Support to change the account type." } };
+    return {
+      status: 409,
+      payload: { error: "This account already has a client profile. Contact MLS Portal Support to change the account type." },
+    };
   }
   if (interpreter && requestedRole !== "interpreter") {
-    return { status: 409, payload: { error: "This account already has an interpreter profile. Contact MLS Portal Support to change the account type." } };
+    return {
+      status: 409,
+      payload: { error: "This account already has an interpreter profile. Contact MLS Portal Support to change the account type." },
+    };
   }
   if (role && role !== requestedRole) {
-    return { status: 409, payload: { error: `This account is already registered as ${role}. Contact MLS Portal Support to change it.` } };
+    return {
+      status: 409,
+      payload: { error: `This account is already registered as ${role}. Contact MLS Portal Support to change it.` },
+    };
   }
 
   const clerk = createClerkClient({ secretKey: clerkKey });
@@ -213,6 +229,7 @@ async function selectRole(db, user, body) {
 async function ensureClient(db, user, profile) {
   const existing = await clientFor(db, user.id);
   if (existing) return existing;
+
   const result = await db.from("clients").insert({
     clerk_user_id: user.id,
     email: user.email,
@@ -229,8 +246,15 @@ async function saveClientSetup(db, user, body) {
   const merged = { ...current, ...incoming, email: user.email };
   const complete = Boolean(body.complete);
   const missing = complete ? clientMissing(merged) : [];
+
   if (missing.length) {
-    return { status: 400, payload: { error: `Complete these fields before finishing: ${missing.join(", ")}.`, missing } };
+    return {
+      status: 400,
+      payload: {
+        error: `Complete these fields before finishing: ${missing.join(", ")}.`,
+        missing,
+      },
+    };
   }
 
   const now = new Date().toISOString();
@@ -242,6 +266,7 @@ async function saveClientSetup(db, user, body) {
     setup_version: 1,
     updated_at: now,
   };
+
   if (complete) {
     updates.setup_completed_at = now;
     updates.setup_current_step = 3;
@@ -275,6 +300,7 @@ async function saveInterpreterSetup(db, user, body) {
     roster_status: "pending_profile",
     screening_status: "not_started",
   };
+
   const submittedEmail = Object.prototype.hasOwnProperty.call(incoming, "email")
     ? incoming.email
     : base.email || user.email;
@@ -286,6 +312,7 @@ async function saveInterpreterSetup(db, user, body) {
     first_name: incoming.first_name || base.first_name || user.firstName || "",
     last_name: incoming.last_name || base.last_name || user.lastName || "",
   };
+
   if (present(merged.email) && !validEmail(merged.email)) {
     return { status: 400, payload: { error: "Enter a valid email address." } };
   }
@@ -293,7 +320,13 @@ async function saveInterpreterSetup(db, user, body) {
   const complete = Boolean(body.complete);
   const missing = complete ? interpreterMissing(merged) : [];
   if (missing.length) {
-    return { status: 400, payload: { error: `Complete these fields before finishing: ${missing.join(", ")}.`, missing } };
+    return {
+      status: 400,
+      payload: {
+        error: `Complete these fields before finishing: ${missing.join(", ")}.`,
+        missing,
+      },
+    };
   }
 
   const payload = {
@@ -309,6 +342,7 @@ async function saveInterpreterSetup(db, user, body) {
     setup_version: 1,
     updated_at: now,
   };
+
   if (current?.id) payload.id = current.id;
   if (!current) {
     payload.roster_status = "pending_profile";
@@ -319,7 +353,10 @@ async function saveInterpreterSetup(db, user, body) {
     payload.setup_current_step = 4;
   }
 
-  const result = await db.from("interpreters").upsert(payload, { onConflict: "clerk_user_id" }).select().single();
+  const result = await db.from("interpreters")
+    .upsert(payload, { onConflict: "clerk_user_id" })
+    .select()
+    .single();
   if (result.error) throw result.error;
 
   await audit(db, user, {
@@ -337,6 +374,7 @@ export default async function handler(req, res) {
   try {
     const user = await signedInUser(req);
     if (!user) return send(res, 401, { error: "Sign in is required." });
+
     const db = database();
     const action = String(req.query?.action || "");
 
@@ -347,9 +385,9 @@ export default async function handler(req, res) {
       const result = await selectRole(db, user, readBody(req));
       return send(res, result.status, result.payload);
     }
-
-    if (user.isAdmin) return send(res, 403, { error: "Administrator accounts do not use first-login setup." });
-    if (req.method !== "POST") return send(res, 405, { error: "Use POST for setup changes." });
+    if (req.method !== "POST") {
+      return send(res, 405, { error: "Use POST for setup changes." });
+    }
 
     const body = readBody(req);
     const requestedRole = body.role === "client" ? "client" : "interpreter";
@@ -357,9 +395,26 @@ export default async function handler(req, res) {
       clientFor(db, user.id),
       interpreterFor(db, user.id),
     ]);
-    const actualRole = resolvedRole(user, client, interpreter);
-    if (!actualRole) return send(res, 409, { error: "Choose your account role before continuing setup." });
-    if (requestedRole !== actualRole) return send(res, 403, { error: "This setup wizard does not match your account role." });
+
+    const matchingProfile = requestedRole === "client" ? client : interpreter;
+
+    // Admins normally skip first-login setup, but MLS uses linked test profiles
+    // to verify the client and interpreter experiences. A profile linked to this
+    // exact Clerk user is sufficient authorization to save that profile only.
+    if (user.isAdmin && !matchingProfile) {
+      return send(res, 403, { error: "Administrator accounts do not use first-login setup." });
+    }
+
+    const actualRole = matchingProfile
+      ? requestedRole
+      : resolvedRole(user, client, interpreter);
+
+    if (!actualRole) {
+      return send(res, 409, { error: "Choose your account role before continuing setup." });
+    }
+    if (requestedRole !== actualRole) {
+      return send(res, 403, { error: "This setup wizard does not match your account role." });
+    }
 
     const result = requestedRole === "client"
       ? await saveClientSetup(db, user, body)
