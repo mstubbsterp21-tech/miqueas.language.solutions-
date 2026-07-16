@@ -11,6 +11,7 @@ const adminEmails = (process.env.VITE_ADMIN_EMAILS || supportEmail).split(",").m
 const bucketName = "portal-communications";
 const maxUploadBytes = 10 * 1024 * 1024;
 const maxAttachments = 3;
+const maxGroupMembers = 30;
 const allowedExtensions = new Set(["pdf", "doc", "docx", "xls", "xlsx", "csv", "txt", "png", "jpg", "jpeg", "webp"]);
 const allowedAudiences = new Set(["admin", "client", "interpreter", "all"]);
 
@@ -81,7 +82,11 @@ async function directories(db) {
 }
 
 function allowedContacts(role, all, currentUserId) {
-  const values = role === "admin" ? [...all.clients, ...all.interpreters, ...all.admins] : all.admins;
+  const values = role === "admin"
+    ? [...all.clients, ...all.interpreters, ...all.admins]
+    : role === "interpreter"
+      ? [...all.interpreters, ...all.admins]
+      : all.admins;
   const byId = new Map();
   values.filter((item) => item.clerkUserId && item.clerkUserId !== currentUserId).forEach((item) => byId.set(item.clerkUserId, item));
   return [...byId.values()];
@@ -89,24 +94,6 @@ function allowedContacts(role, all, currentUserId) {
 
 function pairKey(firstId, secondId) {
   return [String(firstId), String(secondId)].sort().join(":");
-}
-
-function participant(conversation, userId) {
-  if (conversation.participant_one_clerk_user_id === userId) return {
-    selfRole: conversation.participant_one_role,
-    otherId: conversation.participant_two_clerk_user_id,
-    otherRole: conversation.participant_two_role,
-    otherName: conversation.participant_two_name,
-    otherEmail: conversation.participant_two_email,
-  };
-  if (conversation.participant_two_clerk_user_id === userId) return {
-    selfRole: conversation.participant_two_role,
-    otherId: conversation.participant_one_clerk_user_id,
-    otherRole: conversation.participant_one_role,
-    otherName: conversation.participant_one_name,
-    otherEmail: conversation.participant_one_email,
-  };
-  return null;
 }
 
 function portalUrl(values = {}) {
@@ -161,16 +148,47 @@ async function emailAttachments(db, attachments) {
   return files;
 }
 
+async function activeMembers(db, conversationIds) {
+  if (!conversationIds.length) return [];
+  const result = await db.from("portal_conversation_members").select("*").in("conversation_id", conversationIds).is("left_at", null).order("joined_at");
+  if (result.error) throw result.error;
+  return result.data || [];
+}
+
+function conversationView(conversation, allMembers, userId) {
+  const members = allMembers.filter((item) => item.conversation_id === conversation.id);
+  const others = members.filter((item) => item.clerk_user_id !== userId);
+  const direct = conversation.conversation_type !== "group";
+  const title = direct
+    ? others[0]?.display_name || "MLS conversation"
+    : conversation.title || others.map((item) => item.display_name).filter(Boolean).slice(0, 3).join(", ") || "Group conversation";
+  return {
+    ...conversation,
+    members,
+    displayTitle: title,
+    participant: direct && others[0] ? {
+      selfRole: members.find((item) => item.clerk_user_id === userId)?.role,
+      otherId: others[0].clerk_user_id,
+      otherRole: others[0].role,
+      otherName: others[0].display_name,
+      otherEmail: others[0].email,
+    } : null,
+  };
+}
+
 export async function loadCommunications(db, user) {
   const identity = await profileFor(db, user);
   const all = await directories(db);
   const contacts = allowedContacts(identity.role, all, user.id);
-  const conversationResult = await db.from("portal_conversations").select("*")
-    .or(`participant_one_clerk_user_id.eq.${user.id},participant_two_clerk_user_id.eq.${user.id}`)
-    .order("last_message_at", { ascending: false, nullsFirst: false });
+  const membershipResult = await db.from("portal_conversation_members").select("conversation_id").eq("clerk_user_id", user.id).is("left_at", null);
+  if (membershipResult.error) throw membershipResult.error;
+  const conversationIds = (membershipResult.data || []).map((item) => item.conversation_id);
+  const conversationResult = conversationIds.length
+    ? await db.from("portal_conversations").select("*").in("id", conversationIds).order("last_message_at", { ascending: false, nullsFirst: false })
+    : { data: [], error: null };
   if (conversationResult.error) throw conversationResult.error;
   const conversations = conversationResult.data || [];
-  const conversationIds = conversations.map((item) => item.id);
+  const members = await activeMembers(db, conversations.map((item) => item.id));
   const messageResult = conversationIds.length
     ? await db.from("portal_direct_messages").select("*").in("conversation_id", conversationIds).order("created_at")
     : { data: [], error: null };
@@ -200,36 +218,96 @@ export async function loadCommunications(db, user) {
   return {
     role: identity.role,
     contacts,
-    conversations: conversations.map((item) => ({ ...item, participant: participant(item, user.id) })),
+    conversations: conversations.map((item) => conversationView(item, members, user.id)),
     messages: (messageResult.data || []).map((message) => ({ ...message, attachments: (messageAttachmentResult.data || []).filter((item) => item.direct_message_id === message.id) })),
     announcements: announcements.map((announcement) => ({ ...announcement, read_at: readMap.get(announcement.id) || null, attachments: (announcementAttachmentResult.data || []).filter((item) => item.announcement_id === announcement.id) })),
     unreadAnnouncements: announcements.filter((item) => !readMap.has(item.id)).length,
   };
 }
 
+function validateConversation(identity, selected, isGroup) {
+  if (isGroup && identity.role === "client") return "Clients can participate in MLS-created group chats but cannot create them.";
+  if (identity.role === "client" && selected.some((item) => item.role !== "admin")) return "Clients may message MLS admins only.";
+  if (identity.role === "interpreter" && selected.some((item) => item.role === "client")) return "Only MLS may add clients to a group chat.";
+  if (!isGroup && identity.role === "interpreter" && selected[0] && !["admin", "interpreter"].includes(selected[0].role)) return "Interpreters may message MLS or other interpreters.";
+  return "";
+}
+
 export async function createCommunicationConversation(db, user, payload) {
   const identity = await profileFor(db, user);
   const contacts = allowedContacts(identity.role, await directories(db), user.id);
-  const recipient = contacts.find((item) => item.clerkUserId === String(payload.recipientClerkUserId || ""));
-  if (!recipient) return { status: 403, payload: { error: "That person is not available as a messaging contact." } };
-  if (identity.role !== "admin" && recipient.role !== "admin") return { status: 403, payload: { error: "Clients and interpreters may message MLS admins only." } };
+  const requestedIds = [...new Set([
+    ...(Array.isArray(payload.memberClerkUserIds) ? payload.memberClerkUserIds : []),
+    payload.recipientClerkUserId,
+  ].map((value) => String(value || "").trim()).filter(Boolean))].slice(0, maxGroupMembers - 1);
+  const selected = requestedIds.map((id) => contacts.find((item) => item.clerkUserId === id)).filter(Boolean);
+  if (!selected.length || selected.length !== requestedIds.length) return { status: 403, payload: { error: "One or more people are not available as messaging contacts." } };
+  const isGroup = payload.conversationType === "group" || selected.length > 1;
+  const validation = validateConversation(identity, selected, isGroup);
+  if (validation) return { status: 403, payload: { error: validation } };
   const self = { clerkUserId: user.id, role: identity.role, name: identity.name, email: user.email };
-  const ordered = [self, recipient].sort((a, b) => a.clerkUserId.localeCompare(b.clerkUserId));
-  const result = await db.from("portal_conversations").upsert({
-    pair_key: pairKey(user.id, recipient.clerkUserId),
-    participant_one_clerk_user_id: ordered[0].clerkUserId,
-    participant_one_role: ordered[0].role,
-    participant_one_name: ordered[0].name,
-    participant_one_email: ordered[0].email,
-    participant_two_clerk_user_id: ordered[1].clerkUserId,
-    participant_two_role: ordered[1].role,
-    participant_two_name: ordered[1].name,
-    participant_two_email: ordered[1].email,
-    created_by_clerk_user_id: user.id,
-    updated_at: new Date().toISOString(),
-  }, { onConflict: "pair_key" }).select().single();
-  if (result.error) throw result.error;
-  return { status: 200, payload: { conversation: { ...result.data, participant: participant(result.data, user.id) } } };
+
+  let conversation;
+  if (!isGroup) {
+    const recipient = selected[0];
+    const key = pairKey(user.id, recipient.clerkUserId);
+    const existing = await db.from("portal_conversations").select("*").eq("pair_key", key).maybeSingle();
+    if (existing.error) throw existing.error;
+    if (existing.data) conversation = existing.data;
+    else {
+      const ordered = [self, recipient].sort((a, b) => a.clerkUserId.localeCompare(b.clerkUserId));
+      const inserted = await db.from("portal_conversations").insert({
+        pair_key: key,
+        conversation_type: "direct",
+        participant_one_clerk_user_id: ordered[0].clerkUserId,
+        participant_one_role: ordered[0].role,
+        participant_one_name: ordered[0].name,
+        participant_one_email: ordered[0].email,
+        participant_two_clerk_user_id: ordered[1].clerkUserId,
+        participant_two_role: ordered[1].role,
+        participant_two_name: ordered[1].name,
+        participant_two_email: ordered[1].email,
+        created_by_clerk_user_id: user.id,
+      }).select().single();
+      if (inserted.error) throw inserted.error;
+      conversation = inserted.data;
+    }
+  } else {
+    const title = String(payload.title || "").trim().slice(0, 120) || `${identity.name} group`;
+    const inserted = await db.from("portal_conversations").insert({
+      pair_key: null,
+      conversation_type: "group",
+      title,
+      created_by_clerk_user_id: user.id,
+    }).select().single();
+    if (inserted.error) throw inserted.error;
+    conversation = inserted.data;
+  }
+
+  const memberValues = [self, ...selected].map((item) => ({
+    conversation_id: conversation.id,
+    clerk_user_id: item.clerkUserId,
+    role: item.role,
+    display_name: item.name,
+    email: item.email || null,
+    added_by_clerk_user_id: user.id,
+    left_at: null,
+  }));
+  const memberResult = await db.from("portal_conversation_members").upsert(memberValues, { onConflict: "conversation_id,clerk_user_id" });
+  if (memberResult.error) throw memberResult.error;
+  const members = await activeMembers(db, [conversation.id]);
+
+  if (isGroup) {
+    await Promise.all(selected.map((person) => notify(db, person.clerkUserId, {
+      category: "message",
+      title: `Added to ${conversation.title}`,
+      body: `${identity.name} added you to an MLS Portal group chat.`,
+      section: "communications",
+      relatedType: "conversation",
+      relatedId: conversation.id,
+    })));
+  }
+  return { status: 200, payload: { conversation: conversationView(conversation, members, user.id) } };
 }
 
 export async function createCommunicationUploadUrl(db, user, payload) {
@@ -250,10 +328,12 @@ export async function sendPortalDirectMessage(db, user, payload) {
   const conversationResult = await db.from("portal_conversations").select("*").eq("id", payload.conversationId).maybeSingle();
   if (conversationResult.error) throw conversationResult.error;
   const conversation = conversationResult.data;
-  const access = conversation ? participant(conversation, user.id) : null;
-  if (!access) return { status: 403, payload: { error: "You do not have access to that conversation." } };
+  if (!conversation) return { status: 404, payload: { error: "Conversation not found." } };
+  const members = await activeMembers(db, [conversation.id]);
+  const selfMember = members.find((item) => item.clerk_user_id === user.id);
+  if (!selfMember) return { status: 403, payload: { error: "You do not have access to that conversation." } };
   const identity = await profileFor(db, user);
-  if (identity.role !== access.selfRole && !user.isAdmin) return { status: 403, payload: { error: "Conversation role does not match your account." } };
+  if (identity.role !== selfMember.role && !user.isAdmin) return { status: 403, payload: { error: "Conversation role does not match your account." } };
   const inserted = await db.from("portal_direct_messages").insert({ conversation_id: conversation.id, sender_clerk_user_id: user.id, sender_role: identity.role, body: text }).select().single();
   if (inserted.error) throw inserted.error;
   if (attachments.length) {
@@ -261,19 +341,39 @@ export async function sendPortalDirectMessage(db, user, payload) {
     if (attachmentResult.error) throw attachmentResult.error;
   }
   await db.from("portal_conversations").update({ last_message_at: new Date().toISOString(), updated_at: new Date().toISOString() }).eq("id", conversation.id);
-  await notify(db, access.otherId, { category: "message", title: `New message from ${identity.name}`, body: text || `${attachments.length} attachment${attachments.length === 1 ? "" : "s"}`, section: "communications", relatedType: "direct_message", relatedId: conversation.id });
-  const copy = emailCopy({ heading: `New message from ${identity.name}`, intro: "A new direct message was sent through MLS Portal.", bodyText: text || "An attachment was added to the conversation.", buttonLabel: "Reply in MLS Portal", buttonUrl: portalUrl({ conversation: conversation.id }) });
-  const delivery = access.otherEmail ? await sendGmailEmailWithAttachments(db, { to: access.otherEmail, subject: `New MLS Portal message from ${identity.name}`, ...copy, attachments: await emailAttachments(db, attachments) }) : { sent: false, status: "skipped", error: "Recipient email is unavailable." };
+  const recipients = members.filter((item) => item.clerk_user_id !== user.id);
+  await Promise.all(recipients.map((recipient) => notify(db, recipient.clerk_user_id, {
+    category: "message",
+    title: conversation.conversation_type === "group" ? `New message in ${conversation.title || "group chat"}` : `New message from ${identity.name}`,
+    body: text || `${attachments.length} attachment${attachments.length === 1 ? "" : "s"}`,
+    section: "communications",
+    relatedType: "direct_message",
+    relatedId: conversation.id,
+  })));
+
+  const files = await emailAttachments(db, attachments);
+  const heading = conversation.conversation_type === "group" ? `${identity.name} in ${conversation.title || "MLS group chat"}` : `New message from ${identity.name}`;
+  const copy = emailCopy({ heading, intro: "A new message was sent through MLS Portal.", bodyText: text || "An attachment was added to the conversation.", buttonLabel: "Reply in MLS Portal", buttonUrl: portalUrl({ conversation: conversation.id }) });
+  const deliveries = [];
+  for (let index = 0; index < recipients.length; index += 5) {
+    const batch = recipients.slice(index, index + 5);
+    deliveries.push(...await Promise.all(batch.map(async (recipient) => recipient.email
+      ? { email: recipient.email, ...await sendGmailEmailWithAttachments(db, { to: recipient.email, subject: `MLS Portal: ${heading}`, ...copy, attachments: files }) }
+      : { email: "", sent: false, status: "skipped", error: "Recipient email is unavailable." })));
+  }
+  const sent = deliveries.filter((item) => item.sent);
+  const failed = deliveries.filter((item) => !item.sent && item.status !== "skipped");
+  const status = !deliveries.length ? "skipped" : sent.length === deliveries.length ? "sent" : sent.length ? "partial" : failed[0]?.status || "failed";
   const update = await db.from("portal_direct_messages").update({
-    email_status: delivery.status || (delivery.sent ? "sent" : "failed"),
-    email_recipients: access.otherEmail ? [access.otherEmail] : [],
-    gmail_message_id: delivery.messageId || null,
-    gmail_thread_id: delivery.threadId || null,
-    email_sent_at: delivery.sent ? new Date().toISOString() : null,
-    email_last_error: delivery.error || null,
+    email_status: status,
+    email_recipients: deliveries.map((item) => item.email).filter(Boolean),
+    gmail_message_id: sent[0]?.messageId || null,
+    gmail_thread_id: sent[0]?.threadId || null,
+    email_sent_at: sent.length ? new Date().toISOString() : null,
+    email_last_error: failed.map((item) => `${item.email}: ${item.error}`).join(" | ") || null,
   }).eq("id", inserted.data.id);
   if (update.error) throw update.error;
-  return { status: 201, payload: { message: inserted.data, email: delivery } };
+  return { status: 201, payload: { message: inserted.data, email: { status, sent: sent.length, total: deliveries.length } } };
 }
 
 async function announcementRecipients(db, audiences) {
@@ -343,9 +443,11 @@ export async function openCommunicationAttachment(db, user, payload) {
   if (attachment.direct_message_id) {
     const message = await db.from("portal_direct_messages").select("conversation_id").eq("id", attachment.direct_message_id).maybeSingle();
     if (message.error) throw message.error;
-    const conversation = message.data ? await db.from("portal_conversations").select("*").eq("id", message.data.conversation_id).maybeSingle() : { data: null, error: null };
-    if (conversation.error) throw conversation.error;
-    allowed = Boolean(conversation.data && participant(conversation.data, user.id));
+    if (message.data) {
+      const membership = await db.from("portal_conversation_members").select("conversation_id").eq("conversation_id", message.data.conversation_id).eq("clerk_user_id", user.id).is("left_at", null).maybeSingle();
+      if (membership.error) throw membership.error;
+      allowed = Boolean(membership.data);
+    }
   } else if (attachment.announcement_id) {
     const announcement = await db.from("portal_announcements").select("*").eq("id", attachment.announcement_id).maybeSingle();
     if (announcement.error) throw announcement.error;
