@@ -20,6 +20,28 @@ function preferredService(client = {}) {
   return "";
 }
 
+function savedCommunicationStyles(text = "") {
+  const rules = [
+    [/\bptasl\b|pro[- ]?tactile/i, "PTASL (Pro-Tactile ASL)"],
+    [/\bcase\b|conceptually accurate signed english/i, "CASE (Conceptually Accurate Signed English)"],
+    [/\bmce\b|manually coded english/i, "MCE (Manually Coded English)"],
+    [/cued speech/i, "Cued Speech"],
+    [/\basl\b|american sign language/i, "ASL (American Sign Language)"],
+  ];
+  return rules.filter(([pattern]) => pattern.test(text)).map(([, label]) => label);
+}
+
+function savedAdditionalConsiderations(text = "") {
+  const rules = [
+    [/deafblind/i, "DeafBlind"],
+    [/low vision/i, "Low Vision"],
+    [/low mobility|mobility/i, "Low Mobility"],
+    [/language still developing|language development|non-standard language/i, "Language still developing / non-standard language use"],
+    [/foreign sign|foreign sign language/i, "Uses a foreign sign language"],
+  ];
+  return rules.filter(([pattern]) => pattern.test(text)).map(([, label]) => label);
+}
+
 export function initialValuesFromClient(client = {}) {
   const physicalAddress = client.physical_address_text || assembledAddress(client);
   const billingAddress = client.billing_address_text || physicalAddress;
@@ -36,6 +58,8 @@ export function initialValuesFromClient(client = {}) {
     contactEmail: email,
     phoneNumber: client.phone || client.billing_phone || "",
     serviceNeeded: preferredService(client),
+    communicationStyles: savedCommunicationStyles(savedPreferences),
+    additionalConsiderations: savedAdditionalConsiderations(savedPreferences),
     communicationNotes: savedPreferences,
     cdiOrAdditionalSupportNeeded: cdiPreference ? "Yes" : "",
   };
