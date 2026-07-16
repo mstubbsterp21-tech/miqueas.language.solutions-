@@ -31,6 +31,7 @@ export function createMLSApi(session) {
     app: (action, method, body) => appRequest(session, action, method, body),
     operationsV2: (action, method, body) => request(session, "/api/operations-v2", action, method, body),
     assignmentAdmin: (action, method = "POST", body) => request(session, "/api/assignment-admin", action, method, body),
+    assignmentWorkspace: (action, method = "POST", body) => request(session, "/api/assignment-workspace-sync", action, method, body),
     communications: (action = "loadCommunications", method = "GET", body) => request(session, "/api/communications", action, method, body),
     setup: (role, body) => request(session, "/api/first-login-setup", role, "POST", body),
     role: (action = "status", method = "GET", body) => request(
