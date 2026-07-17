@@ -150,7 +150,7 @@ async function adminDeleteProfile(database, user, payload) {
   return { status: 200, payload: { deletedId: profileId, profileType, label } };
 }
 
-async function loadOperations(database, user) {
+export async function loadOperations(database, user) {
   const [interpreter, client] = await Promise.all([interpreterFor(database, user), clientFor(database, user)]);
   const response = { training: [], opportunities: [], bids: [], feedback: [], admin: null };
 

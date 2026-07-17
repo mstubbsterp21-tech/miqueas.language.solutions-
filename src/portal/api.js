@@ -55,6 +55,7 @@ async function assignmentAutomationRequest(session, action, method, body) {
 
 export function createMLSApi(session) {
   return {
+    bootstrap: () => request(session, "/api/portal-bootstrap", "load", "GET"),
     core: (action, method, body) => coreRequest(session, action, method, body),
     operations: (action, method, body) => request(session, "/api/portal-operations", action, method, body),
     app: (action, method, body) => appRequest(session, action, method, body),

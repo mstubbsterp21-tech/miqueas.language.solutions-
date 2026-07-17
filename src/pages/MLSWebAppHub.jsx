@@ -55,7 +55,7 @@ function learningAlert(notification) {
 export default function MLSWebAppHub() {
   const { session } = useSession();
   const controller = useMLSController();
-  const v2 = useOperationsV2();
+  const v2 = useOperationsV2({ initialData: controller.operationsV2, deferInitialLoad: true });
   const {
     isLoaded, workspace, operations, app, role, section, setSection,
     loading, refreshing, busyDoc, message, error, setMessage, setError,
@@ -90,9 +90,7 @@ export default function MLSWebAppHub() {
 
   useEffect(() => {
     if (!session || !app) return;
-    const candidates = activeSection === "communications"
-      ? communicationNotifications
-      : activeSection === "learning"
+    const candidates = activeSection === "learning"
         ? learningNotifications
         : [];
     const ids = candidates.map((item) => item.id).filter((id) => id && !markingRead.current.has(id));
@@ -118,19 +116,19 @@ export default function MLSWebAppHub() {
     })();
 
     return () => { cancelled = true; };
-  }, [activeSection, app, communicationNotifications, learningNotifications, session]);
+  }, [activeSection, app, learningNotifications, session]);
 
   if (!isSupabaseConfigured) return <PortalSetupNotice />;
   if (!isLoaded || loading) return <PortalLoading />;
   if (!workspace || !app) return <div className="flex min-h-[100dvh] items-center justify-center bg-[#f7f3ef] p-5"><EmptyState icon={AlertCircle} title="Workspace unavailable" text={error || "Refresh the app and try again."} /></div>;
   if (!workspace.user?.isAdmin && roleSelection.loading) return <PortalLoading title="Checking your account type" text="Preparing the correct MLS profile setup." />;
-  if (!workspace.user?.isAdmin && roleSelection.selectionRequired) return <PortalRoleSelection user={workspace.user} saving={roleSelection.saving} error={roleSelection.error} onSelect={async (selectedRole) => { await roleSelection.selectRole(selectedRole); setModal(""); await Promise.allSettled([load(true), v2.load(true)]); await roleSelection.load(); }} />;
+  if (!workspace.user?.isAdmin && roleSelection.selectionRequired) return <PortalRoleSelection user={workspace.user} saving={roleSelection.saving} error={roleSelection.error} onSelect={async (selectedRole) => { await roleSelection.selectRole(selectedRole); setModal(""); await load(true); await roleSelection.load(); }} />;
   if (needsFirstLoginSetup(role, workspace)) {
     const profile = role === "client" ? workspace.client?.profile : workspace.interpreter?.profile;
-    return <FirstLoginSetupWizard role={role} profile={profile} user={workspace.user} onComplete={async () => { setModal(""); await Promise.allSettled([load(true), v2.load(true)]); }} />;
+    return <FirstLoginSetupWizard role={role} profile={profile} user={workspace.user} onComplete={async () => { setModal(""); await load(true); }} />;
   }
 
-  const refreshAll = () => Promise.allSettled([load(true), v2.load(true)]);
+  const refreshAll = () => load(true);
   const combinedActions = { ...actions, ...v2.actions, refreshPortal: refreshAll };
   const personalization = role === "admin" ? v2.data?.personalProfileCustomization : v2.data?.profileCustomization;
   const legacyClientSection = activeSection === "notifications" ? "notifications" : activeSection;

@@ -155,9 +155,16 @@ async function activeMembers(db, conversationIds) {
   return result.data || [];
 }
 
-function conversationView(conversation, allMembers, userId) {
+function conversationView(conversation, allMembers, userId, allMessages = []) {
   const members = allMembers.filter((item) => item.conversation_id === conversation.id);
   const others = members.filter((item) => item.clerk_user_id !== userId);
+  const self = members.find((item) => item.clerk_user_id === userId);
+  const lastReadAt = self?.last_read_at ? new Date(self.last_read_at).getTime() : 0;
+  const unreadCount = allMessages.filter((message) => (
+    message.conversation_id === conversation.id
+    && message.sender_clerk_user_id !== userId
+    && new Date(message.created_at).getTime() > lastReadAt
+  )).length;
   const direct = conversation.conversation_type !== "group";
   const title = direct
     ? others[0]?.display_name || "MLS conversation"
@@ -166,6 +173,8 @@ function conversationView(conversation, allMembers, userId) {
     ...conversation,
     members,
     displayTitle: title,
+    unreadCount,
+    lastReadAt: self?.last_read_at || null,
     participant: direct && others[0] ? {
       selfRole: members.find((item) => item.clerk_user_id === userId)?.role,
       otherId: others[0].clerk_user_id,
@@ -218,7 +227,7 @@ export async function loadCommunications(db, user) {
   return {
     role: identity.role,
     contacts,
-    conversations: conversations.map((item) => conversationView(item, members, user.id)),
+    conversations: conversations.map((item) => conversationView(item, members, user.id, messageResult.data || [])),
     messages: (messageResult.data || []).map((message) => ({ ...message, attachments: (messageAttachmentResult.data || []).filter((item) => item.direct_message_id === message.id) })),
     announcements: announcements.map((announcement) => ({ ...announcement, read_at: readMap.get(announcement.id) || null, attachments: (announcementAttachmentResult.data || []).filter((item) => item.announcement_id === announcement.id) })),
     unreadAnnouncements: announcements.filter((item) => !readMap.has(item.id)).length,
@@ -295,6 +304,10 @@ export async function createCommunicationConversation(db, user, payload) {
   }));
   const memberResult = await db.from("portal_conversation_members").upsert(memberValues, { onConflict: "conversation_id,clerk_user_id" });
   if (memberResult.error) throw memberResult.error;
+  const selfRead = await db.from("portal_conversation_members").update({ last_read_at: new Date().toISOString() })
+    .eq("conversation_id", conversation.id)
+    .eq("clerk_user_id", user.id);
+  if (selfRead.error) throw selfRead.error;
   const members = await activeMembers(db, [conversation.id]);
 
   if (isGroup) {
@@ -308,6 +321,44 @@ export async function createCommunicationConversation(db, user, payload) {
     })));
   }
   return { status: 200, payload: { conversation: conversationView(conversation, members, user.id) } };
+}
+
+export async function markPortalConversationRead(db, user, payload) {
+  const conversationId = String(payload?.conversationId || "").trim();
+  if (!conversationId) return { status: 400, payload: { error: "Conversation ID is required." } };
+
+  const membership = await db.from("portal_conversation_members")
+    .select("conversation_id")
+    .eq("conversation_id", conversationId)
+    .eq("clerk_user_id", user.id)
+    .is("left_at", null)
+    .maybeSingle();
+  if (membership.error) throw membership.error;
+  if (!membership.data) return { status: 403, payload: { error: "You do not have access to that conversation." } };
+
+  const latest = await db.from("portal_direct_messages")
+    .select("id,created_at")
+    .eq("conversation_id", conversationId)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (latest.error) throw latest.error;
+
+  const readAt = new Date().toISOString();
+  const updated = await db.from("portal_conversation_members").update({
+    last_read_at: readAt,
+    last_read_message_id: latest.data?.id || null,
+  }).eq("conversation_id", conversationId).eq("clerk_user_id", user.id).select("conversation_id,last_read_at,last_read_message_id").single();
+  if (updated.error) throw updated.error;
+
+  const notifications = await db.from("notifications").update({ is_read: true, read_at: readAt })
+    .eq("recipient_clerk_user_id", user.id)
+    .eq("section", "communications")
+    .eq("related_id", conversationId)
+    .in("category", ["message", "mention"]);
+  if (notifications.error) throw notifications.error;
+
+  return { status: 200, payload: { read: updated.data } };
 }
 
 export async function createCommunicationUploadUrl(db, user, payload) {

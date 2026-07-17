@@ -69,7 +69,7 @@ function PortalLoading({ title = "Opening the MLS app", text = "Loading your sec
 
 export default function MLSWebApp() {
   const controller = useMLSController();
-  const v2 = useOperationsV2();
+  const v2 = useOperationsV2({ initialData: controller.operationsV2, deferInitialLoad: true });
   const {
     isLoaded, workspace, operations, app, role, section, setSection,
     loading, refreshing, busyDoc, message, error, setMessage, setError,
@@ -104,7 +104,7 @@ export default function MLSWebApp() {
         onSelect={async (selectedRole) => {
           await roleSelection.selectRole(selectedRole);
           setModal("");
-          await Promise.allSettled([load(true), v2.load(true)]);
+          await load(true);
           await roleSelection.load();
         }}
       />
@@ -120,7 +120,7 @@ export default function MLSWebApp() {
         user={workspace.user}
         onComplete={async () => {
           setModal("");
-          await Promise.allSettled([load(true), v2.load(true)]);
+          await load(true);
         }}
       />
     );
@@ -128,7 +128,7 @@ export default function MLSWebApp() {
 
   const activeSection = normalizeSection(role, section);
   const combinedActions = { ...actions, ...v2.actions };
-  const refreshAll = () => Promise.allSettled([load(true), v2.load(true)]);
+  const refreshAll = () => load(true);
   const personalization = role === "admin" ? v2.data?.personalProfileCustomization : v2.data?.profileCustomization;
 
   const legacyClientSection = activeSection === "notifications" ? "notifications" : activeSection;

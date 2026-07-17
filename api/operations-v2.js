@@ -19,6 +19,7 @@ import {
   createCommunicationUploadUrl,
   publishPortalAnnouncement,
   markPortalAnnouncementRead,
+  markPortalConversationRead,
   openCommunicationAttachment,
   deletePortalAnnouncement,
 } from "./_shared/ops-v2-communications.js";
@@ -74,6 +75,7 @@ const actions = {
   sendDirectMessage: sendPortalMessageWithMentions,
   publishAnnouncement: publishPortalAnnouncement,
   markAnnouncementRead: markPortalAnnouncementRead,
+  markConversationRead: markPortalConversationRead,
   openCommunicationAttachment,
   openAttachment: openCommunicationAttachment,
   deleteAnnouncement: deletePortalAnnouncement,

@@ -3,7 +3,7 @@ import { useSession } from "@clerk/clerk-react";
 import { createPortalSupabaseClient } from "../lib/supabaseClient";
 import { createMLSApi } from "./api";
 
-export default function useOperationsV2({ enabled = true } = {}) {
+export default function useOperationsV2({ enabled = true, initialData = null, deferInitialLoad = false } = {}) {
   const { session } = useSession();
   const api = useMemo(() => createMLSApi(session), [session]);
   const storage = useMemo(() => createPortalSupabaseClient(null), []);
@@ -32,7 +32,14 @@ export default function useOperationsV2({ enabled = true } = {}) {
     }
   }, [api, enabled, session]);
 
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => {
+    if (initialData) {
+      setData(initialData);
+      setLoading(false);
+      return;
+    }
+    if (!deferInitialLoad) load();
+  }, [deferInitialLoad, initialData, load]);
 
   useEffect(() => {
     if (!enabled) return undefined;
@@ -67,7 +74,7 @@ export default function useOperationsV2({ enabled = true } = {}) {
     setError("");
     try {
       const result = await work();
-      flash(successText);
+      flash(typeof successText === "function" ? successText(result) : successText);
       window.dispatchEvent(new CustomEvent("mls:assignment-mutated"));
       await load(true);
       return result;
@@ -82,15 +89,27 @@ export default function useOperationsV2({ enabled = true } = {}) {
 
   const createAssignment = useCallback((payload) => runAssignment(async () => {
     const created = await api.core("createAssignment", "POST", payload);
-    await api.automations("requestCreated", "POST", { assignmentId: created.assignment.id });
-    return created;
-  }, "Assignment created and synced to Google Workspace."), [api, runAssignment]);
+    try {
+      const automation = await api.automations("requestCreated", "POST", { assignmentId: created.assignment.id });
+      return { ...created, automation };
+    } catch (automationError) {
+      return { ...created, automation: { error: automationError instanceof Error ? automationError.message : String(automationError) } };
+    }
+  }, (result) => result.automation?.error
+    ? "Assignment created. Google Workspace sync needs a retry."
+    : "Assignment created and synced to Google Workspace."), [api, runAssignment]);
 
   const updateAssignment = useCallback((assignment, patch) => runAssignment(async () => {
     const updated = await api.app("adminUpdateAssignment", "POST", { assignmentId: assignment.id, ...patch });
-    await api.automations("syncAssignment", "POST", { assignmentId: assignment.id });
-    return updated;
-  }, "Assignment updated and synced to Google Workspace."), [api, runAssignment]);
+    try {
+      const automation = await api.automations("syncAssignment", "POST", { assignmentId: assignment.id });
+      return { ...updated, automation };
+    } catch (automationError) {
+      return { ...updated, automation: { error: automationError instanceof Error ? automationError.message : String(automationError) } };
+    }
+  }, (result) => result.automation?.error
+    ? "Assignment updated. Google Workspace sync needs a retry."
+    : "Assignment updated and synced to Google Workspace."), [api, runAssignment]);
 
   const deleteAssignment = useCallback((assignment, confirmation = "") => runAssignment(
     () => api.app("adminDeleteAssignment", "POST", { assignmentId: assignment.id, confirmation }),

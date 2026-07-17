@@ -57,7 +57,7 @@ export default function DocumentRequestEmailForm({ controller }) {
         emailResult = await api.documentRequestEmail("send", "POST", { requestId });
       }
 
-      setDocumentRequestDraft({ ...EMPTY_DOCUMENT_REQUEST, sendEmail: true });
+      setDraft({ ...EMPTY_DOCUMENT_REQUEST, sendEmail: true });
       setModal("");
       if (!sendEmail) {
         setMessage("Document request created without email delivery.");

@@ -39,6 +39,15 @@ export default function PortalAppRouter() {
     ensureMeta("apple-mobile-web-app-capable", "yes");
     ensureMeta("apple-mobile-web-app-status-bar-style", "black-translucent");
     ensureMeta("apple-mobile-web-app-title", "MLS");
+    ensureMeta("robots", "noindex, nofollow, noarchive");
+    let canonical = document.head.querySelector('link[rel="canonical"]');
+    if (!canonical) {
+      canonical = document.createElement("link");
+      canonical.setAttribute("rel", "canonical");
+      document.head.appendChild(canonical);
+    }
+    canonical.setAttribute("href", `https://miqueaslanguagesolutions.com${window.location.pathname}`);
+    document.title = window.location.pathname.startsWith("/login") ? "MLS Secure Login" : "MLS Secure Portal";
     document.documentElement.style.backgroundColor = "#f7f3ef";
   }, []);
 

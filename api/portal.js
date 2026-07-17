@@ -207,7 +207,7 @@ async function loadAdminOverview(db, user) {
   };
 }
 
-async function loadWorkspace(db, user) {
+export async function loadWorkspace(db, user) {
   const [interpreter, client, preference] = await Promise.all([
     getInterpreter(db, user.id),
     getClient(db, user.id),

@@ -24,6 +24,10 @@ import { Badge, Card, EmptyState, Hero, INPUT, SectionHeader, cx, formatDate, pr
 const EMPTY_ANNOUNCEMENT = { title: "", body: "", audiences: ["interpreter"], expiresAt: "" };
 const audienceOptions = [["interpreter", "Interpreters"], ["client", "Clients"], ["admin", "Other admins"]];
 
+function newSubmissionId() {
+  return globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+}
+
 function Button({ children, onClick, tone = "primary", type = "button", disabled = false, icon: Icon }) {
   const styles = {
     primary: "bg-[#721100] text-white",
@@ -386,6 +390,7 @@ export default function CommunicationsCenter({ workspace, onRefresh }) {
     () => new URLSearchParams(window.location.search).get("conversation") || "",
   );
   const [message, setMessage] = useState("");
+  const [messageSubmissionId, setMessageSubmissionId] = useState(newSubmissionId);
   const [mentionIds, setMentionIds] = useState([]);
   const [messageFiles, setMessageFiles] = useState([]);
   const [announcement, setAnnouncement] = useState(EMPTY_ANNOUNCEMENT);
@@ -447,6 +452,19 @@ export default function CommunicationsCenter({ workspace, onRefresh }) {
   const conversations = data?.conversations || [];
   const selectedConversation = conversations.find((item) => item.id === selectedConversationId) || null;
   const conversationMessages = (data?.messages || []).filter((item) => item.conversation_id === selectedConversationId);
+
+  useEffect(() => {
+    if (!selectedConversationId || !selectedConversation?.unreadCount) return;
+    let active = true;
+    setData((current) => current ? {
+      ...current,
+      conversations: (current.conversations || []).map((item) => item.id === selectedConversationId ? { ...item, unreadCount: 0, lastReadAt: new Date().toISOString() } : item),
+    } : current);
+    request("markConversationRead", "POST", { conversationId: selectedConversationId })
+      .then(() => active && onRefresh?.())
+      .catch((readError) => active && setError(readError instanceof Error ? readError.message : String(readError)));
+    return () => { active = false; };
+  }, [selectedConversationId, selectedConversation?.unreadCount]);
 
   function selectConversation(id) {
     setSelectedConversationId(id);
@@ -525,10 +543,12 @@ export default function CommunicationsCenter({ workspace, onRefresh }) {
       await request("sendDirectMessage", "POST", {
         conversationId: selectedConversationId,
         message,
+        idempotencyKey: messageSubmissionId,
         mentionClerkUserIds: mentionIds,
         attachments,
       });
       setMessage("");
+      setMessageSubmissionId(newSubmissionId());
       setMentionIds([]);
       setMessageFiles([]);
       setNotice("Message sent.");
@@ -720,6 +740,11 @@ export default function CommunicationsCenter({ workspace, onRefresh }) {
                             {group ? `${conversation.members?.length || 0} members` : pretty(conversation.participant?.otherRole)}
                           </span>
                         </span>
+                        {conversation.unreadCount > 0 && (
+                          <span className={cx("rounded-full px-2 py-1 text-[10px] font-black", selectedConversationId === conversation.id ? "bg-white text-[#721100]" : "bg-[#dd7d00] text-white")}>
+                            {conversation.unreadCount > 99 ? "99+" : conversation.unreadCount}
+                          </span>
+                        )}
                       </div>
                     </button>
                   );

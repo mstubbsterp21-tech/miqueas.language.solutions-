@@ -5,7 +5,10 @@ export default function PortalRealtimeBridge({ topic, refresh }) {
   const client = useMemo(() => createPortalSupabaseClient(null), []);
   const timer = useRef(null);
   const latestRefresh = useRef(refresh);
-  latestRefresh.current = refresh;
+
+  useEffect(() => {
+    latestRefresh.current = refresh;
+  }, [refresh]);
 
   useEffect(() => {
     if (!topic) return undefined;

@@ -22,6 +22,7 @@ export default function useMLSController() {
   const [workspace, setWorkspace] = useState(null);
   const [operations, setOperations] = useState(null);
   const [app, setApp] = useState(null);
+  const [operationsV2, setOperationsV2] = useState(null);
   const [section, setSectionState] = useState(() => new URLSearchParams(window.location.search).get("section") || "overview");
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -87,14 +88,12 @@ export default function useMLSController() {
     quiet ? setRefreshing(true) : setLoading(true);
     setError("");
     try {
-      const [workspaceData, operationsData, appData] = await Promise.all([
-        api.core("loadWorkspace"),
-        api.operations("loadOperations"),
-        api.app("loadApp"),
-      ]);
+      const bootstrap = await api.bootstrap();
+      const { workspace: workspaceData, operations: operationsData, app: appData } = bootstrap;
       setWorkspace(workspaceData);
       setOperations(operationsData);
       setApp(appData);
+      setOperationsV2(bootstrap.operationsV2 || null);
       if (workspaceData.client?.profile) setClientDraft({ ...EMPTY_CLIENT, ...workspaceData.client.profile });
       if (workspaceData.interpreter?.profile) setInterpreterDraft({ ...EMPTY_INTERPRETER, ...workspaceData.interpreter.profile });
 
@@ -171,11 +170,13 @@ export default function useMLSController() {
     setSaving(true);
     try {
       const result = await api.core("createAssignment", "POST", { assignment: assignmentDraft });
-      await runAssignmentAutomation("requestCreated", { assignmentId: result.assignment.id });
+      const automation = await runAssignmentAutomation("requestCreated", { assignmentId: result.assignment.id });
       window.dispatchEvent(new CustomEvent("mls:assignment-created", { detail: { assignmentId: result.assignment.id } }));
       setAssignmentDraft(EMPTY_ASSIGNMENT);
       setModal("");
-      flash("Interpreter request submitted and added to MLS Open Assignments.");
+      flash(automation.error
+        ? "Interpreter request submitted. Google Workspace sync needs an admin retry."
+        : "Interpreter request submitted and synced to MLS Open Assignments.");
       await load(true);
       setSection("assignments");
     } catch (submitError) {
@@ -348,10 +349,11 @@ export default function useMLSController() {
   async function updateAssignment(assignment, patch) {
     try {
       const result = await api.app("adminUpdateAssignment", "POST", { assignmentId: assignment.id, ...patch });
+      let automation = null;
       if (patch.status === "confirmed") {
-        await runAssignmentAutomation("confirmed", { assignmentId: result.assignment.id });
+        automation = await runAssignmentAutomation("confirmed", { assignmentId: result.assignment.id });
       }
-      flash("Assignment updated.");
+      flash(automation?.error ? "Assignment updated. Google Workspace sync needs a retry." : "Assignment updated.");
       await load(true);
     } catch (assignmentError) {
       fail(assignmentError);
@@ -465,7 +467,7 @@ export default function useMLSController() {
   };
 
   return {
-    user, isLoaded, workspace, operations, app, role, section, setSection,
+    user, isLoaded, workspace, operations, app, operationsV2, role, section, setSection,
     loading, refreshing, saving, busyDoc, message, error, setMessage, setError,
     load, modal, setModal, profileType, clientDraft, setClientDraft,
     interpreterDraft, setInterpreterDraft, assignmentDraft, setAssignmentDraft,

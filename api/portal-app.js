@@ -149,7 +149,7 @@ async function loadAssignments(db, user) {
   }));
 }
 
-async function loadApp(db, user) {
+export async function loadApp(db, user) {
   const assignments = await loadAssignments(db, user);
   const assignmentIds = assignments.map((item) => item.id).filter(Boolean);
 

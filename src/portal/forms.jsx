@@ -105,6 +105,8 @@ export const EMPTY_INTERPRETER = {
   onsite_rate: "",
   vri_rate: "",
   travel_radius: "",
+  availability_status: "contact_me",
+  availability_timezone: "",
 };
 
 export const EMPTY_ASSIGNMENT = {

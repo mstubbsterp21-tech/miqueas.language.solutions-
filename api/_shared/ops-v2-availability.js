@@ -1,15 +1,5 @@
 import { audit, interpreterFor } from "./ops-v2-core.js";
 
-const weeklyMarker = "X-MLS-BLOCK=";
-const dayFields = [
-  "availability_sunday",
-  "availability_monday",
-  "availability_tuesday",
-  "availability_wednesday",
-  "availability_thursday",
-  "availability_friday",
-  "availability_saturday",
-];
 const blockLabels = {
   overnight: "Overnight (12AM-6AM)",
   morning: "Morning (6AM-12PM)",
@@ -86,44 +76,20 @@ export async function interpreterSaveWeeklyAvailability(db, user, payload) {
     }
   }
 
-  const oldRows = await db.from("interpreter_availability")
-    .select("id")
-    .eq("interpreter_id", interpreter.id)
-    .like("recurrence_rule", `%${weeklyMarker}%`);
-  if (oldRows.error) throw oldRows.error;
-
-  if (windows.length) {
-    const values = windows.map((window) => ({
-      interpreter_id: interpreter.id,
-      start_at: window.startAt,
-      end_at: window.endAt,
-      availability_type: window.availabilityType,
-      recurrence_rule: `FREQ=WEEKLY;BYDAY=${window.byDay};${weeklyMarker}${window.block};X-MLS-TZID=${timeZone}`,
-      notes: window.availabilityType === "unavailable" ? "Suppress opportunity emails during this weekly window" : "Weekly availability window",
-      updated_at: new Date().toISOString(),
-    }));
-    const inserted = await db.from("interpreter_availability").insert(values).select();
-    if (inserted.error) throw inserted.error;
-  }
-
-  if ((oldRows.data || []).length) {
-    const removed = await db.from("interpreter_availability").delete().in("id", oldRows.data.map((item) => item.id));
-    if (removed.error) throw removed.error;
-  }
-
-  const profileUpdates = { availability_timezone: timeZone, updated_at: new Date().toISOString() };
-  dayFields.forEach((field, weekday) => {
-    profileUpdates[field] = windows
-      .filter((window) => window.weekday === weekday)
-      .map((window) => `${window.availabilityType === "unavailable" ? "Unavailable" : "Available"}: ${blockLabels[window.block]}`)
-      .join(", ");
+  const replaced = await db.rpc("mls_replace_weekly_availability", {
+    p_interpreter_id: interpreter.id,
+    p_timezone: timeZone,
+    p_windows: windows.map((window) => ({
+      weekday: window.weekday,
+      block: window.block,
+      availabilityType: window.availabilityType,
+      startAt: window.startAt,
+      endAt: window.endAt,
+    })),
   });
-  profileUpdates.availability_morning = windows.some((window) => window.block === "morning" && window.availabilityType === "available");
-  profileUpdates.availability_afternoon = windows.some((window) => window.block === "afternoon" && window.availabilityType === "available");
-  profileUpdates.availability_evening = windows.some((window) => window.block === "evening" && window.availabilityType === "available");
-  profileUpdates.availability_overnight = windows.some((window) => window.block === "overnight" && window.availabilityType === "available");
+  if (replaced.error) throw replaced.error;
 
-  const profile = await db.from("interpreters").update(profileUpdates).eq("id", interpreter.id).select().single();
+  const profile = await db.from("interpreters").select("*").eq("id", interpreter.id).single();
   if (profile.error) throw profile.error;
 
   await audit(db, user, {
@@ -134,9 +100,7 @@ export async function interpreterSaveWeeklyAvailability(db, user, payload) {
     after: { windows, timeZone },
   });
 
-  const refreshed = await db.from("interpreter_availability").select("*").eq("interpreter_id", interpreter.id).order("start_at", { ascending: true });
-  if (refreshed.error) throw refreshed.error;
-  return { status: 200, payload: { availability: refreshed.data || [], profile: profile.data } };
+  return { status: 200, payload: { availability: replaced.data || [], profile: profile.data } };
 }
 
 export async function interpreterDeleteAvailability(db, user, payload) {

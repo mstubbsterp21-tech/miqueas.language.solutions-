@@ -138,11 +138,11 @@ export default async function handler(req, res) {
     if (!opportunity?.assignments) return send(res, 404, { error: "Assignment opportunity not found." });
 
     const interpreterResult = await db.from("interpreters")
-      .select("id,first_name,last_name,email,roster_status,availability_timezone")
+      .select("id,first_name,last_name,email,roster_status,availability_timezone,availability_status")
       .eq("roster_status", "active")
       .not("email", "is", null);
     if (interpreterResult.error) throw interpreterResult.error;
-    const interpreters = interpreterResult.data || [];
+    const interpreters = (interpreterResult.data || []).filter((item) => item.availability_status !== "not_accepting");
     const ids = interpreters.map((item) => item.id);
     const availabilityResult = ids.length
       ? await db.from("interpreter_availability").select("*").in("interpreter_id", ids)

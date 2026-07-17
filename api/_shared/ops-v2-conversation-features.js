@@ -178,6 +178,8 @@ export async function renamePortalConversation(db, user, payload = {}) {
 export async function sendPortalMessageWithMentions(db, user, payload = {}) {
   const text = String(payload.message || payload.body || "").trim();
   const attachments = normalizedAttachments(payload.attachments);
+  const submittedKey = String(payload.idempotencyKey || "").trim().slice(0, 160);
+  const idempotencyKey = submittedKey ? `${user.id}:${submittedKey}` : null;
   if (!text && !attachments.length) return { status: 400, payload: { error: "Enter a message or attach a file." } };
   if (text.length > 4000) return { status: 400, payload: { error: "Messages must be 4,000 characters or fewer." } };
 
@@ -194,6 +196,20 @@ export async function sendPortalMessageWithMentions(db, user, payload = {}) {
     return { status: 403, payload: { error: "Conversation role does not match your account." } };
   }
 
+  if (idempotencyKey) {
+    const existing = await db.from("portal_direct_messages")
+      .select("*")
+      .eq("idempotency_key", idempotencyKey)
+      .maybeSingle();
+    if (existing.error) throw existing.error;
+    if (existing.data) {
+      if (existing.data.conversation_id !== conversation.id || existing.data.sender_clerk_user_id !== user.id) {
+        return { status: 409, payload: { error: "That message submission key is already in use." } };
+      }
+      return { status: 200, payload: { message: existing.data, duplicate: true } };
+    }
+  }
+
   const requestedMentionIds = [...new Set((Array.isArray(payload.mentionClerkUserIds) ? payload.mentionClerkUserIds : [])
     .map((value) => String(value || "").trim())
     .filter((value) => value && value !== user.id))];
@@ -207,6 +223,7 @@ export async function sendPortalMessageWithMentions(db, user, payload = {}) {
     sender_clerk_user_id: user.id,
     sender_role: identity.role,
     body: text,
+    idempotency_key: idempotencyKey,
   }).select().single();
   if (inserted.error) throw inserted.error;
 
@@ -247,6 +264,7 @@ export async function sendPortalMessageWithMentions(db, user, payload = {}) {
     section: "communications",
     relatedType: mentionedIds.has(recipient.clerk_user_id) ? "message_mention" : "direct_message",
     relatedId: conversation.id,
+    key: `message:${inserted.data.id}:${recipient.clerk_user_id}`,
   })));
 
   const files = await emailAttachments(db, attachments);

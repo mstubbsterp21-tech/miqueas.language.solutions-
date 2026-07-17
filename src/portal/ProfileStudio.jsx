@@ -226,7 +226,7 @@ export default function ProfileStudio({ profileType, profile = {}, customization
   const bannerInput = useRef(null);
   const [mediaBusy, setMediaBusy] = useState("");
   const baseSections = useMemo(() => sectionsFor(profileType, profile), [profileType, profile]);
-  const defaultOrder = baseSections.map((section) => section.key);
+  const defaultOrder = useMemo(() => baseSections.map((section) => section.key), [baseSections]);
   const merged = useMemo(() => ({
     ...DEFAULTS,
     display_name: nameFor(profileType, profile, customization),
@@ -236,7 +236,7 @@ export default function ProfileStudio({ profileType, profile = {}, customization
     section_layout: customization?.section_layout?.length ? customization.section_layout : defaultOrder,
     section_visibility: customization?.section_visibility || {},
     social_links: customization?.social_links || [],
-  }), [customization, defaultOrder.join("|"), profile, profileType]);
+  }), [customization, defaultOrder, profile, profileType]);
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(merged);
 
@@ -247,7 +247,7 @@ export default function ProfileStudio({ profileType, profile = {}, customization
     const ordered = (draft.section_layout || defaultOrder).map((key) => map.get(key)).filter(Boolean);
     baseSections.forEach((section) => { if (!ordered.some((item) => item.key === section.key)) ordered.push(section); });
     return ordered;
-  }, [baseSections, defaultOrder.join("|"), draft.section_layout]);
+  }, [baseSections, defaultOrder, draft.section_layout]);
 
   const move = (from, to) => {
     if (from === to || from < 0 || to < 0) return;

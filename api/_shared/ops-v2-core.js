@@ -1,4 +1,4 @@
-import { createClerkClient } from "@clerk/backend";
+import { createClerkClient, verifyToken } from "@clerk/backend";
 import { createClient } from "@supabase/supabase-js";
 
 const dbUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
@@ -8,6 +8,8 @@ const adminEmails = (process.env.VITE_ADMIN_EMAILS || "")
   .split(",")
   .map((value) => value.trim().toLowerCase())
   .filter(Boolean);
+const clerkUserCache = new Map();
+const clerkUserCacheMs = 30_000;
 
 export function send(res, status, payload) {
   res.status(status).setHeader("content-type", "application/json");
@@ -26,27 +28,33 @@ function bearer(req) {
   return String(req.headers.authorization || "").match(/^Bearer\s+(.+)$/i)?.[1] || "";
 }
 
-function decode(token) {
-  return JSON.parse(Buffer.from(token.split(".")[1] || "", "base64url").toString("utf8"));
-}
-
 export async function signedInUser(req) {
   const jwt = bearer(req);
   if (!jwt || !clerkKey) return null;
-  const claims = decode(jwt);
+  const claims = await verifyToken(jwt, { secretKey: clerkKey });
   if (!claims?.sid || !claims?.sub) return null;
-  const clerk = createClerkClient({ secretKey: clerkKey });
-  const session = await clerk.sessions.getSession(claims.sid);
-  if (session?.userId !== claims.sub) return null;
-  const record = await clerk.users.getUser(claims.sub);
+  const cached = clerkUserCache.get(claims.sub);
+  let record = cached?.expiresAt > Date.now() ? cached.record : null;
+  if (!record) {
+    const clerk = createClerkClient({ secretKey: clerkKey });
+    record = await clerk.users.getUser(claims.sub);
+    clerkUserCache.set(claims.sub, { record, expiresAt: Date.now() + clerkUserCacheMs });
+    if (clerkUserCache.size > 250) {
+      for (const [key, value] of clerkUserCache) {
+        if (value.expiresAt <= Date.now()) clerkUserCache.delete(key);
+      }
+    }
+  }
   const email = record.primaryEmailAddress?.emailAddress?.toLowerCase() || "";
+  const metadataRole = String(record.publicMetadata?.portalRole || "").toLowerCase();
   return {
     id: record.id,
     email,
     firstName: record.firstName || "",
     lastName: record.lastName || "",
     isAdmin: adminEmails.includes(email),
-    metadataRole: String(record.publicMetadata?.portalRole || "").toLowerCase(),
+    role: metadataRole,
+    metadataRole,
   };
 }
 
@@ -71,7 +79,7 @@ export async function interpreterFor(db, userId) {
 
 export async function notify(db, recipient, values) {
   if (!recipient) return;
-  const result = await db.from("notifications").insert({
+  const notification = {
     recipient_clerk_user_id: recipient,
     category: values.category || "general",
     title: values.title,
@@ -79,7 +87,11 @@ export async function notify(db, recipient, values) {
     section: values.section || null,
     related_type: values.relatedType || null,
     related_id: values.relatedId || null,
-  });
+    notification_key: values.key || null,
+  };
+  const result = values.key
+    ? await db.from("notifications").upsert(notification, { onConflict: "notification_key", ignoreDuplicates: true })
+    : await db.from("notifications").insert(notification);
   if (result.error) throw result.error;
 }
 

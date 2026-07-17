@@ -28,11 +28,18 @@ import {
 import { cx } from "./ui";
 
 const AVAILABILITY_BLOCKS = [
-  "Morning (6AM-12PM EST)",
-  "Afternoon (12PM-6PM EST)",
-  "Evening (6PM-12AM EST)",
-  "Overnight (12AM-6AM EST)",
+  "Morning (6AM-12PM)",
+  "Afternoon (12PM-6PM)",
+  "Evening (6PM-12AM)",
+  "Overnight (12AM-6AM)",
   "Unavailable",
+];
+
+const AVAILABILITY_STATUS_OPTIONS = [
+  ["scheduled", "Use my weekly schedule"],
+  ["contact_me", "Contact me about opportunities"],
+  ["unknown", "I’ll update this later"],
+  ["not_accepting", "I’m not accepting work"],
 ];
 
 const DAY_FIELDS = [
@@ -165,7 +172,9 @@ function interpreterStepErrors(step, draft) {
       ["professional_liability_insurance", "Professional liability insurance status"],
     ].filter(([field]) => !present(draft[field])).map(([, label]) => label);
   }
-  if (step === 3 && !DAY_FIELDS.some(([, field]) => present(draft[field]))) return ["Weekly availability"];
+  if (step === 3 && draft.availability_status === "scheduled" && !DAY_FIELDS.some(([, field]) => present(draft[field]))) {
+    return ["At least one weekly window, or choose a different availability preference"];
+  }
   return [];
 }
 
@@ -334,21 +343,39 @@ function InterpreterSteps({ step, draft, setDraft }) {
     );
   }
   return (
-    <div>
-      <p className="mb-5 text-sm leading-6 text-slate-600">Choose every general window that normally works. You can update this later, and it does not guarantee that you will accept every assignment during that window.</p>
-      <div className="grid gap-3 md:grid-cols-2 2xl:grid-cols-4">
-        {DAY_FIELDS.map(([day, field]) => (
-          <div key={field} className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-            <p className="mb-3 text-sm font-black text-slate-900">{day}</p>
-            <div className="grid gap-2">
-              {AVAILABILITY_BLOCKS.map((block) => {
-                const active = splitValues(draft[field]).includes(block);
-                return <button key={block} type="button" onClick={() => toggle(field, block)} className={cx("rounded-xl border px-3 py-2 text-left text-xs font-black transition", active ? "border-[#dd7d00] bg-[#fff4df] text-[#721100]" : "border-slate-200 bg-white text-slate-600 hover:border-[#dd7d00]/50")}>{active && <Check size={13} className="mr-1 inline" />}{block}</button>;
-              })}
-            </div>
-          </div>
-        ))}
+    <div className="space-y-6">
+      <div className="grid gap-4 md:grid-cols-2">
+        <Field label="Availability preference" help="Availability is optional during setup and can be changed at any time.">
+          <select className={INPUT} value={draft.availability_status || "contact_me"} onChange={set("availability_status")}>
+            {AVAILABILITY_STATUS_OPTIONS.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+          </select>
+        </Field>
+        <Field label="Time zone" help="All weekly windows below use this time zone.">
+          <input className={INPUT} value={draft.availability_timezone || ""} onChange={set("availability_timezone")} placeholder="America/New_York" />
+        </Field>
       </div>
+      {draft.availability_status === "scheduled" ? (
+        <>
+          <p className="text-sm leading-6 text-slate-600">Choose every general window that normally works. These are matching preferences, not a commitment to accept every assignment.</p>
+          <div className="grid gap-3 md:grid-cols-2 2xl:grid-cols-4">
+            {DAY_FIELDS.map(([day, field]) => (
+              <div key={field} className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                <p className="mb-3 text-sm font-black text-slate-900">{day}</p>
+                <div className="grid gap-2">
+                  {AVAILABILITY_BLOCKS.map((block) => {
+                    const active = splitValues(draft[field]).includes(block);
+                    return <button key={block} type="button" onClick={() => toggle(field, block)} className={cx("rounded-xl border px-3 py-2 text-left text-xs font-black transition", active ? "border-[#dd7d00] bg-[#fff4df] text-[#721100]" : "border-slate-200 bg-white text-slate-600 hover:border-[#dd7d00]/50")}>{active && <Check size={13} className="mr-1 inline" />}{block}</button>;
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
+      ) : (
+        <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-5 text-sm leading-6 text-emerald-900">
+          You can finish setup now. MLS will use this preference until you add a weekly schedule from the Schedule page.
+        </div>
+      )}
     </div>
   );
 }
@@ -368,6 +395,8 @@ export default function FirstLoginSetupWizard({ role, profile, user, onComplete 
     other_credential: profile?.other_credential || otherCredentialFrom(profile?.credentials),
     primary_contact_name: profile?.primary_contact_name || [user?.firstName, user?.lastName].filter(Boolean).join(" "),
     billing_email: profile?.billing_email || user?.email || "",
+    availability_status: profile?.availability_status || defaults.availability_status || "contact_me",
+    availability_timezone: profile?.availability_timezone || Intl.DateTimeFormat().resolvedOptions().timeZone || "America/New_York",
   });
   const initialStep = Math.min(Math.max(Number(profile?.setup_current_step || 0), 0), steps.length - 1);
   const [step, setStep] = useState(initialStep);

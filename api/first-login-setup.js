@@ -54,6 +54,8 @@ const interpreterFields = [
   "technical_readiness_confirmed",
   "professional_liability_insurance",
   "travel_radius",
+  "availability_status",
+  "availability_timezone",
   "availability_sunday",
   "availability_monday",
   "availability_tuesday",
@@ -72,6 +74,7 @@ const dayFields = [
   "availability_friday",
   "availability_saturday",
 ];
+const availabilityStatuses = new Set(["scheduled", "contact_me", "unknown", "not_accepting"]);
 
 function clean(input, fields) {
   return fields.reduce((result, field) => {
@@ -88,6 +91,15 @@ function present(value) {
 
 function validEmail(value) {
   return /^\S+@\S+\.\S+$/.test(String(value || "").trim());
+}
+
+function validTimeZone(value) {
+  try {
+    new Intl.DateTimeFormat("en-US", { timeZone: value }).format();
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 function clientMissing(profile) {
@@ -123,7 +135,6 @@ function interpreterMissing(profile) {
     ["professional_liability_insurance", "Professional liability insurance status"],
   ];
   const missing = required.filter(([field]) => !present(profile[field])).map(([, label]) => label);
-  if (!dayFields.some((field) => present(profile[field]))) missing.push("Weekly availability");
   return missing;
 }
 
@@ -315,6 +326,15 @@ async function saveInterpreterSetup(db, user, body) {
 
   if (present(merged.email) && !validEmail(merged.email)) {
     return { status: 400, payload: { error: "Enter a valid email address." } };
+  }
+  if (!availabilityStatuses.has(merged.availability_status || "contact_me")) {
+    return { status: 400, payload: { error: "Choose a valid availability preference." } };
+  }
+  if (!validTimeZone(merged.availability_timezone || "America/New_York")) {
+    return { status: 400, payload: { error: "Enter a valid IANA time zone, such as America/New_York." } };
+  }
+  if (Boolean(body.complete) && merged.availability_status === "scheduled" && !dayFields.some((field) => present(merged[field]))) {
+    return { status: 400, payload: { error: "Choose at least one weekly window or select a different availability preference." } };
   }
 
   const complete = Boolean(body.complete);
