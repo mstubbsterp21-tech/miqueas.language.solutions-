@@ -20,6 +20,15 @@ function weeklyRule(item) {
   return String(item?.recurrence_rule || "").includes("X-MLS-BLOCK=");
 }
 
+function AvailabilityChoice({ selected, choose }) {
+  return (
+    <div className="grid grid-cols-2 gap-2 rounded-2xl border border-slate-200 bg-white p-2">
+      <button type="button" onClick={() => choose("available")} className={cx("min-h-11 rounded-xl px-2 py-2 text-xs font-black transition", selected === "available" ? "bg-emerald-600 text-white" : "bg-emerald-50 text-emerald-800 hover:bg-emerald-100")}><Check size={13} className="mr-1 inline" />Available</button>
+      <button type="button" onClick={() => choose("unavailable")} className={cx("min-h-11 rounded-xl px-2 py-2 text-xs font-black transition", selected === "unavailable" ? "bg-rose-600 text-white" : "bg-rose-50 text-rose-800 hover:bg-rose-100")}><Ban size={13} className="mr-1 inline" />Unavailable</button>
+    </div>
+  );
+}
+
 function parseWeekly(records, profile) {
   const grid = {};
   records.filter(weeklyRule).forEach((item) => {
@@ -160,17 +169,35 @@ function Schedule({ workspace, app, v2, actions, saving }) {
       <Card>
         <SectionHeader title="Weekly availability" text={`${timeZoneLabel(timeZone)} · Select Available, Unavailable, or leave a window blank.`} />
         <div className="mt-5 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-900"><strong>Unavailable takes priority.</strong> MLS will suppress opportunity emails that overlap an unavailable window. Opportunities remain visible in Assignments.</div>
-        <div className="mt-5 overflow-x-auto">
+        <div className="mt-5 grid gap-4 lg:hidden sm:grid-cols-2">
+          {DAYS.map((day, weekday) => (
+            <section key={day} className="rounded-[1.35rem] border border-slate-200 bg-slate-50 p-3">
+              <h3 className="rounded-2xl bg-[#721100] px-4 py-3 font-black text-white">{day}</h3>
+              <div className="mt-3 space-y-3">
+                {BLOCKS.map((block) => (
+                  <div key={block.key}>
+                    <div className="mb-2 flex items-baseline justify-between gap-2 px-1">
+                      <p className="text-sm font-black text-slate-900">{block.label}</p>
+                      <p className="text-[11px] font-bold text-slate-500">{block.helper} · {zone}</p>
+                    </div>
+                    <AvailabilityChoice selected={weekly[`${weekday}:${block.key}`]} choose={(type) => choose(weekday, block.key, type)} />
+                  </div>
+                ))}
+              </div>
+            </section>
+          ))}
+        </div>
+        <div className="mt-5 hidden overflow-x-auto lg:block">
           <div className="min-w-[980px] space-y-3">
             <div className="grid grid-cols-[150px_repeat(4,minmax(180px,1fr))] gap-3"> <div />{BLOCKS.map((block) => <div key={block.key} className="rounded-2xl bg-slate-100 p-3 text-center"><p className="text-sm font-black text-slate-900">{block.label}</p><p className="text-xs text-slate-500">{block.helper} · {zone}</p></div>)}</div>
-            {DAYS.map((day, weekday) => <div key={day} className="grid grid-cols-[150px_repeat(4,minmax(180px,1fr))] gap-3"><div className="flex items-center rounded-2xl bg-[#721100] px-4 font-black text-white">{day}</div>{BLOCKS.map((block) => { const selected = weekly[`${weekday}:${block.key}`]; return <div key={block.key} className="grid grid-cols-2 gap-2 rounded-2xl border border-slate-200 bg-white p-2"><button type="button" onClick={() => choose(weekday, block.key, "available")} className={cx("rounded-xl px-2 py-2 text-xs font-black transition", selected === "available" ? "bg-emerald-600 text-white" : "bg-emerald-50 text-emerald-800 hover:bg-emerald-100")}><Check size={13} className="mr-1 inline" />Available</button><button type="button" onClick={() => choose(weekday, block.key, "unavailable")} className={cx("rounded-xl px-2 py-2 text-xs font-black transition", selected === "unavailable" ? "bg-rose-600 text-white" : "bg-rose-50 text-rose-800 hover:bg-rose-100")}><Ban size={13} className="mr-1 inline" />Unavailable</button></div>; })}</div>)}
+            {DAYS.map((day, weekday) => <div key={day} className="grid grid-cols-[150px_repeat(4,minmax(180px,1fr))] gap-3"><div className="flex items-center rounded-2xl bg-[#721100] px-4 font-black text-white">{day}</div>{BLOCKS.map((block) => <AvailabilityChoice key={block.key} selected={weekly[`${weekday}:${block.key}`]} choose={(type) => choose(weekday, block.key, type)} />)}</div>)}
           </div>
         </div>
-        <div className="mt-6 flex justify-end"><ActionButton onClick={saveWeekly} disabled={saving}>Save weekly schedule</ActionButton></div>
+        <div className="mt-6 flex justify-end"><div className="w-full sm:w-auto"><ActionButton onClick={saveWeekly} disabled={saving}>Save weekly schedule</ActionButton></div></div>
       </Card>
       <div className="grid gap-5 xl:grid-cols-[.8fr_1.2fr]">
         <div id="unavailable-period-form"><Card><SectionHeader title={unavailable.availabilityId ? "Edit unavailable period" : "Add unavailable period"} text={`Appointments, travel, or time off · ${timeZoneLabel(timeZone)}`} /><form onSubmit={saveUnavailable} className="mt-6 grid gap-4"><Field name={`Start · ${zone}`} required><input className={INPUT} type="datetime-local" value={unavailable.startAt} onChange={(event) => setUnavailable({ ...unavailable, startAt: event.target.value })} /></Field><Field name={`End · ${zone}`} required><input className={INPUT} type="datetime-local" value={unavailable.endAt} onChange={(event) => setUnavailable({ ...unavailable, endAt: event.target.value })} /></Field><Field name="Notes"><textarea className={INPUT} rows={3} value={unavailable.notes} onChange={(event) => setUnavailable({ ...unavailable, notes: event.target.value })} /></Field><div className="flex flex-wrap gap-2"><ActionButton type="submit" disabled={saving || !unavailable.startAt || !unavailable.endAt}>{unavailable.availabilityId ? "Update period" : "Save period"}</ActionButton>{unavailable.availabilityId && <button type="button" onClick={() => setUnavailable(emptyUnavailable)} className="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-black text-slate-600"><X size={15} />Cancel</button>}</div></form></Card></div>
-        <Card><SectionHeader title="Schedule" text="Unavailable periods and confirmed assignments in your selected time zone." /><div className="mt-5 space-y-3">{oneTime.map((item) => <div key={item.id} className="flex items-start gap-3 rounded-2xl bg-slate-50 p-4"><span className="flex h-10 w-10 items-center justify-center rounded-xl bg-rose-100 text-rose-700"><MapPin size={17} /></span><div className="min-w-0 flex-1"><p className="font-black">{formatDate(item.start_at)} – {formatDate(item.end_at)}</p><p className="mt-1 text-xs text-slate-500">{item.notes || "Unavailable"}</p></div><div className="flex flex-col items-end gap-2"><Badge value={item.availability_type} /><div className="flex gap-3"><button type="button" onClick={() => editUnavailable(item)} className="inline-flex items-center gap-1 text-xs font-black text-[#721100]"><Pencil size={13} />Edit</button><button type="button" onClick={() => actions.deleteAvailability(item.id)} className="text-xs font-black text-rose-600">Delete</button></div></div></div>)}{assignments.map((item) => <AssignmentRow key={item.id} assignment={item} onOpen={actions.openAssignment} />)}{!oneTime.length && !assignments.length && <EmptyState icon={CalendarDays} title="Schedule is empty" text="Add availability or accept an assignment." />}</div></Card>
+        <Card><SectionHeader title="Schedule" text="Unavailable periods and confirmed assignments in your selected time zone." /><div className="mt-5 space-y-3">{oneTime.map((item) => <div key={item.id} className="grid grid-cols-[auto_minmax(0,1fr)] items-start gap-3 rounded-2xl bg-slate-50 p-4 sm:grid-cols-[auto_minmax(0,1fr)_auto]"><span className="flex h-10 w-10 items-center justify-center rounded-xl bg-rose-100 text-rose-700"><MapPin size={17} /></span><div className="min-w-0"><p className="font-black">{formatDate(item.start_at)} – {formatDate(item.end_at)}</p><p className="mt-1 text-xs text-slate-500">{item.notes || "Unavailable"}</p></div><div className="col-start-2 flex flex-wrap items-center gap-3 sm:col-auto sm:flex-col sm:items-end"><Badge value={item.availability_type} /><div className="flex gap-3"><button type="button" onClick={() => editUnavailable(item)} className="inline-flex items-center gap-1 text-xs font-black text-[#721100]"><Pencil size={13} />Edit</button><button type="button" onClick={() => actions.deleteAvailability(item.id)} className="text-xs font-black text-rose-600">Delete</button></div></div></div>)}{assignments.map((item) => <AssignmentRow key={item.id} assignment={item} onOpen={actions.openAssignment} />)}{!oneTime.length && !assignments.length && <EmptyState icon={CalendarDays} title="Schedule is empty" text="Add availability or accept an assignment." />}</div></Card>
       </div>
     </div>
   );

@@ -12,6 +12,30 @@
 .mls-portal-theme input[type="checkbox"],
 .mls-portal-theme input[type="radio"] { accent-color: var(--mls-primary); }
 
+.mls-shell-content { padding-bottom: calc(6.5rem + env(safe-area-inset-bottom)); }
+.mls-portal-header { padding-top: max(.625rem, env(safe-area-inset-top)); }
+.mls-floating-action,
+.mls-mobile-sticky-actions { bottom: calc(6.75rem + env(safe-area-inset-bottom)); }
+.mls-hide-scrollbar { scrollbar-width: none; }
+.mls-hide-scrollbar::-webkit-scrollbar { display: none; }
+.mls-portal-theme button,
+.mls-portal-theme a,
+.mls-portal-theme input,
+.mls-portal-theme select,
+.mls-portal-theme textarea { touch-action: manipulation; }
+
+@media (min-width: 1024px) {
+  .mls-shell-content { padding-bottom: 0; }
+  .mls-floating-action { bottom: 2rem; }
+  .mls-mobile-sticky-actions { bottom: 1rem; }
+}
+
+@media (max-width: 639px) {
+  .mls-portal-theme input,
+  .mls-portal-theme select,
+  .mls-portal-theme textarea { font-size: 16px; }
+}
+
 .mls-portal-theme[data-card-style="flat"] main [class~="rounded-[1.75rem]"],
 .mls-portal-theme[data-card-style="flat"] main [class~="rounded-[1.55rem]"] {
   border-radius: .8rem !important;

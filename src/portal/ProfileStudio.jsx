@@ -130,7 +130,7 @@ function sectionsFor(profileType, profile) {
 
 function EditorPanel({ children, theme }) {
   const dark = theme.background_style === "dark";
-  return <div className={cx("border p-5", cardClasses(theme.card_style))} style={surfaceFor(theme, dark)}>{children}</div>;
+  return <div className={cx("border p-4 sm:p-5", cardClasses(theme.card_style))} style={surfaceFor(theme, dark)}>{children}</div>;
 }
 
 function ProfileEditor({ draft, setDraft, sections, move, toggle, save, cancel, saving, uploadMedia, removeMedia, customization }) {
@@ -149,7 +149,7 @@ function ProfileEditor({ draft, setDraft, sections, move, toggle, save, cancel, 
         <button type="button" onClick={cancel} className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10"><X size={18} /></button>
       </div>
 
-      <div className="grid gap-5 p-5 xl:grid-cols-[1.05fr_.95fr]">
+      <div className="grid gap-5 p-3 sm:p-5 xl:grid-cols-[1.05fr_.95fr]">
         <div className="space-y-5">
           <EditorPanel theme={draft}>
             <div className={cx("grid gap-4 sm:grid-cols-2", dark && "[&_label]:text-white/80")}>
@@ -211,7 +211,7 @@ function ProfileEditor({ draft, setDraft, sections, move, toggle, save, cancel, 
             </div>
           </EditorPanel>
 
-          <div className={cx("sticky bottom-4 flex gap-3 border p-3 backdrop-blur-xl", cardClasses(draft.card_style))} style={surfaceFor(draft, dark)}>
+          <div className={cx("mls-mobile-sticky-actions sticky flex gap-3 border p-3 backdrop-blur-xl", cardClasses(draft.card_style))} style={surfaceFor(draft, dark)}>
             <button type="button" onClick={cancel} className={cx("flex flex-1 items-center justify-center border px-4 py-3 text-sm font-black", draft.card_style === "flat" ? "rounded-lg" : "rounded-2xl", dark ? "border-white/15 text-white/80" : "border-slate-200 text-slate-700")}>Cancel</button>
             <button type="button" onClick={save} disabled={saving} className={cx("flex flex-1 items-center justify-center gap-2 px-4 py-3 text-sm font-black text-white disabled:opacity-50", draft.card_style === "flat" ? "rounded-lg" : "rounded-2xl")} style={{ backgroundColor: draft.theme_primary }}><Save size={16} /> Save</button>
           </div>
@@ -287,7 +287,7 @@ export default function ProfileStudio({ profileType, profile = {}, customization
           <div className="relative h-44 sm:h-56" style={{ background: customization?.banner_url ? undefined : `linear-gradient(120deg, ${draft.theme_secondary}, ${draft.theme_primary} 55%, ${draft.theme_accent})` }}>
             {customization?.banner_url && <img src={customization.banner_url} alt="Profile banner" className="h-full w-full object-cover" />}
             <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-black/5" />
-            {editable && <div className="absolute right-4 top-4 flex flex-wrap justify-end gap-2"><button type="button" onClick={() => bannerInput.current?.click()} disabled={mediaBusy === "banner"} className={cx("inline-flex items-center gap-2 bg-white/90 px-3 py-2 text-xs font-black shadow-lg backdrop-blur disabled:opacity-50", draft.card_style === "flat" ? "rounded-lg" : "rounded-2xl")} style={{ color: draft.theme_secondary }}><Upload size={15} />{mediaBusy === "banner" ? "Uploading…" : "Change banner"}</button><button type="button" onClick={() => setEditing((value) => !value)} className={cx("inline-flex items-center gap-2 bg-white/90 px-3 py-2 text-xs font-black shadow-lg backdrop-blur", draft.card_style === "flat" ? "rounded-lg" : "rounded-2xl")} style={{ color: draft.theme_secondary }}><Palette size={15} /> Customize</button></div>}
+            {editable && <div className="absolute right-3 top-3 flex flex-wrap justify-end gap-2 sm:right-4 sm:top-4"><button type="button" onClick={() => bannerInput.current?.click()} disabled={mediaBusy === "banner"} className={cx("inline-flex min-h-10 items-center gap-2 bg-white/90 px-3 py-2 text-xs font-black shadow-lg backdrop-blur disabled:opacity-50", draft.card_style === "flat" ? "rounded-lg" : "rounded-2xl")} style={{ color: draft.theme_secondary }}><Upload size={15} /><span className="hidden sm:inline">{mediaBusy === "banner" ? "Uploading…" : "Change banner"}</span></button><button type="button" onClick={() => setEditing((value) => !value)} className={cx("inline-flex min-h-10 items-center gap-2 bg-white/90 px-3 py-2 text-xs font-black shadow-lg backdrop-blur", draft.card_style === "flat" ? "rounded-lg" : "rounded-2xl")} style={{ color: draft.theme_secondary }}><Palette size={15} /><span className="hidden sm:inline">Customize</span></button></div>}
           </div>
 
           <div className="relative px-5 pb-6 sm:px-7">
@@ -297,7 +297,7 @@ export default function ProfileStudio({ profileType, profile = {}, customization
                   {customization?.avatar_url ? <img src={customization.avatar_url} alt="Profile" className="h-full w-full object-cover" /> : <span style={{ backgroundColor: dark ? "rgba(255,255,255,.08)" : `${draft.theme_primary}14` }} className="flex h-full w-full items-center justify-center">{initials}</span>}
                   {editable && <span className="absolute inset-x-2 bottom-2 flex items-center justify-center gap-1 rounded-xl bg-black/70 px-2 py-1.5 text-[10px] font-black text-white opacity-100 transition sm:opacity-0 sm:group-hover:opacity-100"><Camera size={13} />{mediaBusy === "avatar" ? "Uploading…" : customization?.avatar_url ? "Change photo" : "Add photo"}</span>}
                 </button>
-                <div className="pb-1"><h1 className={cx("text-3xl font-black", dark ? "text-white" : "text-slate-950")}>{nameFor(profileType, profile, draft)}</h1><p className={cx("mt-2 text-sm font-semibold", dark ? "text-white/70" : "text-slate-600")}>{draft.headline || fallbackHeadline(profileType, profile)}</p></div>
+                <div className="min-w-0 pb-1"><h1 className={cx("break-words text-2xl font-black sm:text-3xl", dark ? "text-white" : "text-slate-950")}>{nameFor(profileType, profile, draft)}</h1><p className={cx("mt-2 text-sm font-semibold", dark ? "text-white/70" : "text-slate-600")}>{draft.headline || fallbackHeadline(profileType, profile)}</p></div>
               </div>
               {editable && <button type="button" onClick={actions.openProfile} className={cx("inline-flex items-center justify-center gap-2 px-4 py-3 text-sm font-black text-white shadow-lg", draft.card_style === "flat" ? "rounded-lg" : "rounded-2xl")} style={{ backgroundColor: draft.theme_primary }}><Pencil size={16} /> Edit details</button>}
             </div>

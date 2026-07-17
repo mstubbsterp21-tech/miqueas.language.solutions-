@@ -271,8 +271,27 @@ function PersonCard({ icon: Icon, title, subtitle, status, lines, onClick }) {
 function ClientTable({ clients, openClient }) {
   const headings = ["Organization", "Primary Contact", "Email", "Phone", "Location", "Industry", "Default Service", "Delivery", "Status", "Actions"];
   return (
-    <div className="overflow-hidden rounded-[1.75rem] border border-slate-200 bg-white shadow-sm">
-      <div className="overflow-x-auto">
+    <>
+      <div className="grid gap-3 sm:grid-cols-2 lg:hidden">
+        {clients.map((client) => (
+          <PersonCard
+            key={client.id}
+            icon={Building2}
+            title={client.organization_name || client.email}
+            subtitle={client.primary_contact_name || client.email}
+            status={client.account_status}
+            lines={[
+              [getLocation(client), client.industry].filter(Boolean).join(" · "),
+              client.email,
+              client.phone,
+              client.default_service_type && `${client.default_service_type} · ${client.default_delivery_mode || "Delivery not set"}`,
+            ]}
+            onClick={() => openClient(client)}
+          />
+        ))}
+      </div>
+      <div className="hidden overflow-hidden rounded-[1.75rem] border border-slate-200 bg-white shadow-sm lg:block">
+        <div className="overflow-x-auto">
         <table className="min-w-full text-left text-sm">
           <thead className="bg-[#721100]/5"><tr>{headings.map((heading) => <th key={heading} className="whitespace-nowrap border-b border-slate-200 px-4 py-3 text-[10px] font-black uppercase tracking-[.1em] text-slate-500">{heading}</th>)}</tr></thead>
           <tbody>{clients.map((client) => (
@@ -283,16 +302,40 @@ function ClientTable({ clients, openClient }) {
             </tr>
           ))}</tbody>
         </table>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 
 function InterpreterTable({ interpreters, onboarding, openInterpreter }) {
   const headings = ["First Name", "Last Name", "Email", "Phone", "Location", "Credentials", "Modalities", "Settings", "Experience", "Assignment Preference", "On-site Rate", "VRI Rate", "Status", "Actions"];
   return (
-    <div className="overflow-hidden rounded-[1.75rem] border border-slate-200 bg-white shadow-sm">
-      <div className="overflow-x-auto">
+    <>
+      <div className="grid gap-3 sm:grid-cols-2 lg:hidden">
+        {interpreters.map((interpreter) => {
+          const pipeline = onboarding.get(interpreter.id);
+          return (
+            <PersonCard
+              key={interpreter.id}
+              icon={Users}
+              title={`${interpreter.first_name || ""} ${interpreter.last_name || ""}`.trim() || interpreter.email}
+              subtitle={getLocation(interpreter) || interpreter.email}
+              status={interpreter.roster_status}
+              lines={[
+                interpreter.email,
+                interpreter.phone,
+                interpreter.credentials && `Credentials: ${interpreter.credentials}`,
+                interpreter.assignment_type_preference && `Assignments: ${interpreter.assignment_type_preference}`,
+                pipeline && `Onboarding: ${pretty(pipeline.stage)}`,
+              ]}
+              onClick={() => openInterpreter(interpreter)}
+            />
+          );
+        })}
+      </div>
+      <div className="hidden overflow-hidden rounded-[1.75rem] border border-slate-200 bg-white shadow-sm lg:block">
+        <div className="overflow-x-auto">
         <table className="min-w-full text-left text-sm">
           <thead className="bg-[#721100]/5"><tr>{headings.map((heading) => <th key={heading} className="whitespace-nowrap border-b border-slate-200 px-4 py-3 text-[10px] font-black uppercase tracking-[.1em] text-slate-500">{heading}</th>)}</tr></thead>
           <tbody>{interpreters.map((interpreter) => {
@@ -306,8 +349,9 @@ function InterpreterTable({ interpreters, onboarding, openInterpreter }) {
             );
           })}</tbody>
         </table>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 

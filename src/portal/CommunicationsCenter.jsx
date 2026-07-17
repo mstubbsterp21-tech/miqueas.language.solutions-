@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useSession } from "@clerk/clerk-react";
 import {
   AlertCircle,
+  ArrowLeft,
   AtSign,
   Bell,
   Check,
@@ -44,7 +45,7 @@ function Button({ children, onClick, tone = "primary", type = "button", disabled
       onClick={onClick}
       disabled={disabled}
       className={cx(
-        "inline-flex items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-black transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-50",
+        "inline-flex min-h-11 items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-black transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-50",
         styles[tone],
       )}
     >
@@ -431,7 +432,7 @@ export default function CommunicationsCenter({ workspace, onRefresh }) {
       const result = await request("loadCommunications");
       setData(result);
       const requested = new URLSearchParams(window.location.search).get("conversation");
-      setSelectedConversationId((current) => requested || current || result.conversations?.[0]?.id || "");
+      setSelectedConversationId((current) => requested || current || (window.innerWidth >= 1024 ? result.conversations?.[0]?.id : "") || "");
     } catch (loadError) {
       setError(loadError instanceof Error ? loadError.message : String(loadError));
     } finally {
@@ -474,6 +475,13 @@ export default function CommunicationsCenter({ workspace, onRefresh }) {
     const url = new URL(window.location.href);
     url.searchParams.set("section", "communications");
     url.searchParams.set("conversation", id);
+    window.history.replaceState({}, "", url);
+  }
+
+  function closeConversation() {
+    setSelectedConversationId("");
+    const url = new URL(window.location.href);
+    url.searchParams.delete("conversation");
     window.history.replaceState({}, "", url);
   }
 
@@ -692,7 +700,7 @@ export default function CommunicationsCenter({ workspace, onRefresh }) {
       )}
       {notice && <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm font-bold text-emerald-800">{notice}</div>}
 
-      <div className="inline-flex rounded-2xl border border-slate-200 bg-white p-1 shadow-sm">
+      <div className="mls-hide-scrollbar flex max-w-full overflow-x-auto rounded-2xl border border-slate-200 bg-white p-1 shadow-sm sm:inline-flex">
         <button
           type="button"
           onClick={() => setTab("messages")}
@@ -714,8 +722,8 @@ export default function CommunicationsCenter({ workspace, onRefresh }) {
 
       {tab === "messages" ? (
         <Card className="overflow-hidden p-0 md:p-0">
-          <div className="grid min-h-[650px] lg:grid-cols-[340px_minmax(0,1fr)]">
-            <aside className="border-b border-slate-200 bg-slate-50 p-4 lg:border-b-0 lg:border-r">
+          <div className="grid min-h-[calc(100dvh-11rem)] lg:min-h-[650px] lg:grid-cols-[340px_minmax(0,1fr)]">
+            <aside className={cx("border-b border-slate-200 bg-slate-50 p-3 sm:p-4 lg:block lg:border-b-0 lg:border-r", selectedConversation ? "hidden" : "block")}>
               <div className="flex items-center justify-between gap-3">
                 <SectionHeader
                   title="Messages"
@@ -761,7 +769,7 @@ export default function CommunicationsCenter({ workspace, onRefresh }) {
                 </div>
               )}
 
-              <div className="mt-5 max-h-[510px] space-y-2 overflow-y-auto">
+              <div className="mls-hide-scrollbar mt-5 max-h-[calc(100dvh-20rem)] space-y-2 overflow-y-auto lg:max-h-[510px]">
                 {conversations.map((conversation) => {
                   const group = conversation.conversation_type === "group";
                   return (
@@ -807,10 +815,11 @@ export default function CommunicationsCenter({ workspace, onRefresh }) {
               </div>
             </aside>
 
-            <section className="flex min-w-0 flex-col">
+            <section className={cx("min-h-0 min-w-0 flex-col", selectedConversation ? "flex" : "hidden lg:flex")}>
               {selectedConversation ? (
                 <>
-                  <header className="border-b border-slate-200 bg-white p-5">
+                  <header className="border-b border-slate-200 bg-white p-4 sm:p-5">
+                    <button type="button" onClick={closeConversation} className="mb-3 inline-flex min-h-10 items-center gap-2 rounded-xl bg-slate-100 px-3 text-xs font-black text-[#721100] lg:hidden"><ArrowLeft size={16} /> All messages</button>
                     {editingTitle ? (
                       <div className="space-y-3">
                         <div className="flex flex-col gap-2 sm:flex-row">
@@ -837,7 +846,7 @@ export default function CommunicationsCenter({ workspace, onRefresh }) {
                         <p className="text-xs text-slate-400">Everyone in this conversation will see the same name.</p>
                       </div>
                     ) : (
-                      <div className="flex items-start justify-between gap-4">
+                      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                         <div className="min-w-0">
                           <p className="truncate font-black text-slate-950">{selectedConversation.displayTitle}</p>
                           <p className="mt-1 text-xs text-slate-500">
@@ -846,7 +855,7 @@ export default function CommunicationsCenter({ workspace, onRefresh }) {
                               : `${pretty(selectedConversation.participant?.otherRole)} · Private conversation`}
                           </p>
                         </div>
-                        <div className="flex shrink-0 flex-wrap justify-end gap-2">
+                        <div className="mls-hide-scrollbar -mx-1 flex max-w-full shrink-0 gap-2 overflow-x-auto px-1 pb-1 sm:mx-0 sm:flex-wrap sm:justify-end sm:overflow-visible sm:px-0 sm:pb-0">
                           {selectedConversation.clearedRestoreUntil && new Date(selectedConversation.clearedRestoreUntil).getTime() > Date.now() && <button type="button" disabled={saving} onClick={() => conversationAction("restoreClearedConversation", selectedConversation.id, "Cleared messages restored.")} className="inline-flex items-center gap-2 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-black text-amber-800"><Undo2 size={14} /> Undo clear</button>}
                           <button type="button" disabled={saving} onClick={() => conversationAction("clearConversation", selectedConversation.id, "Conversation cleared. Undo is available for 10 minutes.")} className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-black text-[#721100] hover:bg-slate-50"><Eraser size={14} /> Clear</button>
                           <button type="button" disabled={saving} onClick={() => window.confirm(`Delete “${selectedConversation.displayTitle}” from your inbox? You can restore it for 10 minutes.`) && conversationAction("deleteConversation", selectedConversation.id, "Conversation deleted. Restore is available for 10 minutes.")} className="inline-flex items-center gap-2 rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-black text-rose-700"><Trash2 size={14} /> Delete</button>
@@ -856,7 +865,7 @@ export default function CommunicationsCenter({ workspace, onRefresh }) {
                     )}
                   </header>
 
-                  <div className="flex-1 space-y-3 overflow-y-auto bg-[#faf8f6] p-5">
+                  <div className="mls-hide-scrollbar min-h-0 flex-1 space-y-3 overflow-y-auto bg-[#faf8f6] p-3 sm:p-5">
                     {conversationMessages.map((item) => {
                       const mine = item.sender_clerk_user_id === workspace.user?.id;
                       const sender = selectedConversation.members?.find((member) => member.clerk_user_id === item.sender_clerk_user_id);
@@ -864,7 +873,7 @@ export default function CommunicationsCenter({ workspace, onRefresh }) {
                       return (
                         <div key={item.id} className={cx("flex", mine ? "justify-end" : "justify-start")}>
                           <div className={cx(
-                            "max-w-[86%] rounded-[1.35rem] px-4 py-3 text-sm shadow-sm",
+                            "max-w-[92%] rounded-[1.35rem] px-4 py-3 text-sm shadow-sm sm:max-w-[86%]",
                             mine ? "rounded-br-md bg-[#721100] text-white" : "rounded-bl-md bg-white text-slate-700",
                             mentionedMe && !mine ? "ring-2 ring-[#dd7d00]/50" : "",
                           )}>
@@ -899,7 +908,7 @@ export default function CommunicationsCenter({ workspace, onRefresh }) {
                     {!conversationMessages.length && <EmptyState icon={MessageSquare} title="Start the conversation" text="Messages are private to the people in this thread." />}
                   </div>
 
-                  <form onSubmit={sendDirectMessage} className="border-t border-slate-200 bg-white p-4">
+                  <form onSubmit={sendDirectMessage} className="border-t border-slate-200 bg-white p-3 pb-[max(.75rem,env(safe-area-inset-bottom))] sm:p-4">
                     <UploadPicker files={messageFiles} setFiles={setMessageFiles} disabled={saving} />
                     <div className="mt-3 flex items-start gap-3">
                       <MentionComposer

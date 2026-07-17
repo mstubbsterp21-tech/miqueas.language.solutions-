@@ -228,13 +228,13 @@ function Pills({ options, value, onToggle }) {
 
 function StepRail({ steps, step, setStep }) {
   return (
-    <div className="grid gap-2 md:grid-cols-2 xl:grid-cols-4">
+    <div className="mls-hide-scrollbar -mx-2 flex snap-x snap-mandatory gap-2 overflow-x-auto px-2 pb-2 md:mx-0 md:grid md:grid-cols-2 md:overflow-visible md:px-0 md:pb-0 xl:grid-cols-4">
       {steps.map((item, index) => {
         const Icon = item.icon;
         const active = index === step;
         const complete = index < step;
         return (
-          <button key={item.title} type="button" onClick={() => index <= step && setStep(index)} className={cx("rounded-2xl border p-4 text-left transition", active ? "border-[#dd7d00] bg-[#fff8ec] shadow-md" : complete ? "border-emerald-200 bg-emerald-50" : "border-slate-200 bg-white/65", index <= step ? "cursor-pointer hover:-translate-y-0.5" : "cursor-default")}>
+          <button key={item.title} type="button" onClick={() => index <= step && setStep(index)} className={cx("min-w-[78%] snap-start rounded-2xl border p-4 text-left transition sm:min-w-[46%] md:min-w-0", active ? "border-[#dd7d00] bg-[#fff8ec] shadow-md" : complete ? "border-emerald-200 bg-emerald-50" : "border-slate-200 bg-white/65", index <= step ? "cursor-pointer hover:-translate-y-0.5" : "cursor-default")}>
             <div className="flex items-center gap-2">
               <span className={cx("flex h-8 w-8 items-center justify-center rounded-xl", active ? "bg-[#721100] text-white" : complete ? "bg-emerald-600 text-white" : "bg-slate-100 text-slate-400")}>{complete ? <Check size={15} /> : <Icon size={15} />}</span>
               <span className="text-sm font-black text-slate-900">{item.title}</span>
@@ -457,7 +457,7 @@ export default function FirstLoginSetupWizard({ role, profile, user, onComplete 
   }
 
   return (
-    <div className="min-h-[100dvh] bg-[#f7f3ef] px-4 py-6 text-slate-900 md:px-8 md:py-10">
+    <div className="min-h-[100dvh] bg-[#f7f3ef] px-3 pb-[max(1rem,env(safe-area-inset-bottom))] pt-[max(1rem,env(safe-area-inset-top))] text-slate-900 sm:px-4 sm:py-6 md:px-8 md:py-10">
       <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(circle_at_8%_8%,rgba(114,17,0,.12),transparent_30%),radial-gradient(circle_at_92%_2%,rgba(221,125,0,.17),transparent_27%)]" />
       <div className="relative mx-auto max-w-7xl">
         <div className="mb-5 flex flex-col gap-4 rounded-[1.75rem] border border-white/70 bg-white/90 p-5 shadow-xl backdrop-blur-xl md:flex-row md:items-center md:justify-between">
@@ -472,14 +472,14 @@ export default function FirstLoginSetupWizard({ role, profile, user, onComplete 
         </div>
 
         <div className="overflow-hidden rounded-[2rem] border border-white/70 bg-white/92 shadow-2xl backdrop-blur-xl">
-          <div className="border-b border-slate-100 bg-[#24130e] px-6 py-8 text-white md:px-10">
+          <div className="border-b border-slate-100 bg-[#24130e] px-4 py-6 text-white sm:px-6 sm:py-8 md:px-10">
             <p className="flex items-center gap-2 text-xs font-black uppercase tracking-[.16em] text-[#f6b34c]"><Sparkles size={15} /> First-time {role} setup</p>
-            <h1 className="mt-3 text-3xl font-black tracking-tight md:text-5xl">Welcome to Miqueas Language Solutions!</h1>
+            <h1 className="mt-3 text-2xl font-black tracking-tight sm:text-3xl md:text-5xl">Welcome to Miqueas Language Solutions!</h1>
             <p className="mt-3 max-w-3xl text-sm leading-7 text-white/70 md:text-base">Complete your profile before entering the workspace. MLS uses this information to support communication, billing, compliance, and appropriate assignment matching.</p>
             <div className="mt-7"><StepRail steps={steps} step={step} setStep={setStep} /></div>
           </div>
 
-          <div className="p-6 md:p-10">
+          <div className="p-4 sm:p-6 md:p-10">
             <AnimatePresence mode="wait">
               <motion.div key={`${role}-${step}`} initial={{ opacity: 0, x: 18 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -18 }} transition={{ duration: 0.2 }}>
                 <div className="mb-7">

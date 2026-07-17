@@ -10,7 +10,7 @@ export function ActionButton({ children, onClick, type = "button", tone = "prima
     danger: "bg-rose-50 text-rose-700 hover:bg-rose-100",
   };
   return (
-    <button type={type} onClick={onClick} disabled={disabled} className={cx("inline-flex items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-black transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-50", styles[tone])}>
+    <button type={type} onClick={onClick} disabled={disabled} className={cx("inline-flex min-h-11 items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-black transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-50", styles[tone])}>
       {disabled ? <Loader2 size={16} className="animate-spin" /> : Icon ? <Icon size={16} /> : null}
       {children}
     </button>
@@ -31,14 +31,14 @@ export function WorkflowList({ title, eyebrow, text, items, emptyTitle, emptyTex
 
 export function AssignmentRow({ assignment, onOpen, detail }) {
   return (
-    <button type="button" onClick={() => onOpen?.(assignment)} className="flex w-full flex-col gap-4 rounded-2xl border border-slate-200 bg-slate-50 p-4 text-left transition hover:border-[#dd7d00]/40 hover:bg-white hover:shadow-lg md:flex-row md:items-center">
+    <button type="button" onClick={() => onOpen?.(assignment)} className="grid w-full grid-cols-[auto_minmax(0,1fr)] items-start gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-4 text-left transition hover:border-[#dd7d00]/40 hover:bg-white hover:shadow-lg md:grid-cols-[auto_minmax(0,1fr)_auto] md:items-center md:gap-4">
       <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#721100]/10 text-[#721100]"><CalendarDays size={19} /></span>
       <span className="min-w-0 flex-1">
-        <span className="block truncate font-black text-slate-950">{assignment.service_type || "MLS assignment"}</span>
+        <span className="block font-black text-slate-950">{assignment.service_type || "MLS assignment"}</span>
         <span className="mt-1 block text-xs text-slate-500">{assignment.clients?.organization_name || assignment.clients?.email || "Client"} · {formatDate(assignment.start_at)}</span>
         {detail && <span className="mt-2 block text-xs font-bold text-[#721100]">{detail}</span>}
       </span>
-      <span className="flex flex-wrap items-center gap-2"><Badge value={assignment.lifecycle_status || assignment.status} /><ArrowRight size={16} className="text-slate-400" /></span>
+      <span className="col-start-2 flex flex-wrap items-center gap-2 md:col-auto"><Badge value={assignment.lifecycle_status || assignment.status} /><ArrowRight size={16} className="text-slate-400" /></span>
     </button>
   );
 }

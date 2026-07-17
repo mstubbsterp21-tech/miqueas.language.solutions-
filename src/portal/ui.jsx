@@ -14,7 +14,7 @@ export const BRAND = {
   slate: "#464747",
 };
 
-export const INPUT = "w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-800 outline-none transition focus:border-[#dd7d00] focus:ring-4 focus:ring-[#dd7d00]/10 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400";
+export const INPUT = "w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-base font-medium text-slate-800 outline-none transition sm:text-sm focus:border-[#dd7d00] focus:ring-4 focus:ring-[#dd7d00]/10 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400";
 
 export const cx = (...values) => values.filter(Boolean).join(" ");
 export const safe = (value) => String(value ?? "").trim();
@@ -65,7 +65,7 @@ export function Badge({ value, className = "" }) {
 export function Card({ children, className = "", hover = false, onClick }) {
   const Element = onClick ? motion.button : motion.div;
   return (
-    <Element layout initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} whileHover={hover ? { y: -3 } : undefined} transition={{ duration: 0.2 }} onClick={onClick} className={cx("rounded-[1.75rem] border border-black/5 bg-white p-5 text-left shadow-[0_18px_55px_rgba(40,25,18,.07)] md:p-6", onClick && "w-full cursor-pointer transition hover:shadow-[0_22px_65px_rgba(40,25,18,.12)]", className)}>
+    <Element layout initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} whileHover={hover ? { y: -3 } : undefined} transition={{ duration: 0.2 }} onClick={onClick} className={cx("rounded-[1.35rem] border border-black/5 bg-white p-4 text-left shadow-[0_18px_55px_rgba(40,25,18,.07)] sm:rounded-[1.75rem] sm:p-5 md:p-6", onClick && "w-full cursor-pointer transition hover:shadow-[0_22px_65px_rgba(40,25,18,.12)]", className)}>
       {children}
     </Element>
   );
@@ -73,9 +73,9 @@ export function Card({ children, className = "", hover = false, onClick }) {
 
 export function Metric({ icon: Icon, name, value, note, color = BRAND.burgundy, onClick }) {
   return (
-    <motion.button type="button" onClick={onClick} whileHover={{ y: -3 }} className={cx("rounded-[1.55rem] border border-black/5 bg-white p-5 text-left shadow-[0_16px_50px_rgba(40,25,18,.07)]", onClick ? "cursor-pointer" : "cursor-default")}>
+    <motion.button type="button" onClick={onClick} whileHover={{ y: -3 }} className={cx("rounded-[1.35rem] border border-black/5 bg-white p-4 text-left shadow-[0_16px_50px_rgba(40,25,18,.07)] sm:rounded-[1.55rem] sm:p-5", onClick ? "cursor-pointer" : "cursor-default")}>
       <div className="flex justify-between gap-4">
-        <div><p className="text-sm font-black text-slate-500">{name}</p><p className="mt-2 text-3xl font-black text-slate-900">{value}</p>{note && <p className="mt-1 text-xs leading-5 text-slate-500">{note}</p>}</div>
+        <div className="min-w-0"><p className="text-sm font-black text-slate-500">{name}</p><p className="mt-2 text-2xl font-black text-slate-900 sm:text-3xl">{value}</p>{note && <p className="mt-1 text-xs leading-5 text-slate-500">{note}</p>}</div>
         <span className="flex h-11 w-11 items-center justify-center rounded-2xl text-white" style={{ background: color }}><Icon size={20} /></span>
       </div>
     </motion.button>
@@ -84,21 +84,21 @@ export function Metric({ icon: Icon, name, value, note, color = BRAND.burgundy, 
 
 export function SectionHeader({ title, text, action }) {
   return (
-    <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
-      <div><h2 className="text-2xl font-black tracking-tight text-slate-950 md:text-3xl">{title}</h2>{text && <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-500">{text}</p>}</div>
-      {action}
+    <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+      <div className="min-w-0"><h2 className="text-xl font-black tracking-tight text-slate-950 sm:text-2xl md:text-3xl">{title}</h2>{text && <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-500">{text}</p>}</div>
+      {action && <div className="w-full shrink-0 sm:w-auto">{action}</div>}
     </div>
   );
 }
 
 export function Hero({ title, text, actions, children }) {
   return (
-    <motion.div initial={{ opacity: 0, scale: 0.99 }} animate={{ opacity: 1, scale: 1 }} className="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-[#721100] via-[#5b180b] to-[#24130e] p-6 text-white shadow-2xl md:p-8">
+    <motion.div initial={{ opacity: 0, scale: 0.99 }} animate={{ opacity: 1, scale: 1 }} className="relative overflow-hidden rounded-[1.5rem] bg-gradient-to-br from-[#721100] via-[#5b180b] to-[#24130e] p-5 text-white shadow-2xl sm:rounded-[2rem] sm:p-6 md:p-8">
       <div className="pointer-events-none absolute -right-16 -top-20 h-56 w-56 rounded-full border-[38px] border-white/[.04]" />
       <div className="pointer-events-none absolute -bottom-24 right-24 h-48 w-48 rounded-full bg-[#dd7d00]/15 blur-3xl" />
       <div className="relative flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
-        <div><h1 className="max-w-4xl text-3xl font-black tracking-tight md:text-5xl">{title}</h1>{text && <p className="mt-3 max-w-3xl text-sm leading-7 text-white/72">{text}</p>}{children}</div>
-        {actions && <div className="flex flex-wrap gap-3">{actions}</div>}
+        <div className="min-w-0"><h1 className="max-w-4xl text-2xl font-black tracking-tight sm:text-3xl md:text-4xl xl:text-5xl">{title}</h1>{text && <p className="mt-3 max-w-3xl text-sm leading-6 text-white/72 sm:leading-7">{text}</p>}{children}</div>
+        {actions && <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:flex-wrap">{actions}</div>}
       </div>
     </motion.div>
   );
@@ -128,10 +128,10 @@ export function EmptyState({ icon: Icon = FileText, title, text, action }) {
 export function Modal({ open, close, title, children, wide = false, subtitle }) {
   return (
     <AnimatePresence>
-      {open && <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[120] flex items-center justify-center bg-[#1c100c]/70 p-3 backdrop-blur-sm md:p-5" onMouseDown={(event) => event.target === event.currentTarget && close()}>
-        <motion.div initial={{ y: 24, opacity: 0, scale: 0.98 }} animate={{ y: 0, opacity: 1, scale: 1 }} exit={{ y: 18, opacity: 0, scale: 0.99 }} transition={{ type: "spring", stiffness: 260, damping: 24 }} className={cx("max-h-[94vh] w-full overflow-y-auto rounded-[2rem] bg-[#f8f5f1] shadow-2xl", wide ? "max-w-6xl" : "max-w-3xl")}>
-          <div className="sticky top-0 z-20 flex items-start justify-between border-b border-black/5 bg-[#f8f5f1]/95 px-5 py-5 backdrop-blur md:px-7"><div><h2 className="text-2xl font-black text-slate-950">{title}</h2>{subtitle && <p className="mt-1 text-sm text-slate-500">{subtitle}</p>}</div><button type="button" onClick={close} className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-slate-500 shadow"><X size={18} /></button></div>
-          <div className="p-5 md:p-8">{children}</div>
+      {open && <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[120] flex items-end justify-center bg-[#1c100c]/70 p-0 backdrop-blur-sm sm:items-center sm:p-3 md:p-5" onMouseDown={(event) => event.target === event.currentTarget && close()}>
+        <motion.div initial={{ y: 24, opacity: 0, scale: 0.98 }} animate={{ y: 0, opacity: 1, scale: 1 }} exit={{ y: 18, opacity: 0, scale: 0.99 }} transition={{ type: "spring", stiffness: 260, damping: 24 }} className={cx("max-h-[96dvh] w-full overflow-y-auto rounded-t-[1.5rem] bg-[#f8f5f1] pb-[env(safe-area-inset-bottom)] shadow-2xl sm:max-h-[94vh] sm:rounded-[2rem]", wide ? "max-w-6xl" : "max-w-3xl")}>
+          <div className="sticky top-0 z-20 flex items-start justify-between gap-3 border-b border-black/5 bg-[#f8f5f1]/95 px-4 py-4 backdrop-blur sm:px-5 sm:py-5 md:px-7"><div className="min-w-0"><h2 className="text-xl font-black text-slate-950 sm:text-2xl">{title}</h2>{subtitle && <p className="mt-1 text-sm text-slate-500">{subtitle}</p>}</div><button type="button" onClick={close} className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-slate-500 shadow"><X size={18} /></button></div>
+          <div className="p-4 sm:p-5 md:p-8">{children}</div>
         </motion.div>
       </motion.div>}
     </AnimatePresence>
@@ -230,5 +230,5 @@ export function InstallAppButton({ compact = false }) {
 }
 
 export function FloatingAction({ onClick, label, icon: Icon = Plus }) {
-  return <motion.button type="button" whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} onClick={onClick} className="fixed bottom-24 right-5 z-40 inline-flex items-center gap-2 rounded-full bg-[#721100] px-5 py-3.5 text-sm font-black text-white shadow-2xl md:bottom-8 md:right-8"><Icon size={18} /> {label}</motion.button>;
+  return <motion.button type="button" whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} onClick={onClick} className="mls-floating-action fixed right-4 z-40 inline-flex min-h-12 items-center gap-2 rounded-full bg-[#721100] px-5 py-3 text-sm font-black text-white shadow-2xl md:right-8"><Icon size={18} /> {label}</motion.button>;
 }
