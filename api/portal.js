@@ -1,14 +1,11 @@
 import { createClerkClient } from "@clerk/backend";
-import { createClient } from "@supabase/supabase-js";
 import { randomUUID } from "node:crypto";
+import { database as getDb, signedInUser as getSignedInUser } from "./_shared/ops-v2-core.js";
+import { loadOperationsV2 } from "./_shared/ops-v2-load.js";
+import { loadApp } from "./portal-app.js";
+import { loadOperations } from "./portal-operations.js";
 
-const dbUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
-const dbAdminKey = process.env["SUPABASE_" + "SERVICE_ROLE_KEY"];
 const clerkKey = process.env["CLERK_" + "SECRET_KEY"];
-const adminEmails = (process.env.VITE_ADMIN_EMAILS || "")
-  .split(",")
-  .map((email) => email.trim().toLowerCase())
-  .filter(Boolean);
 
 const interpreterDocumentBucket = "interpreter-documents";
 const clientDocumentBucket = "client-documents";
@@ -48,12 +45,6 @@ function sendJson(res, status, payload) {
   res.end(JSON.stringify(payload));
 }
 
-function getBearerToken(req) {
-  const header = req.headers.authorization || "";
-  const [, token] = header.match(/^Bearer\s+(.+)$/i) || [];
-  return token || "";
-}
-
 function getRequestBody(req) {
   if (!req.body) return {};
   if (typeof req.body === "string") {
@@ -66,52 +57,16 @@ function getRequestBody(req) {
   return req.body;
 }
 
-function cleanInput(input = {}, allowedFields = []) {
-  return allowedFields.reduce((result, field) => {
-    if (Object.prototype.hasOwnProperty.call(input, field)) result[field] = input[field];
-    return result;
-  }, {});
-}
-
-function decodeJwtPayload(token) {
-  const encodedPayload = token.split(".")[1] || "";
-  return JSON.parse(Buffer.from(encodedPayload, "base64url").toString("utf8"));
-}
-
 function getClerkClient() {
   if (!clerkKey) throw new Error("Missing Clerk server key in Vercel.");
   return createClerkClient({ secretKey: clerkKey });
 }
 
-async function getSignedInUser(req) {
-  const token = getBearerToken(req);
-  if (!token) return null;
-
-  const clerkClient = getClerkClient();
-  const claims = decodeJwtPayload(token);
-  if (!claims?.sid || !claims?.sub) return null;
-
-  const clerkSession = await clerkClient.sessions.getSession(claims.sid);
-  if (clerkSession?.userId !== claims.sub) return null;
-
-  const user = await clerkClient.users.getUser(claims.sub);
-  const email = user.primaryEmailAddress?.emailAddress?.toLowerCase() || "";
-  const metadataRole = String(user.publicMetadata?.portalRole || "").toLowerCase();
-
-  return {
-    id: user.id,
-    firstName: user.firstName || "",
-    lastName: user.lastName || "",
-    email,
-    isAdmin: adminEmails.includes(email),
-    metadataRole: metadataRole === "client" || metadataRole === "interpreter" ? metadataRole : "",
-    organizationName: String(user.publicMetadata?.organizationName || ""),
-  };
-}
-
-function getDb() {
-  if (!dbUrl || !dbAdminKey) throw new Error("Missing Supabase server settings in Vercel.");
-  return createClient(dbUrl, dbAdminKey, { auth: { persistSession: false, autoRefreshToken: false } });
+function cleanInput(input = {}, allowedFields = []) {
+  return allowedFields.reduce((result, field) => {
+    if (Object.prototype.hasOwnProperty.call(input, field)) result[field] = input[field];
+    return result;
+  }, {});
 }
 
 async function getInterpreter(db, userId) {
@@ -584,6 +539,15 @@ export default async function handler(req, res) {
     const action = req.query?.action || "loadWorkspace";
     const body = req.method === "POST" ? getRequestBody(req) : {};
 
+    if (req.method === "GET" && action === "loadBootstrap") {
+      const [workspace, operations, app, operationsV2] = await Promise.all([
+        loadWorkspace(db, user),
+        loadOperations(db, user),
+        loadApp(db, user),
+        loadOperationsV2(db, user),
+      ]);
+      return sendJson(res, 200, { workspace, operations, app, operationsV2 });
+    }
     if (req.method === "GET" && action === "loadWorkspace") return sendJson(res, 200, await loadWorkspace(db, user));
     if (req.method === "GET" && action === "load") return sendJson(res, 200, await loadInterpreterWorkspace(db, user));
     if (req.method === "POST" && action === "saveProfile") return sendJson(res, 200, await saveInterpreterProfile(db, user, body));

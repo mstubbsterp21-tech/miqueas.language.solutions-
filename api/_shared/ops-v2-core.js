@@ -55,6 +55,7 @@ export async function signedInUser(req) {
     isAdmin: adminEmails.includes(email),
     role: metadataRole,
     metadataRole,
+    organizationName: String(record.publicMetadata?.organizationName || ""),
   };
 }
 
