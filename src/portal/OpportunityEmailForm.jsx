@@ -2,7 +2,8 @@ import { useMemo, useState } from "react";
 import { useSession } from "@clerk/clerk-react";
 import { Loader2, Mail, Send } from "lucide-react";
 import { createMLSApi } from "./api";
-import { Field, INPUT, cx } from "./ui";
+import { Field, INPUT, cx, formatDate } from "./ui";
+import { getPortalTimeZone, timeZoneAbbreviation, zonedDateTimeToUtc } from "./timezones";
 
 const EMPTY = { assignmentId: "", closesAt: "", notes: "", sendEmail: true };
 
@@ -21,13 +22,17 @@ export default function OpportunityEmailForm({ controller }) {
   const [saving, setSaving] = useState(false);
   const sendEmail = draft.sendEmail !== false;
   const assignments = app?.assignments || [];
+  const timeZone = getPortalTimeZone();
 
   async function submit(event) {
     event.preventDefault();
     setSaving(true);
     setError("");
     try {
-      const published = await api.operations("adminPublishOpportunity", "POST", draft);
+      const published = await api.operations("adminPublishOpportunity", "POST", {
+        ...draft,
+        closesAt: draft.closesAt ? zonedDateTimeToUtc(draft.closesAt, timeZone) : null,
+      });
       const opportunityId = published.opportunity?.id;
       let text = "Assignment opportunity published without an email blast.";
 
@@ -63,12 +68,12 @@ export default function OpportunityEmailForm({ controller }) {
           <option value="">Choose an assignment</option>
           {assignments.filter((assignment) => !["completed", "cancelled"].includes(assignment.status)).map((assignment) => (
             <option key={assignment.id} value={assignment.id}>
-              {assignment.clients?.organization_name || assignment.clients?.email} · {assignment.service_type} · {assignment.start_at ? new Date(assignment.start_at).toLocaleString() : "No date"}
+              {assignment.clients?.organization_name || assignment.clients?.email} · {assignment.service_type} · {formatDate(assignment.start_at)}
             </option>
           ))}
         </select>
       </Field>
-      <Field name="Closes at"><input className={INPUT} type="datetime-local" value={draft.closesAt || ""} onChange={(event) => setDraft({ ...draft, closesAt: event.target.value })} /></Field>
+      <Field name={`Closes at · ${timeZoneAbbreviation(timeZone)}`}><input className={INPUT} type="datetime-local" value={draft.closesAt || ""} onChange={(event) => setDraft({ ...draft, closesAt: event.target.value })} /></Field>
       <Field name="Notes"><textarea className={cx(INPUT, "min-h-28")} value={draft.notes || ""} onChange={(event) => setDraft({ ...draft, notes: event.target.value })} /></Field>
       <label className="flex items-start gap-3 rounded-2xl border border-slate-200 bg-white p-4 text-sm text-slate-700">
         <input type="checkbox" className="mt-1" checked={sendEmail} onChange={(event) => setDraft({ ...draft, sendEmail: event.target.checked })} />

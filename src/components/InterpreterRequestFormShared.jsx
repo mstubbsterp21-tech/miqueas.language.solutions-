@@ -1,4 +1,6 @@
 import { useMemo, useState } from "react";
+import TimeZoneSelect from "../portal/TimeZoneSelect";
+import { getPortalTimeZone, timeZoneAbbreviation, timeZoneLabel } from "../portal/timezones";
 
 export const EMPTY_INTERPRETER_REQUEST = {
   formType: "request",
@@ -17,6 +19,7 @@ export const EMPTY_INTERPRETER_REQUEST = {
   assignmentDate: "",
   startTime: "",
   endTime: "",
+  timeZone: "",
   estimatedDuration: "",
   assignmentLocationPlatform: "",
   participantCount: "",
@@ -118,6 +121,7 @@ function calculateDuration(startTime, endTime) {
 
 function normalizedInitialValues(values = {}) {
   const merged = { ...EMPTY_INTERPRETER_REQUEST, ...values };
+  merged.timeZone = values.timeZone || getPortalTimeZone();
   merged.communicationStyles = Array.isArray(values.communicationStyles) ? values.communicationStyles : [];
   merged.additionalConsiderations = Array.isArray(values.additionalConsiderations) ? values.additionalConsiderations : [];
   if (merged.billingSameAsPhysical && !merged.billingAddress) merged.billingAddress = merged.physicalAddress;
@@ -222,6 +226,7 @@ export default function InterpreterRequestFormShared({
       if (!formData.assignmentDate) next.assignmentDate = "Date is required.";
       if (!formData.startTime) next.startTime = "Start time is required.";
       if (!formData.endTime) next.endTime = "End time is required.";
+      if (!formData.timeZone) next.timeZone = "Time zone is required.";
       if (!formData.assignmentLocationPlatform.trim()) next.assignmentLocationPlatform = "Location / platform is required.";
       if (formData.startTime && formData.endTime && !calculateDuration(formData.startTime, formData.endTime)) next.endTime = "End time must be later than start time.";
     }
@@ -368,7 +373,7 @@ export default function InterpreterRequestFormShared({
       </SectionCard>}
 
       {step === 3 && <SectionCard step={3} title="Assignment Details" subtitle="Include the core details needed to review availability and fit." palette={p}>
-        <div className="grid gap-5 md:grid-cols-2">{renderSelect("serviceNeeded", "Service Needed", serviceOptions)}{renderSelect("setting", "Setting", settingOptions)}{formData.setting === "Other" ? renderInput("settingOther", "Describe the Other Setting", "text", "Describe the community, event, or environment") : null}{renderInput("assignmentDate", "Assignment Date", "date")}{renderInput("startTime", "Start Time", "time")}{renderInput("endTime", "End Time", "time")}<div><p className={labelClass} style={{ color: p.charcoal }}>Estimated Duration</p><div className="rounded-xl border bg-white px-4 py-3 text-sm" style={{ borderColor: p.border, color: p.charcoal }}>{derivedDuration || "Enter start and end time"}</div></div></div>
+        <div className="grid gap-5 md:grid-cols-2">{renderSelect("serviceNeeded", "Service Needed", serviceOptions)}{renderSelect("setting", "Setting", settingOptions)}{formData.setting === "Other" ? renderInput("settingOther", "Describe the Other Setting", "text", "Describe the community, event, or environment") : null}{renderInput("assignmentDate", "Assignment Date", "date")}{renderInput("startTime", `Start Time · ${timeZoneAbbreviation(formData.timeZone)}`, "time")}{renderInput("endTime", `End Time · ${timeZoneAbbreviation(formData.timeZone)}`, "time")}<div><label className={labelClass} style={{ color: p.charcoal }} htmlFor="timeZone">Time Zone</label><TimeZoneSelect value={formData.timeZone} onChange={(value) => setField("timeZone", value)} className={inputClass} /><ErrorText errors={errors} name="timeZone" /></div><div><p className={labelClass} style={{ color: p.charcoal }}>Estimated Duration</p><div className="rounded-xl border bg-white px-4 py-3 text-sm" style={{ borderColor: p.border, color: p.charcoal }}>{derivedDuration || "Enter start and end time"}</div></div></div>
         <div className="mt-5">{renderTextarea("assignmentLocationPlatform", "Assignment Location / Platform", "Address, room, link, platform, or access details", 3)}</div>
       </SectionCard>}
 
@@ -387,7 +392,7 @@ export default function InterpreterRequestFormShared({
       </SectionCard>}
 
       {step === 7 && <SectionCard step={7} title="Review & Submit" subtitle="Review the request before submitting. MLS will follow up after reviewing the details." palette={p}>
-        <dl className="grid gap-4 md:grid-cols-2"><ReviewItem label="Requester" value={formData.fullName} palette={p} /><ReviewItem label="Organization" value={formData.organizationName} palette={p} /><ReviewItem label="Contact Email" value={formData.contactEmail || formData.emailCapture} palette={p} /><ReviewItem label="Phone" value={formData.phoneNumber} palette={p} /><ReviewItem label="Service" value={formData.serviceNeeded} palette={p} /><ReviewItem label="Setting" value={formData.setting === "Other" ? `Other: ${formData.settingOther}` : formData.setting} palette={p} /><ReviewItem label="Date" value={formData.assignmentDate} palette={p} /><ReviewItem label="Time" value={`${to12Hour(formData.startTime) || "—"} – ${to12Hour(formData.endTime) || "—"}`} palette={p} /><ReviewItem label="Duration" value={derivedDuration} palette={p} /><ReviewItem label="Location / Platform" value={formData.assignmentLocationPlatform} palette={p} /><ReviewItem label="Communication Styles" value={formData.communicationStyles.join(", ")} palette={p} /><ReviewItem label="Description" value={formData.assignmentDescription} palette={p} /></dl>
+        <dl className="grid gap-4 md:grid-cols-2"><ReviewItem label="Requester" value={formData.fullName} palette={p} /><ReviewItem label="Organization" value={formData.organizationName} palette={p} /><ReviewItem label="Contact Email" value={formData.contactEmail || formData.emailCapture} palette={p} /><ReviewItem label="Phone" value={formData.phoneNumber} palette={p} /><ReviewItem label="Service" value={formData.serviceNeeded} palette={p} /><ReviewItem label="Setting" value={formData.setting === "Other" ? `Other: ${formData.settingOther}` : formData.setting} palette={p} /><ReviewItem label="Date" value={formData.assignmentDate} palette={p} /><ReviewItem label="Time" value={`${to12Hour(formData.startTime) || "—"} – ${to12Hour(formData.endTime) || "—"} · ${timeZoneLabel(formData.timeZone)}`} palette={p} /><ReviewItem label="Duration" value={derivedDuration} palette={p} /><ReviewItem label="Location / Platform" value={formData.assignmentLocationPlatform} palette={p} /><ReviewItem label="Communication Styles" value={formData.communicationStyles.join(", ")} palette={p} /><ReviewItem label="Description" value={formData.assignmentDescription} palette={p} /></dl>
         {submitError ? <p className="mt-5 rounded-2xl border px-4 py-3 text-sm font-semibold form-error">{submitError}</p> : null}
       </SectionCard>}
 

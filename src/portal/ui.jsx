@@ -4,6 +4,7 @@ import {
   Bell, CheckCircle2, Download, FileCheck2, FileText, Loader2,
   Plus, Smartphone, Trash2, UploadCloud, X,
 } from "lucide-react";
+import { formatInPortalTimeZone } from "./timezones";
 
 export const BRAND = {
   burgundy: "#721100",
@@ -18,17 +19,7 @@ export const INPUT = "w-full rounded-2xl border border-slate-200 bg-white px-4 p
 export const cx = (...values) => values.filter(Boolean).join(" ");
 export const safe = (value) => String(value ?? "").trim();
 export const pretty = (value) => safe(value || "Not set").replaceAll("_", " ").replace(/\b\w/g, (character) => character.toUpperCase());
-export const formatDate = (value, options = {}) => {
-  if (!value) return "Not scheduled";
-  return new Intl.DateTimeFormat("en", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-    ...options,
-  }).format(new Date(value));
-};
+export const formatDate = (value, options = {}) => formatInPortalTimeZone(value, options);
 export const formatMoney = (value) => {
   if (value === null || value === undefined || value === "") return "—";
   return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(Number(value));

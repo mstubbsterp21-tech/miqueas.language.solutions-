@@ -13,6 +13,11 @@ const maxUploadBytes = 15 * 1024 * 1024;
 const allowedFileExtensions = new Set(["pdf", "doc", "docx", "png", "jpg", "jpeg"]);
 const assignmentStatuses = new Set(["draft", "pending_confirmation", "confirmed", "completed", "cancelled"]);
 const paymentStatuses = new Set(["not_invoiced", "pending_payment", "paid", "void"]);
+const portalTimeZones = new Set([
+  "America/New_York", "America/Chicago", "America/Denver", "America/Phoenix",
+  "America/Los_Angeles", "America/Anchorage", "America/Adak", "Pacific/Honolulu",
+  "America/Puerto_Rico", "Pacific/Pago_Pago", "Pacific/Guam",
+]);
 
 const allowedInterpreterProfileFields = [
   "first_name", "last_name", "email", "phone", "city", "state", "current_location",
@@ -166,7 +171,7 @@ export async function loadWorkspace(db, user) {
   const [interpreter, client, preference] = await Promise.all([
     getInterpreter(db, user.id),
     getClient(db, user.id),
-    db.from("portal_preferences").select("default_portal").eq("clerk_user_id", user.id).maybeSingle(),
+    db.from("portal_preferences").select("default_portal,time_zone").eq("clerk_user_id", user.id).maybeSingle(),
   ]);
   if (preference.error) throw preference.error;
 
@@ -189,6 +194,10 @@ export async function loadWorkspace(db, user) {
     user: { id: user.id, email: user.email, firstName: user.firstName, lastName: user.lastName, isAdmin: user.isAdmin },
     availablePortals,
     defaultPortal,
+    preferences: {
+      defaultPortal,
+      timeZone: preference.data?.time_zone || null,
+    },
     client: clientWorkspace,
     interpreter: interpreterWorkspace,
     admin: await loadAdminOverview(db, user),
@@ -468,12 +477,22 @@ async function adminCreateDocumentRequest(db, user, body) {
 }
 
 async function savePortalPreference(db, user, body) {
-  const portal = String(body?.defaultPortal || "");
-  const allowed = user.isAdmin ? new Set(["admin", "client", "interpreter"]) : new Set([user.metadataRole || "interpreter"]);
-  if (!allowed.has(portal)) return { status: 400, payload: { error: "That portal is not available for this account." } };
+  const updates = { clerk_user_id: user.id, updated_at: new Date().toISOString() };
+  if (Object.prototype.hasOwnProperty.call(body || {}, "defaultPortal")) {
+    const portal = String(body?.defaultPortal || "");
+    const allowed = user.isAdmin ? new Set(["admin", "client", "interpreter"]) : new Set([user.metadataRole || "interpreter"]);
+    if (!allowed.has(portal)) return { status: 400, payload: { error: "That portal is not available for this account." } };
+    updates.default_portal = portal;
+  }
+  if (Object.prototype.hasOwnProperty.call(body || {}, "timeZone")) {
+    const timeZone = String(body?.timeZone || "");
+    if (!portalTimeZones.has(timeZone)) return { status: 400, payload: { error: "Choose a supported United States time zone." } };
+    updates.time_zone = timeZone;
+  }
+  if (!updates.default_portal && !updates.time_zone) return { status: 400, payload: { error: "Choose a portal preference to update." } };
   const { data, error } = await db
     .from("portal_preferences")
-    .upsert({ clerk_user_id: user.id, default_portal: portal, updated_at: new Date().toISOString() }, { onConflict: "clerk_user_id" })
+    .upsert(updates, { onConflict: "clerk_user_id" })
     .select()
     .single();
   if (error) throw error;

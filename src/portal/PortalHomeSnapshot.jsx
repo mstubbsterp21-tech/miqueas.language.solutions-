@@ -13,6 +13,7 @@ import {
   Users,
 } from "lucide-react";
 import { Badge, Card, Hero, Metric, SectionHeader, formatDate, formatMoney } from "./ui";
+import { formatInPortalTimeZone } from "./timezones";
 
 const SNAPSHOT_NOW = Date.now();
 
@@ -47,8 +48,8 @@ function QueueItem({ icon: Icon = ClipboardCheck, title, text, badge, onClick, t
 
 function ScheduleItem({ assignment, onClick, note }) {
   const date = assignment.start_at ? new Date(assignment.start_at) : null;
-  const month = date ? new Intl.DateTimeFormat("en", { month: "short" }).format(date) : "TBD";
-  const day = date ? new Intl.DateTimeFormat("en", { day: "numeric" }).format(date) : "—";
+  const month = date ? formatInPortalTimeZone(date, { year: undefined, day: undefined, hour: undefined, minute: undefined, timeZoneName: undefined }) : "TBD";
+  const day = date ? formatInPortalTimeZone(date, { year: undefined, month: undefined, hour: undefined, minute: undefined, timeZoneName: undefined }) : "—";
   return <button type="button" onClick={onClick} className="group flex w-full items-center gap-4 rounded-2xl border border-slate-200 bg-slate-50 p-3 text-left transition hover:border-[#dd7d00]/45 hover:bg-white hover:shadow">
     <span className="flex h-14 w-14 shrink-0 flex-col items-center justify-center rounded-2xl bg-[#721100] text-white"><span className="text-[10px] font-black uppercase tracking-[.12em] text-[#f6b34c]">{month}</span><span className="text-xl font-black leading-none">{day}</span></span>
     <span className="min-w-0 flex-1"><span className="block truncate text-sm font-black text-slate-900">{assignment.service_type || "Interpreter service"}</span><span className="mt-1 block truncate text-xs text-slate-500">{note || `${formatDate(assignment.start_at)} · ${assignment.delivery_mode || "Details in portal"}`}</span></span>

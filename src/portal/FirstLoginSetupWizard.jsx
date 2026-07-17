@@ -26,6 +26,8 @@ import {
   SETTING_OPTIONS,
 } from "./forms";
 import { cx } from "./ui";
+import TimeZoneSelect from "./TimeZoneSelect";
+import { detectedUSTimeZone, normalizeUSTimeZone, timeZoneAbbreviation } from "./timezones";
 
 const AVAILABILITY_BLOCKS = [
   "Morning (6AM-12PM)",
@@ -82,6 +84,10 @@ function splitValues(value) {
 
 function joinValues(values) {
   return [...new Set(values.filter(Boolean))].join(", ");
+}
+
+function normalizedExperience(value) {
+  return joinValues(splitValues(value).map((item) => item === "Community / Freelance" ? "General / Community" : item));
 }
 
 function isOtherCredential(value) {
@@ -350,8 +356,8 @@ function InterpreterSteps({ step, draft, setDraft }) {
             {AVAILABILITY_STATUS_OPTIONS.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
           </select>
         </Field>
-        <Field label="Time zone" help="All weekly windows below use this time zone.">
-          <input className={INPUT} value={draft.availability_timezone || ""} onChange={set("availability_timezone")} placeholder="America/New_York" />
+        <Field label="Time zone" help="Every weekly time below uses this zone.">
+          <TimeZoneSelect value={draft.availability_timezone} onChange={(value) => setDraft((current) => ({ ...current, availability_timezone: value }))} className={INPUT} />
         </Field>
       </div>
       {draft.availability_status === "scheduled" ? (
@@ -364,7 +370,7 @@ function InterpreterSteps({ step, draft, setDraft }) {
                 <div className="grid gap-2">
                   {AVAILABILITY_BLOCKS.map((block) => {
                     const active = splitValues(draft[field]).includes(block);
-                    return <button key={block} type="button" onClick={() => toggle(field, block)} className={cx("rounded-xl border px-3 py-2 text-left text-xs font-black transition", active ? "border-[#dd7d00] bg-[#fff4df] text-[#721100]" : "border-slate-200 bg-white text-slate-600 hover:border-[#dd7d00]/50")}>{active && <Check size={13} className="mr-1 inline" />}{block}</button>;
+                    return <button key={block} type="button" onClick={() => toggle(field, block)} className={cx("rounded-xl border px-3 py-2 text-left text-xs font-black transition", active ? "border-[#dd7d00] bg-[#fff4df] text-[#721100]" : "border-slate-200 bg-white text-slate-600 hover:border-[#dd7d00]/50")}>{active && <Check size={13} className="mr-1 inline" />}{block}{block !== "Unavailable" && <span className="ml-1 text-[10px] opacity-65">· {timeZoneAbbreviation(draft.availability_timezone)}</span>}</button>;
                   })}
                 </div>
               </div>
@@ -393,15 +399,16 @@ export default function FirstLoginSetupWizard({ role, profile, user, onComplete 
     ...defaults,
     ...(profile || {}),
     ...savedDraft,
-    email: profile?.email || user?.email || "",
-    country: profile?.country || defaults.country || "United States",
-    first_name: profile?.first_name || user?.firstName || "",
-    last_name: profile?.last_name || user?.lastName || "",
-    other_credential: profile?.other_credential || otherCredentialFrom(profile?.credentials),
-    primary_contact_name: profile?.primary_contact_name || [user?.firstName, user?.lastName].filter(Boolean).join(" "),
-    billing_email: profile?.billing_email || user?.email || "",
-    availability_status: profile?.availability_status || defaults.availability_status || "contact_me",
-    availability_timezone: profile?.availability_timezone || Intl.DateTimeFormat().resolvedOptions().timeZone || "America/New_York",
+    email: savedDraft.email || profile?.email || user?.email || "",
+    country: savedDraft.country || profile?.country || defaults.country || "United States",
+    first_name: savedDraft.first_name || profile?.first_name || user?.firstName || "",
+    last_name: savedDraft.last_name || profile?.last_name || user?.lastName || "",
+    other_credential: savedDraft.other_credential || profile?.other_credential || otherCredentialFrom(savedDraft.credentials || profile?.credentials),
+    primary_contact_name: savedDraft.primary_contact_name || profile?.primary_contact_name || [user?.firstName, user?.lastName].filter(Boolean).join(" "),
+    billing_email: savedDraft.billing_email || profile?.billing_email || user?.email || "",
+    availability_status: savedDraft.availability_status || profile?.availability_status || defaults.availability_status || "contact_me",
+    availability_timezone: normalizeUSTimeZone(savedDraft.availability_timezone || profile?.availability_timezone || detectedUSTimeZone()),
+    areas_of_experience: normalizedExperience(savedDraft.areas_of_experience || profile?.areas_of_experience || defaults.areas_of_experience),
   });
   const initialStep = Math.min(Math.max(Number(profile?.setup_current_step || 0), 0), steps.length - 1);
   const [step, setStep] = useState(initialStep);
@@ -429,6 +436,7 @@ export default function FirstLoginSetupWizard({ role, profile, user, onComplete 
         role,
         step: nextStep,
         complete,
+        timeZone: role === "interpreter" ? draft.availability_timezone : detectedUSTimeZone(),
         profile: profileForSave,
       });
       setDraft((current) => ({

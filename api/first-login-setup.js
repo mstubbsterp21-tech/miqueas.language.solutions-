@@ -75,6 +75,11 @@ const dayFields = [
   "availability_saturday",
 ];
 const availabilityStatuses = new Set(["scheduled", "contact_me", "unknown", "not_accepting"]);
+const portalTimeZones = new Set([
+  "America/New_York", "America/Chicago", "America/Denver", "America/Phoenix",
+  "America/Los_Angeles", "America/Anchorage", "America/Adak", "Pacific/Honolulu",
+  "America/Puerto_Rico", "Pacific/Pago_Pago", "Pacific/Guam",
+]);
 
 function clean(input, fields) {
   return fields.reduce((result, field) => {
@@ -100,6 +105,19 @@ function validTimeZone(value) {
   } catch {
     return false;
   }
+}
+
+async function savePortalTimeZone(db, user, role, value) {
+  const timeZone = String(value || "America/New_York").trim();
+  if (!portalTimeZones.has(timeZone)) return { error: "Choose a supported United States time zone." };
+  const result = await db.from("portal_preferences").upsert({
+    clerk_user_id: user.id,
+    default_portal: role,
+    time_zone: timeZone,
+    updated_at: new Date().toISOString(),
+  }, { onConflict: "clerk_user_id" });
+  if (result.error) throw result.error;
+  return { timeZone };
 }
 
 function clientMissing(profile) {
@@ -271,6 +289,9 @@ async function ensureClient(db, user, profile) {
 }
 
 async function saveClientSetup(db, user, body) {
+  if (!portalTimeZones.has(String(body.timeZone || "America/New_York"))) {
+    return { status: 400, payload: { error: "Choose a supported United States time zone." } };
+  }
   const incoming = clean(body.profile, clientFields);
   const current = await ensureClient(db, user, incoming);
   const merged = { ...current, ...incoming, email: user.email };
@@ -305,6 +326,8 @@ async function saveClientSetup(db, user, body) {
 
   const result = await db.from("clients").update(updates).eq("id", current.id).select().single();
   if (result.error) throw result.error;
+  const preference = await savePortalTimeZone(db, user, "client", body.timeZone);
+  if (preference.error) return { status: 400, payload: { error: preference.error } };
 
   await audit(db, user, {
     action: complete ? "setup.client_completed" : "setup.client_progress_saved",
@@ -352,6 +375,9 @@ async function saveInterpreterSetup(db, user, body) {
   if (!validTimeZone(merged.availability_timezone || "America/New_York")) {
     return { status: 400, payload: { error: "Enter a valid IANA time zone, such as America/New_York." } };
   }
+  if (!portalTimeZones.has(String(body.timeZone || merged.availability_timezone || "America/New_York"))) {
+    return { status: 400, payload: { error: "Choose a supported United States time zone." } };
+  }
   if (Boolean(body.complete) && merged.availability_status === "scheduled" && !dayFields.some((field) => present(merged[field]))) {
     return { status: 400, payload: { error: "Choose at least one weekly window or select a different availability preference." } };
   }
@@ -397,6 +423,7 @@ async function saveInterpreterSetup(db, user, body) {
     .select()
     .single();
   if (result.error) throw result.error;
+  await savePortalTimeZone(db, user, "interpreter", body.timeZone || merged.availability_timezone);
 
   await audit(db, user, {
     action: complete ? "setup.interpreter_completed" : "setup.interpreter_progress_saved",

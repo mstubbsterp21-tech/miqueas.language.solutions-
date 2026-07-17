@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import { createPortalSupabaseClient } from "../lib/supabaseClient";
 import { Badge, Card, EmptyState, Hero, INPUT, SectionHeader, cx, formatDate, pretty } from "./ui";
+import { getPortalTimeZone, timeZoneAbbreviation, zonedDateTimeToUtc } from "./timezones";
 
 const EMPTY_ANNOUNCEMENT = { title: "", body: "", audiences: ["interpreter"], expiresAt: "" };
 const audienceOptions = [["interpreter", "Interpreters"], ["client", "Clients"], ["admin", "Other admins"]];
@@ -610,7 +611,12 @@ export default function CommunicationsCenter({ workspace, onRefresh }) {
     setError("");
     try {
       const attachments = await uploadFiles(announcementFiles, "announcement");
-      await request("publishAnnouncement", "POST", { ...announcement, attachments });
+      const timeZone = getPortalTimeZone();
+      await request("publishAnnouncement", "POST", {
+        ...announcement,
+        expiresAt: announcement.expiresAt ? zonedDateTimeToUtc(announcement.expiresAt, timeZone) : null,
+        attachments,
+      });
       setAnnouncement(EMPTY_ANNOUNCEMENT);
       setAnnouncementFiles([]);
       setShowAnnouncementComposer(false);
@@ -974,7 +980,7 @@ export default function CommunicationsCenter({ workspace, onRefresh }) {
                   </div>
                 </div>
                 <label className="text-sm font-black text-slate-600">
-                  Expires <span className="font-medium text-slate-400">(optional)</span>
+                  Expires · {timeZoneAbbreviation(getPortalTimeZone())} <span className="font-medium text-slate-400">(optional)</span>
                   <input
                     type="datetime-local"
                     className={cx(INPUT, "mt-2")}

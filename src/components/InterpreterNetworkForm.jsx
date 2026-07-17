@@ -78,7 +78,7 @@ const experienceOptions = [
   'Edu.(K-12)',
   'Edu.(Post-Secondary)',
   'Mental Health',
-  'Community / Freelance',
+  'General / Community',
   'Platform / Conference',
   'Performance / Arts',
   'Cruise',

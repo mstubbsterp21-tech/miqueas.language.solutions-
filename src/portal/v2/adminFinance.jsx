@@ -5,6 +5,13 @@ import {
   formatDate, formatMoney,
 } from "../ui";
 import { ActionButton, ExternalRecordLink, MoneySummary, SelectField } from "./shared";
+import {
+  getPortalTimeZone,
+  timeZoneAbbreviation,
+  timeZoneLabel,
+  zonedDateTimeToUtc,
+  zonedInputValue,
+} from "../timezones";
 
 const emptyQuote = {
   assignmentId: "",
@@ -48,20 +55,6 @@ const emptyPayment = {
   foundPaymentUrl: "",
 };
 
-function toLocalInput(value) {
-  if (!value) return "";
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "";
-  const local = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
-  return local.toISOString().slice(0, 16);
-}
-
-function toIso(value) {
-  if (!value) return null;
-  const date = new Date(value);
-  return Number.isNaN(date.getTime()) ? null : date.toISOString();
-}
-
 function FilePicker({ label, file, onChange, existing, onOpen }) {
   return (
     <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-4">
@@ -97,6 +90,8 @@ function FilePicker({ label, file, onChange, existing, onOpen }) {
 }
 
 export default function AdminFinanceV2({ workspace, app, v2, actions, saving }) {
+  const timeZone = getPortalTimeZone(workspace.preferences?.timeZone);
+  const zone = timeZoneAbbreviation(timeZone);
   const assignments = app?.assignments || workspace.admin?.assignments || [];
   const clients = workspace.admin?.clients || [];
   const agreements = v2?.agreements || [];
@@ -145,9 +140,9 @@ export default function AdminFinanceV2({ workspace, app, v2, actions, saving }) 
       boldsignSigningUrl: existing.boldsign_signing_url || "",
       boldsignAuditTrailUrl: existing.boldsign_audit_trail_url || "",
       status: existing.status || "draft",
-      sentAt: toLocalInput(existing.sent_at),
-      signedAt: toLocalInput(existing.signed_at),
-      expiresAt: toLocalInput(existing.expires_at),
+      sentAt: zonedInputValue(existing.sent_at, timeZone),
+      signedAt: zonedInputValue(existing.signed_at, timeZone),
+      expiresAt: zonedInputValue(existing.expires_at, timeZone),
       internalNotes: existing.internal_notes || "",
       completedDocumentId: existing.completed_document_id || "",
       auditTrailDocumentId: existing.audit_trail_document_id || "",
@@ -164,7 +159,7 @@ export default function AdminFinanceV2({ workspace, app, v2, actions, saving }) 
     await actions.createQuote({
       assignmentId: quote.assignmentId,
       depositAmount: quote.depositAmount,
-      expiresAt: quote.expiresAt || null,
+      expiresAt: quote.expiresAt ? zonedDateTimeToUtc(quote.expiresAt, timeZone) : null,
       items: [{
         itemType: "service",
         description: quote.description,
@@ -212,9 +207,9 @@ export default function AdminFinanceV2({ workspace, app, v2, actions, saving }) 
       ...agreement,
       completedDocumentId,
       auditTrailDocumentId,
-      sentAt: toIso(agreement.sentAt),
-      signedAt: toIso(agreement.signedAt),
-      expiresAt: toIso(agreement.expiresAt),
+      sentAt: agreement.sentAt ? zonedDateTimeToUtc(agreement.sentAt, timeZone) : null,
+      signedAt: agreement.signedAt ? zonedDateTimeToUtc(agreement.signedAt, timeZone) : null,
+      expiresAt: agreement.expiresAt ? zonedDateTimeToUtc(agreement.expiresAt, timeZone) : null,
     });
 
     setAgreement(emptyAgreement);
@@ -273,7 +268,7 @@ export default function AdminFinanceV2({ workspace, app, v2, actions, saving }) 
               <Field name="Rate"><input className={INPUT} type="number" step="0.01" value={quote.unitRate} onChange={(event) => setQuote({ ...quote, unitRate: event.target.value })} /></Field>
               <Field name="Deposit"><input className={INPUT} type="number" step="0.01" value={quote.depositAmount} onChange={(event) => setQuote({ ...quote, depositAmount: event.target.value })} /></Field>
             </div>
-            <Field name="Expires"><input className={INPUT} type="datetime-local" value={quote.expiresAt} onChange={(event) => setQuote({ ...quote, expiresAt: event.target.value })} /></Field>
+            <Field name={`Expires · ${zone}`} help={timeZoneLabel(timeZone)}><input className={INPUT} type="datetime-local" value={quote.expiresAt} onChange={(event) => setQuote({ ...quote, expiresAt: event.target.value })} /></Field>
             <ActionButton type="submit" disabled={saving || !quote.assignmentId}>Save quote</ActionButton>
           </form>
         </Card>
@@ -330,9 +325,9 @@ export default function AdminFinanceV2({ workspace, app, v2, actions, saving }) 
             <Field name="Manual status"><SelectField value={agreement.status} onChange={(event) => setAgreement({ ...agreement, status: event.target.value })} options={["draft", "sent", "viewed", "signed", "declined", "expired", "voided"]} /></Field>
             <Field name="Client signing link"><input className={INPUT} type="url" value={agreement.boldsignSigningUrl} onChange={(event) => setAgreement({ ...agreement, boldsignSigningUrl: event.target.value })} /></Field>
             <Field name="External audit-trail link"><input className={INPUT} type="url" value={agreement.boldsignAuditTrailUrl} onChange={(event) => setAgreement({ ...agreement, boldsignAuditTrailUrl: event.target.value })} /></Field>
-            <Field name="Date sent"><input className={INPUT} type="datetime-local" value={agreement.sentAt} onChange={(event) => setAgreement({ ...agreement, sentAt: event.target.value })} /></Field>
-            <Field name="Date signed"><input className={INPUT} type="datetime-local" value={agreement.signedAt} onChange={(event) => setAgreement({ ...agreement, signedAt: event.target.value })} /></Field>
-            <Field name="Expiration date"><input className={INPUT} type="datetime-local" value={agreement.expiresAt} onChange={(event) => setAgreement({ ...agreement, expiresAt: event.target.value })} /></Field>
+            <Field name={`Date sent · ${zone}`}><input className={INPUT} type="datetime-local" value={agreement.sentAt} onChange={(event) => setAgreement({ ...agreement, sentAt: event.target.value })} /></Field>
+            <Field name={`Date signed · ${zone}`}><input className={INPUT} type="datetime-local" value={agreement.signedAt} onChange={(event) => setAgreement({ ...agreement, signedAt: event.target.value })} /></Field>
+            <Field name={`Expiration date · ${zone}`}><input className={INPUT} type="datetime-local" value={agreement.expiresAt} onChange={(event) => setAgreement({ ...agreement, expiresAt: event.target.value })} /></Field>
           </div>
 
           <div className="grid gap-4 lg:grid-cols-2">

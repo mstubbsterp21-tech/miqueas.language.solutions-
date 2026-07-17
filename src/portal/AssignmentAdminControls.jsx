@@ -1,25 +1,21 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Building2, CalendarPlus, Check, Loader2, MapPin, MonitorPlay, Pencil, Trash2, UserPlus, Users } from "lucide-react";
 import { EMPTY_ASSIGNMENT } from "./forms";
 import PortalInterpreterRequestForm from "./PortalInterpreterRequestForm";
 import { Field, INPUT, Modal, cx } from "./ui";
+import TimeZoneSelect from "./TimeZoneSelect";
+import { getPortalTimeZone, timeZoneAbbreviation, timeZoneLabel, zonedDateTimeToUtc, zonedInputValue } from "./timezones";
 
 const SERVICES = ["ASL/English Interpreting", "Certified Deaf Interpreter Team", "DeafBlind / ProTactile Access", "ASL Video Translation"];
 const DELIVERY = [["On-site", MapPin], ["VRI", MonitorPlay], ["Hybrid", Users]];
 const SPECIALTIES = ["General / Community", "Medical", "Legal", "Mental Health", "K-12 Education", "Post-Secondary Education", "Platform / Conference", "Performance / Arts", "Cruise", "Other"];
 const LANGUAGES = ["ASL", "Tactile ASL / ProTactile", "English", "Spanish", "Other"];
 
-function toLocal(value) {
-  if (!value) return "";
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "";
-  const offset = date.getTimezoneOffset() * 60000;
-  return new Date(date.getTime() - offset).toISOString().slice(0, 16);
-}
-
 function initialDraft(assignment) {
-  if (!assignment) return { ...EMPTY_ASSIGNMENT };
-  return { ...EMPTY_ASSIGNMENT, ...assignment, start_at: toLocal(assignment.start_at), end_at: toLocal(assignment.end_at) };
+  if (!assignment) return { ...EMPTY_ASSIGNMENT, timezone: getPortalTimeZone() };
+  const timeZone = assignment.timezone || getPortalTimeZone();
+  const savedSpecialty = String(assignment.specialty || "");
+  return { ...EMPTY_ASSIGNMENT, ...assignment, timezone: timeZone, specialty: savedSpecialty.startsWith("Other:") ? "Other" : savedSpecialty, specialty_other: savedSpecialty.startsWith("Other:") ? savedSpecialty.slice("Other:".length).trim() : "", start_at: zonedInputValue(assignment.start_at, timeZone), end_at: zonedInputValue(assignment.end_at, timeZone) };
 }
 
 function RadioCards({ value, options, onChange, columns = "sm:grid-cols-2" }) {
@@ -42,13 +38,14 @@ function AssignmentForm({ assignment, clients, actions, close }) {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const editing = Boolean(assignment?.id);
+  const zone = timeZoneAbbreviation(draft.timezone);
   const set = (name) => (event) => setDraft((current) => ({ ...current, [name]: event.target.type === "checkbox" ? event.target.checked : event.target.value }));
   const choose = (name, value) => setDraft((current) => ({ ...current, [name]: value }));
 
   async function submit(event) {
     event.preventDefault(); setSaving(true); setError("");
     try {
-      const payload = { ...draft, specialty: draft.specialty === "Other" ? `Other: ${String(draft.specialty_other || "").trim()}` : draft.specialty, deaf_participants: draft.deaf_participants === "" ? null : Number(draft.deaf_participants), hearing_participants: draft.hearing_participants === "" ? null : Number(draft.hearing_participants) };
+      const payload = { ...draft, start_at: zonedDateTimeToUtc(draft.start_at, draft.timezone), end_at: draft.end_at ? zonedDateTimeToUtc(draft.end_at, draft.timezone) : null, specialty: draft.specialty === "Other" ? `Other: ${String(draft.specialty_other || "").trim()}` : draft.specialty, deaf_participants: draft.deaf_participants === "" ? null : Number(draft.deaf_participants), hearing_participants: draft.hearing_participants === "" ? null : Number(draft.hearing_participants) };
       delete payload.specialty_other;
       if (editing) await actions.updateAssignment(assignment, { assignment: payload });
       else await actions.createAssignment({ clientId, assignment: payload });
@@ -59,7 +56,7 @@ function AssignmentForm({ assignment, clients, actions, close }) {
 
   return <form onSubmit={submit} className="space-y-5">{error && <div className="rounded-2xl border border-rose-200 bg-rose-50 p-4 text-sm font-bold text-rose-800">{error}</div>}
     <Section title="Client and service" text="Choose the same core details used in the Interpreter Request Form."><div className="space-y-5"><Field name="Client" required><select className={INPUT} required disabled={editing} value={clientId} onChange={(event) => setClientId(event.target.value)}><option value="">Choose a client</option>{(clients || []).map((client) => <option key={client.id} value={client.id}>{client.organization_name || client.primary_contact_name || client.email}</option>)}</select></Field><div><p className="mb-2 text-sm font-bold text-slate-600">Service type *</p><RadioCards value={draft.service_type} options={SERVICES} onChange={(value) => choose("service_type", value)} /></div><div><p className="mb-2 text-sm font-bold text-slate-600">Delivery mode *</p><RadioCards value={draft.delivery_mode} options={DELIVERY} onChange={(value) => choose("delivery_mode", value)} columns="sm:grid-cols-3" /></div></div></Section>
-    <Section title="Schedule" text="Times are stored with the selected assignment time zone."><div className="grid gap-4 md:grid-cols-2"><Field name="Start" required><input className={INPUT} type="datetime-local" required value={draft.start_at || ""} onChange={set("start_at")} /></Field><Field name="End"><input className={INPUT} type="datetime-local" value={draft.end_at || ""} onChange={set("end_at")} /></Field><Field name="Timezone"><select className={INPUT} value={draft.timezone || "America/New_York"} onChange={set("timezone")}><option value="America/New_York">Eastern</option><option value="America/Chicago">Central</option><option value="America/Denver">Mountain</option><option value="America/Los_Angeles">Pacific</option><option value="America/Puerto_Rico">Atlantic</option></select></Field><Field name="Specialty"><select className={INPUT} value={draft.specialty || "General / Community"} onChange={set("specialty")}>{SPECIALTIES.map((item) => <option key={item}>{item}</option>)}</select></Field>{draft.specialty === "Other" && <Field name="Describe the other setting" required><input className={INPUT} required value={draft.specialty_other || ""} onChange={set("specialty_other")} placeholder="Describe the community, event, or environment" /></Field>}</div></Section>
+    <Section title="Schedule" text={timeZoneLabel(draft.timezone)}><div className="grid gap-4 md:grid-cols-2"><Field name={`Start · ${zone}`} required><input className={INPUT} type="datetime-local" required value={draft.start_at || ""} onChange={set("start_at")} /></Field><Field name={`End · ${zone}`}><input className={INPUT} type="datetime-local" value={draft.end_at || ""} onChange={set("end_at")} /></Field><Field name="Time zone"><TimeZoneSelect value={draft.timezone} onChange={(value) => choose("timezone", value)} className={INPUT} /></Field><Field name="Specialty"><select className={INPUT} value={draft.specialty || "General / Community"} onChange={set("specialty")}>{SPECIALTIES.map((item) => <option key={item}>{item}</option>)}</select></Field>{draft.specialty === "Other" && <Field name="Describe the other setting" required><input className={INPUT} required value={draft.specialty_other || ""} onChange={set("specialty_other")} placeholder="Describe the community, event, or environment" /></Field>}</div></Section>
     <Section title={draft.delivery_mode === "VRI" ? "Virtual access" : "Location"}><div className="grid gap-4 md:grid-cols-2">{draft.delivery_mode !== "VRI" && <><Field name="Location name"><input className={INPUT} value={draft.location_name || ""} onChange={set("location_name")} placeholder="Facility or venue" /></Field>{draft.delivery_mode === "Hybrid" && <Field name="Meeting link"><input className={INPUT} type="url" value={draft.meeting_link || ""} onChange={set("meeting_link")} /></Field>}<Field name="Address" className="md:col-span-2"><input className={INPUT} value={draft.address_line_1 || ""} onChange={set("address_line_1")} /></Field><Field name="Address line 2" className="md:col-span-2"><input className={INPUT} value={draft.address_line_2 || ""} onChange={set("address_line_2")} /></Field><Field name="City"><input className={INPUT} value={draft.city || ""} onChange={set("city")} /></Field><Field name="State"><input className={INPUT} value={draft.state || ""} onChange={set("state")} /></Field><Field name="Postal code"><input className={INPUT} value={draft.postal_code || ""} onChange={set("postal_code")} /></Field></>}{draft.delivery_mode === "VRI" && <Field name="Meeting link" className="md:col-span-2"><input className={INPUT} type="url" value={draft.meeting_link || ""} onChange={set("meeting_link")} /></Field>}</div></Section>
     <Section title="Participants and access"><div className="grid gap-5 md:grid-cols-2"><Field name="Deaf participants"><input className={INPUT} type="number" min="0" value={draft.deaf_participants ?? ""} onChange={set("deaf_participants")} /></Field><Field name="Hearing participants"><input className={INPUT} type="number" min="0" value={draft.hearing_participants ?? ""} onChange={set("hearing_participants")} /></Field><div className="md:col-span-2"><p className="mb-2 text-sm font-bold text-slate-600">Language and communication preferences</p><CheckPills value={draft.language_preferences} options={LANGUAGES} onChange={(value) => choose("language_preferences", value)} /></div><label className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm font-bold text-slate-700"><input type="checkbox" checked={Boolean(draft.team_requested)} onChange={set("team_requested")} />Interpreter team requested</label><label className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm font-bold text-slate-700"><input type="checkbox" checked={Boolean(draft.cdi_requested)} onChange={set("cdi_requested")} />Certified Deaf Interpreter requested</label></div></Section>
     <Section title="Contacts and preparation"><div className="grid gap-4 md:grid-cols-2"><Field name="On-site contact"><input className={INPUT} value={draft.onsite_contact_name || ""} onChange={set("onsite_contact_name")} /></Field><Field name="On-site phone"><input className={INPUT} value={draft.onsite_contact_phone || ""} onChange={set("onsite_contact_phone")} /></Field><Field name="Purchase order"><input className={INPUT} value={draft.purchase_order_number || ""} onChange={set("purchase_order_number")} /></Field><Field name="Client reference"><input className={INPUT} value={draft.client_reference || ""} onChange={set("client_reference")} /></Field><Field name="Assignment details" className="md:col-span-2"><textarea className={cx(INPUT, "min-h-32")} value={draft.description || ""} onChange={set("description")} /></Field><Field name="Preparation materials / notes" className="md:col-span-2"><textarea className={cx(INPUT, "min-h-28")} value={draft.preparation_materials || ""} onChange={set("preparation_materials")} /></Field></div></Section>
@@ -107,13 +104,13 @@ export function NewAssignmentControl({ clients, actions }) {
 }
 
 export default function AssignmentAdminControls({ assignment, clients, actions }) {
-  const [open, setOpen] = useState(false);
-  useEffect(() => setOpen(false), [assignment?.id]);
+  const [openAssignmentId, setOpenAssignmentId] = useState("");
+  const open = openAssignmentId === assignment?.id;
   if (!assignment?.id) return null;
   async function remove() {
     const confirmation = window.prompt(`Permanently delete ${assignment.service_type}?\n\nGoogle Calendar and Drive records will also be removed. Assignments with financial, time, expense, agreement, or staffing history cannot be deleted.\n\nType DELETE to continue.`);
     if (confirmation !== "DELETE") return;
     await actions.deleteAssignment(assignment, confirmation);
   }
-  return <div className="flex flex-wrap justify-end gap-3"><button type="button" onClick={() => setOpen(true)} className="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-black text-[#721100]"><Pencil size={16} />Edit assignment</button><button type="button" onClick={remove} className="inline-flex items-center gap-2 rounded-2xl bg-rose-50 px-4 py-3 text-sm font-black text-rose-700"><Trash2 size={16} />Delete assignment</button><Modal open={open} close={() => setOpen(false)} title="Edit assignment" wide><AssignmentForm assignment={assignment} clients={clients} actions={actions} close={() => setOpen(false)} /></Modal></div>;
+  return <div className="flex flex-wrap justify-end gap-3"><button type="button" onClick={() => setOpenAssignmentId(assignment.id)} className="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-black text-[#721100]"><Pencil size={16} />Edit assignment</button><button type="button" onClick={remove} className="inline-flex items-center gap-2 rounded-2xl bg-rose-50 px-4 py-3 text-sm font-black text-rose-700"><Trash2 size={16} />Delete assignment</button><Modal open={open} close={() => setOpenAssignmentId("")} title="Edit assignment" wide><AssignmentForm assignment={assignment} clients={clients} actions={actions} close={() => setOpenAssignmentId("")} /></Modal></div>;
 }

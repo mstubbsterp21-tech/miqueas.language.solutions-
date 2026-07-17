@@ -5,6 +5,7 @@ import { createMLSApi } from "./api";
 import {
   EMPTY_ASSIGNMENT, EMPTY_CLIENT, EMPTY_INTERPRETER,
 } from "./forms";
+import { getPortalTimeZone, setActivePortalTimeZone, zonedDateTimeToUtc } from "./timezones";
 
 export const EMPTY_FEEDBACK = { assignmentId: "", rating: 5, comments: "", followUpRequested: false };
 export const EMPTY_INVITE = { role: "client", email: "", organizationName: "" };
@@ -27,6 +28,7 @@ export default function useMLSController() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [savingTimeZone, setSavingTimeZone] = useState(false);
   const [busyDoc, setBusyDoc] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
@@ -90,6 +92,7 @@ export default function useMLSController() {
     try {
       const bootstrap = await api.bootstrap();
       const { workspace: workspaceData, operations: operationsData, app: appData } = bootstrap;
+      setActivePortalTimeZone(workspaceData.preferences?.timeZone || getPortalTimeZone());
       setWorkspace(workspaceData);
       setOperations(operationsData);
       setApp(appData);
@@ -169,7 +172,12 @@ export default function useMLSController() {
     event.preventDefault();
     setSaving(true);
     try {
-      const result = await api.core("createAssignment", "POST", { assignment: assignmentDraft });
+      const assignment = {
+        ...assignmentDraft,
+        start_at: assignmentDraft.start_at ? zonedDateTimeToUtc(assignmentDraft.start_at, assignmentDraft.timezone || getPortalTimeZone()) : null,
+        end_at: assignmentDraft.end_at ? zonedDateTimeToUtc(assignmentDraft.end_at, assignmentDraft.timezone || getPortalTimeZone()) : null,
+      };
+      const result = await api.core("createAssignment", "POST", { assignment });
       const automation = await runAssignmentAutomation("requestCreated", { assignmentId: result.assignment.id });
       window.dispatchEvent(new CustomEvent("mls:assignment-created", { detail: { assignmentId: result.assignment.id } }));
       setAssignmentDraft(EMPTY_ASSIGNMENT);
@@ -254,7 +262,10 @@ export default function useMLSController() {
     event.preventDefault();
     setSaving(true);
     try {
-      await api.operations("adminPublishOpportunity", "POST", opportunityDraft);
+      await api.operations("adminPublishOpportunity", "POST", {
+        ...opportunityDraft,
+        closesAt: opportunityDraft.closesAt ? zonedDateTimeToUtc(opportunityDraft.closesAt, getPortalTimeZone()) : null,
+      });
       setOpportunityDraft(EMPTY_OPPORTUNITY);
       setModal("");
       flash("Assignment opportunity published.");
@@ -422,6 +433,30 @@ export default function useMLSController() {
     }
   }
 
+  async function saveTimeZone(timeZone) {
+    const previous = workspace?.preferences?.timeZone || getPortalTimeZone();
+    setSavingTimeZone(true);
+    setActivePortalTimeZone(timeZone);
+    setWorkspace((current) => current ? {
+      ...current,
+      preferences: { ...(current.preferences || {}), timeZone },
+    } : current);
+    try {
+      await api.core("savePortalPreference", "POST", { timeZone });
+      flash("Schedule time zone updated.");
+      await load(true);
+    } catch (timeZoneError) {
+      setActivePortalTimeZone(previous);
+      setWorkspace((current) => current ? {
+        ...current,
+        preferences: { ...(current.preferences || {}), timeZone: previous },
+      } : current);
+      fail(timeZoneError);
+    } finally {
+      setSavingTimeZone(false);
+    }
+  }
+
   function openAssignment(assignment) {
     setSelectedAssignmentId(assignment.id);
     setModal("assignment");
@@ -457,6 +492,7 @@ export default function useMLSController() {
     acceptBid,
     sendMessage,
     markNotificationRead,
+    saveTimeZone,
     updateAssignment,
     syncAssignmentAutomation,
     assignInterpreter,
@@ -468,7 +504,7 @@ export default function useMLSController() {
 
   return {
     user, isLoaded, workspace, operations, app, operationsV2, role, section, setSection,
-    loading, refreshing, saving, busyDoc, message, error, setMessage, setError,
+    loading, refreshing, saving, savingTimeZone, busyDoc, message, error, setMessage, setError,
     load, modal, setModal, profileType, clientDraft, setClientDraft,
     interpreterDraft, setInterpreterDraft, assignmentDraft, setAssignmentDraft,
     feedbackDraft, setFeedbackDraft, inviteDraft, setInviteDraft,

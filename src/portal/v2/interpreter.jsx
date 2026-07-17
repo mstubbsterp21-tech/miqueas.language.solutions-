@@ -1,7 +1,8 @@
 import { useMemo, useState } from "react";
-import { Ban, CalendarDays, Check, CircleDollarSign, ClipboardCheck, Clock3, MapPin, ShieldCheck } from "lucide-react";
+import { Ban, CalendarDays, Check, CircleDollarSign, ClipboardCheck, Clock3, MapPin, Pencil, ShieldCheck, X } from "lucide-react";
 import { Badge, Card, EmptyState, Field, Hero, INPUT, Metric, SectionHeader, cx, formatDate, formatMoney } from "../ui";
 import { ActionButton, AssignmentRow, LoadingPanel, SelectField } from "./shared";
+import { getPortalTimeZone, timeZoneAbbreviation, timeZoneLabel, zonedDateTimeToUtc, zonedInputValue } from "../timezones";
 
 const emptyTime = { assignmentId: "", actualStartAt: "", actualEndAt: "", breakMinutes: 0, notes: "" };
 const emptyExpense = { assignmentId: "", expenseType: "mileage", amount: "", mileage: "", description: "" };
@@ -38,18 +39,22 @@ function parseWeekly(records, profile) {
   return grid;
 }
 
-function occurrence(weekday, block) {
-  const start = new Date();
-  const delta = (weekday - start.getDay() + 7) % 7;
-  start.setDate(start.getDate() + delta);
-  start.setHours(block.start[0], block.start[1], 0, 0);
-  const end = new Date(start);
-  end.setHours(block.end[0], block.end[1], 0, 0);
-  if (end.getTime() <= Date.now()) {
-    start.setDate(start.getDate() + 7);
-    end.setDate(end.getDate() + 7);
+function occurrence(weekday, block, timeZone) {
+  const [today] = zonedInputValue(new Date(), timeZone).split("T");
+  const localDate = new Date(`${today}T12:00:00Z`);
+  const delta = (weekday - localDate.getUTCDay() + 7) % 7;
+  localDate.setUTCDate(localDate.getUTCDate() + delta);
+  const pad = (value) => String(value).padStart(2, "0");
+  const date = `${localDate.getUTCFullYear()}-${pad(localDate.getUTCMonth() + 1)}-${pad(localDate.getUTCDate())}`;
+  let startAt = zonedDateTimeToUtc(`${date}T${pad(block.start[0])}:${pad(block.start[1])}`, timeZone);
+  let endAt = zonedDateTimeToUtc(`${date}T${pad(block.end[0])}:${pad(block.end[1])}`, timeZone);
+  if (new Date(endAt).getTime() <= Date.now()) {
+    localDate.setUTCDate(localDate.getUTCDate() + 7);
+    const nextDate = `${localDate.getUTCFullYear()}-${pad(localDate.getUTCMonth() + 1)}-${pad(localDate.getUTCDate())}`;
+    startAt = zonedDateTimeToUtc(`${nextDate}T${pad(block.start[0])}:${pad(block.start[1])}`, timeZone);
+    endAt = zonedDateTimeToUtc(`${nextDate}T${pad(block.end[0])}:${pad(block.end[1])}`, timeZone);
   }
-  return { startAt: start.toISOString(), endAt: end.toISOString() };
+  return { startAt, endAt };
 }
 
 function Home({ workspace, operations, app, v2, actions }) {
@@ -71,16 +76,26 @@ function Home({ workspace, operations, app, v2, actions }) {
 
 function Work({ operations, app, v2, actions, saving }) {
   const assignments = app?.assignments || [];
+  const timeZone = getPortalTimeZone();
+  const zone = timeZoneAbbreviation(timeZone);
   const [time, setTime] = useState(emptyTime);
   const [expense, setExpense] = useState(emptyExpense);
   const assignmentOptions = useMemo(() => assignments.map((item) => ({ value: item.id, label: `${item.service_type} · ${formatDate(item.start_at)}` })), [assignments]);
-  async function submitTime(event) { event.preventDefault(); await actions.submitTime(time); setTime(emptyTime); }
+  async function submitTime(event) {
+    event.preventDefault();
+    await actions.submitTime({
+      ...time,
+      actualStartAt: zonedDateTimeToUtc(time.actualStartAt, timeZone),
+      actualEndAt: zonedDateTimeToUtc(time.actualEndAt, timeZone),
+    });
+    setTime(emptyTime);
+  }
   async function submitExpense(event) { event.preventDefault(); await actions.submitExpense(expense); setExpense(emptyExpense); }
   return (
     <div className="space-y-6">
-      <Hero eyebrow="Work center" title="Assigned work, bids, time, expenses, and pay status." text="Complete the operational parts of an assignment here. Found remains the payment system; MLS displays the linked status and record." />
+      <Hero title="Assignments" text="Assigned services, opportunities, time, expenses, and payment status in one place." />
       <div className="grid gap-5 xl:grid-cols-2">
-        <Card><SectionHeader eyebrow="Timekeeping" title="Submit actual time" text="MLS uses the recorded start and end time for client billing review and contractor payment preparation." /><form onSubmit={submitTime} className="mt-6 grid gap-4"><Field name="Assignment" required><SelectField value={time.assignmentId} onChange={(event) => setTime({ ...time, assignmentId: event.target.value })} options={assignmentOptions} /></Field><div className="grid gap-3 sm:grid-cols-2"><Field name="Actual start" required><input className={INPUT} type="datetime-local" value={time.actualStartAt} onChange={(event) => setTime({ ...time, actualStartAt: event.target.value })} /></Field><Field name="Actual end" required><input className={INPUT} type="datetime-local" value={time.actualEndAt} onChange={(event) => setTime({ ...time, actualEndAt: event.target.value })} /></Field></div><Field name="Break minutes"><input className={INPUT} type="number" min="0" value={time.breakMinutes} onChange={(event) => setTime({ ...time, breakMinutes: event.target.value })} /></Field><Field name="Notes"><textarea className={INPUT} rows={3} value={time.notes} onChange={(event) => setTime({ ...time, notes: event.target.value })} /></Field><ActionButton type="submit" disabled={saving || !time.assignmentId || !time.actualStartAt || !time.actualEndAt}>Submit time</ActionButton></form></Card>
+        <Card><SectionHeader title="Submit actual time" text={`Enter both times in ${timeZoneLabel(timeZone)}.`} /><form onSubmit={submitTime} className="mt-6 grid gap-4"><Field name="Assignment" required><SelectField value={time.assignmentId} onChange={(event) => setTime({ ...time, assignmentId: event.target.value })} options={assignmentOptions} /></Field><div className="grid gap-3 sm:grid-cols-2"><Field name={`Actual start · ${zone}`} required><input className={INPUT} type="datetime-local" value={time.actualStartAt} onChange={(event) => setTime({ ...time, actualStartAt: event.target.value })} /></Field><Field name={`Actual end · ${zone}`} required><input className={INPUT} type="datetime-local" value={time.actualEndAt} onChange={(event) => setTime({ ...time, actualEndAt: event.target.value })} /></Field></div><Field name="Break minutes"><input className={INPUT} type="number" min="0" value={time.breakMinutes} onChange={(event) => setTime({ ...time, breakMinutes: event.target.value })} /></Field><Field name="Notes"><textarea className={INPUT} rows={3} value={time.notes} onChange={(event) => setTime({ ...time, notes: event.target.value })} /></Field><ActionButton type="submit" disabled={saving || !time.assignmentId || !time.actualStartAt || !time.actualEndAt}>Submit time</ActionButton></form></Card>
         <Card><SectionHeader eyebrow="Expenses" title="Submit assignment expense" text="Mileage, parking, tolls, lodging, airfare, and approved costs can be reviewed before reimbursement or client billing." /><form onSubmit={submitExpense} className="mt-6 grid gap-4"><Field name="Assignment" required><SelectField value={expense.assignmentId} onChange={(event) => setExpense({ ...expense, assignmentId: event.target.value })} options={assignmentOptions} /></Field><div className="grid gap-3 sm:grid-cols-2"><Field name="Expense type"><SelectField value={expense.expenseType} onChange={(event) => setExpense({ ...expense, expenseType: event.target.value })} options={["mileage", "parking", "toll", "airfare", "lodging", "per_diem", "rideshare", "supplies", "other"]} /></Field><Field name="Amount"><input className={INPUT} type="number" step="0.01" value={expense.amount} onChange={(event) => setExpense({ ...expense, amount: event.target.value })} /></Field></div>{expense.expenseType === "mileage" && <Field name="Miles"><input className={INPUT} type="number" step="0.1" value={expense.mileage} onChange={(event) => setExpense({ ...expense, mileage: event.target.value })} /></Field>}<Field name="Description"><textarea className={INPUT} rows={3} value={expense.description} onChange={(event) => setExpense({ ...expense, description: event.target.value })} /></Field><ActionButton type="submit" disabled={saving || !expense.assignmentId}>Submit expense</ActionButton></form></Card>
       </div>
       <div className="grid gap-5 xl:grid-cols-2">
@@ -98,7 +113,8 @@ function Schedule({ workspace, app, v2, actions, saving }) {
   const availability = v2?.availability || [];
   const [weekly, setWeekly] = useState(() => parseWeekly(availability, profile));
   const [unavailable, setUnavailable] = useState(emptyUnavailable);
-  const timeZone = profile.availability_timezone || Intl.DateTimeFormat().resolvedOptions().timeZone || "America/New_York";
+  const timeZone = workspace.preferences?.timeZone || getPortalTimeZone(profile.availability_timezone);
+  const zone = timeZoneAbbreviation(timeZone);
   const oneTime = availability.filter((item) => !weeklyRule(item));
 
   function choose(weekday, block, type) {
@@ -111,34 +127,50 @@ function Schedule({ workspace, app, v2, actions, saving }) {
     DAYS.forEach((_, weekday) => BLOCKS.forEach((block) => {
       const availabilityType = weekly[`${weekday}:${block.key}`];
       if (!availabilityType) return;
-      windows.push({ weekday, byDay: BY_DAY[weekday], block: block.key, availabilityType, ...occurrence(weekday, block) });
+      windows.push({ weekday, byDay: BY_DAY[weekday], block: block.key, availabilityType, ...occurrence(weekday, block, timeZone) });
     }));
     await actions.saveWeeklyAvailability({ timeZone, windows });
   }
 
   async function saveUnavailable(event) {
     event.preventDefault();
-    await actions.saveAvailability(unavailable);
+    await actions.saveAvailability({
+      ...unavailable,
+      startAt: zonedDateTimeToUtc(unavailable.startAt, timeZone),
+      endAt: zonedDateTimeToUtc(unavailable.endAt, timeZone),
+      recurrenceRule: unavailable.recurrenceRule || `X-MLS-TZID=${timeZone}`,
+    });
     setUnavailable(emptyUnavailable);
+  }
+
+  function editUnavailable(item) {
+    setUnavailable({
+      availabilityId: item.id,
+      startAt: zonedInputValue(item.start_at, timeZone),
+      endAt: zonedInputValue(item.end_at, timeZone),
+      availabilityType: item.availability_type || "unavailable",
+      notes: item.notes || "",
+      recurrenceRule: item.recurrence_rule || `X-MLS-TZID=${timeZone}`,
+    });
+    window.requestAnimationFrame(() => document.getElementById("unavailable-period-form")?.scrollIntoView({ behavior: "smooth", block: "center" }));
   }
 
   return (
     <div className="space-y-6">
-      <Hero eyebrow="Schedule and availability" title="Tell MLS when you can work and when you cannot." text="Weekly available windows improve matching. Weekly or one-time unavailable windows prevent opportunity email blasts when the assignment overlaps that time." />
       <Card>
-        <SectionHeader eyebrow="Weekly schedule" title="Select your regular available and unavailable windows." text={`Times are saved in ${timeZone}. Choose Available, Unavailable, or leave a window blank.`} />
-        <div className="mt-5 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-900"><strong>Unavailable takes priority.</strong> MLS will not email you a new assignment opportunity that overlaps an unavailable window. The opportunity can still remain visible in your Work center.</div>
+        <SectionHeader title="Weekly availability" text={`${timeZoneLabel(timeZone)} · Select Available, Unavailable, or leave a window blank.`} />
+        <div className="mt-5 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-900"><strong>Unavailable takes priority.</strong> MLS will suppress opportunity emails that overlap an unavailable window. Opportunities remain visible in Assignments.</div>
         <div className="mt-5 overflow-x-auto">
           <div className="min-w-[980px] space-y-3">
-            <div className="grid grid-cols-[150px_repeat(4,minmax(180px,1fr))] gap-3"> <div />{BLOCKS.map((block) => <div key={block.key} className="rounded-2xl bg-slate-100 p-3 text-center"><p className="text-sm font-black text-slate-900">{block.label}</p><p className="text-xs text-slate-500">{block.helper}</p></div>)}</div>
+            <div className="grid grid-cols-[150px_repeat(4,minmax(180px,1fr))] gap-3"> <div />{BLOCKS.map((block) => <div key={block.key} className="rounded-2xl bg-slate-100 p-3 text-center"><p className="text-sm font-black text-slate-900">{block.label}</p><p className="text-xs text-slate-500">{block.helper} · {zone}</p></div>)}</div>
             {DAYS.map((day, weekday) => <div key={day} className="grid grid-cols-[150px_repeat(4,minmax(180px,1fr))] gap-3"><div className="flex items-center rounded-2xl bg-[#721100] px-4 font-black text-white">{day}</div>{BLOCKS.map((block) => { const selected = weekly[`${weekday}:${block.key}`]; return <div key={block.key} className="grid grid-cols-2 gap-2 rounded-2xl border border-slate-200 bg-white p-2"><button type="button" onClick={() => choose(weekday, block.key, "available")} className={cx("rounded-xl px-2 py-2 text-xs font-black transition", selected === "available" ? "bg-emerald-600 text-white" : "bg-emerald-50 text-emerald-800 hover:bg-emerald-100")}><Check size={13} className="mr-1 inline" />Available</button><button type="button" onClick={() => choose(weekday, block.key, "unavailable")} className={cx("rounded-xl px-2 py-2 text-xs font-black transition", selected === "unavailable" ? "bg-rose-600 text-white" : "bg-rose-50 text-rose-800 hover:bg-rose-100")}><Ban size={13} className="mr-1 inline" />Unavailable</button></div>; })}</div>)}
           </div>
         </div>
         <div className="mt-6 flex justify-end"><ActionButton onClick={saveWeekly} disabled={saving}>Save weekly schedule</ActionButton></div>
       </Card>
       <div className="grid gap-5 xl:grid-cols-[.8fr_1.2fr]">
-        <Card><SectionHeader eyebrow="Time off / conflicts" title="Add one-time unavailable period" text="Use this for appointments, travel, vacation, or any specific dates when you do not want opportunity emails." /><form onSubmit={saveUnavailable} className="mt-6 grid gap-4"><Field name="Start" required><input className={INPUT} type="datetime-local" value={unavailable.startAt} onChange={(event) => setUnavailable({ ...unavailable, startAt: event.target.value })} /></Field><Field name="End" required><input className={INPUT} type="datetime-local" value={unavailable.endAt} onChange={(event) => setUnavailable({ ...unavailable, endAt: event.target.value })} /></Field><Field name="Notes"><textarea className={INPUT} rows={3} value={unavailable.notes} onChange={(event) => setUnavailable({ ...unavailable, notes: event.target.value })} /></Field><ActionButton type="submit" disabled={saving || !unavailable.startAt || !unavailable.endAt}>Save unavailable period</ActionButton></form></Card>
-        <Card><SectionHeader eyebrow="Calendar" title="Unavailable periods and assignments" text="Remove an unavailable period when it no longer applies." /><div className="mt-5 space-y-3">{oneTime.map((item) => <div key={item.id} className="flex items-start gap-3 rounded-2xl bg-slate-50 p-4"><span className="flex h-10 w-10 items-center justify-center rounded-xl bg-rose-100 text-rose-700"><MapPin size={17} /></span><div className="min-w-0 flex-1"><p className="font-black">{formatDate(item.start_at)} – {formatDate(item.end_at)}</p><p className="mt-1 text-xs text-slate-500">{item.notes || "No notes"}</p></div><div className="flex flex-col items-end gap-2"><Badge value={item.availability_type} /><button type="button" onClick={() => actions.deleteAvailability(item.id)} className="text-xs font-black text-rose-600">Remove</button></div></div>)}{assignments.map((item) => <AssignmentRow key={item.id} assignment={item} onOpen={actions.openAssignment} />)}{!oneTime.length && !assignments.length && <EmptyState icon={CalendarDays} title="Schedule is empty" text="Save weekly availability, add time off, or accept an assignment." />}</div></Card>
+        <div id="unavailable-period-form"><Card><SectionHeader title={unavailable.availabilityId ? "Edit unavailable period" : "Add unavailable period"} text={`Appointments, travel, or time off · ${timeZoneLabel(timeZone)}`} /><form onSubmit={saveUnavailable} className="mt-6 grid gap-4"><Field name={`Start · ${zone}`} required><input className={INPUT} type="datetime-local" value={unavailable.startAt} onChange={(event) => setUnavailable({ ...unavailable, startAt: event.target.value })} /></Field><Field name={`End · ${zone}`} required><input className={INPUT} type="datetime-local" value={unavailable.endAt} onChange={(event) => setUnavailable({ ...unavailable, endAt: event.target.value })} /></Field><Field name="Notes"><textarea className={INPUT} rows={3} value={unavailable.notes} onChange={(event) => setUnavailable({ ...unavailable, notes: event.target.value })} /></Field><div className="flex flex-wrap gap-2"><ActionButton type="submit" disabled={saving || !unavailable.startAt || !unavailable.endAt}>{unavailable.availabilityId ? "Update period" : "Save period"}</ActionButton>{unavailable.availabilityId && <button type="button" onClick={() => setUnavailable(emptyUnavailable)} className="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-black text-slate-600"><X size={15} />Cancel</button>}</div></form></Card></div>
+        <Card><SectionHeader title="Schedule" text="Unavailable periods and confirmed assignments in your selected time zone." /><div className="mt-5 space-y-3">{oneTime.map((item) => <div key={item.id} className="flex items-start gap-3 rounded-2xl bg-slate-50 p-4"><span className="flex h-10 w-10 items-center justify-center rounded-xl bg-rose-100 text-rose-700"><MapPin size={17} /></span><div className="min-w-0 flex-1"><p className="font-black">{formatDate(item.start_at)} – {formatDate(item.end_at)}</p><p className="mt-1 text-xs text-slate-500">{item.notes || "Unavailable"}</p></div><div className="flex flex-col items-end gap-2"><Badge value={item.availability_type} /><div className="flex gap-3"><button type="button" onClick={() => editUnavailable(item)} className="inline-flex items-center gap-1 text-xs font-black text-[#721100]"><Pencil size={13} />Edit</button><button type="button" onClick={() => actions.deleteAvailability(item.id)} className="text-xs font-black text-rose-600">Delete</button></div></div></div>)}{assignments.map((item) => <AssignmentRow key={item.id} assignment={item} onOpen={actions.openAssignment} />)}{!oneTime.length && !assignments.length && <EmptyState icon={CalendarDays} title="Schedule is empty" text="Add availability or accept an assignment." />}</div></Card>
       </div>
     </div>
   );

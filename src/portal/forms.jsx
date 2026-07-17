@@ -1,5 +1,7 @@
 import { Loader2, Save, Send } from "lucide-react";
-import { Field, INPUT, cx } from "./ui";
+import { Field, INPUT, cx, formatDate } from "./ui";
+import TimeZoneSelect from "./TimeZoneSelect";
+import { getPortalTimeZone, timeZoneAbbreviation } from "./timezones";
 
 export const CLIENT_DOCUMENTS = [
   ["service_agreement", "Service agreement"],
@@ -45,7 +47,6 @@ export const SETTING_OPTIONS = [
   "Edu.(K-12)",
   "Edu.(Post-Secondary)",
   "Mental Health",
-  "Community / Freelance",
   "General / Community",
   "Platform / Conference",
   "Performance / Arts",
@@ -214,6 +215,8 @@ export function InterpreterProfileForm({ draft, setDraft, submit, saving, admin 
 }
 
 export function AssignmentRequestForm({ draft, setDraft, submit, saving }) {
+  const timeZone = draft.timezone || getPortalTimeZone();
+  const zone = timeZoneAbbreviation(timeZone);
   const set = (name) => (event) => {
     const value = event.target.type === "checkbox" ? event.target.checked : event.target.value;
     setDraft({ ...draft, [name]: value });
@@ -223,9 +226,9 @@ export function AssignmentRequestForm({ draft, setDraft, submit, saving }) {
       <div className="grid gap-4 md:grid-cols-2">
         <Field name="Service" required><select className={INPUT} required value={draft.service_type} onChange={set("service_type")}><option>ASL/English Interpreting</option><option>Certified Deaf Interpreter Team</option><option>DeafBlind / ProTactile Access</option><option>ASL Video Translation</option></select></Field>
         <Field name="Delivery" required><select className={INPUT} required value={draft.delivery_mode} onChange={set("delivery_mode")}><option>On-site</option><option>VRI</option><option>Hybrid</option></select></Field>
-        <Field name="Start" required><input className={INPUT} type="datetime-local" required value={draft.start_at} onChange={set("start_at")} /></Field>
-        <Field name="End"><input className={INPUT} type="datetime-local" value={draft.end_at || ""} onChange={set("end_at")} /></Field>
-        <Field name="Timezone"><select className={INPUT} value={draft.timezone} onChange={set("timezone")}><option value="America/New_York">Eastern</option><option value="America/Chicago">Central</option><option value="America/Denver">Mountain</option><option value="America/Los_Angeles">Pacific</option><option value="America/Puerto_Rico">Atlantic</option></select></Field>
+        <Field name={`Start · ${zone}`} required><input className={INPUT} type="datetime-local" required value={draft.start_at} onChange={set("start_at")} /></Field>
+        <Field name={`End · ${zone}`}><input className={INPUT} type="datetime-local" value={draft.end_at || ""} onChange={set("end_at")} /></Field>
+        <Field name="Time zone"><TimeZoneSelect className={INPUT} value={timeZone} onChange={(value) => setDraft({ ...draft, timezone: value })} /></Field>
         <Field name="Specialty"><select className={INPUT} value={draft.specialty} onChange={set("specialty")}><option>General / Community</option><option>Medical</option><option>Legal</option><option>Mental Health</option><option>K-12 Education</option><option>Post-Secondary Education</option><option>Platform / Conference</option><option>Performance / Arts</option><option>Cruise</option></select></Field>
         {draft.delivery_mode !== "VRI" && <Field name="Location"><input className={INPUT} value={draft.location_name || ""} onChange={set("location_name")} placeholder="Facility or venue" /></Field>}
         {draft.delivery_mode === "VRI" && <Field name="Meeting link"><input className={INPUT} type="url" value={draft.meeting_link || ""} onChange={set("meeting_link")} /></Field>}
@@ -252,7 +255,7 @@ export function AssignmentRequestForm({ draft, setDraft, submit, saving }) {
 export function FeedbackForm({ draft, setDraft, assignments, submit, saving }) {
   return (
     <form onSubmit={submit} className="space-y-4">
-      <Field name="Assignment"><select className={INPUT} value={draft.assignmentId || ""} onChange={(event) => setDraft({ ...draft, assignmentId: event.target.value })}><option value="">General feedback</option>{assignments.map((assignment) => <option key={assignment.id} value={assignment.id}>{assignment.service_type} · {assignment.start_at ? new Date(assignment.start_at).toLocaleDateString() : "No date"}</option>)}</select></Field>
+      <Field name="Assignment"><select className={INPUT} value={draft.assignmentId || ""} onChange={(event) => setDraft({ ...draft, assignmentId: event.target.value })}><option value="">General feedback</option>{assignments.map((assignment) => <option key={assignment.id} value={assignment.id}>{assignment.service_type} · {assignment.start_at ? formatDate(assignment.start_at) : "No date"}</option>)}</select></Field>
       <Field name="Rating" required><select className={INPUT} value={draft.rating} onChange={(event) => setDraft({ ...draft, rating: Number(event.target.value) })}>{[5,4,3,2,1].map((rating) => <option key={rating} value={rating}>{rating} star{rating === 1 ? "" : "s"}</option>)}</select></Field>
       <Field name="Comments"><textarea className={cx(INPUT, "min-h-32")} value={draft.comments || ""} onChange={(event) => setDraft({ ...draft, comments: event.target.value })} /></Field>
       <label className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-4 text-sm font-bold text-slate-700"><input type="checkbox" checked={Boolean(draft.followUpRequested)} onChange={(event) => setDraft({ ...draft, followUpRequested: event.target.checked })} /> I would like MLS to follow up with me.</label>
@@ -306,10 +309,11 @@ export function CourseForm({ draft, setDraft, submit, saving }) {
 }
 
 export function OpportunityForm({ draft, setDraft, assignments, submit, saving }) {
+  const zone = timeZoneAbbreviation(getPortalTimeZone());
   return (
     <form onSubmit={submit} className="space-y-4">
-      <Field name="Assignment" required><select className={INPUT} required value={draft.assignmentId || ""} onChange={(event) => setDraft({ ...draft, assignmentId: event.target.value })}><option value="">Choose an assignment</option>{assignments.filter((assignment) => !["completed", "cancelled"].includes(assignment.status)).map((assignment) => <option key={assignment.id} value={assignment.id}>{assignment.clients?.organization_name || assignment.clients?.email} · {assignment.service_type} · {assignment.start_at ? new Date(assignment.start_at).toLocaleString() : "No date"}</option>)}</select></Field>
-      <Field name="Closes at"><input className={INPUT} type="datetime-local" value={draft.closesAt || ""} onChange={(event) => setDraft({ ...draft, closesAt: event.target.value })} /></Field>
+      <Field name="Assignment" required><select className={INPUT} required value={draft.assignmentId || ""} onChange={(event) => setDraft({ ...draft, assignmentId: event.target.value })}><option value="">Choose an assignment</option>{assignments.filter((assignment) => !["completed", "cancelled"].includes(assignment.status)).map((assignment) => <option key={assignment.id} value={assignment.id}>{assignment.clients?.organization_name || assignment.clients?.email} · {assignment.service_type} · {assignment.start_at ? formatDate(assignment.start_at) : "No date"}</option>)}</select></Field>
+      <Field name={`Closes at · ${zone}`}><input className={INPUT} type="datetime-local" value={draft.closesAt || ""} onChange={(event) => setDraft({ ...draft, closesAt: event.target.value })} /></Field>
       <Field name="Notes"><textarea className={cx(INPUT, "min-h-28")} value={draft.notes || ""} onChange={(event) => setDraft({ ...draft, notes: event.target.value })} /></Field>
       <SaveButton saving={saving} label="Publish opportunity" icon={Send} />
     </form>

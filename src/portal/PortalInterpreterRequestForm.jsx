@@ -1,5 +1,6 @@
 import ExistingClientInterpreterRequestForm from "../components/ExistingClientInterpreterRequestForm";
 import InterpreterRequestFormShared from "../components/InterpreterRequestFormShared";
+import { getPortalTimeZone, zonedDateTimeToUtc } from "./timezones";
 
 function assembledAddress(client = {}) {
   return [
@@ -62,13 +63,12 @@ export function initialValuesFromClient(client = {}) {
     additionalConsiderations: savedAdditionalConsiderations(savedPreferences),
     communicationNotes: savedPreferences,
     cdiOrAdditionalSupportNeeded: cdiPreference ? "Yes" : "",
+    timeZone: getPortalTimeZone(),
   };
 }
 
-function localDateTimeToIso(date, time) {
-  const value = new Date(`${date}T${time}`);
-  if (Number.isNaN(value.getTime())) throw new Error("Enter a valid assignment date and time.");
-  return value.toISOString();
+function localDateTimeToIso(date, time, timeZone) {
+  return zonedDateTimeToUtc(`${date}T${time}`, timeZone);
 }
 
 function deliveryMode(serviceNeeded) {
@@ -89,13 +89,13 @@ export function portalAssignmentFromRequest(request, source = "client_portal") {
   const mode = deliveryMode(request.serviceNeeded);
   const location = String(request.assignmentLocationPlatform || "").trim();
   const isUrl = /^https?:\/\//i.test(location);
-  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || "America/New_York";
+  const timezone = request.timeZone || getPortalTimeZone();
 
   return {
     service_type: request.serviceNeeded,
     delivery_mode: mode,
-    start_at: localDateTimeToIso(request.assignmentDate, request.startTime),
-    end_at: localDateTimeToIso(request.assignmentDate, request.endTime),
+    start_at: localDateTimeToIso(request.assignmentDate, request.startTime, timezone),
+    end_at: localDateTimeToIso(request.assignmentDate, request.endTime, timezone),
     timezone,
     location_name: location,
     meeting_link: isUrl ? location : null,

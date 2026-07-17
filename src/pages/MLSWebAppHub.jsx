@@ -51,7 +51,7 @@ export default function MLSWebAppHub() {
   const v2 = useOperationsV2({ initialData: controller.operationsV2, deferInitialLoad: true });
   const {
     isLoaded, workspace, operations, app, role, section, setSection,
-    loading, refreshing, busyDoc, message, error, setMessage, setError,
+    loading, refreshing, savingTimeZone, busyDoc, message, error, setMessage, setError,
     load, actions, setModal,
   } = controller;
   const roleSelection = usePortalRoleSelection({ enabled: Boolean(isLoaded && workspace && !workspace.user?.isAdmin) });
@@ -112,7 +112,7 @@ export default function MLSWebAppHub() {
 
   return <>
     <PortalRealtimeBridge topic={v2.data?.realtimeTopic} refresh={refreshAll} />
-    <AppShell role={role} section={activeSection} setSection={setSection} user={workspace.user} personalization={personalization} unread={app.unreadCount || 0} navBadges={navBadges} refreshing={refreshing || v2.loading} refresh={refreshAll}>
+    <AppShell role={role} section={activeSection} setSection={setSection} user={workspace.user} personalization={personalization} unread={app.unreadCount || 0} navBadges={navBadges} refreshing={refreshing || v2.loading} refresh={refreshAll} timeZone={workspace.preferences?.timeZone} onTimeZoneChange={actions.saveTimeZone} savingTimeZone={savingTimeZone}>
       {message && <Toast message={message} dismiss={() => setMessage("")} />}
       {error && <Toast message={error} type="error" dismiss={() => setError("")} />}
       {v2.message && <Toast message={v2.message} dismiss={() => v2.setMessage("")} />}

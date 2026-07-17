@@ -5,6 +5,7 @@ import {
   CircleDollarSign, ClipboardCheck, FileText, GraduationCap, Mail,
   MessageSquare, ShieldCheck, Trash2,
 } from "lucide-react";
+import { formatInPortalTimeZone, getPortalTimeZone } from "./timezones";
 
 const categoryDetails = {
   assignment: { label: "Assignment", Icon: CalendarDays, iconClass: "bg-blue-500 text-white" },
@@ -22,23 +23,25 @@ function notificationMeta(category) {
   return categoryDetails[category] || categoryDetails.general;
 }
 
-function isSameDay(left, right) {
-  return left.getFullYear() === right.getFullYear()
-    && left.getMonth() === right.getMonth()
-    && left.getDate() === right.getDate();
+function dayKey(value) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: getPortalTimeZone(),
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(date);
+  const get = (type) => parts.find((part) => part.type === type)?.value || "";
+  return `${get("year")}-${get("month")}-${get("day")}`;
 }
 
 function groupName(value) {
   const date = new Date(value);
-  const now = new Date();
   if (Number.isNaN(date.getTime())) return "Earlier";
-  if (isSameDay(date, now)) return "Today";
-  const yesterday = new Date(now);
-  yesterday.setDate(now.getDate() - 1);
-  if (isSameDay(date, yesterday)) return "Yesterday";
-  const weekAgo = new Date(now);
-  weekAgo.setDate(now.getDate() - 7);
-  if (date >= weekAgo) return "This Week";
+  if (dayKey(date) === dayKey(Date.now())) return "Today";
+  if (dayKey(date) === dayKey(Date.now() - 864e5)) return "Yesterday";
+  if (date.getTime() >= Date.now() - 7 * 864e5) return "This Week";
   return "Earlier";
 }
 
@@ -53,18 +56,14 @@ function relativeTime(value) {
   if (hours < 24) return `${hours}h`;
   const days = Math.floor(hours / 24);
   if (days < 7) return `${days}d`;
-  return date.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+  return formatInPortalTimeZone(date, { year: undefined, hour: undefined, minute: undefined, timeZoneName: undefined });
 }
 
 function fullTimestamp(value) {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "";
-  return date.toLocaleString(undefined, {
+  return formatInPortalTimeZone(date, {
     weekday: "short",
-    month: "short",
-    day: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
   });
 }
 
@@ -145,10 +144,14 @@ export default function IOSNotificationCenter({ app, actions = {} }) {
     return order.map((name) => [name, map.get(name)]).filter(([, items]) => items.length);
   }, [visible]);
 
-  const dateLabel = new Date().toLocaleDateString(undefined, {
+  const dateLabel = formatInPortalTimeZone(new Date(), {
     weekday: "long",
     month: "long",
     day: "numeric",
+    year: undefined,
+    hour: undefined,
+    minute: undefined,
+    timeZoneName: undefined,
   });
 
   async function clearGroup(name, items) {
