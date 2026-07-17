@@ -2,6 +2,7 @@ import { createClerkClient } from "@clerk/backend";
 import { randomUUID } from "node:crypto";
 import { notify } from "./ops-v2-core.js";
 import { sendGmailEmailWithAttachments } from "./gmail-attachments.js";
+import { brandedPortalEmail } from "./branded-email.js";
 
 const clerkKey = process.env["CLERK_" + "SECRET_KEY"];
 const supportEmail = process.env.EMAIL_SUPPORT_ADDRESS || "m.stubbs@miqueaslanguagesolutions.com";
@@ -175,6 +176,8 @@ function conversationView(conversation, allMembers, userId, allMessages = []) {
     displayTitle: title,
     unreadCount,
     lastReadAt: self?.last_read_at || null,
+    clearedAt: self?.cleared_at || null,
+    clearedRestoreUntil: self?.cleared_restore_until || null,
     participant: direct && others[0] ? {
       selfRole: members.find((item) => item.clerk_user_id === userId)?.role,
       otherId: others[0].clerk_user_id,
@@ -189,20 +192,30 @@ export async function loadCommunications(db, user) {
   const identity = await profileFor(db, user);
   const all = await directories(db);
   const contacts = allowedContacts(identity.role, all, user.id);
-  const membershipResult = await db.from("portal_conversation_members").select("conversation_id").eq("clerk_user_id", user.id).is("left_at", null);
+  const membershipResult = await db.from("portal_conversation_members").select("*").eq("clerk_user_id", user.id).is("left_at", null);
   if (membershipResult.error) throw membershipResult.error;
-  const conversationIds = (membershipResult.data || []).map((item) => item.conversation_id);
-  const conversationResult = conversationIds.length
-    ? await db.from("portal_conversations").select("*").in("id", conversationIds).order("last_message_at", { ascending: false, nullsFirst: false })
+  const now = Date.now();
+  const memberships = membershipResult.data || [];
+  const activeMemberships = memberships.filter((item) => !item.hidden_at);
+  const recoverableMemberships = memberships.filter((item) => item.hidden_at && item.hidden_restore_until && new Date(item.hidden_restore_until).getTime() > now);
+  const allConversationIds = memberships.map((item) => item.conversation_id);
+  const conversationIds = activeMemberships.map((item) => item.conversation_id);
+  const conversationResult = allConversationIds.length
+    ? await db.from("portal_conversations").select("*").in("id", allConversationIds).order("last_message_at", { ascending: false, nullsFirst: false })
     : { data: [], error: null };
   if (conversationResult.error) throw conversationResult.error;
-  const conversations = conversationResult.data || [];
-  const members = await activeMembers(db, conversations.map((item) => item.id));
+  const allConversations = conversationResult.data || [];
+  const conversations = allConversations.filter((item) => conversationIds.includes(item.id));
+  const members = await activeMembers(db, allConversationIds);
   const messageResult = conversationIds.length
     ? await db.from("portal_direct_messages").select("*").in("conversation_id", conversationIds).order("created_at")
     : { data: [], error: null };
   if (messageResult.error) throw messageResult.error;
-  const messageIds = (messageResult.data || []).map((item) => item.id);
+  const visibleMessages = (messageResult.data || []).filter((message) => {
+    const membership = activeMemberships.find((item) => item.conversation_id === message.conversation_id);
+    return !membership?.cleared_at || new Date(message.created_at).getTime() > new Date(membership.cleared_at).getTime();
+  });
+  const messageIds = visibleMessages.filter((item) => !item.deleted_at).map((item) => item.id);
   const messageAttachmentResult = messageIds.length
     ? await db.from("portal_communication_attachments").select("*").in("direct_message_id", messageIds).order("created_at")
     : { data: [], error: null };
@@ -210,7 +223,6 @@ export async function loadCommunications(db, user) {
 
   const announcementResult = await db.from("portal_announcements").select("*").order("published_at", { ascending: false }).limit(100);
   if (announcementResult.error) throw announcementResult.error;
-  const now = Date.now();
   const announcements = (announcementResult.data || []).filter((item) => {
     if (identity.role === "admin") return true;
     if (item.expires_at && new Date(item.expires_at).getTime() < now) return false;
@@ -227,8 +239,24 @@ export async function loadCommunications(db, user) {
   return {
     role: identity.role,
     contacts,
-    conversations: conversations.map((item) => conversationView(item, members, user.id, messageResult.data || [])),
-    messages: (messageResult.data || []).map((message) => ({ ...message, attachments: (messageAttachmentResult.data || []).filter((item) => item.direct_message_id === message.id) })),
+    conversations: conversations.map((item) => conversationView(item, members, user.id, visibleMessages.filter((message) => !message.deleted_at))),
+    recentlyDeletedConversations: recoverableMemberships.map((membership) => {
+      const conversation = allConversations.find((item) => item.id === membership.conversation_id);
+      return conversation ? { ...conversationView(conversation, members, user.id, []), restoreUntil: membership.hidden_restore_until } : null;
+    }).filter(Boolean),
+    messages: visibleMessages.map((message) => {
+      const deleted = Boolean(message.deleted_at);
+      const canRestore = deleted && message.deleted_by_clerk_user_id === user.id && new Date(message.delete_restore_until || 0).getTime() > now;
+      const canDelete = !deleted && message.sender_clerk_user_id === user.id && new Date(message.created_at).getTime() <= now - 10 * 60 * 1000;
+      return {
+        ...message,
+        body: deleted ? "Message deleted" : message.body,
+        isDeleted: deleted,
+        canDelete,
+        canRestore,
+        attachments: deleted ? [] : (messageAttachmentResult.data || []).filter((item) => item.direct_message_id === message.id),
+      };
+    }),
     announcements: announcements.map((announcement) => ({ ...announcement, read_at: readMap.get(announcement.id) || null, attachments: (announcementAttachmentResult.data || []).filter((item) => item.announcement_id === announcement.id) })),
     unreadAnnouncements: announcements.filter((item) => !readMap.has(item.id)).length,
   };
@@ -404,7 +432,7 @@ export async function sendPortalDirectMessage(db, user, payload) {
 
   const files = await emailAttachments(db, attachments);
   const heading = conversation.conversation_type === "group" ? `${identity.name} in ${conversation.title || "MLS group chat"}` : `New message from ${identity.name}`;
-  const copy = emailCopy({ heading, intro: "A new message was sent through MLS Portal.", bodyText: text || "An attachment was added to the conversation.", buttonLabel: "Reply in MLS Portal", buttonUrl: portalUrl({ conversation: conversation.id }) });
+  const copy = brandedPortalEmail({ heading, intro: "A new message was sent through MLS Portal.", bodyText: text || "An attachment was added to the conversation.", buttonLabel: "Reply in MLS Portal", buttonUrl: portalUrl({ conversation: conversation.id }) });
   const deliveries = [];
   for (let index = 0; index < recipients.length; index += 5) {
     const batch = recipients.slice(index, index + 5);
@@ -456,7 +484,7 @@ export async function publishPortalAnnouncement(db, user, payload) {
     const notificationResult = await db.from("notifications").insert(notificationRows);
     if (notificationResult.error) throw notificationResult.error;
   }
-  const copy = emailCopy({ heading: title, intro: "Miqueas Language Solutions posted a new portal announcement.", bodyText: text, buttonLabel: "Open announcement", buttonUrl: portalUrl({ announcement: inserted.data.id }) });
+  const copy = brandedPortalEmail({ heading: title, intro: "Miqueas Language Solutions posted a new portal announcement.", bodyText: text, buttonLabel: "Open announcement", buttonUrl: portalUrl({ announcement: inserted.data.id }) });
   const files = await emailAttachments(db, attachments);
   const deliveries = [];
   for (let index = 0; index < recipients.length; index += 5) {

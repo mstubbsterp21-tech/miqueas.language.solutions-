@@ -48,7 +48,9 @@ export default function usePortalRoleSelection({ enabled = true } = {}) {
     setSaving(true);
     setError("");
     try {
-      return await api.role("select", "POST", { role });
+      const result = await api.role("select", "POST", { role });
+      setState({ loading: false, checked: true, ...result });
+      return result;
     } catch (selectionError) {
       const text = selectionError instanceof Error ? selectionError.message : String(selectionError);
       setError(text);

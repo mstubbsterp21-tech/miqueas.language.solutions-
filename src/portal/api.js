@@ -67,7 +67,7 @@ export function createMLSApi(session) {
       method,
       body,
     ),
-    setup: (role, body) => request(session, "/api/first-login-setup", role, "POST", body),
+    setup: (action = "save", method = "POST", body) => request(session, "/api/first-login-setup", action, method, body),
     role: (action = "status", method = "GET", body) => request(
       session,
       "/api/first-login-setup",

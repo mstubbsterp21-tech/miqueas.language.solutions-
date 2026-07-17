@@ -1,4 +1,4 @@
-import { AlertCircle, Bell, BookOpenCheck, CalendarDays, CircleDollarSign, ClipboardCheck, FileSignature, FileWarning, MessageSquare, ShieldCheck, Users } from "lucide-react";
+import { AlertCircle, Bell, BookOpenCheck, CalendarDays, CircleDollarSign, ClipboardCheck, FileSignature, FileWarning, Megaphone, MessageSquare, ShieldCheck, Users } from "lucide-react";
 import { Badge, Card, EmptyState, Hero, Metric, SectionHeader, formatDate, formatMoney } from "./ui";
 
 function Action({ children, onClick, tone = "primary" }) {
@@ -7,6 +7,33 @@ function Action({ children, onClick, tone = "primary" }) {
 
 function AttentionItem({ title, text, badge, onClick }) {
   return <button type="button" onClick={onClick} className="flex w-full items-start gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-4 text-left transition hover:border-[#dd7d00]/45 hover:bg-white hover:shadow"><span className="mt-1 h-2.5 w-2.5 shrink-0 rounded-full bg-[#dd7d00]" /><span className="min-w-0 flex-1"><span className="block font-black text-slate-900">{title}</span>{text && <span className="mt-1 block text-xs leading-5 text-slate-500">{text}</span>}</span>{badge && <Badge value={badge} />}</button>;
+}
+
+function HubExtras({ role, workspace, operations, app, v2, actions }) {
+  const announcements = v2?.announcements || [];
+  const assignments = app?.assignments || workspace?.admin?.assignments || workspace?.client?.assignments || [];
+  const newest = [...assignments].sort((a, b) => new Date(b.created_at || b.start_at) - new Date(a.created_at || a.start_at)).slice(0, 5);
+  const opportunities = (operations?.opportunities || []).slice(0, 5);
+  const activityTitle = role === "interpreter" ? "Recommended open assignments" : role === "client" ? "Recent requests" : "New assignments";
+  const activityText = role === "interpreter" ? "Open opportunities matched to your portal profile." : "Recently added work that may need your attention.";
+  const activity = role === "interpreter" ? opportunities : newest;
+  const activityEmpty = role === "interpreter" ? "No recommended opportunities right now." : "New requests and assignments will appear here.";
+  return <div className="grid gap-5 xl:grid-cols-2">
+    <Card>
+      <SectionHeader title={activityTitle} text={activityText} />
+      <div className="mt-5 space-y-3">
+        {activity.map((item) => <AttentionItem key={item.id} title={item.service_type || item.title || "Interpreter assignment"} text={`${formatDate(item.start_at)}${item.delivery_mode ? ` · ${item.delivery_mode}` : ""}${item.location_name ? ` · ${item.location_name}` : ""}`} badge={item.lifecycle_status || item.status || (role === "interpreter" ? "open" : "new")} onClick={() => role === "interpreter" ? actions.go("work") : actions.openAssignment(item)} />)}
+        {!activity.length && <EmptyState icon={ClipboardCheck} title="Nothing new" text={activityEmpty} />}
+      </div>
+    </Card>
+    <Card>
+      <SectionHeader title="Announcements" text="MLS updates, reminders, and portal news in one place." />
+      <div className="mt-5 space-y-3">
+        {announcements.slice(0, 5).map((item) => <AttentionItem key={item.id} title={item.title} text={`${item.body || ""}${item.published_at ? ` · ${formatDate(item.published_at)}` : ""}`} badge={item.read_at ? "read" : "new"} onClick={() => actions.go("communications")} />)}
+        {!announcements.length && <EmptyState icon={Megaphone} title="No announcements" text="MLS announcements will appear here as soon as they are published." />}
+      </div>
+    </Card>
+  </div>;
 }
 
 function AdminHome({ workspace, app, operations, v2, actions }) {
@@ -69,7 +96,10 @@ function InterpreterHome({ workspace, operations, app, v2, actions }) {
 }
 
 export default function PortalHomeSnapshot({ role, workspace, operations, app, v2, actions }) {
-  if (role === "admin") return <AdminHome workspace={workspace} app={app} operations={operations} v2={v2} actions={actions} />;
-  if (role === "client") return <ClientHome workspace={workspace} app={app} v2={v2} actions={actions} />;
-  return <InterpreterHome workspace={workspace} operations={operations} app={app} v2={v2} actions={actions} />;
+  const home = role === "admin"
+    ? <AdminHome workspace={workspace} app={app} operations={operations} v2={v2} actions={actions} />
+    : role === "client"
+      ? <ClientHome workspace={workspace} app={app} v2={v2} actions={actions} />
+      : <InterpreterHome workspace={workspace} operations={operations} app={app} v2={v2} actions={actions} />;
+  return <div className="space-y-6">{home}<HubExtras role={role} workspace={workspace} operations={operations} app={app} v2={v2} actions={actions} /></div>;
 }

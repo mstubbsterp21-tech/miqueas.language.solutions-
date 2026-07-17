@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSession } from "@clerk/clerk-react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -385,9 +385,14 @@ export default function FirstLoginSetupWizard({ role, profile, user, onComplete 
   const api = useMemo(() => createMLSApi(session), [session]);
   const steps = role === "client" ? CLIENT_STEPS : INTERPRETER_STEPS;
   const defaults = role === "client" ? EMPTY_CLIENT : EMPTY_INTERPRETER;
+  const storageKey = `mls:first-login:${user?.id || user?.email || "user"}:${role}`;
+  const savedDraft = (() => {
+    try { return JSON.parse(localStorage.getItem(storageKey) || "null") || {}; } catch { return {}; }
+  })();
   const [draft, setDraft] = useState({
     ...defaults,
     ...(profile || {}),
+    ...savedDraft,
     email: profile?.email || user?.email || "",
     country: profile?.country || defaults.country || "United States",
     first_name: profile?.first_name || user?.firstName || "",
@@ -403,6 +408,10 @@ export default function FirstLoginSetupWizard({ role, profile, user, onComplete 
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const completion = Math.round((step / steps.length) * 100);
+
+  useEffect(() => {
+    localStorage.setItem(storageKey, JSON.stringify(draft));
+  }, [draft, storageKey]);
 
   async function saveProgress(nextStep, complete = false) {
     const missing = role === "client" ? clientStepErrors(step, draft) : interpreterStepErrors(step, draft);
@@ -427,7 +436,10 @@ export default function FirstLoginSetupWizard({ role, profile, user, onComplete 
         ...(result.profile || {}),
         other_credential: current.other_credential || otherCredentialFrom(result.profile?.credentials),
       }));
-      if (complete) onComplete(result.profile);
+      if (complete) {
+        localStorage.removeItem(storageKey);
+        onComplete(result.profile);
+      }
       else setStep(nextStep);
     } catch (saveError) {
       setError(saveError instanceof Error ? saveError.message : String(saveError));

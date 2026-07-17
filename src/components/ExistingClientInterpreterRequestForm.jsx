@@ -23,6 +23,7 @@ const settingOptions = [
   "Edu. Post Secondary",
   "Cruise",
   "Mental Health",
+  "General / Community",
   "Business",
   "Platform / Conference",
   "Performance / Artistic",
@@ -101,6 +102,7 @@ export default function ExistingClientInterpreterRequestForm({
   const p = { ...defaultPalette, ...palette };
   const initial = useMemo(() => ({
     ...initialValues,
+    settingOther: initialValues?.settingOther || "",
     communicationStyles: Array.isArray(initialValues?.communicationStyles) ? initialValues.communicationStyles : [],
     additionalConsiderations: Array.isArray(initialValues?.additionalConsiderations) ? initialValues.additionalConsiderations : [],
   }), [initialValues]);
@@ -139,6 +141,7 @@ export default function ExistingClientInterpreterRequestForm({
     if (currentStep === 1) {
       if (!formData.serviceNeeded) next.serviceNeeded = "Please select a service.";
       if (!formData.setting) next.setting = "Please select a setting.";
+      if (formData.setting === "Other" && !formData.settingOther?.trim()) next.settingOther = "Please describe the setting.";
       if (!formData.assignmentDate) next.assignmentDate = "Date is required.";
       if (!formData.startTime) next.startTime = "Start time is required.";
       if (!formData.endTime) next.endTime = "End time is required.";
@@ -185,6 +188,7 @@ export default function ExistingClientInterpreterRequestForm({
     try {
       const payload = {
         ...formData,
+        setting: formData.setting === "Other" ? `Other: ${formData.settingOther.trim()}` : formData.setting,
         estimatedDuration: derivedDuration,
         communicationStyles: formData.communicationStyles.includes("Other")
           ? [...formData.communicationStyles.filter((item) => item !== "Other"), `Other: ${formData.communicationStyleOther}`].join(", ")
@@ -213,7 +217,7 @@ export default function ExistingClientInterpreterRequestForm({
   return <div className="mx-auto max-w-5xl space-y-6">
     <div className="rounded-[1.5rem] border border-emerald-200 bg-emerald-50 p-4"><p className="text-sm font-bold text-emerald-950">Using saved client profile</p><p className="mt-1 text-xs leading-5 text-emerald-800">Contact, billing, and saved communication preferences were filled from this client’s MLS profile. Complete only the assignment-specific sections below.</p></div>
 
-    {step === 1 && <SectionCard step={1} title="Assignment Details" subtitle="Include the core details needed to review availability and fit." palette={p}><div className="grid gap-5 md:grid-cols-2">{renderSelect("serviceNeeded", "Service Needed", serviceOptions)}{renderSelect("setting", "Setting", settingOptions)}{renderInput("assignmentDate", "Assignment Date", "date")}{renderInput("startTime", "Start Time", "time")}{renderInput("endTime", "End Time", "time")}<div><p className={labelClass} style={{ color: p.charcoal }}>Estimated Duration</p><div className="rounded-xl border bg-white px-4 py-3 text-sm" style={{ borderColor: p.border, color: p.charcoal }}>{derivedDuration || "Enter start and end time"}</div></div></div><div className="mt-5">{renderTextarea("assignmentLocationPlatform", "Assignment Location / Platform", "Address, room, link, platform, or access details", 3)}</div></SectionCard>}
+    {step === 1 && <SectionCard step={1} title="Assignment Details" subtitle="Include the core details needed to review availability and fit." palette={p}><div className="grid gap-5 md:grid-cols-2">{renderSelect("serviceNeeded", "Service Needed", serviceOptions)}{renderSelect("setting", "Setting", settingOptions)}{formData.setting === "Other" ? renderInput("settingOther", "Describe the Other Setting", "text", "Describe the community, event, or environment") : null}{renderInput("assignmentDate", "Assignment Date", "date")}{renderInput("startTime", "Start Time", "time")}{renderInput("endTime", "End Time", "time")}<div><p className={labelClass} style={{ color: p.charcoal }}>Estimated Duration</p><div className="rounded-xl border bg-white px-4 py-3 text-sm" style={{ borderColor: p.border, color: p.charcoal }}>{derivedDuration || "Enter start and end time"}</div></div></div><div className="mt-5">{renderTextarea("assignmentLocationPlatform", "Assignment Location / Platform", "Address, room, link, platform, or access details", 3)}</div></SectionCard>}
 
     {step === 2 && <SectionCard step={2} title="Communication Needs" subtitle="Share enough detail to support communication access while keeping consumer information need-to-know." palette={p}><div className="grid gap-5 md:grid-cols-2">{renderInput("participantCount", "Estimated Participant Count")}{renderInput("consumerNames", "Deaf Participant Name(s), if appropriate / available")}{renderInput("hearingParticipantsLanguages", "Hearing Participants’ Primary Language(s)")}{renderYesNo("workedWithInterpreterBefore", "Has the consumer/client worked with an interpreter before?", ["Not sure"])}{renderYesNo("cdiOrAdditionalSupportNeeded", "Is a CDI or additional support needed?", ["Not sure"])}</div><div className="mt-5 space-y-5">{renderCheckboxGroup("communicationStyles", "Communication Style(s)", communicationStyleOptions, "communicationStyleOther")}{renderCheckboxGroup("additionalConsiderations", "Additional Considerations", additionalConsiderationOptions, "additionalConsiderationsOther")}{renderTextarea("communicationNotes", "Additional Communication Notes", "Language preferences, accessibility needs, context, or other relevant details", 4)}</div></SectionCard>}
 

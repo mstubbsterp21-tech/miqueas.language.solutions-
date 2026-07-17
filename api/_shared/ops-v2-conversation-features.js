@@ -1,6 +1,7 @@
 import { sendGmailEmailWithAttachments } from "./gmail-attachments.js";
 import { notify } from "./ops-v2-core.js";
 import { loadCommunications } from "./ops-v2-communications.js";
+import { brandedPortalEmail } from "./branded-email.js";
 
 const supportEmail = process.env.EMAIL_SUPPORT_ADDRESS || "m.stubbs@miqueaslanguagesolutions.com";
 const supportPhone = process.env.EMAIL_SUPPORT_PHONE || "(321) 379-8010";
@@ -175,6 +176,74 @@ export async function renamePortalConversation(db, user, payload = {}) {
   return { status: 200, payload: { conversation: { ...updateResult.data, displayTitle } } };
 }
 
+async function membershipFor(db, userId, conversationId) {
+  const result = await db.from("portal_conversation_members").select("*").eq("conversation_id", conversationId).eq("clerk_user_id", userId).is("left_at", null).maybeSingle();
+  if (result.error) throw result.error;
+  return result.data;
+}
+
+export async function clearPortalConversation(db, user, payload = {}) {
+  const conversationId = String(payload.conversationId || "").trim();
+  const membership = await membershipFor(db, user.id, conversationId);
+  if (!membership) return { status: 404, payload: { error: "Conversation not found." } };
+  const now = new Date();
+  const result = await db.from("portal_conversation_members").update({ cleared_at: now.toISOString(), cleared_restore_until: new Date(now.getTime() + 10 * 60 * 1000).toISOString() }).eq("conversation_id", conversationId).eq("clerk_user_id", user.id);
+  if (result.error) throw result.error;
+  return { status: 200, payload: { cleared: true, restoreUntil: new Date(now.getTime() + 10 * 60 * 1000).toISOString() } };
+}
+
+export async function restoreClearedPortalConversation(db, user, payload = {}) {
+  const conversationId = String(payload.conversationId || "").trim();
+  const membership = await membershipFor(db, user.id, conversationId);
+  if (!membership?.cleared_restore_until || new Date(membership.cleared_restore_until).getTime() < Date.now()) return { status: 409, payload: { error: "The 10-minute recovery window has ended." } };
+  const result = await db.from("portal_conversation_members").update({ cleared_at: null, cleared_restore_until: null }).eq("conversation_id", conversationId).eq("clerk_user_id", user.id);
+  if (result.error) throw result.error;
+  return { status: 200, payload: { restored: true } };
+}
+
+export async function deletePortalConversation(db, user, payload = {}) {
+  const conversationId = String(payload.conversationId || "").trim();
+  const membership = await membershipFor(db, user.id, conversationId);
+  if (!membership) return { status: 404, payload: { error: "Conversation not found." } };
+  const now = new Date();
+  const result = await db.from("portal_conversation_members").update({ hidden_at: now.toISOString(), hidden_restore_until: new Date(now.getTime() + 10 * 60 * 1000).toISOString() }).eq("conversation_id", conversationId).eq("clerk_user_id", user.id);
+  if (result.error) throw result.error;
+  return { status: 200, payload: { deleted: true, restoreUntil: new Date(now.getTime() + 10 * 60 * 1000).toISOString() } };
+}
+
+export async function restoreDeletedPortalConversation(db, user, payload = {}) {
+  const conversationId = String(payload.conversationId || "").trim();
+  const membership = await membershipFor(db, user.id, conversationId);
+  if (!membership?.hidden_restore_until || new Date(membership.hidden_restore_until).getTime() < Date.now()) return { status: 409, payload: { error: "The 10-minute recovery window has ended." } };
+  const result = await db.from("portal_conversation_members").update({ hidden_at: null, hidden_restore_until: null }).eq("conversation_id", conversationId).eq("clerk_user_id", user.id);
+  if (result.error) throw result.error;
+  return { status: 200, payload: { restored: true } };
+}
+
+export async function deletePortalDirectMessage(db, user, payload = {}) {
+  const messageId = String(payload.messageId || "").trim();
+  const message = await db.from("portal_direct_messages").select("*").eq("id", messageId).maybeSingle();
+  if (message.error) throw message.error;
+  if (!message.data || message.data.sender_clerk_user_id !== user.id) return { status: 403, payload: { error: "You can only delete a message you sent." } };
+  if (message.data.deleted_at) return { status: 409, payload: { error: "That message is already deleted." } };
+  if (new Date(message.data.created_at).getTime() > Date.now() - 10 * 60 * 1000) return { status: 409, payload: { error: "Sent messages can be deleted after 10 minutes." } };
+  const now = new Date();
+  const result = await db.from("portal_direct_messages").update({ deleted_at: now.toISOString(), deleted_by_clerk_user_id: user.id, delete_restore_until: new Date(now.getTime() + 10 * 60 * 1000).toISOString() }).eq("id", messageId);
+  if (result.error) throw result.error;
+  return { status: 200, payload: { deleted: true, restoreUntil: new Date(now.getTime() + 10 * 60 * 1000).toISOString() } };
+}
+
+export async function restorePortalDirectMessage(db, user, payload = {}) {
+  const messageId = String(payload.messageId || "").trim();
+  const message = await db.from("portal_direct_messages").select("*").eq("id", messageId).maybeSingle();
+  if (message.error) throw message.error;
+  if (!message.data || message.data.deleted_by_clerk_user_id !== user.id) return { status: 403, payload: { error: "You cannot restore that message." } };
+  if (!message.data.delete_restore_until || new Date(message.data.delete_restore_until).getTime() < Date.now()) return { status: 409, payload: { error: "The 10-minute recovery window has ended." } };
+  const result = await db.from("portal_direct_messages").update({ deleted_at: null, deleted_by_clerk_user_id: null, delete_restore_until: null }).eq("id", messageId);
+  if (result.error) throw result.error;
+  return { status: 200, payload: { restored: true } };
+}
+
 export async function sendPortalMessageWithMentions(db, user, payload = {}) {
   const text = String(payload.message || payload.body || "").trim();
   const attachments = normalizedAttachments(payload.attachments);
@@ -250,6 +319,8 @@ export async function sendPortalMessageWithMentions(db, user, payload = {}) {
     updated_at: new Date().toISOString(),
   }).eq("id", conversation.id);
 
+  await db.from("portal_conversation_members").update({ hidden_at: null, hidden_restore_until: null }).eq("conversation_id", conversation.id).neq("clerk_user_id", user.id).is("left_at", null);
+
   const mentionedIds = new Set(mentionedMembers.map((item) => item.clerk_user_id));
   const recipients = members.filter((item) => item.clerk_user_id !== user.id);
   const label = conversationLabel(conversation, members, user.id);
@@ -279,7 +350,7 @@ export async function sendPortalMessageWithMentions(db, user, payload = {}) {
         : conversation.conversation_type === "group" || conversation.title
           ? `${identity.name} in ${label}`
           : `New message from ${identity.name}`;
-      const copy = emailCopy({
+      const copy = brandedPortalEmail({
         heading,
         intro: wasMentioned ? "You were mentioned in an MLS Portal message." : "A new message was sent through MLS Portal.",
         bodyText: text || "An attachment was added to the conversation.",

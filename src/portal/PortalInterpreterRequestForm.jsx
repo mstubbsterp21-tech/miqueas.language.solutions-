@@ -102,7 +102,9 @@ export function portalAssignmentFromRequest(request, source = "client_portal") {
     deaf_participants: null,
     hearing_participants: null,
     language_preferences: [request.communicationStyles, request.hearingParticipantsLanguages].filter(Boolean).join(" | "),
-    specialty: request.setting,
+    specialty: request.setting === "Other" && request.settingOther
+      ? `Other: ${request.settingOther}`
+      : request.setting,
     team_requested: request.exceedsTwoHours === "Yes",
     cdi_requested: request.cdiOrAdditionalSupportNeeded === "Yes",
     onsite_contact_name: request.fullName,

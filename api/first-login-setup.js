@@ -224,6 +224,25 @@ async function selectRole(db, user, body) {
   }, { onConflict: "clerk_user_id" });
   if (preference.error) throw preference.error;
 
+  if (requestedRole === "client" && !client) {
+    const existingByEmail = await db.from("clients").select("id").eq("email", user.email).is("clerk_user_id", null).maybeSingle();
+    if (existingByEmail.error) throw existingByEmail.error;
+    const starter = { clerk_user_id: user.id, email: user.email, primary_contact_name: [user.firstName, user.lastName].filter(Boolean).join(" ") || null, setup_started_at: new Date().toISOString(), setup_current_step: 0 };
+    const created = existingByEmail.data
+      ? await db.from("clients").update(starter).eq("id", existingByEmail.data.id)
+      : await db.from("clients").insert(starter);
+    if (created.error) throw created.error;
+  }
+  if (requestedRole === "interpreter" && !interpreter) {
+    const existingByEmail = await db.from("interpreters").select("id").eq("email", user.email).is("clerk_user_id", null).maybeSingle();
+    if (existingByEmail.error) throw existingByEmail.error;
+    const starter = { clerk_user_id: user.id, email: user.email, first_name: user.firstName || "", last_name: user.lastName || "", country: "United States", roster_status: "pending_profile", screening_status: "not_started", setup_started_at: new Date().toISOString(), setup_current_step: 0 };
+    const created = existingByEmail.data
+      ? await db.from("interpreters").update(starter).eq("id", existingByEmail.data.id)
+      : await db.from("interpreters").insert(starter);
+    if (created.error) throw created.error;
+  }
+
   await audit(db, { ...user, metadataRole: requestedRole }, {
     action: "portal.role_selected",
     entityType: "portal_user",

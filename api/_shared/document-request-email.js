@@ -124,20 +124,8 @@ function emailCopy(request, owner, eventType) {
   <div class="mls-shell" style="max-width:640px;margin:0 auto;padding:28px 16px">
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="width:100%;background:#ffffff;border-radius:24px 24px 0 0">
       <tr>
-        <td style="padding:24px 28px">
-          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="width:100%">
-            <tr>
-              <td class="mls-masthead-cell mls-logo-cell" width="55%" valign="middle" style="width:55%;padding:0 20px 0 0">
-                <img src="${safeLogoUrl}" width="210" alt="Miqueas Language Solutions" style="display:block;width:210px;max-width:100%;height:auto;border:0;margin:0">
-              </td>
-              <td class="mls-masthead-cell mls-contact-cell" width="45%" valign="middle" align="right" style="width:45%;text-align:right;font-size:12px;line-height:1.6;color:#51453f">
-                <div style="font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#721100">MLS Portal Support</div>
-                <a href="mailto:${safeSupportEmail}" style="color:#51453f;text-decoration:none">${safeSupportEmail}</a><br>
-                <a href="tel:${safeSupportPhoneLink}" style="color:#51453f;text-decoration:none">${safeSupportPhoneDisplay}</a><br>
-                <a href="${safeWebsiteUrl}" style="color:#51453f;text-decoration:none">${safeWebsiteDisplay}</a>
-              </td>
-            </tr>
-          </table>
+        <td style="padding:24px 28px;text-align:center">
+          <img src="${safeLogoUrl}" width="230" alt="Miqueas Language Solutions" style="display:inline-block;width:230px;max-width:80%;height:auto;border:0;margin:0 auto">
         </td>
       </tr>
     </table>
@@ -156,7 +144,7 @@ function emailCopy(request, owner, eventType) {
       </div>
       <p style="text-align:center;margin:26px 0"><a href="${escapeHtml(portalUrl)}" style="display:inline-block;background:#721100;color:#fff;text-decoration:none;font-weight:700;padding:14px 22px;border-radius:14px">Open secure document center</a></p>
       <p style="font-size:13px;line-height:1.6;color:#6b625e;background:#f7f3ef;padding:14px 16px;border-radius:14px">For privacy and security, upload the document through the MLS portal. Please do not reply to this email with the document attached.</p>
-      <p style="margin:24px 0 0;font-size:14px;line-height:1.6">Miqueas Language Solutions<br><span style="color:#721100;font-weight:700">Bridging Perspectives. Delivering Understanding.</span></p>
+      <div style="margin-top:28px;border-top:1px solid #eadfd8;padding-top:20px;text-align:center;font-size:12px;line-height:1.75;color:#6b625e"><strong style="color:#721100">Miqueas Language Solutions</strong><br><span style="color:#721100;font-weight:700">Bridging Perspectives. Delivering Understanding.</span><br><a href="mailto:${safeSupportEmail}" style="color:#721100">${safeSupportEmail}</a> · ${safeSupportPhoneDisplay}<br><a href="${safeWebsiteUrl}" style="color:#721100">${safeWebsiteDisplay}</a></div>
     </div>
   </div>
 </body>

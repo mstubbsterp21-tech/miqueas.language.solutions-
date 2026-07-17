@@ -1,5 +1,6 @@
 import { database, readBody, send, signedInUser } from "./_shared/ops-v2-core.js";
 import { getGmailStatus, sendGmailEmail } from "./_shared/gmail-oauth.js";
+import { brandedPortalEmail } from "./_shared/branded-email.js";
 
 const DAY_CODES = ["SU", "MO", "TU", "WE", "TH", "FR", "SA"];
 const BLOCKS = {
@@ -103,23 +104,16 @@ async function sendOpportunity(db, interpreter, assignment) {
   const date = displayDate(assignment);
   const name = interpreter.first_name || "Interpreter";
   const subject = `New MLS assignment opportunity – ${assignment.service_type}`;
-  const text = [
-    `Hello ${name},`,
-    "",
-    "A new assignment opportunity that matches your saved availability is available in the MLS portal.",
-    "",
-    `Service: ${assignment.service_type}`,
-    `Date: ${date}`,
-    `Delivery: ${assignment.delivery_mode}`,
-    `Location: ${location}`,
-    "",
-    "Sign in to review the full assignment and submit your interest or bid:",
-    portalUrl,
-    "",
-    "Miqueas Language Solutions",
-  ].join("\n");
-  const html = `<!doctype html><html><body style="font-family:Arial,sans-serif;background:#f7f3ef;padding:24px;color:#24130e"><div style="max-width:620px;margin:auto;background:#fff;padding:30px;border-radius:22px"><p style="font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#dd7d00">Miqueas Language Solutions</p><h1 style="font-size:28px">New assignment opportunity</h1><p style="line-height:1.7">Hello ${escapeHtml(name)},</p><p style="line-height:1.7">A new assignment opportunity that matches your saved availability is available in the MLS portal.</p><div style="background:#f8f5f2;border-radius:16px;padding:18px;line-height:1.8"><strong>Service:</strong> ${escapeHtml(assignment.service_type)}<br><strong>Date:</strong> ${escapeHtml(date)}<br><strong>Delivery:</strong> ${escapeHtml(assignment.delivery_mode)}<br><strong>Location:</strong> ${escapeHtml(location)}</div><p style="margin-top:24px"><a href="${portalUrl}" style="display:inline-block;background:#721100;color:#fff;text-decoration:none;padding:14px 20px;border-radius:12px;font-weight:700">Open MLS Portal</a></p><p style="font-size:12px;line-height:1.6;color:#6b625d">Your unavailable windows are automatically excluded from opportunity email notifications.</p></div></body></html>`;
-  return sendGmailEmail(db, { to: interpreter.email, subject, text, html });
+  const copy = brandedPortalEmail({
+    heading: "New assignment opportunity",
+    greeting: `Hello ${name},`,
+    intro: "A new assignment opportunity that matches your saved availability is available in MLS Portal.",
+    details: [["Service", assignment.service_type], ["Date", date], ["Delivery", assignment.delivery_mode], ["Location", location]],
+    buttonLabel: "Review opportunity",
+    buttonUrl: portalUrl,
+    footerNote: "Your unavailable windows are automatically excluded from opportunity email notifications.",
+  });
+  return sendGmailEmail(db, { to: interpreter.email, subject, ...copy });
 }
 
 export default async function handler(req, res) {

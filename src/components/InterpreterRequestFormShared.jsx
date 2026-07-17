@@ -13,6 +13,7 @@ export const EMPTY_INTERPRETER_REQUEST = {
   phoneNumber: "",
   serviceNeeded: "",
   setting: "",
+  settingOther: "",
   assignmentDate: "",
   startTime: "",
   endTime: "",
@@ -65,6 +66,7 @@ const settingOptions = [
   "Edu. Post Secondary",
   "Cruise",
   "Mental Health",
+  "General / Community",
   "Business",
   "Platform / Conference",
   "Performance / Artistic",
@@ -216,6 +218,7 @@ export default function InterpreterRequestFormShared({
     if (currentStep === 3) {
       if (!formData.serviceNeeded) next.serviceNeeded = "Please select a service.";
       if (!formData.setting) next.setting = "Please select a setting.";
+      if (formData.setting === "Other" && !formData.settingOther.trim()) next.settingOther = "Please describe the setting.";
       if (!formData.assignmentDate) next.assignmentDate = "Date is required.";
       if (!formData.startTime) next.startTime = "Start time is required.";
       if (!formData.endTime) next.endTime = "End time is required.";
@@ -265,6 +268,7 @@ export default function InterpreterRequestFormShared({
     try {
       const payload = {
         ...formData,
+        setting: formData.setting === "Other" ? `Other: ${formData.settingOther.trim()}` : formData.setting,
         estimatedDuration: derivedDuration,
         communicationStyles: formData.communicationStyles.includes("Other")
           ? [...formData.communicationStyles.filter((item) => item !== "Other"), `Other: ${formData.communicationStyleOther}`].join(", ")
@@ -364,7 +368,7 @@ export default function InterpreterRequestFormShared({
       </SectionCard>}
 
       {step === 3 && <SectionCard step={3} title="Assignment Details" subtitle="Include the core details needed to review availability and fit." palette={p}>
-        <div className="grid gap-5 md:grid-cols-2">{renderSelect("serviceNeeded", "Service Needed", serviceOptions)}{renderSelect("setting", "Setting", settingOptions)}{renderInput("assignmentDate", "Assignment Date", "date")}{renderInput("startTime", "Start Time", "time")}{renderInput("endTime", "End Time", "time")}<div><p className={labelClass} style={{ color: p.charcoal }}>Estimated Duration</p><div className="rounded-xl border bg-white px-4 py-3 text-sm" style={{ borderColor: p.border, color: p.charcoal }}>{derivedDuration || "Enter start and end time"}</div></div></div>
+        <div className="grid gap-5 md:grid-cols-2">{renderSelect("serviceNeeded", "Service Needed", serviceOptions)}{renderSelect("setting", "Setting", settingOptions)}{formData.setting === "Other" ? renderInput("settingOther", "Describe the Other Setting", "text", "Describe the community, event, or environment") : null}{renderInput("assignmentDate", "Assignment Date", "date")}{renderInput("startTime", "Start Time", "time")}{renderInput("endTime", "End Time", "time")}<div><p className={labelClass} style={{ color: p.charcoal }}>Estimated Duration</p><div className="rounded-xl border bg-white px-4 py-3 text-sm" style={{ borderColor: p.border, color: p.charcoal }}>{derivedDuration || "Enter start and end time"}</div></div></div>
         <div className="mt-5">{renderTextarea("assignmentLocationPlatform", "Assignment Location / Platform", "Address, room, link, platform, or access details", 3)}</div>
       </SectionCard>}
 
@@ -383,7 +387,7 @@ export default function InterpreterRequestFormShared({
       </SectionCard>}
 
       {step === 7 && <SectionCard step={7} title="Review & Submit" subtitle="Review the request before submitting. MLS will follow up after reviewing the details." palette={p}>
-        <dl className="grid gap-4 md:grid-cols-2"><ReviewItem label="Requester" value={formData.fullName} palette={p} /><ReviewItem label="Organization" value={formData.organizationName} palette={p} /><ReviewItem label="Contact Email" value={formData.contactEmail || formData.emailCapture} palette={p} /><ReviewItem label="Phone" value={formData.phoneNumber} palette={p} /><ReviewItem label="Service" value={formData.serviceNeeded} palette={p} /><ReviewItem label="Setting" value={formData.setting} palette={p} /><ReviewItem label="Date" value={formData.assignmentDate} palette={p} /><ReviewItem label="Time" value={`${to12Hour(formData.startTime) || "—"} – ${to12Hour(formData.endTime) || "—"}`} palette={p} /><ReviewItem label="Duration" value={derivedDuration} palette={p} /><ReviewItem label="Location / Platform" value={formData.assignmentLocationPlatform} palette={p} /><ReviewItem label="Communication Styles" value={formData.communicationStyles.join(", ")} palette={p} /><ReviewItem label="Description" value={formData.assignmentDescription} palette={p} /></dl>
+        <dl className="grid gap-4 md:grid-cols-2"><ReviewItem label="Requester" value={formData.fullName} palette={p} /><ReviewItem label="Organization" value={formData.organizationName} palette={p} /><ReviewItem label="Contact Email" value={formData.contactEmail || formData.emailCapture} palette={p} /><ReviewItem label="Phone" value={formData.phoneNumber} palette={p} /><ReviewItem label="Service" value={formData.serviceNeeded} palette={p} /><ReviewItem label="Setting" value={formData.setting === "Other" ? `Other: ${formData.settingOther}` : formData.setting} palette={p} /><ReviewItem label="Date" value={formData.assignmentDate} palette={p} /><ReviewItem label="Time" value={`${to12Hour(formData.startTime) || "—"} – ${to12Hour(formData.endTime) || "—"}`} palette={p} /><ReviewItem label="Duration" value={derivedDuration} palette={p} /><ReviewItem label="Location / Platform" value={formData.assignmentLocationPlatform} palette={p} /><ReviewItem label="Communication Styles" value={formData.communicationStyles.join(", ")} palette={p} /><ReviewItem label="Description" value={formData.assignmentDescription} palette={p} /></dl>
         {submitError ? <p className="mt-5 rounded-2xl border px-4 py-3 text-sm font-semibold form-error">{submitError}</p> : null}
       </SectionCard>}
 

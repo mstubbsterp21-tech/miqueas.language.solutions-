@@ -399,11 +399,8 @@ function brandedEmail({ eyebrow, heading, greeting, intro, details = [], buttonL
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
 <body style="margin:0;background:#f7f3ef;font-family:Arial,sans-serif;color:#24130e">
 <div style="max-width:660px;margin:0 auto;padding:28px 14px">
-  <div style="background:#fff;border-radius:24px 24px 0 0;padding:22px 26px">
-    <table role="presentation" width="100%"><tr>
-      <td><img src="${escapeHtml(brandLogoUrl)}" alt="Miqueas Language Solutions" width="205" style="display:block;max-width:100%;height:auto"></td>
-      <td align="right" style="font-size:12px;line-height:1.6;color:#51453f"><strong style="color:#721100">MLS Portal Support</strong><br>${escapeHtml(supportEmail)}<br>${escapeHtml(supportPhone)}</td>
-    </tr></table>
+  <div style="background:#fff;border-radius:24px 24px 0 0;padding:24px;text-align:center">
+    <img src="${escapeHtml(brandLogoUrl)}" alt="Miqueas Language Solutions" width="230" style="display:inline-block;max-width:80%;height:auto">
   </div>
   <div style="background:#24130e;color:#fff;padding:24px 28px">
     <div style="font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#f6b34c">${escapeHtml(eyebrow)}</div>
@@ -415,7 +412,7 @@ function brandedEmail({ eyebrow, heading, greeting, intro, details = [], buttonL
     <table role="presentation" width="100%" style="margin:22px 0;padding:14px 18px;border:1px solid #eadfd8;border-radius:18px;background:#fffaf5">${safeDetails}</table>
     <p style="text-align:center;margin:28px 0"><a href="${escapeHtml(buttonUrl)}" style="display:inline-block;background:#721100;color:#fff;text-decoration:none;font-weight:700;padding:14px 22px;border-radius:14px">${escapeHtml(buttonLabel)}</a></p>
     ${footerNote ? `<p style="font-size:13px;line-height:1.6;color:#6b625e;background:#f7f3ef;padding:14px 16px;border-radius:14px">${escapeHtml(footerNote)}</p>` : ""}
-    <p style="margin:24px 0 0;font-size:14px;line-height:1.6">Miqueas Language Solutions<br><span style="color:#721100;font-weight:700">Bridging Perspectives. Delivering Understanding.</span></p>
+    <div style="margin-top:28px;border-top:1px solid #eadfd8;padding-top:20px;text-align:center;font-size:12px;line-height:1.75;color:#6b625e"><strong style="color:#721100">Miqueas Language Solutions</strong><br><span style="color:#721100;font-weight:700">Bridging Perspectives. Delivering Understanding.</span><br>${escapeHtml(supportEmail)} · ${escapeHtml(supportPhone)}<br>miqueaslanguagesolutions.com</div>
   </div>
 </div>
 </body></html>`;

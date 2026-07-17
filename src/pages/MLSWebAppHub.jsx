@@ -22,6 +22,7 @@ import { AdminWorkspace, ClientWorkspace, InterpreterWorkspace } from "../portal
 import AdminV2Workspace from "../portal/v2/admin";
 import ClientV2Workspace from "../portal/v2/client";
 import InterpreterV2Workspace from "../portal/v2/interpreter";
+import { navBadgesFor, notificationSection } from "../portal/notificationRouting";
 
 const allowedSections = {
   admin: new Set(["home", "assignments", "communications", "people", "finance", "compliance", "reports", "profile", "settings", "notifications"]),
@@ -44,14 +45,6 @@ function PortalLoading({ title = "Opening the MLS app", text = "Loading your sec
   return <div className="flex min-h-[100dvh] items-center justify-center bg-[#f7f3ef] p-5"><div className="rounded-[2rem] bg-white p-12 text-center shadow-2xl"><Loader2 className="mx-auto animate-spin text-[#721100]" size={34} /><h1 className="mt-5 text-2xl font-black">{title}</h1><p className="mt-2 text-sm text-slate-500">{text}</p></div></div>;
 }
 
-function communicationAlert(notification) {
-  return notification.section === "communications" || ["message", "mention", "announcement"].includes(notification.category);
-}
-
-function learningAlert(notification) {
-  return ["learning", "training"].includes(notification.section) || notification.category === "training";
-}
-
 export default function MLSWebAppHub() {
   const { session } = useSession();
   const controller = useMLSController();
@@ -69,30 +62,13 @@ export default function MLSWebAppHub() {
     () => (app?.notifications || []).filter((item) => !item.is_read),
     [app?.notifications],
   );
-  const communicationNotifications = useMemo(
-    () => unreadNotifications.filter(communicationAlert),
-    [unreadNotifications],
-  );
-  const learningNotifications = useMemo(
-    () => unreadNotifications.filter(learningAlert),
-    [unreadNotifications],
-  );
-  const pendingLearning = useMemo(
-    () => role === "interpreter"
-      ? (operations?.training || []).filter((course) => course.progress?.status !== "completed").length
-      : 0,
-    [operations?.training, role],
-  );
-  const navBadges = useMemo(() => ({
-    communications: communicationNotifications.length,
-    ...(role === "interpreter" ? { learning: Math.max(pendingLearning, learningNotifications.length) } : {}),
-  }), [communicationNotifications.length, learningNotifications.length, pendingLearning, role]);
+  const navBadges = useMemo(() => navBadgesFor(role, app?.notifications || []), [app?.notifications, role]);
 
   useEffect(() => {
     if (!session || !app) return;
-    const candidates = activeSection === "learning"
-        ? learningNotifications
-        : [];
+    const candidates = ["home", "communications"].includes(activeSection)
+      ? []
+      : unreadNotifications.filter((item) => notificationSection(role, item) === activeSection);
     const ids = candidates.map((item) => item.id).filter((id) => id && !markingRead.current.has(id));
     if (!ids.length) return;
     ids.forEach((id) => markingRead.current.add(id));
@@ -116,13 +92,13 @@ export default function MLSWebAppHub() {
     })();
 
     return () => { cancelled = true; };
-  }, [activeSection, app, learningNotifications, session]);
+  }, [activeSection, app, load, role, session, unreadNotifications]);
 
   if (!isSupabaseConfigured) return <PortalSetupNotice />;
   if (!isLoaded || loading) return <PortalLoading />;
   if (!workspace || !app) return <div className="flex min-h-[100dvh] items-center justify-center bg-[#f7f3ef] p-5"><EmptyState icon={AlertCircle} title="Workspace unavailable" text={error || "Refresh the app and try again."} /></div>;
   if (!workspace.user?.isAdmin && roleSelection.loading) return <PortalLoading title="Checking your account type" text="Preparing the correct MLS profile setup." />;
-  if (!workspace.user?.isAdmin && roleSelection.selectionRequired) return <PortalRoleSelection user={workspace.user} saving={roleSelection.saving} error={roleSelection.error} onSelect={async (selectedRole) => { await roleSelection.selectRole(selectedRole); setModal(""); await load(true); await roleSelection.load(); }} />;
+  if (!workspace.user?.isAdmin && roleSelection.selectionRequired) return <PortalRoleSelection user={workspace.user} saving={roleSelection.saving} error={roleSelection.error} onSelect={async (selectedRole) => { await roleSelection.selectRole(selectedRole); setModal(""); await load(true); }} />;
   if (needsFirstLoginSetup(role, workspace)) {
     const profile = role === "client" ? workspace.client?.profile : workspace.interpreter?.profile;
     return <FirstLoginSetupWizard role={role} profile={profile} user={workspace.user} onComplete={async () => { setModal(""); await load(true); }} />;

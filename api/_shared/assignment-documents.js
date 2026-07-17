@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { audit, notify } from "./ops-v2-core.js";
 import { driveScope, getGoogleWorkspaceAccessToken, sendGmailEmail } from "./gmail-oauth.js";
+import { brandedPortalEmail } from "./branded-email.js";
 import { ensureAssignmentDriveFolder } from "./assignment-automations.js";
 
 const bucketName = "assignment-documents";
@@ -295,6 +296,14 @@ function documentEmail(assignment, document, sender) {
   const portalUrl = assignmentUrl(assignment.id);
   const label = categoryLabels[document.category] || "Assignment document";
   const senderLabel = uploaderName(sender);
+  const branded = brandedPortalEmail({
+    heading: document.title,
+    intro: `${senderLabel} added or shared a secure assignment document in MLS Portal.`,
+    details: [["Assignment", assignment.service_type], ["Client", assignmentName(assignment)], ["Category", label], ["File", document.file_name]],
+    buttonLabel: "Open secure document center",
+    buttonUrl: portalUrl,
+    footerNote: "The document is intentionally not attached to this email. Sign in to MLS Portal so access remains limited to the appropriate assignment participants.",
+  });
   const text = [
     "Hello,",
     "",
@@ -315,7 +324,7 @@ function documentEmail(assignment, document, sender) {
     supportPhone,
   ].join("\n");
   const html = `<!doctype html><html lang="en"><body style="margin:0;background:#f7f3ef;font-family:Arial,sans-serif;color:#24130e"><div style="max-width:660px;margin:0 auto;padding:28px 14px"><div style="background:#fff;border-radius:24px 24px 0 0;padding:22px 26px"><table role="presentation" width="100%"><tr><td><img src="${escapeHtml(brandLogoUrl)}" alt="Miqueas Language Solutions" width="205" style="display:block;max-width:100%;height:auto"></td><td align="right" style="font-size:12px;line-height:1.6;color:#51453f"><strong style="color:#721100">MLS Portal Support</strong><br>${escapeHtml(supportEmail)}<br>${escapeHtml(supportPhone)}</td></tr></table></div><div style="background:#24130e;color:#fff;padding:24px 28px"><div style="font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#f6b34c">Secure assignment document</div><h1 style="margin:10px 0 0;font-size:28px;line-height:1.25">${escapeHtml(document.title)}</h1></div><div style="background:#fff;border-radius:0 0 24px 24px;padding:28px;box-shadow:0 12px 40px rgba(36,19,14,.10)"><p style="font-size:15px;line-height:1.7;color:#51453f">${escapeHtml(senderLabel)} added or shared a document for <strong>${escapeHtml(assignment.service_type)}</strong>.</p><table role="presentation" width="100%" style="margin:22px 0;padding:14px 18px;border:1px solid #eadfd8;border-radius:18px;background:#fffaf5"><tr><td style="padding:8px 12px 8px 0;font-size:13px;font-weight:700;color:#721100">Client</td><td style="padding:8px 0;font-size:13px;color:#51453f">${escapeHtml(assignmentName(assignment))}</td></tr><tr><td style="padding:8px 12px 8px 0;font-size:13px;font-weight:700;color:#721100">Category</td><td style="padding:8px 0;font-size:13px;color:#51453f">${escapeHtml(label)}</td></tr><tr><td style="padding:8px 12px 8px 0;font-size:13px;font-weight:700;color:#721100">File</td><td style="padding:8px 0;font-size:13px;color:#51453f">${escapeHtml(document.file_name)}</td></tr></table><p style="text-align:center;margin:28px 0"><a href="${escapeHtml(portalUrl)}" style="display:inline-block;background:#721100;color:#fff;text-decoration:none;font-weight:700;padding:14px 22px;border-radius:14px">Open secure document center</a></p><p style="font-size:13px;line-height:1.6;color:#6b625e;background:#f7f3ef;padding:14px 16px;border-radius:14px">The document is intentionally not attached to this email. Sign in to MLS Portal so access remains limited to the appropriate assignment participants.</p></div></div></body></html>`;
-  return { text, html };
+  return branded;
 }
 
 async function sendDocumentEmails(db, assignment, document, sender) {

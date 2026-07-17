@@ -46,6 +46,7 @@ export const SETTING_OPTIONS = [
   "Edu.(Post-Secondary)",
   "Mental Health",
   "Community / Freelance",
+  "General / Community",
   "Platform / Conference",
   "Performance / Arts",
   "Cruise",

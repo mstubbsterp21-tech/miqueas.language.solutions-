@@ -5,6 +5,7 @@ import {
   AtSign,
   Bell,
   Check,
+  Eraser,
   FileText,
   Loader2,
   Megaphone,
@@ -14,6 +15,7 @@ import {
   Plus,
   Send,
   Trash2,
+  Undo2,
   UserPlus,
   Users,
   X,
@@ -512,6 +514,38 @@ export default function CommunicationsCenter({ workspace, onRefresh }) {
     }
   }
 
+  async function conversationAction(action, conversationId, successMessage) {
+    if (!conversationId) return;
+    setSaving(true);
+    setError("");
+    try {
+      await request(action, "POST", { conversationId });
+      setNotice(successMessage);
+      await load(true);
+      await onRefresh?.();
+      if (action === "deleteConversation") setSelectedConversationId("");
+    } catch (actionError) {
+      setError(actionError instanceof Error ? actionError.message : String(actionError));
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function messageAction(action, messageId, successMessage) {
+    setSaving(true);
+    setError("");
+    try {
+      await request(action, "POST", { messageId });
+      setNotice(successMessage);
+      await load(true);
+      await onRefresh?.();
+    } catch (actionError) {
+      setError(actionError instanceof Error ? actionError.message : String(actionError));
+    } finally {
+      setSaving(false);
+    }
+  }
+
   async function uploadFiles(files, context) {
     const uploaded = [];
     for (const file of files) {
@@ -707,6 +741,20 @@ export default function CommunicationsCenter({ workspace, onRefresh }) {
                 </div>
               )}
 
+              {(data?.recentlyDeletedConversations || []).length > 0 && (
+                <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 p-3">
+                  <p className="text-[11px] font-black uppercase tracking-[.12em] text-amber-800">Recently deleted · recover for 10 minutes</p>
+                  <div className="mt-2 space-y-2">
+                    {data.recentlyDeletedConversations.map((conversation) => (
+                      <div key={conversation.id} className="flex items-center justify-between gap-2 rounded-xl bg-white px-3 py-2">
+                        <span className="truncate text-xs font-bold text-slate-700">{conversation.displayTitle}</span>
+                        <button type="button" disabled={saving} onClick={() => conversationAction("restoreDeletedConversation", conversation.id, "Conversation restored.")} className="inline-flex items-center gap-1 text-xs font-black text-[#721100]"><Undo2 size={13} /> Restore</button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <div className="mt-5 max-h-[510px] space-y-2 overflow-y-auto">
                 {conversations.map((conversation) => {
                   const group = conversation.conversation_type === "group";
@@ -792,17 +840,12 @@ export default function CommunicationsCenter({ workspace, onRefresh }) {
                               : `${pretty(selectedConversation.participant?.otherRole)} · Private conversation`}
                           </p>
                         </div>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setTitleDraft(selectedConversation.title || selectedConversation.displayTitle || "");
-                            setEditingTitle(true);
-                          }}
-                          className="inline-flex shrink-0 items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-black text-[#721100] hover:bg-slate-50"
-                        >
-                          <Pencil size={14} />
-                          Rename
-                        </button>
+                        <div className="flex shrink-0 flex-wrap justify-end gap-2">
+                          {selectedConversation.clearedRestoreUntil && new Date(selectedConversation.clearedRestoreUntil).getTime() > Date.now() && <button type="button" disabled={saving} onClick={() => conversationAction("restoreClearedConversation", selectedConversation.id, "Cleared messages restored.")} className="inline-flex items-center gap-2 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-black text-amber-800"><Undo2 size={14} /> Undo clear</button>}
+                          <button type="button" disabled={saving} onClick={() => conversationAction("clearConversation", selectedConversation.id, "Conversation cleared. Undo is available for 10 minutes.")} className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-black text-[#721100] hover:bg-slate-50"><Eraser size={14} /> Clear</button>
+                          <button type="button" disabled={saving} onClick={() => window.confirm(`Delete “${selectedConversation.displayTitle}” from your inbox? You can restore it for 10 minutes.`) && conversationAction("deleteConversation", selectedConversation.id, "Conversation deleted. Restore is available for 10 minutes.")} className="inline-flex items-center gap-2 rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-black text-rose-700"><Trash2 size={14} /> Delete</button>
+                          <button type="button" onClick={() => { setTitleDraft(selectedConversation.title || selectedConversation.displayTitle || ""); setEditingTitle(true); }} className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-black text-[#721100] hover:bg-slate-50"><Pencil size={14} /> Rename</button>
+                        </div>
                       </div>
                     )}
                   </header>
@@ -828,7 +871,9 @@ export default function CommunicationsCenter({ workspace, onRefresh }) {
                                 Mentioned you
                               </span>
                             )}
-                            <MessageText body={item.body} mentions={item.mentions || []} mine={mine} />
+                            {item.isDeleted
+                              ? <p className={cx("italic", mine ? "text-white/70" : "text-slate-400")}>Message deleted</p>
+                              : <MessageText body={item.body} mentions={item.mentions || []} mine={mine} />}
                             {item.attachments?.length > 0 && (
                               <div className="mt-3 flex flex-wrap gap-2">
                                 {item.attachments.map((attachment) => (
@@ -836,7 +881,11 @@ export default function CommunicationsCenter({ workspace, onRefresh }) {
                                 ))}
                               </div>
                             )}
-                            <p className={cx("mt-2 text-[10px]", mine ? "text-white/55" : "text-slate-400")}>{formatDate(item.created_at)}</p>
+                            <div className="mt-2 flex items-center justify-between gap-3">
+                              <p className={cx("text-[10px]", mine ? "text-white/55" : "text-slate-400")}>{formatDate(item.created_at)}</p>
+                              {item.canDelete && <button type="button" disabled={saving} onClick={() => window.confirm("Delete this sent message? You can restore it for 10 minutes.") && messageAction("deleteDirectMessage", item.id, "Message deleted. Restore is available for 10 minutes.")} className={cx("inline-flex items-center gap-1 text-[10px] font-black", mine ? "text-white/75" : "text-rose-700")}><Trash2 size={11} /> Delete</button>}
+                              {item.canRestore && <button type="button" disabled={saving} onClick={() => messageAction("restoreDirectMessage", item.id, "Message restored.")} className={cx("inline-flex items-center gap-1 text-[10px] font-black", mine ? "text-white" : "text-amber-800")}><Undo2 size={11} /> Restore</button>}
+                            </div>
                           </div>
                         </div>
                       );

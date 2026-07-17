@@ -11,6 +11,22 @@ async function realtimeTopic(db, user, role) {
   return `portal-user:${result.data.topic_token}`;
 }
 
+async function homeAnnouncements(db, user, role) {
+  const announcementResult = await db.from("portal_announcements").select("*").order("published_at", { ascending: false }).limit(12);
+  if (announcementResult.error) throw announcementResult.error;
+  const now = Date.now();
+  const announcements = (announcementResult.data || []).filter((item) => {
+    if (role === "admin") return true;
+    if (item.expires_at && new Date(item.expires_at).getTime() < now) return false;
+    return item.audiences?.includes("all") || item.audiences?.includes(role);
+  });
+  if (!announcements.length) return [];
+  const reads = await db.from("portal_announcement_reads").select("announcement_id,read_at").eq("clerk_user_id", user.id).in("announcement_id", announcements.map((item) => item.id));
+  if (reads.error) throw reads.error;
+  const readMap = new Map((reads.data || []).map((item) => [item.announcement_id, item.read_at]));
+  return announcements.map((item) => ({ ...item, read_at: readMap.get(item.id) || null }));
+}
+
 async function loadAdmin(db, user) {
   const personalInterpreter = await interpreterFor(db, user.id);
   const [quotes, invoices, agreements, times, expenses, credentials, availability, onboarding, auditEvents, integrations, profileCustomizations, personalProfileCustomization] = await Promise.all([
@@ -71,7 +87,15 @@ async function loadInterpreter(db, user) {
 }
 
 export async function loadOperationsV2(db, user) {
-  if (user.isAdmin) return loadAdmin(db, user);
+  if (user.isAdmin) {
+    const data = await loadAdmin(db, user);
+    return { ...data, announcements: await homeAnnouncements(db, user, "admin") };
+  }
   const client = await clientFor(db, user.id);
-  return client ? loadClient(db, user) : loadInterpreter(db, user);
+  if (client) {
+    const data = await loadClient(db, user);
+    return { ...data, announcements: await homeAnnouncements(db, user, "client") };
+  }
+  const data = await loadInterpreter(db, user);
+  return { ...data, announcements: await homeAnnouncements(db, user, "interpreter") };
 }

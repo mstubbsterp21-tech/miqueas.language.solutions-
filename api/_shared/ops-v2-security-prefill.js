@@ -1,5 +1,6 @@
 import crypto from "node:crypto";
 import { getGoogleWorkspaceAccessToken, sendGmailEmail } from "./gmail-oauth.js";
+import { brandedPortalEmail } from "./branded-email.js";
 import { sheetsReadonlyScope } from "./workspace-oauth-extension.js";
 
 const spreadsheetId = process.env.INTERPRETER_NETWORK_SHEET_ID || "1iQa-CORVo3lsVBNW2H3xzJxyV1gbL5Wq5k-KAqXM1XE";
@@ -69,11 +70,18 @@ export async function beginPortalDeviceVerification(db, user, req, res, payload 
   });
   if (inserted.error) throw inserted.error;
   appendCookie(res, secureCookie(pendingCookie, pendingToken, 600));
+  const copy = brandedPortalEmail({
+    heading: "Verify this MLS Portal sign-in",
+    intro: "Enter the verification code below in MLS Portal. It expires in 10 minutes.",
+    bodyText: code,
+    buttonLabel: "Return to MLS Portal",
+    buttonUrl: "https://miqueaslanguagesolutions.com/portal",
+    footerNote: "If you did not attempt to sign in, do not share this code and contact Miqueas Language Solutions.",
+  });
   const delivery = await sendGmailEmail(db, {
     to: user.email,
     subject: "Verify your new MLS Portal sign-in",
-    text: `Your MLS Portal verification code is ${code}. It expires in 10 minutes. If you did not attempt to sign in, do not share this code and contact MLS.`,
-    html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:auto;padding:28px"><h1 style="color:#721100">Verify this MLS Portal sign-in</h1><p>Enter this code in MLS Portal:</p><p style="font-size:34px;font-weight:800;letter-spacing:.18em;color:#24130e">${code}</p><p>The code expires in 10 minutes.</p><p style="color:#6b625e">If you did not attempt to sign in, do not share this code and contact Miqueas Language Solutions.</p></div>`,
+    ...copy,
   });
   if (!delivery.sent) return { status: 503, payload: { error: delivery.error || "The verification email could not be sent." } };
   return { status: 200, payload: { sent: true, expiresAt, emailHint: user.email.replace(/^(.{1,2}).*(@.*)$/, "$1•••$2"), label: deviceLabel(req, payload.deviceLabel) } };
