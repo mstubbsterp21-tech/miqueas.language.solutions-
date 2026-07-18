@@ -3,6 +3,7 @@ import { randomUUID } from "node:crypto";
 import { notify } from "./ops-v2-core.js";
 import { sendGmailEmailWithAttachments } from "./gmail-attachments.js";
 import { brandedPortalEmail } from "./branded-email.js";
+import { sendPushNotifications } from "./web-push.js";
 
 const clerkKey = process.env["CLERK_" + "SECRET_KEY"];
 const supportEmail = process.env.EMAIL_SUPPORT_ADDRESS || "m.stubbs@miqueaslanguagesolutions.com";
@@ -481,8 +482,9 @@ export async function publishPortalAnnouncement(db, user, payload) {
   const recipients = await announcementRecipients(db, audiences);
   const notificationRows = recipients.filter((item) => item.clerkUserId !== user.id).map((item) => ({ recipient_clerk_user_id: item.clerkUserId, category: "announcement", title, body: text.slice(0, 240), section: "communications", related_type: "announcement", related_id: inserted.data.id }));
   if (notificationRows.length) {
-    const notificationResult = await db.from("notifications").insert(notificationRows);
+    const notificationResult = await db.from("notifications").insert(notificationRows).select();
     if (notificationResult.error) throw notificationResult.error;
+    await sendPushNotifications(db, notificationResult.data || []).catch((error) => console.warn("MLS announcement push delivery failed", error));
   }
   const copy = brandedPortalEmail({ heading: title, intro: "Miqueas Language Solutions posted a new portal announcement.", bodyText: text, buttonLabel: "Open announcement", buttonUrl: portalUrl({ announcement: inserted.data.id }) });
   const files = await emailAttachments(db, attachments);

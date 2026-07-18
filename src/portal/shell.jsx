@@ -9,6 +9,7 @@ import { PortalSignOutButton } from "../components/AuthStatus";
 import logo from "../logo.png";
 import { InstallAppButton, cx, pretty } from "./ui";
 import TimeZoneSelect from "./TimeZoneSelect";
+import PushNotificationButton from "./PushNotificationButton";
 import { getPortalTimeZone, timeZoneAbbreviation } from "./timezones";
 
 const roleNavigation = {
@@ -104,6 +105,7 @@ export default function AppShell({ role, section, setSection, user, personalizat
         <button type="button" onClick={refresh} disabled={refreshing} className="mb-2 flex min-h-11 w-full items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-black text-white/70 transition hover:bg-white/10 hover:text-white disabled:opacity-50">
           <RefreshCcw size={16} className={refreshing ? "animate-spin" : ""} />Sync now
         </button>
+        <PushNotificationButton />
         <InstallAppButton />
         <div className="mt-2"><PortalSignOutButton /></div>
       </div>

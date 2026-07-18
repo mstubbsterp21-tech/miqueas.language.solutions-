@@ -1,5 +1,6 @@
 import { createClerkClient } from "@clerk/backend";
 import { createClient } from "@supabase/supabase-js";
+import { sendPushNotification } from "./_shared/web-push.js";
 
 const dbUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
 const dbAdminKey = process.env["SUPABASE_" + "SERVICE_ROLE_KEY"];
@@ -88,6 +89,7 @@ async function createNotification(db, recipient, values) {
     related_id: values.relatedId || null,
   }).select().single();
   if (result.error) throw result.error;
+  await sendPushNotification(db, result.data).catch((error) => console.warn("MLS push delivery failed", error));
   return result.data;
 }
 
