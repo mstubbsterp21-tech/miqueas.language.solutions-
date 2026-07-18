@@ -3,10 +3,10 @@ import { CloudSun, Clock3, Eye, EyeOff, GripVertical, LayoutPanelTop, MapPinned,
 import { Modal, cx } from "./ui";
 
 export const PORTAL_WIDGETS = [
-  ["clock", "Date & time", Clock3],
-  ["weather", "Local weather", CloudSun],
-  ["map", "GPS map", MapPinned],
-  ["news", "Interpreter industry news", Newspaper],
+  ["clock", "Date & Time", Clock3],
+  ["weather", "Weather", CloudSun],
+  ["map", "Map", MapPinned],
+  ["news", "News", Newspaper],
 ];
 
 export const LAYOUT_DEFAULTS = {
@@ -15,8 +15,8 @@ export const LAYOUT_DEFAULTS = {
     home: [["hero", "Command center"], ["metrics", "Key metrics"], ["widgets", "Optional widgets"], ["decision_queue", "Decision queue"], ["staffed_schedule", "Staffed schedule"], ["announcements", "Announcements"]],
   },
   client: {
-    nav: [["home", "Home"], ["requests", "Requests"], ["assignments", "Assignments"], ["communications", "Communications"], ["billing", "Billing"], ["documents", "Documents"], ["feedback", "Feedback"], ["profile", "Profile"]],
-    home: [["hero", "Service hub"], ["metrics", "Key metrics"], ["widgets", "Optional widgets"], ["action_queue", "Action queue"], ["upcoming_services", "Upcoming services"], ["announcements", "Announcements"]],
+    nav: [["home", "Home"], ["requests", "Requests"], ["assignments", "Services"], ["communications", "Communications"], ["billing", "Billing"], ["documents", "Documents"], ["feedback", "Feedback"], ["profile", "Profile"]],
+    home: [["hero", "Service hub"], ["metrics", "Key metrics"], ["widgets", "Optional widgets"], ["action_queue", "Action queue"], ["next_service", "Next service"], ["upcoming_services", "Upcoming services"], ["request_roadmap", "How service works"], ["announcements", "Announcements"]],
   },
   interpreter: {
     nav: [["home", "Home"], ["work", "Assignments"], ["payments", "Payments"], ["communications", "Communications"], ["schedule", "Availability"], ["documents", "Documents"], ["learning", "Learning"], ["feedback", "Feedback"], ["profile", "My Profile"]],

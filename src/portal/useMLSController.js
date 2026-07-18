@@ -46,6 +46,7 @@ export default function useMLSController() {
   const [opportunityDraft, setOpportunityDraft] = useState(EMPTY_OPPORTUNITY);
   const [bidDraft, setBidDraft] = useState(EMPTY_BID);
   const [bidOpportunity, setBidOpportunity] = useState(null);
+  const [requestTemplateAssignmentId, setRequestTemplateAssignmentId] = useState("");
   const [selectedAssignmentId, setSelectedAssignmentId] = useState("");
   const [accountType, setAccountType] = useState("");
   const [accountRecordId, setAccountRecordId] = useState("");
@@ -53,6 +54,7 @@ export default function useMLSController() {
   const role = workspace?.user?.isAdmin ? "admin" : app?.role || (workspace?.client ? "client" : "interpreter");
   const allAssignments = app?.assignments || workspace?.admin?.assignments || workspace?.client?.assignments || [];
   const selectedAssignment = allAssignments.find((item) => item.id === selectedAssignmentId) || null;
+  const requestTemplateAssignment = allAssignments.find((item) => item.id === requestTemplateAssignmentId) || null;
   const accountRecord = accountType === "client"
     ? workspace?.admin?.clients?.find((item) => item.id === accountRecordId) || null
     : workspace?.admin?.interpreters?.find((item) => item.id === accountRecordId) || null;
@@ -504,6 +506,16 @@ export default function useMLSController() {
     setModal("assignment");
   }
 
+  function openNewRequest() {
+    setRequestTemplateAssignmentId("");
+    setModal("request");
+  }
+
+  function openRepeatRequest(assignment) {
+    setRequestTemplateAssignmentId(assignment?.id || "");
+    setModal("request");
+  }
+
   function openAccount(type, record) {
     setAccountType(type);
     setAccountRecordId(record.id);
@@ -518,7 +530,9 @@ export default function useMLSController() {
   const actions = {
     go: setSection,
     openProfile: openOwnProfile,
-    openRequest: () => setModal("request"),
+    openRequest: openNewRequest,
+    openRepeatRequest,
+    closeModal: () => setModal(""),
     openFeedback: () => setModal("feedback"),
     openInvite: () => setModal("invite"),
     openDocumentRequest: () => setModal("documentRequest"),
@@ -554,7 +568,7 @@ export default function useMLSController() {
     feedbackDraft, setFeedbackDraft, inviteDraft, setInviteDraft,
     documentRequestDraft, setDocumentRequestDraft, courseDraft, setCourseDraft,
     opportunityDraft, setOpportunityDraft, bidDraft, setBidDraft, bidOpportunity,
-    selectedAssignment, accountType, accountRecord, actions,
+    selectedAssignment, requestTemplateAssignment, accountType, accountRecord, actions,
     saveProfile, submitAssignment, submitFeedback, inviteUser, createDocumentRequest,
     saveCourse, publishOpportunity, submitBid,
   };
