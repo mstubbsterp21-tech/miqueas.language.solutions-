@@ -16,6 +16,14 @@ import {
 } from "lucide-react";
 import { PortalSignOutButton } from "../components/AuthStatus";
 import logo from "../logo.png";
+import {
+  applyRequestDefaultsToClient,
+  INTERPRETER_REQUEST_ADDITIONAL_CONSIDERATION_OPTIONS,
+  INTERPRETER_REQUEST_COMMUNICATION_STYLE_OPTIONS,
+  INTERPRETER_REQUEST_SERVICE_OPTIONS,
+  INTERPRETER_REQUEST_SETTING_OPTIONS,
+  requestDefaultsFromClient,
+} from "../requestFormConfig";
 import { createMLSApi } from "./api";
 import {
   CREDENTIAL_OPTIONS,
@@ -138,6 +146,16 @@ function clientStepErrors(step, draft) {
     ].filter(([field]) => !present(draft[field])).map(([, label]) => label);
   }
   if (step === 1 && !present(draft.billing_email)) return ["Billing email"];
+  if (step === 2) {
+    const defaults = requestDefaultsFromClient(draft);
+    const missing = [];
+    if (!present(defaults.serviceNeeded)) missing.push("Default service");
+    if (!present(defaults.setting)) missing.push("Default setting");
+    if (defaults.setting === "Other" && !present(defaults.settingOther)) missing.push("Other setting description");
+    if (defaults.communicationStyles.includes("Other") && !present(defaults.communicationStyleOther)) missing.push("Other communication style");
+    if (defaults.additionalConsiderations.includes("Other") && !present(defaults.additionalConsiderationsOther)) missing.push("Other additional consideration");
+    return missing;
+  }
   return [];
 }
 
@@ -226,6 +244,17 @@ function Pills({ options, value, onToggle }) {
   );
 }
 
+function RequestPills({ options, values = [], onToggle }) {
+  return (
+    <div className="flex flex-wrap gap-2">
+      {options.map((option) => {
+        const active = values.includes(option);
+        return <button key={option} type="button" onClick={() => onToggle(option)} className={cx("rounded-full border px-3 py-2 text-xs font-black transition", active ? "border-[#dd7d00] bg-[#fff4df] text-[#721100] shadow-sm" : "border-slate-200 bg-white text-slate-600 hover:border-[#dd7d00]/50 hover:text-[#721100]")}>{active && <Check size={13} className="mr-1 inline" />}{option}</button>;
+      })}
+    </div>
+  );
+}
+
 function StepRail({ steps, step, setStep }) {
   return (
     <div className="mls-hide-scrollbar -mx-2 flex snap-x snap-mandatory gap-2 overflow-x-auto px-2 pb-2 md:mx-0 md:grid md:grid-cols-2 md:overflow-visible md:px-0 md:pb-0 xl:grid-cols-4">
@@ -249,6 +278,17 @@ function StepRail({ steps, step, setStep }) {
 
 function ClientSteps({ step, draft, setDraft }) {
   const set = (field) => (event) => setDraft((current) => ({ ...current, [field]: event.target.value }));
+  const defaults = requestDefaultsFromClient(draft);
+  const setDefault = (field, value) => setDraft((current) => applyRequestDefaultsToClient(current, { ...requestDefaultsFromClient(current), [field]: value }));
+  const toggleDefault = (field, option) => setDraft((current) => {
+    const currentDefaults = requestDefaultsFromClient(current);
+    const values = currentDefaults[field] || [];
+    const next = values.includes(option) ? values.filter((item) => item !== option) : [...values, option];
+    const patch = { ...currentDefaults, [field]: next };
+    if (field === "communicationStyles" && option === "Other" && !next.includes("Other")) patch.communicationStyleOther = "";
+    if (field === "additionalConsiderations" && option === "Other" && !next.includes("Other")) patch.additionalConsiderationsOther = "";
+    return applyRequestDefaultsToClient(current, patch);
+  });
   if (step === 0) {
     return (
       <div className="grid gap-4 md:grid-cols-2">
@@ -276,12 +316,19 @@ function ClientSteps({ step, draft, setDraft }) {
     );
   }
   return (
-    <div className="grid gap-4 md:grid-cols-2">
-      <Field label="Default service"><Select value={draft.default_service_type} onChange={set("default_service_type")} options={["ASL/English Interpreting", "Certified Deaf Interpreter Team", "DeafBlind / ProTactile Access", "ASL Video Translation"]} /></Field>
-      <Field label="Default delivery"><Select value={draft.default_delivery_mode} onChange={set("default_delivery_mode")} options={["On-site", "VRI", "Hybrid"]} /></Field>
-      <Field label="Communication preferences" className="md:col-span-2" help="Share anything MLS should know about how your organization prefers to communicate."><textarea className={cx(INPUT, "min-h-32 resize-y")} value={draft.communication_preferences || ""} onChange={set("communication_preferences")} /></Field>
+    <div className="grid gap-5 md:grid-cols-2">
+      <Field label="Default service" required help="Matches Service Needed on the Interpreter Request Form."><Select value={defaults.serviceNeeded} onChange={(event) => setDefault("serviceNeeded", event.target.value)} options={INTERPRETER_REQUEST_SERVICE_OPTIONS} /></Field>
+      <Field label="Default Settings" required help="Choose the setting your organization requests most often."><Select value={defaults.setting} onChange={(event) => setDefault("setting", event.target.value)} options={INTERPRETER_REQUEST_SETTING_OPTIONS} /></Field>
+      {defaults.setting === "Other" && <Field label="Describe the other default setting" required className="md:col-span-2"><input className={INPUT} value={defaults.settingOther} onChange={(event) => setDefault("settingOther", event.target.value)} placeholder="Describe the community, event, or environment" /></Field>}
+      <Field label="Default communication style(s)" className="md:col-span-2" help="Choose any communication styles that are commonly requested. You can change these on every request."><RequestPills options={INTERPRETER_REQUEST_COMMUNICATION_STYLE_OPTIONS} values={defaults.communicationStyles} onToggle={(option) => toggleDefault("communicationStyles", option)} /></Field>
+      {defaults.communicationStyles.includes("Other") && <Field label="Other communication style" required className="md:col-span-2"><input className={INPUT} value={defaults.communicationStyleOther} onChange={(event) => setDefault("communicationStyleOther", event.target.value)} /></Field>}
+      <Field label="Hearing participants’ primary language(s)" help="Add a reusable default only if it is normally consistent."><input className={INPUT} value={defaults.hearingParticipantsLanguages} onChange={(event) => setDefault("hearingParticipantsLanguages", event.target.value)} placeholder="English, Spanish..." /></Field>
+      <Field label="CDI or additional support" help="Select the answer your organization uses most often."><Select value={defaults.cdiOrAdditionalSupportNeeded} onChange={(event) => setDefault("cdiOrAdditionalSupportNeeded", event.target.value)} options={["Yes", "No", "Not sure"]} /></Field>
+      <Field label="Default additional considerations" className="md:col-span-2" help="Select recurring access considerations. Do not add consumer-specific details here."><RequestPills options={INTERPRETER_REQUEST_ADDITIONAL_CONSIDERATION_OPTIONS} values={defaults.additionalConsiderations} onToggle={(option) => toggleDefault("additionalConsiderations", option)} /></Field>
+      {defaults.additionalConsiderations.includes("Other") && <Field label="Other additional consideration" required className="md:col-span-2"><input className={INPUT} value={defaults.additionalConsiderationsOther} onChange={(event) => setDefault("additionalConsiderationsOther", event.target.value)} /></Field>}
+      <Field label="Reusable communication & access notes" className="md:col-span-2" help="Share stable organization-level preferences, contact procedures, or access guidance."><textarea className={cx(INPUT, "min-h-28 resize-y")} value={defaults.communicationNotes} onChange={(event) => setDefault("communicationNotes", event.target.value)} /></Field>
       <div className="md:col-span-2 rounded-2xl border border-[#dd7d00]/25 bg-[#fff8ec] p-4 text-sm leading-6 text-slate-600">
-        After setup, use <strong>Requests</strong> to submit assignment details. You do not need to enter consumer-specific or confidential assignment information here.
+        These values prefill the same fields used on the website’s <strong>Interpreter Request Form</strong>. You can change them for each request. Do not enter consumer names, dates, locations, or confidential assignment details here.
       </div>
     </div>
   );
@@ -395,7 +442,7 @@ export default function FirstLoginSetupWizard({ role, profile, user, onComplete 
   const savedDraft = (() => {
     try { return JSON.parse(localStorage.getItem(storageKey) || "null") || {}; } catch { return {}; }
   })();
-  const [draft, setDraft] = useState({
+  const seedDraft = {
     ...defaults,
     ...(profile || {}),
     ...savedDraft,
@@ -409,7 +456,8 @@ export default function FirstLoginSetupWizard({ role, profile, user, onComplete 
     availability_status: savedDraft.availability_status || profile?.availability_status || defaults.availability_status || "contact_me",
     availability_timezone: normalizeUSTimeZone(savedDraft.availability_timezone || profile?.availability_timezone || detectedUSTimeZone()),
     areas_of_experience: normalizedExperience(savedDraft.areas_of_experience || profile?.areas_of_experience || defaults.areas_of_experience),
-  });
+  };
+  const [draft, setDraft] = useState(role === "client" ? applyRequestDefaultsToClient(seedDraft, requestDefaultsFromClient(seedDraft)) : seedDraft);
   const initialStep = Math.min(Math.max(Number(profile?.setup_current_step || 0), 0), steps.length - 1);
   const [step, setStep] = useState(initialStep);
   const [saving, setSaving] = useState(false);
@@ -431,7 +479,7 @@ export default function FirstLoginSetupWizard({ role, profile, user, onComplete 
     try {
       const profileForSave = role === "interpreter"
         ? { ...draft, credentials: credentialsForSubmission(draft.credentials, draft.other_credential) }
-        : draft;
+        : applyRequestDefaultsToClient(draft, requestDefaultsFromClient(draft));
       const result = await api.setup("save", "POST", {
         role,
         step: nextStep,

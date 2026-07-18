@@ -1,5 +1,6 @@
 import { audit } from "./ops-v2-core.js";
 import { removeAssignmentWorkspaceRecords, syncAssignmentWorkspaceRecord } from "./assignment-workspace-records.js";
+import { INTERPRETER_REQUEST_SERVICE_OPTIONS, INTERPRETER_REQUEST_SETTING_OPTIONS } from "../../src/requestFormConfig.js";
 
 const editableFields = [
   "service_type", "delivery_mode", "start_at", "end_at", "timezone", "location_name",
@@ -7,6 +8,7 @@ const editableFields = [
   "deaf_participants", "hearing_participants", "language_preferences", "specialty",
   "team_requested", "cdi_requested", "onsite_contact_name", "onsite_contact_phone",
   "description", "preparation_materials", "purchase_order_number", "client_reference",
+  "request_source", "request_form_version", "request_form_data",
 ];
 
 function cleanAssignment(input = {}) {
@@ -39,6 +41,14 @@ export async function adminUpdateFullAssignment(db, user, payload) {
   if (Object.prototype.hasOwnProperty.call(updates, "service_type") && !updates.service_type) return { status: 400, payload: { error: "Service type is required." } };
   if (Object.prototype.hasOwnProperty.call(updates, "delivery_mode") && !updates.delivery_mode) return { status: 400, payload: { error: "Delivery mode is required." } };
   if (Object.prototype.hasOwnProperty.call(updates, "start_at") && !updates.start_at) return { status: 400, payload: { error: "Start time is required." } };
+  if (updates.request_form_data) {
+    const request = updates.request_form_data;
+    if (typeof request !== "object" || Array.isArray(request)) return { status: 400, payload: { error: "The complete Interpreter Request form is required." } };
+    if (!INTERPRETER_REQUEST_SERVICE_OPTIONS.includes(request.serviceNeeded) || !INTERPRETER_REQUEST_SETTING_OPTIONS.includes(request.setting)) {
+      return { status: 400, payload: { error: "Choose a service and setting from the current Interpreter Request Form." } };
+    }
+    if (request.setting === "Other" && !String(request.settingOther || "").trim()) return { status: 400, payload: { error: "Describe the other assignment setting." } };
+  }
   const before = await assignmentRecord(db, payload.assignmentId);
   if (!before) return { status: 404, payload: { error: "Assignment not found." } };
   const result = await db.from("assignments")

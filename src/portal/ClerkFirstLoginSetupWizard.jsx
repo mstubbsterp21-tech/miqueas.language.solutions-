@@ -33,6 +33,7 @@ export default function ClerkFirstLoginSetupWizard(props) {
         const token = await session.getToken();
         const response = await fetch("/api/operations-v2?action=interpreterNetworkPrefill", { headers: { Authorization: `Bearer ${token}` } });
         const result = await response.json().catch(() => ({}));
+        if (response.status === 403 && result.error === "Interpreter access required.") return;
         if (!response.ok) throw new Error(result.error || "Interpreter Network prefill could not be loaded.");
         if (!active) return;
         if (result.matched) { setPrefill(result.prefill || {}); setSource(result.source || "MLS Interpreter Network form"); }

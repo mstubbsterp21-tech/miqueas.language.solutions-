@@ -1,6 +1,12 @@
 import { useMemo, useState } from "react";
 import TimeZoneSelect from "../portal/TimeZoneSelect";
 import { getPortalTimeZone, timeZoneAbbreviation, timeZoneLabel } from "../portal/timezones";
+import {
+  INTERPRETER_REQUEST_ADDITIONAL_CONSIDERATION_OPTIONS,
+  INTERPRETER_REQUEST_COMMUNICATION_STYLE_OPTIONS,
+  INTERPRETER_REQUEST_SERVICE_OPTIONS,
+  INTERPRETER_REQUEST_SETTING_OPTIONS,
+} from "../requestFormConfig";
 
 const defaultPalette = {
   burgundy: "#721100",
@@ -11,44 +17,13 @@ const defaultPalette = {
   border: "#e5e5e5",
 };
 
-const serviceOptions = [
-  "In-Person Interpreting",
-  "Video Remote Interpreting",
-  "ASL Video Translation (English → ASL)",
-  "ASL Content Translation (ASL → English)",
-];
+const serviceOptions = INTERPRETER_REQUEST_SERVICE_OPTIONS;
 
-const settingOptions = [
-  "Medical",
-  "Legal",
-  "Edu. K-12",
-  "Edu. Post Secondary",
-  "Cruise",
-  "Mental Health",
-  "General / Community",
-  "Business",
-  "Platform / Conference",
-  "Performance / Artistic",
-  "Other",
-];
+const settingOptions = INTERPRETER_REQUEST_SETTING_OPTIONS;
 
-const communicationStyleOptions = [
-  "ASL (American Sign Language)",
-  "PTASL (Pro-Tactile ASL)",
-  "CASE (Conceptually Accurate Signed English)",
-  "MCE (Manually Coded English)",
-  "Cued Speech",
-  "Other",
-];
+const communicationStyleOptions = INTERPRETER_REQUEST_COMMUNICATION_STYLE_OPTIONS;
 
-const additionalConsiderationOptions = [
-  "DeafBlind",
-  "Low Vision",
-  "Low Mobility",
-  "Language still developing / non-standard language use",
-  "Uses a foreign sign language",
-  "Other",
-];
+const additionalConsiderationOptions = INTERPRETER_REQUEST_ADDITIONAL_CONSIDERATION_OPTIONS;
 
 function calculateDuration(startTime, endTime) {
   if (!startTime || !endTime) return "";

@@ -5,6 +5,7 @@ import {
   Palette, Pencil, Plus, Save, Settings2, ShieldCheck, Sparkles, Trash2,
   Upload, UserRound, X,
 } from "lucide-react";
+import { displayRequestSetting, requestDefaultsFromClient } from "../requestFormConfig";
 import { Badge, Field, INPUT, cx, pretty } from "./ui";
 
 const THEMES = [
@@ -111,10 +112,11 @@ function SectionCard({ section, theme, dark }) {
 
 function sectionsFor(profileType, profile) {
   if (profileType === "client") {
+    const defaults = requestDefaultsFromClient(profile);
     return [
       { key: "about", label: "About", icon: Building2, items: [["Industry", profile.industry], ["Primary contact", profile.primary_contact_name]] },
       { key: "contact", label: "Contact", icon: UserRound, items: [["Email", profile.email], ["Phone", profile.phone], ["Preferred contact", profile.preferred_contact_method]] },
-      { key: "services", label: "Service preferences", icon: BriefcaseBusiness, items: [["Default service", profile.default_service_type], ["Delivery mode", profile.default_delivery_mode], ["Communication preferences", profile.communication_preferences]] },
+      { key: "services", label: "Request defaults", icon: BriefcaseBusiness, items: [["Default service", defaults.serviceNeeded], ["Default setting", displayRequestSetting(defaults)], ["Communication styles", defaults.communicationStyles.join(", ")], ["Hearing languages", defaults.hearingParticipantsLanguages], ["Additional considerations", defaults.additionalConsiderations.join(", ")], ["CDI / additional support", defaults.cdiOrAdditionalSupportNeeded], ["Communication & access notes", defaults.communicationNotes]] },
       { key: "billing", label: "Billing", icon: CircleDollarSign, privateSection: true, items: [["Billing email", profile.billing_email], ["Billing phone", profile.billing_phone], ["Billing notes", profile.billing_notes], ["Billing address", [profile.address_line_1, profile.address_line_2, profile.city, profile.state, profile.postal_code].filter(Boolean).join(", ")]] },
     ];
   }

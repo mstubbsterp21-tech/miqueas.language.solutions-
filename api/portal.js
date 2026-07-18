@@ -34,7 +34,7 @@ const allowedClientProfileFields = [
   "organization_name", "primary_contact_name", "phone", "preferred_contact_method", "billing_email",
   "billing_phone", "address_line_1", "address_line_2", "city", "state", "postal_code", "country",
   "industry", "default_service_type", "default_delivery_mode", "communication_preferences",
-  "billing_notes", "account_status",
+  "request_defaults", "billing_notes", "account_status",
 ];
 
 const allowedAssignmentFields = [
@@ -43,6 +43,7 @@ const allowedAssignmentFields = [
   "deaf_participants", "hearing_participants", "language_preferences", "specialty",
   "team_requested", "cdi_requested", "onsite_contact_name", "onsite_contact_phone",
   "description", "preparation_materials", "purchase_order_number", "client_reference",
+  "request_source", "request_form_version", "request_form_data",
 ];
 
 function sendJson(res, status, payload) {

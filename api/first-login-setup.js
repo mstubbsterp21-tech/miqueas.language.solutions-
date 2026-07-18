@@ -1,4 +1,5 @@
 import { createClerkClient } from "@clerk/backend";
+import { INTERPRETER_REQUEST_SERVICE_OPTIONS, INTERPRETER_REQUEST_SETTING_OPTIONS } from "../src/requestFormConfig.js";
 import {
   audit,
   clientFor,
@@ -29,6 +30,7 @@ const clientFields = [
   "default_service_type",
   "default_delivery_mode",
   "communication_preferences",
+  "request_defaults",
 ];
 
 const interpreterFields = [
@@ -128,7 +130,16 @@ function clientMissing(profile) {
     ["preferred_contact_method", "Preferred contact method"],
     ["billing_email", "Billing email"],
   ];
-  return required.filter(([field]) => !present(profile[field])).map(([, label]) => label);
+  const missing = required.filter(([field]) => !present(profile[field])).map(([, label]) => label);
+  const requestDefaults = profile.request_defaults && typeof profile.request_defaults === "object" && !Array.isArray(profile.request_defaults)
+    ? profile.request_defaults
+    : {};
+  if (!present(requestDefaults.serviceNeeded)) missing.push("Default service");
+  else if (!INTERPRETER_REQUEST_SERVICE_OPTIONS.includes(requestDefaults.serviceNeeded)) missing.push("Valid default service");
+  if (!present(requestDefaults.setting)) missing.push("Default setting");
+  else if (!INTERPRETER_REQUEST_SETTING_OPTIONS.includes(requestDefaults.setting)) missing.push("Valid default setting");
+  if (requestDefaults.setting === "Other" && !present(requestDefaults.settingOther)) missing.push("Other setting description");
+  return missing;
 }
 
 function interpreterMissing(profile) {

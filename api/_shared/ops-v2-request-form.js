@@ -1,4 +1,5 @@
 import { audit, clientFor } from "./ops-v2-core.js";
+import { INTERPRETER_REQUEST_SERVICE_OPTIONS, INTERPRETER_REQUEST_SETTING_OPTIONS } from "../../src/requestFormConfig.js";
 
 const allowedFields = new Set([
   "service_type", "delivery_mode", "start_at", "end_at", "timezone", "location_name",
@@ -27,6 +28,21 @@ function newClientPreferences(request = {}) {
     request.communicationNotes ? `Notes: ${request.communicationNotes}` : "",
     request.cdiOrAdditionalSupportNeeded ? `CDI / additional support: ${request.cdiOrAdditionalSupportNeeded}` : "",
   ].filter(Boolean).join("\n");
+}
+
+function newClientRequestDefaults(request = {}) {
+  return {
+    serviceNeeded: request.serviceNeeded || "",
+    setting: request.setting || "",
+    settingOther: request.settingOther || "",
+    communicationStyles: Array.isArray(request.communicationStyles) ? request.communicationStyles : [],
+    communicationStyleOther: request.communicationStyleOther || "",
+    hearingParticipantsLanguages: request.hearingParticipantsLanguages || "",
+    additionalConsiderations: Array.isArray(request.additionalConsiderations) ? request.additionalConsiderations : [],
+    additionalConsiderationsOther: request.additionalConsiderationsOther || "",
+    cdiOrAdditionalSupportNeeded: request.cdiOrAdditionalSupportNeeded || "",
+    communicationNotes: request.communicationNotes || "",
+  };
 }
 
 async function existingClient(db, user, clientId) {
@@ -82,8 +98,9 @@ async function createNewClient(db, user, request = {}, assignment = {}) {
     billing_address_text: billingAddress,
     country: "United States",
     default_service_type: request.serviceNeeded || assignment.service_type || null,
-    default_delivery_mode: assignment.delivery_mode || null,
+    default_delivery_mode: request.setting === "Other" && request.settingOther ? `Other: ${request.settingOther}` : request.setting || null,
     communication_preferences: newClientPreferences(request) || null,
+    request_defaults: newClientRequestDefaults(request),
     onboarding_complete: false,
     account_status: "active",
     updated_at: new Date().toISOString(),
@@ -99,6 +116,13 @@ export async function createRequestAssignment(db, user, payload = {}) {
   }
   if (!assignment.request_form_data || typeof assignment.request_form_data !== "object" || Array.isArray(assignment.request_form_data)) {
     return { status: 400, payload: { error: "The complete Interpreter Request form is required." } };
+  }
+  const request = assignment.request_form_data;
+  if (!INTERPRETER_REQUEST_SERVICE_OPTIONS.includes(request.serviceNeeded) || !INTERPRETER_REQUEST_SETTING_OPTIONS.includes(request.setting)) {
+    return { status: 400, payload: { error: "Choose a service and setting from the current Interpreter Request Form." } };
+  }
+  if (request.setting === "Other" && !String(request.settingOther || "").trim()) {
+    return { status: 400, payload: { error: "Describe the other assignment setting." } };
   }
 
   const creatingNewClient = user.isAdmin && payload.clientMode === "new";

@@ -1,6 +1,11 @@
 import ExistingClientInterpreterRequestForm from "../components/ExistingClientInterpreterRequestForm";
 import InterpreterRequestFormShared from "../components/InterpreterRequestFormShared";
-import { getPortalTimeZone, zonedDateTimeToUtc } from "./timezones";
+import {
+  normalizeRequestService,
+  normalizeRequestSetting,
+  requestDefaultsFromClient,
+} from "../requestFormConfig";
+import { getPortalTimeZone, zonedDateTimeToUtc, zonedInputValue } from "./timezones";
 
 function assembledAddress(client = {}) {
   return [
@@ -11,44 +16,11 @@ function assembledAddress(client = {}) {
   ].filter(Boolean).join("\n");
 }
 
-function preferredService(client = {}) {
-  const service = String(client.default_service_type || "").toLowerCase();
-  const delivery = String(client.default_delivery_mode || "").toLowerCase();
-  if (service.includes("content translation") || service.includes("asl → english") || service.includes("asl > english")) return "ASL Content Translation (ASL → English)";
-  if (service.includes("video translation") || service.includes("english → asl") || service.includes("english > asl")) return "ASL Video Translation (English → ASL)";
-  if (delivery.includes("vri") || delivery.includes("virtual") || service.includes("video remote")) return "Video Remote Interpreting";
-  if (delivery.includes("on-site") || delivery.includes("onsite") || service.includes("interpreting")) return "In-Person Interpreting";
-  return "";
-}
-
-function savedCommunicationStyles(text = "") {
-  const rules = [
-    [/\bptasl\b|pro[- ]?tactile/i, "PTASL (Pro-Tactile ASL)"],
-    [/\bcase\b|conceptually accurate signed english/i, "CASE (Conceptually Accurate Signed English)"],
-    [/\bmce\b|manually coded english/i, "MCE (Manually Coded English)"],
-    [/cued speech/i, "Cued Speech"],
-    [/\basl\b|american sign language/i, "ASL (American Sign Language)"],
-  ];
-  return rules.filter(([pattern]) => pattern.test(text)).map(([, label]) => label);
-}
-
-function savedAdditionalConsiderations(text = "") {
-  const rules = [
-    [/deafblind/i, "DeafBlind"],
-    [/low vision/i, "Low Vision"],
-    [/low mobility|mobility/i, "Low Mobility"],
-    [/language still developing|language development|non-standard language/i, "Language still developing / non-standard language use"],
-    [/foreign sign|foreign sign language/i, "Uses a foreign sign language"],
-  ];
-  return rules.filter(([pattern]) => pattern.test(text)).map(([, label]) => label);
-}
-
 export function initialValuesFromClient(client = {}) {
   const physicalAddress = client.physical_address_text || assembledAddress(client);
   const billingAddress = client.billing_address_text || physicalAddress;
   const email = client.billing_email || client.email || "";
-  const savedPreferences = String(client.communication_preferences || "").trim();
-  const cdiPreference = /certified deaf interpreter|\bcdi\b/i.test(`${client.default_service_type || ""} ${savedPreferences}`);
+  const defaults = requestDefaultsFromClient(client);
   return {
     emailCapture: email,
     fullName: client.primary_contact_name || "",
@@ -58,12 +30,57 @@ export function initialValuesFromClient(client = {}) {
     billingAddress,
     contactEmail: email,
     phoneNumber: client.phone || client.billing_phone || "",
-    serviceNeeded: preferredService(client),
-    communicationStyles: savedCommunicationStyles(savedPreferences),
-    additionalConsiderations: savedAdditionalConsiderations(savedPreferences),
-    communicationNotes: savedPreferences,
-    cdiOrAdditionalSupportNeeded: cdiPreference ? "Yes" : "",
+    ...defaults,
     timeZone: getPortalTimeZone(),
+  };
+}
+
+function assignmentLocation(assignment = {}) {
+  if (assignment.meeting_link) return assignment.meeting_link;
+  return [
+    assignment.location_name,
+    assignment.address_line_1,
+    assignment.address_line_2,
+    [assignment.city, assignment.state, assignment.postal_code].filter(Boolean).join(", "),
+  ].filter(Boolean).join("\n");
+}
+
+export function initialValuesFromAssignment(assignment = {}, client = {}) {
+  const saved = assignment.request_form_data && typeof assignment.request_form_data === "object" && !Array.isArray(assignment.request_form_data)
+    ? assignment.request_form_data
+    : {};
+  const timeZone = assignment.timezone || saved.timeZone || getPortalTimeZone();
+  const start = zonedInputValue(assignment.start_at, timeZone).split("T");
+  const end = zonedInputValue(assignment.end_at, timeZone).split("T");
+  const setting = normalizeRequestSetting(assignment.specialty || saved.setting);
+  const legacyDefaults = requestDefaultsFromClient({
+    default_service_type: assignment.service_type,
+    default_delivery_mode: assignment.specialty,
+    communication_preferences: assignment.language_preferences,
+  });
+  const clientDefaults = initialValuesFromClient(client);
+  const knownParticipants = [assignment.deaf_participants, assignment.hearing_participants]
+    .filter((value) => value !== null && value !== undefined && value !== "")
+    .map(Number)
+    .filter(Number.isFinite);
+
+  return {
+    ...clientDefaults,
+    ...saved,
+    serviceNeeded: normalizeRequestService(assignment.service_type || saved.serviceNeeded, assignment.delivery_mode),
+    setting: setting.setting || saved.setting || "",
+    settingOther: setting.settingOther || saved.settingOther || "",
+    assignmentDate: start[0] || saved.assignmentDate || "",
+    startTime: start[1] || saved.startTime || "",
+    endTime: end[1] || saved.endTime || "",
+    timeZone,
+    assignmentLocationPlatform: assignmentLocation(assignment) || saved.assignmentLocationPlatform || "",
+    participantCount: saved.participantCount || (knownParticipants.length ? String(knownParticipants.reduce((sum, value) => sum + value, 0)) : ""),
+    communicationStyles: Array.isArray(saved.communicationStyles) && saved.communicationStyles.length ? saved.communicationStyles : legacyDefaults.communicationStyles.length ? legacyDefaults.communicationStyles : clientDefaults.communicationStyles,
+    additionalConsiderations: Array.isArray(saved.additionalConsiderations) && saved.additionalConsiderations.length ? saved.additionalConsiderations : legacyDefaults.additionalConsiderations.length ? legacyDefaults.additionalConsiderations : clientDefaults.additionalConsiderations,
+    cdiOrAdditionalSupportNeeded: saved.cdiOrAdditionalSupportNeeded || (assignment.cdi_requested ? "Yes" : ""),
+    exceedsTwoHours: saved.exceedsTwoHours || (assignment.team_requested ? "Yes" : ""),
+    assignmentDescription: assignment.description || saved.assignmentDescription || "",
   };
 }
 
@@ -98,6 +115,11 @@ export function portalAssignmentFromRequest(request, source = "client_portal") {
     end_at: localDateTimeToIso(request.assignmentDate, request.endTime, timezone),
     timezone,
     location_name: location,
+    address_line_1: null,
+    address_line_2: null,
+    city: null,
+    state: null,
+    postal_code: null,
     meeting_link: isUrl ? location : null,
     deaf_participants: null,
     hearing_participants: null,
@@ -122,8 +144,10 @@ export default function PortalInterpreterRequestForm({
   source = "client_portal",
   onSubmit,
   existingClient = Boolean(client?.id),
+  initialValues: suppliedInitialValues,
+  submitLabel = "Submit Request",
 }) {
-  const initialValues = initialValuesFromClient(client || {});
+  const initialValues = suppliedInitialValues || initialValuesFromClient(client || {});
 
   async function submit(request) {
     const assignment = portalAssignmentFromRequest(request, source);
@@ -135,6 +159,7 @@ export default function PortalInterpreterRequestForm({
     onSubmitRequest: submit,
     successTitle: "Request Submitted",
     successMessage: "Your request has been added to the MLS Portal and is ready for review.",
+    submitLabel,
   };
 
   return existingClient

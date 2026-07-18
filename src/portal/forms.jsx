@@ -1,6 +1,14 @@
 import { Loader2, Save, Send } from "lucide-react";
+import {
+  applyRequestDefaultsToClient,
+  EMPTY_CLIENT_REQUEST_DEFAULTS,
+  INTERPRETER_REQUEST_ADDITIONAL_CONSIDERATION_OPTIONS,
+  INTERPRETER_REQUEST_COMMUNICATION_STYLE_OPTIONS,
+  INTERPRETER_REQUEST_SERVICE_OPTIONS,
+  INTERPRETER_REQUEST_SETTING_OPTIONS,
+  requestDefaultsFromClient,
+} from "../requestFormConfig";
 import { Field, INPUT, cx, formatDate } from "./ui";
-import TimeZoneSelect from "./TimeZoneSelect";
 import { getPortalTimeZone, timeZoneAbbreviation } from "./timezones";
 
 export const CLIENT_DOCUMENTS = [
@@ -79,9 +87,10 @@ export const EMPTY_CLIENT = {
   postal_code: "",
   country: "United States",
   industry: "",
-  default_service_type: "ASL/English Interpreting",
-  default_delivery_mode: "On-site",
+  default_service_type: "",
+  default_delivery_mode: "",
   communication_preferences: "",
+  request_defaults: { ...EMPTY_CLIENT_REQUEST_DEFAULTS },
   billing_notes: "",
 };
 
@@ -112,7 +121,7 @@ export const EMPTY_INTERPRETER = {
 };
 
 export const EMPTY_ASSIGNMENT = {
-  service_type: "ASL/English Interpreting",
+  service_type: "In-Person Interpreting",
   delivery_mode: "On-site",
   start_at: "",
   end_at: "",
@@ -153,6 +162,18 @@ function SaveButton({ saving, label = "Save changes", icon: Icon = Save, classNa
 
 export function ClientProfileForm({ draft, setDraft, submit, saving, admin = false }) {
   const set = (name) => (event) => setDraft({ ...draft, [name]: event.target.value });
+  const defaults = requestDefaultsFromClient(draft);
+  const setDefault = (field, value) => setDraft((current) => applyRequestDefaultsToClient(current, { ...requestDefaultsFromClient(current), [field]: value }));
+  const toggleDefault = (field, option) => setDraft((current) => {
+    const currentDefaults = requestDefaultsFromClient(current);
+    const currentValues = currentDefaults[field] || [];
+    const values = currentValues.includes(option) ? currentValues.filter((item) => item !== option) : [...currentValues, option];
+    const next = { ...currentDefaults, [field]: values };
+    if (field === "communicationStyles" && option === "Other" && !values.includes("Other")) next.communicationStyleOther = "";
+    if (field === "additionalConsiderations" && option === "Other" && !values.includes("Other")) next.additionalConsiderationsOther = "";
+    return applyRequestDefaultsToClient(current, next);
+  });
+  const pills = (options, values, onToggle) => <div className="flex flex-wrap gap-2">{options.map((option) => { const active = values.includes(option); return <button key={option} type="button" onClick={() => onToggle(option)} className={cx("rounded-full border px-3 py-2 text-xs font-black transition", active ? "border-[#dd7d00] bg-[#fff4df] text-[#721100]" : "border-slate-200 bg-white text-slate-600 hover:border-[#dd7d00]/50")}>{active ? "✓ " : ""}{option}</button>; })}</div>;
   return (
     <form onSubmit={submit} className="space-y-7">
       <div className="grid gap-4 md:grid-cols-2">
@@ -170,9 +191,16 @@ export function ClientProfileForm({ draft, setDraft, submit, saving, admin = fal
         <Field name="State"><input className={INPUT} value={draft.state || ""} onChange={set("state")} /></Field>
         <Field name="Postal code"><input className={INPUT} value={draft.postal_code || ""} onChange={set("postal_code")} /></Field>
         <Field name="Country"><input className={INPUT} value={draft.country || ""} onChange={set("country")} /></Field>
-        <Field name="Default service"><select className={INPUT} value={draft.default_service_type || "ASL/English Interpreting"} onChange={set("default_service_type")}><option>ASL/English Interpreting</option><option>Certified Deaf Interpreter Team</option><option>DeafBlind / ProTactile Access</option><option>ASL Video Translation</option></select></Field>
-        <Field name="Default delivery"><select className={INPUT} value={draft.default_delivery_mode || "On-site"} onChange={set("default_delivery_mode")}><option>On-site</option><option>VRI</option><option>Hybrid</option></select></Field>
-        <Field name="Communication preferences" className="md:col-span-2"><textarea className={cx(INPUT, "min-h-24")} value={draft.communication_preferences || ""} onChange={set("communication_preferences")} /></Field>
+        <Field name="Default service" required help="Matches Service Needed on the Interpreter Request Form."><select className={INPUT} required value={defaults.serviceNeeded} onChange={(event) => setDefault("serviceNeeded", event.target.value)}><option value="">Choose</option>{INTERPRETER_REQUEST_SERVICE_OPTIONS.map((option) => <option key={option}>{option}</option>)}</select></Field>
+        <Field name="Default Settings" required help="Choose the setting requested most often."><select className={INPUT} required value={defaults.setting} onChange={(event) => setDefault("setting", event.target.value)}><option value="">Choose</option>{INTERPRETER_REQUEST_SETTING_OPTIONS.map((option) => <option key={option}>{option}</option>)}</select></Field>
+        {defaults.setting === "Other" && <Field name="Describe the other default setting" required className="md:col-span-2"><input className={INPUT} required value={defaults.settingOther} onChange={(event) => setDefault("settingOther", event.target.value)} /></Field>}
+        <Field name="Default communication style(s)" className="md:col-span-2" help="These choices prefill new requests and can be changed per assignment.">{pills(INTERPRETER_REQUEST_COMMUNICATION_STYLE_OPTIONS, defaults.communicationStyles, (option) => toggleDefault("communicationStyles", option))}</Field>
+        {defaults.communicationStyles.includes("Other") && <Field name="Other communication style" required className="md:col-span-2"><input className={INPUT} required value={defaults.communicationStyleOther} onChange={(event) => setDefault("communicationStyleOther", event.target.value)} /></Field>}
+        <Field name="Hearing participants’ primary language(s)"><input className={INPUT} value={defaults.hearingParticipantsLanguages} onChange={(event) => setDefault("hearingParticipantsLanguages", event.target.value)} placeholder="English, Spanish..." /></Field>
+        <Field name="CDI or additional support"><select className={INPUT} value={defaults.cdiOrAdditionalSupportNeeded} onChange={(event) => setDefault("cdiOrAdditionalSupportNeeded", event.target.value)}><option value="">Choose</option>{["Yes", "No", "Not sure"].map((option) => <option key={option}>{option}</option>)}</select></Field>
+        <Field name="Default additional considerations" className="md:col-span-2" help="Select recurring access considerations only.">{pills(INTERPRETER_REQUEST_ADDITIONAL_CONSIDERATION_OPTIONS, defaults.additionalConsiderations, (option) => toggleDefault("additionalConsiderations", option))}</Field>
+        {defaults.additionalConsiderations.includes("Other") && <Field name="Other additional consideration" required className="md:col-span-2"><input className={INPUT} required value={defaults.additionalConsiderationsOther} onChange={(event) => setDefault("additionalConsiderationsOther", event.target.value)} /></Field>}
+        <Field name="Reusable communication & access notes" className="md:col-span-2" help="Add stable organization-level preferences. Keep consumer-specific and confidential details in each request."><textarea className={cx(INPUT, "min-h-24")} value={defaults.communicationNotes} onChange={(event) => setDefault("communicationNotes", event.target.value)} /></Field>
         <Field name="Billing notes" className="md:col-span-2"><textarea className={cx(INPUT, "min-h-24")} value={draft.billing_notes || ""} onChange={set("billing_notes")} /></Field>
       </div>
       <SaveButton saving={saving} />
@@ -210,44 +238,6 @@ export function InterpreterProfileForm({ draft, setDraft, submit, saving, admin 
         {admin && <Field name="Admin notes" className="md:col-span-2"><textarea className={cx(INPUT, "min-h-28")} value={draft.admin_notes || ""} onChange={set("admin_notes")} /></Field>}
       </div>
       <SaveButton saving={saving} />
-    </form>
-  );
-}
-
-export function AssignmentRequestForm({ draft, setDraft, submit, saving }) {
-  const timeZone = draft.timezone || getPortalTimeZone();
-  const zone = timeZoneAbbreviation(timeZone);
-  const set = (name) => (event) => {
-    const value = event.target.type === "checkbox" ? event.target.checked : event.target.value;
-    setDraft({ ...draft, [name]: value });
-  };
-  return (
-    <form onSubmit={submit} className="space-y-7">
-      <div className="grid gap-4 md:grid-cols-2">
-        <Field name="Service" required><select className={INPUT} required value={draft.service_type} onChange={set("service_type")}><option>ASL/English Interpreting</option><option>Certified Deaf Interpreter Team</option><option>DeafBlind / ProTactile Access</option><option>ASL Video Translation</option></select></Field>
-        <Field name="Delivery" required><select className={INPUT} required value={draft.delivery_mode} onChange={set("delivery_mode")}><option>On-site</option><option>VRI</option><option>Hybrid</option></select></Field>
-        <Field name={`Start · ${zone}`} required><input className={INPUT} type="datetime-local" required value={draft.start_at} onChange={set("start_at")} /></Field>
-        <Field name={`End · ${zone}`}><input className={INPUT} type="datetime-local" value={draft.end_at || ""} onChange={set("end_at")} /></Field>
-        <Field name="Time zone"><TimeZoneSelect className={INPUT} value={timeZone} onChange={(value) => setDraft({ ...draft, timezone: value })} /></Field>
-        <Field name="Specialty"><select className={INPUT} value={draft.specialty} onChange={set("specialty")}><option>General / Community</option><option>Medical</option><option>Legal</option><option>Mental Health</option><option>K-12 Education</option><option>Post-Secondary Education</option><option>Platform / Conference</option><option>Performance / Arts</option><option>Cruise</option></select></Field>
-        {draft.delivery_mode !== "VRI" && <Field name="Location"><input className={INPUT} value={draft.location_name || ""} onChange={set("location_name")} placeholder="Facility or venue" /></Field>}
-        {draft.delivery_mode === "VRI" && <Field name="Meeting link"><input className={INPUT} type="url" value={draft.meeting_link || ""} onChange={set("meeting_link")} /></Field>}
-        {draft.delivery_mode !== "VRI" && <Field name="Address" className="md:col-span-2"><input className={INPUT} value={draft.address_line_1 || ""} onChange={set("address_line_1")} /></Field>}
-        {draft.delivery_mode !== "VRI" && <Field name="City"><input className={INPUT} value={draft.city || ""} onChange={set("city")} /></Field>}
-        {draft.delivery_mode !== "VRI" && <Field name="State"><input className={INPUT} value={draft.state || ""} onChange={set("state")} /></Field>}
-        <Field name="Deaf participants"><input className={INPUT} type="number" min="0" value={draft.deaf_participants} onChange={set("deaf_participants")} /></Field>
-        <Field name="Hearing participants"><input className={INPUT} type="number" min="0" value={draft.hearing_participants} onChange={set("hearing_participants")} /></Field>
-        <Field name="Language preferences" className="md:col-span-2"><input className={INPUT} value={draft.language_preferences || ""} onChange={set("language_preferences")} placeholder="ASL, tactile ASL, Spanish, etc." /></Field>
-        <Field name="On-site contact"><input className={INPUT} value={draft.onsite_contact_name || ""} onChange={set("onsite_contact_name")} /></Field>
-        <Field name="Contact phone"><input className={INPUT} value={draft.onsite_contact_phone || ""} onChange={set("onsite_contact_phone")} /></Field>
-        <Field name="Purchase order"><input className={INPUT} value={draft.purchase_order_number || ""} onChange={set("purchase_order_number")} /></Field>
-        <Field name="Client reference"><input className={INPUT} value={draft.client_reference || ""} onChange={set("client_reference")} /></Field>
-        <label className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-4 text-sm font-bold text-slate-700"><input type="checkbox" checked={Boolean(draft.team_requested)} onChange={set("team_requested")} /> Interpreter team requested</label>
-        <label className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-4 text-sm font-bold text-slate-700"><input type="checkbox" checked={Boolean(draft.cdi_requested)} onChange={set("cdi_requested")} /> Certified Deaf Interpreter requested</label>
-        <Field name="Assignment details" className="md:col-span-2" required><textarea className={cx(INPUT, "min-h-32")} required value={draft.description || ""} onChange={set("description")} /></Field>
-        <Field name="Preparation materials" className="md:col-span-2"><textarea className={cx(INPUT, "min-h-24")} value={draft.preparation_materials || ""} onChange={set("preparation_materials")} placeholder="Links, agenda, names, terminology, scripts, or other context" /></Field>
-      </div>
-      <SaveButton saving={saving} label="Submit request" icon={Send} className="bg-[#dd7d00]" />
     </form>
   );
 }

@@ -16,17 +16,13 @@ import {
   MODALITY_OPTIONS,
   SETTING_OPTIONS,
 } from "../forms";
+import { INTERPRETER_REQUEST_SERVICE_OPTIONS, INTERPRETER_REQUEST_SETTING_OPTIONS } from "../../requestFormConfig";
 import { Badge, Card, EmptyState, Hero, INPUT, SectionHeader, cx, parseRate, pretty } from "../ui";
 import { ActionButton } from "./shared";
 
 const CLIENT_STATUS_OPTIONS = ["active", "on_hold", "inactive"];
-const CLIENT_SERVICE_OPTIONS = [
-  "ASL/English Interpreting",
-  "Certified Deaf Interpreter Team",
-  "DeafBlind / ProTactile Access",
-  "ASL Video Translation",
-];
-const CLIENT_DELIVERY_OPTIONS = ["On-site", "VRI", "Hybrid"];
+const CLIENT_SERVICE_OPTIONS = INTERPRETER_REQUEST_SERVICE_OPTIONS;
+const CLIENT_DELIVERY_OPTIONS = INTERPRETER_REQUEST_SETTING_OPTIONS;
 const INTERPRETER_STATUS_OPTIONS = [
   "pending_profile",
   "pending_documents",
@@ -269,7 +265,7 @@ function PersonCard({ icon: Icon, title, subtitle, status, lines, onClick }) {
 }
 
 function ClientTable({ clients, openClient }) {
-  const headings = ["Organization", "Primary Contact", "Email", "Phone", "Location", "Industry", "Default Service", "Delivery", "Status", "Actions"];
+  const headings = ["Organization", "Primary Contact", "Email", "Phone", "Location", "Industry", "Default Service", "Default Setting", "Status", "Actions"];
   return (
     <>
       <div className="grid gap-3 sm:grid-cols-2 lg:hidden">
@@ -284,7 +280,7 @@ function ClientTable({ clients, openClient }) {
               [getLocation(client), client.industry].filter(Boolean).join(" · "),
               client.email,
               client.phone,
-              client.default_service_type && `${client.default_service_type} · ${client.default_delivery_mode || "Delivery not set"}`,
+              client.default_service_type && `${client.default_service_type} · ${client.default_delivery_mode || "Setting not set"}`,
             ]}
             onClick={() => openClient(client)}
           />
@@ -506,7 +502,7 @@ export default function AdminPeopleLean({ workspace, v2, actions }) {
               <OptionGroup label="Industry" options={clientOptions.industries} values={clientFilters.industries} onToggle={(value) => toggleSelection(setClientFilters, "industries", value)} />
               <OptionGroup label="Account status" options={clientOptions.statuses} values={clientFilters.statuses} onToggle={(value) => toggleSelection(setClientFilters, "statuses", value)} format={pretty} />
               <OptionGroup label="Default service" options={clientOptions.services} values={clientFilters.services} onToggle={(value) => toggleSelection(setClientFilters, "services", value)} />
-              <OptionGroup label="Default delivery" options={clientOptions.deliveryModes} values={clientFilters.deliveryModes} onToggle={(value) => toggleSelection(setClientFilters, "deliveryModes", value)} />
+              <OptionGroup label="Default setting" options={clientOptions.deliveryModes} values={clientFilters.deliveryModes} onToggle={(value) => toggleSelection(setClientFilters, "deliveryModes", value)} />
               <SortControl value={clientSort} direction={clientDirection} options={CLIENT_SORT_OPTIONS} setValue={setClientSort} setDirection={setClientDirection} />
             </div>
             <div className="mt-5 flex flex-col gap-3 border-t border-slate-100 pt-5 sm:flex-row sm:items-center sm:justify-between">
@@ -516,7 +512,7 @@ export default function AdminPeopleLean({ workspace, v2, actions }) {
           </Card>
           {filteredClients.length ? clientView === "list" ? <ClientTable clients={filteredClients} openClient={actions.openClient} /> : (
             <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-3">
-              {filteredClients.map((client) => <PersonCard key={client.id} icon={Building2} title={client.organization_name || client.email} subtitle={client.primary_contact_name || client.email} status={client.account_status} lines={[[getLocation(client), client.industry].filter(Boolean).join(" · "), client.email, client.phone, client.default_service_type && `${client.default_service_type} · ${client.default_delivery_mode || "Delivery not set"}`]} onClick={() => actions.openClient(client)} />)}
+              {filteredClients.map((client) => <PersonCard key={client.id} icon={Building2} title={client.organization_name || client.email} subtitle={client.primary_contact_name || client.email} status={client.account_status} lines={[[getLocation(client), client.industry].filter(Boolean).join(" · "), client.email, client.phone, client.default_service_type && `${client.default_service_type} · ${client.default_delivery_mode || "Setting not set"}`]} onClick={() => actions.openClient(client)} />)}
             </div>
           ) : <EmptyState icon={Building2} title="No clients match these filters" text="Clear one or more filters to see additional client accounts." action={<ActionButton tone="soft" onClick={clearClients}>Clear filters</ActionButton>} />}
         </>
