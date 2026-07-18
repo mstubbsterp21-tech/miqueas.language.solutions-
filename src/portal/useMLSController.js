@@ -77,6 +77,21 @@ export default function useMLSController() {
     }
   }
 
+  async function savePortalLayout(payload) {
+    setSaving(true);
+    try {
+      const result = await api.app("savePortalLayout", "POST", payload);
+      setApp((current) => ({ ...current, layout: result.layout }));
+      flash("Portal layout saved.");
+      return result;
+    } catch (layoutError) {
+      fail(layoutError);
+      throw layoutError;
+    } finally {
+      setSaving(false);
+    }
+  }
+
   function setSection(next) {
     setSectionState(next);
     const url = new URL(window.location.href);
@@ -507,6 +522,7 @@ export default function useMLSController() {
     upload: uploadDocument,
     openDocument,
     removeDocument,
+    savePortalLayout,
   };
 
   return {

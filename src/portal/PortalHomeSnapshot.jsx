@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { Badge, Card, Hero, Metric, SectionHeader, formatDate, formatMoney } from "./ui";
 import { formatInPortalTimeZone } from "./timezones";
+import { orderedLayoutKeys } from "./LayoutCustomizer";
 
 const SNAPSHOT_NOW = Date.now();
 
@@ -75,7 +76,12 @@ function Announcements({ items = [], actions }) {
   </Card>;
 }
 
-function AdminHome({ workspace, app, v2, actions }) {
+function DashboardSections({ role, layout, sections }) {
+  const hidden = new Set(layout?.hidden_home_sections || []);
+  return <div className="space-y-6">{orderedLayoutKeys(role, "home", layout?.home_order).filter((key) => sections[key] && !hidden.has(key)).map((key) => <div key={key} data-layout-section={key}>{sections[key]}</div>)}</div>;
+}
+
+function AdminHome({ workspace, app, v2, actions, layout }) {
   const assignments = app?.assignments || workspace.admin?.assignments || [];
   const active = assignments.filter((item) => !["cancelled", "closed", "paid"].includes(item.lifecycle_status));
   const upcoming = active.filter((item) => new Date(item.start_at).getTime() >= SNAPSHOT_NOW).sort((a, b) => new Date(a.start_at) - new Date(b.start_at));
@@ -95,31 +101,28 @@ function AdminHome({ workspace, app, v2, actions }) {
   ];
   const statusText = queue.length ? `${queue.length} priority item${queue.length === 1 ? "" : "s"} need a decision. Everything else is organized below.` : "Staffing, finance, and compliance are caught up.";
 
-  return <div className="space-y-6">
-    <Hero title="MLS command center" text={statusText} actions={<><Action tone="gold" onClick={() => actions.go("assignments")}>Manage assignments</Action><Action onClick={() => actions.go("communications")}>Communications</Action></>}><p className="mt-4 flex items-center gap-2 text-xs font-black uppercase tracking-[.14em] text-[#f6b34c]"><Sparkles size={14} /> One queue. No duplicate work.</p></Hero>
-    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+  const sections = {
+    hero: <Hero title="MLS command center" text={statusText} actions={<><Action tone="gold" onClick={() => actions.go("assignments")}>Manage assignments</Action><Action onClick={() => actions.go("communications")}>Communications</Action></>}><p className="mt-4 flex items-center gap-2 text-xs font-black uppercase tracking-[.14em] text-[#f6b34c]"><Sparkles size={14} /> One queue. No duplicate work.</p></Hero>,
+    metrics: <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
       <Metric icon={Users} name="Need staffing" value={unstaffed.length} note="Assignments without a team" color="#be123c" onClick={() => actions.go("assignments")} />
       <Metric icon={CircleDollarSign} name="Financial reviews" value={financeReviews} note="Time and expenses submitted" color="#1d4ed8" onClick={() => actions.go("finance")} />
       <Metric icon={ShieldCheck} name="Onboarding" value={pendingOnboarding.length} note="Interpreter records in progress" color="#6d28d9" onClick={() => actions.go("compliance")} />
       <Metric icon={Bell} name="Unread updates" value={app?.unreadCount || 0} note="Across the MLS portal" color="#dd7d00" onClick={() => actions.go("notifications")} />
-    </div>
-    <div className="grid gap-6 xl:grid-cols-[minmax(0,1.45fr)_minmax(340px,.75fr)]">
-      <Card>
+    </div>,
+    decision_queue: <Card>
         <SectionHeader title="Decision queue" text="Only work that needs an admin action appears here." action={<ViewAll onClick={() => actions.go("assignments")}>Assignments</ViewAll>} />
         <div className="mt-5 space-y-3">{queue.slice(0, 8).map((item, index) => <QueueItem key={`${item.title}-${index}`} {...item} />)}{!queue.length && <CompactEmpty icon={ShieldCheck} title="Queue cleared" text="There are no staffing, finance, onboarding, or document decisions waiting." />}</div>
-      </Card>
-      <div className="space-y-6">
-        <Card>
+      </Card>,
+    staffed_schedule: <Card>
           <SectionHeader title="Staffed schedule" text="The next confirmed services—unstaffed work stays in the queue." action={<ViewAll onClick={() => actions.go("assignments")} />} />
           <div className="mt-5 space-y-3">{staffed.slice(0, 4).map((item) => <ScheduleItem key={item.id} assignment={item} onClick={() => actions.openAssignment(item)} note={`${formatDate(item.start_at)} · ${(item.assignment_interpreters || []).length} assigned`} />)}{!staffed.length && <CompactEmpty icon={CalendarDays} title="No staffed assignments ahead" text="Once an assignment is staffed, it will move here automatically." />}</div>
-        </Card>
-        <Announcements items={v2?.announcements} actions={actions} />
-      </div>
-    </div>
-  </div>;
+        </Card>,
+    announcements: <Announcements items={v2?.announcements} actions={actions} />,
+  };
+  return <DashboardSections role="admin" layout={layout} sections={sections} />;
 }
 
-function ClientHome({ workspace, app, v2, actions }) {
+function ClientHome({ workspace, app, v2, actions, layout }) {
   const profile = workspace.client?.profile || {};
   const assignments = app?.assignments || workspace.client?.assignments || [];
   const upcoming = assignments.filter((item) => new Date(item.start_at).getTime() >= SNAPSHOT_NOW && !["cancelled", "closed"].includes(item.lifecycle_status)).sort((a, b) => new Date(a.start_at) - new Date(b.start_at));
@@ -135,32 +138,28 @@ function ClientHome({ workspace, app, v2, actions }) {
     ...(due > 0 ? [{ icon: CircleDollarSign, title: `${formatMoney(due)} balance due`, text: `${invoices.length} open invoice${invoices.length === 1 ? "" : "s"} in Billing.`, badge: "pending_payment", onClick: () => actions.go("billing"), tone: "rose" }] : []),
   ];
 
-  return <div className="space-y-6">
-    <Hero title={profile.organization_name ? `Welcome, ${profile.organization_name}` : "Your MLS service hub"} text={queue.length ? `${queue.length} item${queue.length === 1 ? "" : "s"} need your attention before your requests can keep moving.` : "You’re caught up. Upcoming services and MLS updates are ready below."} actions={<><Action tone="gold" onClick={actions.openRequest}>Request an interpreter</Action><Action onClick={() => actions.go("communications")}>Message MLS</Action></>} />
-    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+  const sections = {
+    hero: <Hero title={profile.organization_name ? `Welcome, ${profile.organization_name}` : "Your MLS service hub"} text={queue.length ? `${queue.length} item${queue.length === 1 ? "" : "s"} need your attention before your requests can keep moving.` : "You’re caught up. Upcoming services and MLS updates are ready below."} actions={<><Action tone="gold" onClick={actions.openRequest}>Request an interpreter</Action><Action onClick={() => actions.go("communications")}>Message MLS</Action></>} />,
+    metrics: <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
       <Metric icon={ClipboardCheck} name="Needs action" value={queue.length} note="Approvals, files, or billing" color="#be123c" onClick={() => actions.go("requests")} />
       <Metric icon={CalendarDays} name="Upcoming services" value={upcoming.length} note="Confirmed and in progress" onClick={() => actions.go("assignments")} />
       <Metric icon={FileWarning} name="Requested files" value={docs.length} note="Secure document requests" color="#6d28d9" onClick={() => actions.go("documents")} />
       <Metric icon={CircleDollarSign} name="Balance due" value={formatMoney(due)} note={`${invoices.length} open invoice${invoices.length === 1 ? "" : "s"}`} color="#c2410c" onClick={() => actions.go("billing")} />
-    </div>
-    <div className="grid gap-6 xl:grid-cols-[minmax(0,1.35fr)_minmax(340px,.8fr)]">
-      <Card>
+    </div>,
+    action_queue: <Card>
         <SectionHeader title="Your action queue" text="Approvals, requested documents, and billing tasks—nothing else." action={<ViewAll onClick={() => actions.go("requests")}>Open requests</ViewAll>} />
         <div className="mt-5 space-y-3">{queue.slice(0, 8).map((item, index) => <QueueItem key={`${item.title}-${index}`} {...item} />)}{!queue.length && <CompactEmpty icon={ShieldCheck} title="You’re caught up" text="No quotes, agreements, documents, or payments are waiting." />}</div>
-      </Card>
-      <div className="space-y-6">
-        <Card>
+      </Card>,
+    upcoming_services: <Card>
           <SectionHeader title="Upcoming services" text="Your schedule appears once—right here." action={<ViewAll onClick={() => actions.go("assignments")} />} />
           <div className="mt-5 space-y-3">{upcoming.slice(0, 4).map((item) => <ScheduleItem key={item.id} assignment={item} onClick={() => actions.openAssignment(item)} />)}{!upcoming.length && <CompactEmpty icon={CalendarDays} title="Nothing scheduled" text="Submit a request whenever communication access is needed." />}</div>
-        </Card>
-        <Announcements items={v2?.announcements} actions={actions} />
-      </div>
-    </div>
-  </div>;
+        </Card>,
+    announcements: <Announcements items={v2?.announcements} actions={actions} />,
+  };
+  return <DashboardSections role="client" layout={layout} sections={sections} />;
 }
 
-function InterpreterHome({ workspace, operations, app, v2, actions, identityName }) {
-  const profile = workspace.interpreter?.profile || {};
+function InterpreterHome({ workspace, operations, app, v2, actions, identityName, layout }) {
   const assignments = app?.assignments || [];
   const upcoming = assignments.filter((item) => new Date(item.start_at).getTime() >= SNAPSHOT_NOW && !["cancelled", "closed"].includes(item.lifecycle_status)).sort((a, b) => new Date(a.start_at) - new Date(b.start_at));
   const opportunities = operations?.opportunities || [];
@@ -177,38 +176,33 @@ function InterpreterHome({ workspace, operations, app, v2, actions, identityName
   ];
   const nextAssignment = upcoming[0];
 
-  return <div className="space-y-6">
-    <Hero title={`Welcome back${identityName ? `, ${identityName.split(/\s+/)[0]}` : ""}`} text={tasks.length ? `${tasks.length} readiness task${tasks.length === 1 ? "" : "s"} need attention. Opportunities and assigned work are separated below.` : "You’re assignment-ready. Review matched opportunities or prepare for your next service."} actions={<><Action tone="gold" onClick={() => actions.go("work")}>Open work center</Action><Action onClick={() => actions.go("schedule")}>Update availability</Action></>} />
-    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+  const sections = {
+    hero: <Hero title={`Welcome back${identityName ? `, ${identityName.split(/\s+/)[0]}` : ""}`} text={tasks.length ? `${tasks.length} readiness task${tasks.length === 1 ? "" : "s"} need attention. Opportunities and assigned work are separated below.` : "You’re assignment-ready. Review matched opportunities or prepare for your next service."} actions={<><Action tone="gold" onClick={() => actions.go("work")}>Open work center</Action><Action onClick={() => actions.go("schedule")}>Update availability</Action></>} />,
+    metrics: <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
       <Metric icon={CalendarDays} name="Assigned work" value={upcoming.length} note={nextAssignment ? `Next: ${formatDate(nextAssignment.start_at, { month: "short", day: "numeric" })}` : "No upcoming assignments"} onClick={() => actions.go("work")} />
       <Metric icon={Sparkles} name="Recommended" value={opportunities.length} note="Open assignments matched to you" color="#4338ca" onClick={() => actions.go("work")} />
       <Metric icon={ClipboardCheck} name="Readiness tasks" value={tasks.length} note="Documents, learning, compliance" color="#be123c" onClick={() => actions.go("documents")} />
       <Metric icon={CircleDollarSign} name="Payment activity" value={payments.length} note="Ready or processing" color="#15803d" onClick={() => actions.go("payments")} />
-    </div>
-    <div className="grid gap-6 xl:grid-cols-[minmax(0,1.35fr)_minmax(340px,.8fr)]">
-      <div className="space-y-6">
-        <Card>
+    </div>,
+    recommended: <Card>
           <SectionHeader title="Recommended for you" text="Open opportunities only—assigned work stays in your schedule." action={<ViewAll onClick={() => actions.go("work")}>Browse work</ViewAll>} />
           <div className="mt-5 space-y-3">{opportunities.slice(0, 5).map((item) => { const assignment = item.assignments || {}; return <QueueItem key={item.id} icon={Sparkles} title={assignment.service_type || "Interpreter opportunity"} text={`${formatDate(assignment.start_at)}${assignment.delivery_mode ? ` · ${assignment.delivery_mode}` : ""}${assignment.city || assignment.state ? ` · ${[assignment.city, assignment.state].filter(Boolean).join(", ")}` : ""}`} badge={item.status || "open"} onClick={() => actions.submitBid(item)} tone="green" />; })}{!opportunities.length && <CompactEmpty icon={Sparkles} title="No matches right now" text="New opportunities will appear when they match your profile and availability." />}</div>
-        </Card>
-        {tasks.length > 0 && <Card>
+        </Card>,
+    readiness: tasks.length > 0 ? <Card>
           <SectionHeader title="Readiness tasks" text="Profile and compliance work that can affect assignment matching." />
           <div className="mt-5 space-y-3">{tasks.map((item, index) => <QueueItem key={`${item.title}-${index}`} {...item} />)}</div>
-        </Card>}
-      </div>
-      <div className="space-y-6">
-        <Card>
+        </Card> : <Card><CompactEmpty icon={ShieldCheck} title="You’re assignment-ready" text="There are no outstanding readiness tasks." /></Card>,
+    schedule: <Card>
           <SectionHeader title="Your schedule" text="Accepted and directly assigned work appears once." action={<ViewAll onClick={() => actions.go("work")} />} />
           <div className="mt-5 space-y-3">{upcoming.slice(0, 4).map((item) => <ScheduleItem key={item.id} assignment={item} onClick={() => actions.openAssignment(item)} />)}{!upcoming.length && <CompactEmpty icon={CalendarDays} title="No assigned work ahead" text="Accepted opportunities and direct assignments will appear here." />}</div>
-        </Card>
-        <Announcements items={v2?.announcements} actions={actions} />
-      </div>
-    </div>
-  </div>;
+        </Card>,
+    announcements: <Announcements items={v2?.announcements} actions={actions} />,
+  };
+  return <DashboardSections role="interpreter" layout={layout} sections={sections} />;
 }
 
-export default function PortalHomeSnapshot({ role, workspace, operations, app, v2, actions, identityName }) {
-  if (role === "admin") return <AdminHome workspace={workspace} app={app} v2={v2} actions={actions} />;
-  if (role === "client") return <ClientHome workspace={workspace} app={app} v2={v2} actions={actions} />;
-  return <InterpreterHome workspace={workspace} operations={operations} app={app} v2={v2} actions={actions} identityName={identityName} />;
+export default function PortalHomeSnapshot({ role, workspace, operations, app, v2, actions, identityName, layout }) {
+  if (role === "admin") return <AdminHome workspace={workspace} app={app} v2={v2} actions={actions} layout={layout} />;
+  if (role === "client") return <ClientHome workspace={workspace} app={app} v2={v2} actions={actions} layout={layout} />;
+  return <InterpreterHome workspace={workspace} operations={operations} app={app} v2={v2} actions={actions} identityName={identityName} layout={layout} />;
 }

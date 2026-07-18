@@ -112,13 +112,13 @@ export default function MLSWebAppHub() {
 
   return <>
     <PortalRealtimeBridge topic={v2.data?.realtimeTopic} refresh={refreshAll} />
-    <AppShell role={role} section={activeSection} setSection={setSection} user={workspace.user} personalization={personalization} unread={app.unreadCount || 0} navBadges={navBadges} refreshing={refreshing || v2.loading} refresh={refreshAll} timeZone={workspace.preferences?.timeZone} onTimeZoneChange={actions.saveTimeZone} savingTimeZone={savingTimeZone}>
+    <AppShell role={role} section={activeSection} setSection={setSection} user={workspace.user} personalization={personalization} layout={app.layout} saveLayout={actions.savePortalLayout} unread={app.unreadCount || 0} navBadges={navBadges} refreshing={refreshing || v2.loading} refresh={refreshAll} timeZone={workspace.preferences?.timeZone} onTimeZoneChange={actions.saveTimeZone} savingTimeZone={savingTimeZone}>
       {message && <Toast message={message} dismiss={() => setMessage("")} />}
       {error && <Toast message={error} type="error" dismiss={() => setError("")} />}
       {v2.message && <Toast message={v2.message} dismiss={() => v2.setMessage("")} />}
       {v2.error && <Toast message={v2.error} type="error" dismiss={() => v2.setError("")} />}
 
-      {activeSection === "home" && <PortalHomeSnapshot role={role} workspace={workspace} operations={operations} app={app} v2={v2.data} actions={combinedActions} identityName={personalization?.display_name || [workspace.user?.firstName, workspace.user?.lastName].filter(Boolean).join(" ")} />}
+      {activeSection === "home" && <PortalHomeSnapshot role={role} workspace={workspace} operations={operations} app={app} v2={v2.data} actions={combinedActions} layout={app.layout} identityName={personalization?.display_name || [workspace.user?.firstName, workspace.user?.lastName].filter(Boolean).join(" ")} />}
 
       {role === "admin" && !["home", "notifications"].includes(activeSection) && <AdminV2Workspace section={activeSection} workspace={workspace} operations={operations} app={app} v2={v2.data} loading={v2.loading} saving={v2.saving} actions={combinedActions} />}
       {role === "admin" && activeSection === "notifications" && <AdminWorkspace section="notifications" workspace={workspace} operations={operations} app={app} actions={combinedActions} />}

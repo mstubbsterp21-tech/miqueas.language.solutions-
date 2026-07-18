@@ -189,23 +189,49 @@ async function loadAssignments(db, user) {
 export async function loadApp(db, user) {
   const assignments = await loadAssignments(db, user);
   const assignmentIds = assignments.map((item) => item.id).filter(Boolean);
+  const role = user.isAdmin ? "admin" : (await clientFor(db, user.id)) ? "client" : "interpreter";
 
-  const [notificationResult, messageResult] = await Promise.all([
+  const [notificationResult, messageResult, layoutResult] = await Promise.all([
     db.from("notifications").select("*").eq("recipient_clerk_user_id", user.id).order("created_at", { ascending: false }).limit(50),
     assignmentIds.length
       ? db.from("assignment_messages").select("*").in("assignment_id", assignmentIds).order("created_at", { ascending: true }).limit(500)
       : Promise.resolve({ data: [], error: null }),
+    db.from("portal_layout_preferences").select("nav_order,home_order,hidden_home_sections").eq("clerk_user_id", user.id).eq("role", role).maybeSingle(),
   ]);
   if (notificationResult.error) throw notificationResult.error;
   if (messageResult.error) throw messageResult.error;
+  if (layoutResult.error) throw layoutResult.error;
 
   return {
-    role: user.isAdmin ? "admin" : (await clientFor(db, user.id)) ? "client" : "interpreter",
+    role,
     assignments,
     messages: messageResult.data || [],
     notifications: notificationResult.data || [],
     unreadCount: (notificationResult.data || []).filter((item) => !item.is_read).length,
+    layout: layoutResult.data || { nav_order: [], home_order: [], hidden_home_sections: [] },
   };
+}
+
+const layoutKeys = {
+  admin: { nav: ["home", "assignments", "communications", "people", "finance", "compliance", "reports", "profile", "settings"], home: ["hero", "metrics", "decision_queue", "staffed_schedule", "announcements"] },
+  client: { nav: ["home", "requests", "assignments", "communications", "billing", "documents", "profile"], home: ["hero", "metrics", "action_queue", "upcoming_services", "announcements"] },
+  interpreter: { nav: ["home", "work", "payments", "communications", "schedule", "documents", "learning", "profile"], home: ["hero", "metrics", "recommended", "readiness", "schedule", "announcements"] },
+};
+
+function orderedSelection(values, allowed) {
+  const selected = [...new Set((Array.isArray(values) ? values : []).map(String))].filter((value) => allowed.includes(value));
+  return [...selected, ...allowed.filter((value) => !selected.includes(value))];
+}
+
+async function savePortalLayout(db, user, payload) {
+  const role = user.isAdmin ? "admin" : (await clientFor(db, user.id)) ? "client" : "interpreter";
+  const allowed = layoutKeys[role];
+  const navOrder = orderedSelection(payload.navOrder, allowed.nav);
+  const homeOrder = orderedSelection(payload.homeOrder, allowed.home);
+  const hidden = [...new Set((Array.isArray(payload.hiddenHomeSections) ? payload.hiddenHomeSections : []).map(String))].filter((value) => allowed.home.includes(value) && value !== "hero");
+  const result = await db.from("portal_layout_preferences").upsert({ clerk_user_id: user.id, role, nav_order: navOrder, home_order: homeOrder, hidden_home_sections: hidden, updated_at: new Date().toISOString() }, { onConflict: "clerk_user_id,role" }).select("nav_order,home_order,hidden_home_sections").single();
+  if (result.error) throw result.error;
+  return { status: 200, payload: { layout: result.data } };
 }
 
 function selectedNotificationIds(payload) {
@@ -450,6 +476,10 @@ export default async function handler(req, res) {
     const payload = readBody(req);
 
     if (action === "loadApp") return send(res, 200, await loadApp(db, user));
+    if (action === "savePortalLayout") {
+      const result = await savePortalLayout(db, user, payload);
+      return send(res, result.status, result.payload);
+    }
     if (action.startsWith("push")) {
       const result = await pushAction(db, user, action, payload, req);
       return send(res, result?.status || 404, result?.payload || { error: "Unknown push action." });
