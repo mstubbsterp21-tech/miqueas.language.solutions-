@@ -24,7 +24,7 @@ export default function PushNotificationButton() {
 
   const request = async (action, options = {}) => {
     const token = await session?.getToken();
-    const response = await fetch(`/api/push-notifications?action=${action}`, {
+    const response = await fetch(`/api/portal-app?action=${action}`, {
       ...options,
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}`, ...(options.headers || {}) },
     });
@@ -61,7 +61,7 @@ export default function PushNotificationButton() {
         setState(permission === "denied" ? "blocked" : "disabled");
         return;
       }
-      const config = await request("config");
+      const config = await request("pushConfig");
       if (!config.configured) throw new Error("Push notification service is not configured.");
       const registration = await navigator.serviceWorker.ready;
       const existing = await registration.pushManager.getSubscription();
@@ -69,9 +69,9 @@ export default function PushNotificationButton() {
         userVisibleOnly: true,
         applicationServerKey: decodeKey(config.publicKey),
       });
-      await request("subscribe", { method: "POST", body: JSON.stringify({ subscription: subscription.toJSON() }) });
+      await request("pushSubscribe", { method: "POST", body: JSON.stringify({ subscription: subscription.toJSON() }) });
       setState("enabled");
-      await request("test", { method: "POST", body: "{}" });
+      await request("pushTest", { method: "POST", body: "{}" });
     } catch (error) {
       setMessage(error.message);
       setState("disabled");
@@ -85,7 +85,7 @@ export default function PushNotificationButton() {
       const registration = await navigator.serviceWorker.ready;
       const subscription = await registration.pushManager.getSubscription();
       if (subscription) {
-        await request("unsubscribe", { method: "POST", body: JSON.stringify({ endpoint: subscription.endpoint }) });
+        await request("pushUnsubscribe", { method: "POST", body: JSON.stringify({ endpoint: subscription.endpoint }) });
         await subscription.unsubscribe();
       }
       setState("disabled");

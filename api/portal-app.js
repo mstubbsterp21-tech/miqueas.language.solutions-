@@ -1,6 +1,6 @@
 import { createClerkClient } from "@clerk/backend";
 import { createClient } from "@supabase/supabase-js";
-import { sendPushNotification } from "./_shared/web-push.js";
+import { sendPushNotification, vapidPublicKey } from "./_shared/web-push.js";
 
 const dbUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
 const dbAdminKey = process.env["SUPABASE_" + "SERVICE_ROLE_KEY"];
@@ -91,6 +91,41 @@ async function createNotification(db, recipient, values) {
   if (result.error) throw result.error;
   await sendPushNotification(db, result.data).catch((error) => console.warn("MLS push delivery failed", error));
   return result.data;
+}
+
+function cleanPushSubscription(value = {}) {
+  const endpoint = String(value.endpoint || "").trim();
+  const p256dh = String(value.keys?.p256dh || "").trim();
+  const auth = String(value.keys?.auth || "").trim();
+  return endpoint.startsWith("https://") && p256dh && auth ? { endpoint, p256dh, auth } : null;
+}
+
+async function pushAction(db, user, action, payload, req) {
+  if (action === "pushConfig") {
+    const publicKey = await vapidPublicKey(db);
+    return { status: 200, payload: { configured: Boolean(publicKey), publicKey } };
+  }
+  if (action === "pushSubscribe") {
+    const subscription = cleanPushSubscription(payload.subscription);
+    if (!subscription) return { status: 400, payload: { error: "A valid browser push subscription is required." } };
+    const result = await db.from("push_subscriptions").upsert({
+      clerk_user_id: user.id, ...subscription,
+      user_agent: String(req.headers["user-agent"] || "").slice(0, 500),
+      is_active: true, disabled_at: null, last_error: null, updated_at: new Date().toISOString(),
+    }, { onConflict: "endpoint" }).select("id,endpoint,is_active").single();
+    if (result.error) throw result.error;
+    return { status: 200, payload: { subscription: result.data } };
+  }
+  if (action === "pushUnsubscribe") {
+    const result = await db.from("push_subscriptions").update({ is_active: false, disabled_at: new Date().toISOString(), updated_at: new Date().toISOString() }).eq("clerk_user_id", user.id).eq("endpoint", String(payload.endpoint || "")).select("id");
+    if (result.error) throw result.error;
+    return { status: 200, payload: { disabled: result.data?.length || 0 } };
+  }
+  if (action === "pushTest") {
+    const delivery = await sendPushNotification(db, { recipient_clerk_user_id: user.id, category: "test", title: "MLS alerts are enabled", body: "Apple-style portal notifications are ready on this device.", section: "notifications" });
+    return { status: 200, payload: { delivery } };
+  }
+  return null;
 }
 
 async function assignmentAccess(db, user, assignmentId) {
@@ -415,6 +450,10 @@ export default async function handler(req, res) {
     const payload = readBody(req);
 
     if (action === "loadApp") return send(res, 200, await loadApp(db, user));
+    if (action.startsWith("push")) {
+      const result = await pushAction(db, user, action, payload, req);
+      return send(res, result?.status || 404, result?.payload || { error: "Unknown push action." });
+    }
 
     let result;
     if (action === "markNotificationRead") result = await markNotificationRead(db, user, payload);
