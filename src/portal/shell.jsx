@@ -143,7 +143,7 @@ export default function AppShell({ role, section, setSection, user, personalizat
               </button>
             </div>
           </header>
-          <main className="relative min-w-0 p-3 sm:p-4 md:p-6 lg:p-8">
+          <main className="relative min-w-0 max-w-full overflow-x-hidden p-3 sm:p-4 md:p-6 lg:p-8">
             <AnimatePresence mode="wait">
               <motion.div key={`${role}-${section}`} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.2 }}>{children}</motion.div>
             </AnimatePresence>
@@ -166,7 +166,7 @@ export default function AppShell({ role, section, setSection, user, personalizat
         {mobileNavigation.map(([value, label, Icon]) => (
           <button key={value} type="button" onClick={() => navigate(value)} style={section === value ? { backgroundColor: primary } : undefined} className={cx("relative flex min-h-12 min-w-0 flex-col items-center justify-center gap-1 rounded-xl px-1.5 py-1.5 text-[9px] font-black transition sm:text-[10px]", section === value ? "text-white" : "text-slate-500")}>
             <Icon size={18} />
-            <span className="max-w-full truncate">{label}</span>
+            <span className="line-clamp-2 max-w-full break-words text-center leading-[1.15]">{label}</span>
             {navBadges[value] > 0 && <span className="absolute right-1 top-1 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[8px] font-black text-white" style={{ backgroundColor: accent }}>{navBadges[value] > 99 ? "99+" : navBadges[value]}</span>}
           </button>
         ))}

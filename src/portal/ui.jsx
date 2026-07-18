@@ -59,13 +59,13 @@ const badgeStyles = {
 };
 
 export function Badge({ value, className = "" }) {
-  return <span className={cx("inline-flex shrink-0 items-center rounded-full border px-2.5 py-1 text-[10px] font-black uppercase tracking-[.08em]", badgeStyles[value] || "border-slate-200 bg-slate-50 text-slate-600", className)}>{pretty(value)}</span>;
+  return <span className={cx("inline-flex max-w-full shrink-0 items-center break-words rounded-full border px-2.5 py-1 text-center text-[10px] font-black uppercase leading-4 tracking-[.06em]", badgeStyles[value] || "border-slate-200 bg-slate-50 text-slate-600", className)}>{pretty(value)}</span>;
 }
 
 export function Card({ children, className = "", hover = false, onClick }) {
   const Element = onClick ? motion.button : motion.div;
   return (
-    <Element layout initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} whileHover={hover ? { y: -3 } : undefined} transition={{ duration: 0.2 }} onClick={onClick} className={cx("rounded-[1.35rem] border border-black/5 bg-white p-4 text-left shadow-[0_18px_55px_rgba(40,25,18,.07)] sm:rounded-[1.75rem] sm:p-5 md:p-6", onClick && "w-full cursor-pointer transition hover:shadow-[0_22px_65px_rgba(40,25,18,.12)]", className)}>
+    <Element layout initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} whileHover={hover ? { y: -3 } : undefined} transition={{ duration: 0.2 }} onClick={onClick} className={cx("min-w-0 max-w-full overflow-hidden rounded-[1.35rem] border border-black/5 bg-white p-4 text-left shadow-[0_18px_55px_rgba(40,25,18,.07)] sm:rounded-[1.75rem] sm:p-5 md:p-6", onClick && "w-full cursor-pointer transition hover:shadow-[0_22px_65px_rgba(40,25,18,.12)]", className)}>
       {children}
     </Element>
   );
@@ -129,7 +129,7 @@ export function Modal({ open, close, title, children, wide = false, subtitle }) 
   return (
     <AnimatePresence>
       {open && <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[120] flex items-end justify-center bg-[#1c100c]/70 p-0 backdrop-blur-sm sm:items-center sm:p-3 md:p-5" onMouseDown={(event) => event.target === event.currentTarget && close()}>
-        <motion.div initial={{ y: 24, opacity: 0, scale: 0.98 }} animate={{ y: 0, opacity: 1, scale: 1 }} exit={{ y: 18, opacity: 0, scale: 0.99 }} transition={{ type: "spring", stiffness: 260, damping: 24 }} className={cx("max-h-[96dvh] w-full overflow-y-auto rounded-t-[1.5rem] bg-[#f8f5f1] pb-[env(safe-area-inset-bottom)] shadow-2xl sm:max-h-[94vh] sm:rounded-[2rem]", wide ? "max-w-6xl" : "max-w-3xl")}>
+        <motion.div initial={{ y: 24, opacity: 0, scale: 0.98 }} animate={{ y: 0, opacity: 1, scale: 1 }} exit={{ y: 18, opacity: 0, scale: 0.99 }} transition={{ type: "spring", stiffness: 260, damping: 24 }} className={cx("max-h-[96dvh] min-w-0 w-full max-w-[100vw] overflow-x-hidden overflow-y-auto rounded-t-[1.5rem] bg-[#f8f5f1] pb-[env(safe-area-inset-bottom)] shadow-2xl sm:max-h-[94vh] sm:max-w-[calc(100vw-1.5rem)] sm:rounded-[2rem]", wide ? "sm:w-full sm:max-w-6xl" : "sm:w-full sm:max-w-3xl")}>
           <div className="sticky top-0 z-20 flex items-start justify-between gap-3 border-b border-black/5 bg-[#f8f5f1]/95 px-4 py-4 backdrop-blur sm:px-5 sm:py-5 md:px-7"><div className="min-w-0"><h2 className="text-xl font-black text-slate-950 sm:text-2xl">{title}</h2>{subtitle && <p className="mt-1 text-sm text-slate-500">{subtitle}</p>}</div><button type="button" onClick={close} className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-slate-500 shadow"><X size={18} /></button></div>
           <div className="p-4 sm:p-5 md:p-8">{children}</div>
         </motion.div>
