@@ -16,6 +16,7 @@ import { Badge, Card, Hero, Metric, SectionHeader, formatDate, formatMoney } fro
 import { formatInPortalTimeZone } from "./timezones";
 import { orderedLayoutKeys } from "./LayoutCustomizer";
 import PortalWidgets from "./PortalWidgets";
+import { firstNameFromDisplayName, portalDisplayName } from "./portalIdentity";
 
 const SNAPSHOT_NOW = Date.now();
 
@@ -163,6 +164,8 @@ function ClientHome({ workspace, app, v2, actions, layout }) {
 }
 
 function InterpreterHome({ workspace, operations, app, v2, actions, identityName, layout }) {
+  const displayName = portalDisplayName({ role: "interpreter", workspace, fallbackName: identityName });
+  const firstName = firstNameFromDisplayName(displayName);
   const assignments = app?.assignments || [];
   const upcoming = assignments.filter((item) => new Date(item.start_at).getTime() >= SNAPSHOT_NOW && !["cancelled", "closed"].includes(item.lifecycle_status)).sort((a, b) => new Date(a.start_at) - new Date(b.start_at));
   const opportunities = operations?.opportunities || [];
@@ -184,7 +187,7 @@ function InterpreterHome({ workspace, operations, app, v2, actions, identityName
   const nextAssignment = upcoming[0];
 
   const sections = {
-    hero: <Hero title={`Welcome back${identityName ? `, ${identityName.split(/\s+/)[0]}` : ""}`} text={tasks.length ? `${tasks.length} readiness task${tasks.length === 1 ? "" : "s"} need attention. Opportunities and assigned work are separated below.` : "You’re assignment-ready. Review matched opportunities or prepare for your next service."} actions={<><Action tone="gold" onClick={() => actions.go("work")}>Open work center</Action><Action onClick={() => actions.go("schedule")}>Update availability</Action></>} />,
+    hero: <Hero title={`Welcome back${firstName ? `, ${firstName}` : ""}`} text={tasks.length ? `${tasks.length} readiness task${tasks.length === 1 ? "" : "s"} need attention. Opportunities and assigned work are separated below.` : "You’re assignment-ready. Review matched opportunities or prepare for your next service."} actions={<><Action tone="gold" onClick={() => actions.go("work")}>Open work center</Action><Action onClick={() => actions.go("schedule")}>Update availability</Action></>} />,
     metrics: <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
       <Metric icon={CalendarDays} name="Assigned work" value={upcoming.length} note={nextAssignment ? `Next: ${formatDate(nextAssignment.start_at, { month: "short", day: "numeric" })}` : "No upcoming assignments"} onClick={() => actions.go("work")} />
       <Metric icon={Sparkles} name="Recommended" value={opportunities.length} note="Open assignments matched to you" color="#4338ca" onClick={() => actions.go("work")} />

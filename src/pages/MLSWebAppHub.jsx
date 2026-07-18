@@ -24,6 +24,7 @@ import AdminV2Workspace from "../portal/v2/admin";
 import ClientV2Workspace from "../portal/v2/client";
 import InterpreterV2Workspace from "../portal/v2/interpreter";
 import { navBadgesFor, notificationSection } from "../portal/notificationRouting";
+import { portalDisplayName } from "../portal/portalIdentity";
 
 const allowedSections = {
   admin: new Set(["home", "assignments", "communications", "people", "finance", "compliance", "reports", "feedback", "profile", "settings", "notifications"]),
@@ -108,15 +109,13 @@ export default function MLSWebAppHub() {
   const refreshAll = () => load(true);
   const combinedActions = { ...actions, ...v2.actions, refreshPortal: refreshAll };
   const personalization = role === "admin" ? v2.data?.personalProfileCustomization : v2.data?.profileCustomization;
-  const signedInName = role === "interpreter"
-    ? [workspace.interpreter?.profile?.first_name, workspace.interpreter?.profile?.last_name].filter(Boolean).join(" ")
-    : [workspace.user?.firstName, workspace.user?.lastName].filter(Boolean).join(" ");
+  const signedInName = portalDisplayName({ role, workspace, personalization });
   const legacyClientSection = activeSection === "notifications" ? "notifications" : activeSection;
   const legacyInterpreterSection = activeSection === "learning" ? "training" : activeSection;
 
   return <>
     <PortalRealtimeBridge topic={v2.data?.realtimeTopic} refresh={refreshAll} />
-    <AppShell role={role} section={activeSection} setSection={setSection} user={workspace.user} personalization={personalization} layout={app.layout} saveLayout={actions.savePortalLayout} unread={app.unreadCount || 0} navBadges={navBadges} refreshing={refreshing || v2.loading} refresh={refreshAll} timeZone={workspace.preferences?.timeZone} onTimeZoneChange={actions.saveTimeZone} savingTimeZone={savingTimeZone}>
+    <AppShell role={role} section={activeSection} setSection={setSection} user={workspace.user} personalization={personalization} accountName={signedInName} layout={app.layout} saveLayout={actions.savePortalLayout} unread={app.unreadCount || 0} navBadges={navBadges} refreshing={refreshing || v2.loading} refresh={refreshAll} timeZone={workspace.preferences?.timeZone} onTimeZoneChange={actions.saveTimeZone} savingTimeZone={savingTimeZone}>
       {message && <Toast message={message} dismiss={() => setMessage("")} />}
       {error && <Toast message={error} type="error" dismiss={() => setError("")} />}
       {v2.message && <Toast message={v2.message} dismiss={() => v2.setMessage("")} />}

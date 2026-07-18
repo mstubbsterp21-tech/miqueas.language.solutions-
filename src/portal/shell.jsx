@@ -56,7 +56,7 @@ function pageBackground(personalization, primary, secondary, accent) {
   return `linear-gradient(145deg, #fdfbf9 0%, ${accent}0d 52%, ${primary}0c 100%)`;
 }
 
-export default function AppShell({ role, section, setSection, user, personalization, layout, saveLayout, unread = 0, navBadges = {}, refreshing, refresh, timeZone, onTimeZoneChange, savingTimeZone = false, children }) {
+export default function AppShell({ role, section, setSection, user, personalization, accountName, layout, saveLayout, unread = 0, navBadges = {}, refreshing, refresh, timeZone, onTimeZoneChange, savingTimeZone = false, children }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [customizing, setCustomizing] = useState(false);
   const defaultNavigation = roleNavigation[role] || roleNavigation.interpreter;
@@ -69,8 +69,8 @@ export default function AppShell({ role, section, setSection, user, personalizat
   const primary = personalization?.theme_primary || "#721100";
   const secondary = personalization?.theme_secondary || "#24130e";
   const accent = personalization?.theme_accent || "#dd7d00";
-  const accountName = user?.firstName ? [user.firstName, user.lastName].filter(Boolean).join(" ") : "";
-  const displayName = accountName || personalization?.display_name || user?.email;
+  const clerkAccountName = user?.firstName ? [user.firstName, user.lastName].filter(Boolean).join(" ") : "";
+  const displayName = accountName || clerkAccountName || personalization?.display_name || user?.email;
   const initials = String(displayName || "M").split(/\s+/).map((part) => part[0]).join("").slice(0, 2).toUpperCase();
   const backgroundStyle = personalization?.background_style || "soft";
   const cardStyle = personalization?.card_style || "rounded";

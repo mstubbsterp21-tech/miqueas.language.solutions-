@@ -63,6 +63,10 @@ function xmlTag(item, name) {
   return decodeXml(item.match(new RegExp(`<${name}(?:\\s[^>]*)?>([\\s\\S]*?)<\\/${name}>`, "i"))?.[1] || "");
 }
 
+function xmlAttribute(item, name, attribute) {
+  return decodeXml(item.match(new RegExp(`<${name}\\b[^>]*\\b${attribute}=["']([^"']+)["']`, "i"))?.[1] || "");
+}
+
 async function industryWidgetNews() {
   const query = encodeURIComponent('("sign language interpreter" OR ASL interpreting OR Deaf interpreting) when:30d');
   try {
@@ -78,6 +82,7 @@ async function industryWidgetNews() {
         source: xmlTag(value, "source") || "Industry news",
         url: xmlTag(value, "link"),
         publishedAt: xmlTag(value, "pubDate") || null,
+        imageUrl: xmlAttribute(value, "media:content", "url") || xmlAttribute(value, "enclosure", "url") || null,
       };
     }).filter((item) => item.title && item.url.startsWith("https://"));
     return items.length ? items : fallbackWidgetNews;
@@ -98,7 +103,10 @@ async function widgetWeather(query = {}) {
     latitude: latitude.toFixed(4),
     longitude: longitude.toFixed(4),
     current: "temperature_2m,apparent_temperature,weather_code,wind_speed_10m,precipitation,is_day",
+    daily: "weather_code,temperature_2m_max,temperature_2m_min",
+    forecast_days: "4",
     temperature_unit: "fahrenheit",
+    precipitation_unit: "inch",
     wind_speed_unit: "mph",
     timezone: "auto",
   });
@@ -107,6 +115,7 @@ async function widgetWeather(query = {}) {
   if (!response.ok || !data.current) throw new Error(data.reason || "Current weather is unavailable.");
   return {
     current: data.current,
+    daily: data.daily || null,
     units: data.current_units || {},
     timeZone: data.timezone || null,
     location: { latitude, longitude },
