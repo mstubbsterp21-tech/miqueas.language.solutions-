@@ -17,6 +17,7 @@ import { AdminWorkspace, ClientWorkspace, InterpreterWorkspace } from "../portal
 import AdminV2Workspace from "../portal/v2/admin";
 import ClientV2Workspace from "../portal/v2/client";
 import InterpreterV2Workspace from "../portal/v2/interpreter";
+import { portalDisplayName } from "../portal/portalIdentity";
 
 const allowedSections = {
   admin: new Set(["home", "assignments", "people", "finance", "compliance", "reports", "feedback", "profile", "settings", "notifications"]),
@@ -129,6 +130,7 @@ export default function MLSWebApp() {
   const combinedActions = { ...actions, ...v2.actions };
   const refreshAll = () => load(true);
   const personalization = role === "admin" ? v2.data?.personalProfileCustomization : v2.data?.profileCustomization;
+  const signedInName = portalDisplayName({ role, workspace, personalization });
 
   const legacyClientSection = activeSection === "notifications" ? "notifications" : activeSection;
   const legacyInterpreterSection = activeSection === "learning" ? "training" : activeSection;
@@ -141,6 +143,7 @@ export default function MLSWebApp() {
         setSection={setSection}
         user={workspace.user}
         personalization={personalization}
+        accountName={signedInName}
         unread={app.unreadCount || 0}
         refreshing={refreshing || v2.loading}
         refresh={refreshAll}
