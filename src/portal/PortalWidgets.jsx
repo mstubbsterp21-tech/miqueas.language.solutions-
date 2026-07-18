@@ -15,7 +15,7 @@ const WEATHER_LABELS = {
 async function widgetRequest(session, params) {
   const token = await session?.getToken();
   if (!token) throw new Error("Sign in is required.");
-  const response = await fetch(`/api/portal-widgets?${new URLSearchParams(params)}`, { headers: { Authorization: `Bearer ${token}` } });
+  const response = await fetch(`/api/portal-app?${new URLSearchParams({ action: "widgetData", ...params })}`, { headers: { Authorization: `Bearer ${token}` } });
   const data = await response.json().catch(() => ({}));
   if (!response.ok) throw new Error(data.error || "Widget data is unavailable.");
   return data;

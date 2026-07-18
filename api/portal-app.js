@@ -29,6 +29,12 @@ const portalFeedbackCategories = new Set([
   "Other",
 ]);
 
+const fallbackWidgetNews = [
+  { title: "Registry of Interpreters for the Deaf news", source: "RID", url: "https://rid.org/news/" },
+  { title: "National Association of the Deaf news", source: "NAD", url: "https://www.nad.org/category/news/" },
+  { title: "CASLI updates and announcements", source: "CASLI", url: "https://www.casli.org/" },
+];
+
 function send(res, status, payload) {
   res.status(status).setHeader("content-type", "application/json");
   res.end(JSON.stringify(payload));
@@ -44,6 +50,74 @@ function readBody(req) {
     }
   }
   return req.body;
+}
+
+function decodeXml(value = "") {
+  return String(value)
+    .replace(/^<!\[CDATA\[/, "").replace(/\]\]>$/, "")
+    .replaceAll("&amp;", "&").replaceAll("&quot;", '"').replaceAll("&#39;", "'")
+    .replaceAll("&lt;", "<").replaceAll("&gt;", ">").trim();
+}
+
+function xmlTag(item, name) {
+  return decodeXml(item.match(new RegExp(`<${name}(?:\\s[^>]*)?>([\\s\\S]*?)<\\/${name}>`, "i"))?.[1] || "");
+}
+
+async function industryWidgetNews() {
+  const query = encodeURIComponent('("sign language interpreter" OR ASL interpreting OR Deaf interpreting) when:30d');
+  try {
+    const response = await fetch(`https://news.google.com/rss/search?q=${query}&hl=en-US&gl=US&ceid=US:en`, {
+      headers: { "user-agent": "Miqueas-MLS-Portal/1.0" },
+    });
+    if (!response.ok) throw new Error(`News source returned ${response.status}.`);
+    const xml = await response.text();
+    const items = [...xml.matchAll(/<item>([\s\S]*?)<\/item>/gi)].slice(0, 8).map((match) => {
+      const value = match[1];
+      return {
+        title: xmlTag(value, "title"),
+        source: xmlTag(value, "source") || "Industry news",
+        url: xmlTag(value, "link"),
+        publishedAt: xmlTag(value, "pubDate") || null,
+      };
+    }).filter((item) => item.title && item.url.startsWith("https://"));
+    return items.length ? items : fallbackWidgetNews;
+  } catch (error) {
+    console.warn("MLS widget news refresh failed", error);
+    return fallbackWidgetNews;
+  }
+}
+
+async function widgetWeather(query = {}) {
+  const latitude = Number(query.latitude);
+  const longitude = Number(query.longitude);
+  if (!Number.isFinite(latitude) || latitude < -90 || latitude > 90 || !Number.isFinite(longitude) || longitude < -180 || longitude > 180) {
+    throw new Error("Valid latitude and longitude are required.");
+  }
+  const url = new URL("https://api.open-meteo.com/v1/forecast");
+  url.search = new URLSearchParams({
+    latitude: latitude.toFixed(4),
+    longitude: longitude.toFixed(4),
+    current: "temperature_2m,apparent_temperature,weather_code,wind_speed_10m,precipitation,is_day",
+    temperature_unit: "fahrenheit",
+    wind_speed_unit: "mph",
+    timezone: "auto",
+  });
+  const response = await fetch(url, { headers: { "user-agent": "Miqueas-MLS-Portal/1.0" } });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok || !data.current) throw new Error(data.reason || "Current weather is unavailable.");
+  return {
+    current: data.current,
+    units: data.current_units || {},
+    timeZone: data.timezone || null,
+    location: { latitude, longitude },
+  };
+}
+
+async function widgetData(query = {}) {
+  const type = String(query.type || "news");
+  if (type === "news") return { status: 200, payload: { news: await industryWidgetNews() }, cache: "private, max-age=300" };
+  if (type === "weather") return { status: 200, payload: { weather: await widgetWeather(query) }, cache: "private, max-age=120" };
+  return { status: 400, payload: { error: "Unknown widget type." } };
 }
 
 function bearer(req) {
@@ -587,6 +661,11 @@ export default async function handler(req, res) {
     const payload = readBody(req);
 
     if (action === "loadApp") return send(res, 200, await loadApp(db, user));
+    if (action === "widgetData") {
+      const result = await widgetData(req.query || {});
+      if (result.cache) res.setHeader("Cache-Control", result.cache);
+      return send(res, result.status, result.payload);
+    }
     if (action === "savePortalLayout") {
       const result = await savePortalLayout(db, user, payload);
       return send(res, result.status, result.payload);
