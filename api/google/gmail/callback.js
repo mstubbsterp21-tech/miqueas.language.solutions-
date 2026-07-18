@@ -1,5 +1,6 @@
 import { database } from "../../_shared/ops-v2-core.js";
 import { completeGmailAuthorization } from "../../_shared/gmail-oauth.js";
+import { flushPendingPortalFeedback } from "../../_shared/portal-feedback-email.js";
 
 const portalUrl = process.env.MLS_PORTAL_BASE_URL || "https://miqueaslanguagesolutions.com/portal";
 
@@ -30,8 +31,14 @@ export default async function handler(req, res) {
 
     const code = String(req.query?.code || "");
     const state = String(req.query?.state || "");
-    const result = await completeGmailAuthorization(database(), { code, state });
-    redirect(res, "connected", `${result.email} is connected.`);
+    const db = database();
+    const result = await completeGmailAuthorization(db, { code, state });
+    const feedback = await flushPendingPortalFeedback(db).catch((feedbackError) => {
+      console.error("MLS pending feedback delivery failed", feedbackError);
+      return { delivered: 0, failed: 1 };
+    });
+    const routed = feedback.delivered ? ` ${feedback.delivered} pending feedback message${feedback.delivered === 1 ? " was" : "s were"} filed.` : "";
+    redirect(res, "connected", `${result.email} is connected.${routed}`);
   } catch (callbackError) {
     console.error("MLS Gmail callback error", callbackError);
     redirect(res, "error", callbackError.message || "Gmail authorization failed.");

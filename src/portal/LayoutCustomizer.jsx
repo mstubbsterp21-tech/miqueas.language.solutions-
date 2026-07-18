@@ -4,15 +4,15 @@ import { Modal, cx } from "./ui";
 
 export const LAYOUT_DEFAULTS = {
   admin: {
-    nav: [["home", "Home"], ["assignments", "Assignments"], ["communications", "Communications"], ["people", "People"], ["finance", "Finance"], ["compliance", "Compliance"], ["reports", "Reports"], ["profile", "My Profile"], ["settings", "Settings"]],
+    nav: [["home", "Home"], ["assignments", "Assignments"], ["communications", "Communications"], ["people", "People"], ["finance", "Finance"], ["compliance", "Compliance"], ["reports", "Reports"], ["feedback", "Feedback"], ["profile", "My Profile"], ["settings", "Settings"]],
     home: [["hero", "Command center"], ["metrics", "Key metrics"], ["decision_queue", "Decision queue"], ["staffed_schedule", "Staffed schedule"], ["announcements", "Announcements"]],
   },
   client: {
-    nav: [["home", "Home"], ["requests", "Requests"], ["assignments", "Assignments"], ["communications", "Communications"], ["billing", "Billing"], ["documents", "Documents"], ["profile", "Profile"]],
+    nav: [["home", "Home"], ["requests", "Requests"], ["assignments", "Assignments"], ["communications", "Communications"], ["billing", "Billing"], ["documents", "Documents"], ["feedback", "Feedback"], ["profile", "Profile"]],
     home: [["hero", "Service hub"], ["metrics", "Key metrics"], ["action_queue", "Action queue"], ["upcoming_services", "Upcoming services"], ["announcements", "Announcements"]],
   },
   interpreter: {
-    nav: [["home", "Home"], ["work", "Assignments"], ["payments", "Payments"], ["communications", "Communications"], ["schedule", "Schedule"], ["documents", "Documents"], ["learning", "Learning"], ["profile", "My Profile"]],
+    nav: [["home", "Home"], ["work", "Assignments"], ["payments", "Payments"], ["communications", "Communications"], ["schedule", "Schedule"], ["documents", "Documents"], ["learning", "Learning"], ["feedback", "Feedback"], ["profile", "My Profile"]],
     home: [["hero", "Welcome and shortcuts"], ["metrics", "Key metrics"], ["recommended", "Recommended opportunities"], ["readiness", "Readiness tasks"], ["schedule", "Assigned schedule"], ["announcements", "Announcements"]],
   },
 };

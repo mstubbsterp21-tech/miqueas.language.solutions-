@@ -5,6 +5,7 @@ import AppShell from "../portal/shell";
 import BidModal from "../portal/BidModal";
 import FirstLoginSetupWizard, { needsFirstLoginSetup } from "../portal/ClerkFirstLoginSetupWizard";
 import PortalRoleSelection from "../portal/PortalRoleSelection";
+import PortalFeedback from "../portal/PortalFeedback";
 import ProfileModals from "../portal/ProfileModals";
 import ProfileStudio from "../portal/ProfileStudio";
 import WorkflowModals from "../portal/WorkflowModals";
@@ -18,9 +19,9 @@ import ClientV2Workspace from "../portal/v2/client";
 import InterpreterV2Workspace from "../portal/v2/interpreter";
 
 const allowedSections = {
-  admin: new Set(["home", "assignments", "people", "finance", "compliance", "reports", "profile", "settings", "notifications"]),
-  client: new Set(["home", "requests", "assignments", "billing", "documents", "profile", "notifications"]),
-  interpreter: new Set(["home", "work", "schedule", "documents", "learning", "profile", "notifications"]),
+  admin: new Set(["home", "assignments", "people", "finance", "compliance", "reports", "feedback", "profile", "settings", "notifications"]),
+  client: new Set(["home", "requests", "assignments", "billing", "documents", "feedback", "profile", "notifications"]),
+  interpreter: new Set(["home", "work", "schedule", "documents", "learning", "feedback", "profile", "notifications"]),
 };
 
 const legacySectionMap = {
@@ -33,14 +34,12 @@ const legacySectionMap = {
     training: "compliance",
     bids: "assignments",
     messages: "assignments",
-    feedback: "reports",
   },
   client: {
     overview: "home",
     request: "requests",
     schedule: "assignments",
     messages: "assignments",
-    feedback: "assignments",
   },
   interpreter: {
     overview: "home",
@@ -72,7 +71,7 @@ export default function MLSWebApp() {
   const v2 = useOperationsV2({ initialData: controller.operationsV2, deferInitialLoad: true });
   const {
     isLoaded, workspace, operations, app, role, section, setSection,
-    loading, refreshing, busyDoc, message, error, setMessage, setError,
+    loading, refreshing, saving, busyDoc, message, error, setMessage, setError,
     load, actions, setModal,
   } = controller;
   const roleSelection = usePortalRoleSelection({
@@ -151,7 +150,9 @@ export default function MLSWebApp() {
         {v2.message && <Toast message={v2.message} dismiss={() => v2.setMessage("")} />}
         {v2.error && <Toast message={v2.error} type="error" dismiss={() => v2.setError("")} />}
 
-        {role === "admin" && activeSection !== "notifications" && (
+        {activeSection === "feedback" && <PortalFeedback role={role} saving={saving} submit={actions.submitPortalFeedback} />}
+
+        {role === "admin" && !["feedback", "notifications"].includes(activeSection) && (
           <AdminV2Workspace
             section={activeSection}
             workspace={workspace}

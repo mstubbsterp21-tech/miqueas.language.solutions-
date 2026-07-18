@@ -92,6 +92,26 @@ export default function useMLSController() {
     }
   }
 
+  async function submitPortalFeedback(payload) {
+    setSaving(true);
+    try {
+      const result = await api.app("submitPortalFeedback", "POST", payload);
+      if (result.delivery?.sent && result.delivery?.filed) {
+        flash("Feedback submitted and filed with MLS. Thank you.");
+      } else if (result.delivery?.sent) {
+        flash("Feedback submitted and emailed to MLS. Gmail filing is pending.");
+      } else {
+        flash("Feedback saved securely. Email delivery is pending MLS Gmail reconnection.");
+      }
+      return result;
+    } catch (feedbackError) {
+      fail(feedbackError);
+      throw feedbackError;
+    } finally {
+      setSaving(false);
+    }
+  }
+
   function setSection(next) {
     setSectionState(next);
     const url = new URL(window.location.href);
@@ -523,6 +543,7 @@ export default function useMLSController() {
     openDocument,
     removeDocument,
     savePortalLayout,
+    submitPortalFeedback,
   };
 
   return {

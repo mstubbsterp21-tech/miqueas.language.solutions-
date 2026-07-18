@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import {
   BarChart3, Bell, BookOpen, Building2, CalendarDays, ChevronRight,
   CircleDollarSign, ClipboardCheck, Clock3, FileText, LayoutDashboard, Menu,
-  MessageSquare, RefreshCcw, Settings2, ShieldCheck, UserRound, Users, X,
+  Lightbulb, MessageSquare, RefreshCcw, Settings2, ShieldCheck, UserRound, Users, X,
 } from "lucide-react";
 import { PortalSignOutButton } from "../components/AuthStatus";
 import logo from "../logo.png";
@@ -14,9 +14,9 @@ import LayoutCustomizer, { orderedLayoutKeys } from "./LayoutCustomizer";
 import { getPortalTimeZone, timeZoneAbbreviation } from "./timezones";
 
 const roleNavigation = {
-  admin: [["home", "Home", LayoutDashboard], ["assignments", "Assignments", ClipboardCheck], ["communications", "Communications", MessageSquare], ["people", "People", Users], ["finance", "Finance", CircleDollarSign], ["compliance", "Compliance", ShieldCheck], ["reports", "Reports", BarChart3], ["profile", "My Profile", UserRound], ["settings", "Settings", Settings2]],
-  client: [["home", "Home", LayoutDashboard], ["requests", "Requests", ClipboardCheck], ["assignments", "Assignments", CalendarDays], ["communications", "Communications", MessageSquare], ["billing", "Billing", CircleDollarSign], ["documents", "Documents", FileText], ["profile", "Profile", Building2]],
-  interpreter: [["home", "Home", LayoutDashboard], ["work", "Assignments", ClipboardCheck], ["payments", "Payments", CircleDollarSign], ["communications", "Communications", MessageSquare], ["schedule", "Schedule", CalendarDays], ["documents", "Documents", FileText], ["learning", "Learning", BookOpen], ["profile", "My Profile", UserRound]],
+  admin: [["home", "Home", LayoutDashboard], ["assignments", "Assignments", ClipboardCheck], ["communications", "Communications", MessageSquare], ["people", "People", Users], ["finance", "Finance", CircleDollarSign], ["compliance", "Compliance", ShieldCheck], ["reports", "Reports", BarChart3], ["feedback", "Feedback", Lightbulb], ["profile", "My Profile", UserRound], ["settings", "Settings", Settings2]],
+  client: [["home", "Home", LayoutDashboard], ["requests", "Requests", ClipboardCheck], ["assignments", "Assignments", CalendarDays], ["communications", "Communications", MessageSquare], ["billing", "Billing", CircleDollarSign], ["documents", "Documents", FileText], ["feedback", "Feedback", Lightbulb], ["profile", "Profile", Building2]],
+  interpreter: [["home", "Home", LayoutDashboard], ["work", "Assignments", ClipboardCheck], ["payments", "Payments", CircleDollarSign], ["communications", "Communications", MessageSquare], ["schedule", "Schedule", CalendarDays], ["documents", "Documents", FileText], ["learning", "Learning", BookOpen], ["feedback", "Feedback", Lightbulb], ["profile", "My Profile", UserRound]],
 };
 
 function BadgeCount({ value, active, accent }) {

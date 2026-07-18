@@ -7,10 +7,11 @@ const senderEmail = String(process.env.GOOGLE_GMAIL_SENDER || "").trim().toLower
 const senderName = process.env.EMAIL_FROM_NAME || "Miqueas Language Solutions";
 
 export const gmailScope = "https://www.googleapis.com/auth/gmail.send";
+export const gmailModifyScope = "https://www.googleapis.com/auth/gmail.modify";
 export const calendarScope = "https://www.googleapis.com/auth/calendar";
 export const driveScope = "https://www.googleapis.com/auth/drive.file";
 const identityScopes = ["openid", "email"];
-const workspaceScopes = [gmailScope, calendarScope, driveScope];
+const workspaceScopes = [gmailScope, gmailModifyScope, calendarScope, driveScope];
 
 function encodeHeader(value) {
   const text = String(value || "");
@@ -220,7 +221,7 @@ async function refreshAccessToken(db, requiredScopes = [gmailScope]) {
   const missing = missingScopes(status.scope, requiredScopes);
   if (missing.length) {
     return {
-      error: "Reconnect Google Workspace in MLS Settings to approve Calendar and Drive access.",
+      error: "Reconnect Google Workspace in MLS Settings to approve portal email filing, Calendar, and Drive access.",
       status: "not_configured",
       missingScopes: missing,
     };
@@ -292,10 +293,59 @@ function buildRawMessage({ to, subject, text, html }) {
   };
 }
 
-export async function sendGmailEmail(db, { to, subject, text, html, threadId = null }) {
-  const access = await refreshAccessToken(db, [gmailScope]);
+async function ensureGmailLabel(accessToken, labelName) {
+  const listResponse = await fetch("https://gmail.googleapis.com/gmail/v1/users/me/labels", {
+    headers: { authorization: `Bearer ${accessToken}` },
+  });
+  const list = await listResponse.json().catch(() => ({}));
+  if (!listResponse.ok) throw new Error(list.error?.message || "Gmail labels could not be read.");
+
+  const existing = (list.labels || []).find((label) => String(label.name || "").toLowerCase() === String(labelName).toLowerCase());
+  if (existing?.id) return existing.id;
+
+  const createResponse = await fetch("https://gmail.googleapis.com/gmail/v1/users/me/labels", {
+    method: "POST",
+    headers: {
+      authorization: `Bearer ${accessToken}`,
+      "content-type": "application/json",
+    },
+    body: JSON.stringify({
+      name: labelName,
+      labelListVisibility: "labelShow",
+      messageListVisibility: "show",
+    }),
+  });
+  const created = await createResponse.json().catch(() => ({}));
+  if (!createResponse.ok || !created.id) throw new Error(created.error?.message || "The Gmail feedback label could not be created.");
+  return created.id;
+}
+
+async function applyGmailLabel(accessToken, messageId, labelId) {
+  const response = await fetch(`https://gmail.googleapis.com/gmail/v1/users/me/messages/${encodeURIComponent(messageId)}/modify`, {
+    method: "POST",
+    headers: {
+      authorization: `Bearer ${accessToken}`,
+      "content-type": "application/json",
+    },
+    body: JSON.stringify({ addLabelIds: [labelId], removeLabelIds: [] }),
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(data.error?.message || "The Gmail feedback label could not be applied.");
+}
+
+export async function sendGmailEmail(db, { to, subject, text, html, threadId = null, labelName = "" }) {
+  const access = await refreshAccessToken(db, labelName ? [gmailScope, gmailModifyScope] : [gmailScope]);
   if (!access.accessToken) {
     return { sent: false, status: access.status || "failed", error: access.error || "Gmail access is unavailable." };
+  }
+
+  let labelId = null;
+  if (labelName) {
+    try {
+      labelId = await ensureGmailLabel(access.accessToken, labelName);
+    } catch (labelError) {
+      return { sent: false, status: "failed", error: labelError.message, labelName };
+    }
   }
 
   const message = buildRawMessage({ to, subject, text, html });
@@ -320,16 +370,29 @@ export async function sendGmailEmail(db, { to, subject, text, html, threadId = n
     return { sent: false, status: "failed", error };
   }
 
+  let labelError = null;
+  if (labelId) {
+    try {
+      await applyGmailLabel(access.accessToken, data.id, labelId);
+    } catch (error) {
+      labelError = error.message;
+    }
+  }
+
   await db.from("gmail_integrations").update({
     status: "connected",
-    last_error: null,
+    last_error: labelError,
     updated_at: new Date().toISOString(),
   }).eq("id", "primary");
   return {
     sent: true,
-    status: "sent",
+    status: labelError ? "sent_unfiled" : "sent",
     messageId: data.id || message.messageId,
     threadId: data.threadId || threadId || null,
+    labelId,
+    labelName: labelName || null,
+    labeled: Boolean(labelId && !labelError),
+    error: labelError,
   };
 }
 

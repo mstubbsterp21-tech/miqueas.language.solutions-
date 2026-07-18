@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useSession } from "@clerk/clerk-react";
 import {
   CalendarDays, CheckCircle2, FolderOpen, Loader2, Mail, PlugZap,
-  RefreshCw, Send, Unplug,
+  RefreshCw, Send, Tag, Unplug,
 } from "lucide-react";
 import { createMLSApi } from "./api";
 import { Badge, Card, formatDate } from "./ui";
@@ -109,12 +109,13 @@ export default function GmailIntegrationCard() {
       </div>
       <h2 className="mt-5 text-xl font-black text-slate-950">Google Workspace</h2>
       <p className="mt-2 text-sm leading-6 text-slate-600">
-        Connects Gmail, the MLS Assignments calendar, and MLS assignment folders in Google Drive.
+        Connects Gmail delivery and feedback filing, the MLS Assignments calendar, and MLS assignment folders in Google Drive.
       </p>
 
-      <div className="mt-5 grid gap-3 sm:grid-cols-3">
+      <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         {[
           [Mail, "Gmail", gmailConnected ? "Email delivery ready" : "Not connected"],
+          [Tag, "Feedback", workspaceConnected ? "MLS Portal Feedback label ready" : "Reconnect required"],
           [CalendarDays, "Calendar", status?.calendarSummary || (workspaceConnected ? "Created on first sync" : "Reconnect required")],
           [FolderOpen, "Drive", status?.driveRootFolderId ? "MLS Assignments folder ready" : (workspaceConnected ? "Created on first sync" : "Reconnect required")],
         ].map(([Icon, label, detail]) => (
@@ -136,7 +137,7 @@ export default function GmailIntegrationCard() {
           {status?.workspaceLastVerifiedAt && <p><strong>Workspace verified:</strong> {formatDate(status.workspaceLastVerifiedAt)}</p>}
           {status?.lastTestAt && <p><strong>Last email test:</strong> {formatDate(status.lastTestAt)}</p>}
           {!status?.environmentConfigured && <p className="font-bold text-amber-700">Missing Vercel settings: {(status?.missingEnvironmentVariables || []).join(", ")}</p>}
-          {status?.missingScopes?.length > 0 && <p className="font-bold text-amber-700">Reconnect once to approve Calendar and Drive access.</p>}
+          {status?.missingScopes?.length > 0 && <p className="font-bold text-amber-700">Reconnect once to approve Gmail feedback filing, Calendar, and Drive access.</p>}
           {status?.lastError && <p className="font-bold text-rose-700">Last error: {status.lastError}</p>}
         </div>
       )}

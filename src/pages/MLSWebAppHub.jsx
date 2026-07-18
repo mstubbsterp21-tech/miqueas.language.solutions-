@@ -8,6 +8,7 @@ import BidModal from "../portal/BidModal";
 import CommunicationsCenter from "../portal/CommunicationsCenter";
 import FirstLoginSetupWizard, { needsFirstLoginSetup } from "../portal/ClerkFirstLoginSetupWizard";
 import PortalHomeSnapshot from "../portal/PortalHomeSnapshot";
+import PortalFeedback from "../portal/PortalFeedback";
 import PortalRealtimeBridge from "../portal/PortalRealtimeBridge";
 import PortalRoleSelection from "../portal/PortalRoleSelection";
 import ProfileMessageShortcut from "../portal/ProfileMessageShortcut";
@@ -25,14 +26,14 @@ import InterpreterV2Workspace from "../portal/v2/interpreter";
 import { navBadgesFor, notificationSection } from "../portal/notificationRouting";
 
 const allowedSections = {
-  admin: new Set(["home", "assignments", "communications", "people", "finance", "compliance", "reports", "profile", "settings", "notifications"]),
-  client: new Set(["home", "requests", "assignments", "communications", "billing", "documents", "profile", "notifications"]),
-  interpreter: new Set(["home", "work", "payments", "communications", "schedule", "documents", "learning", "profile", "notifications"]),
+  admin: new Set(["home", "assignments", "communications", "people", "finance", "compliance", "reports", "feedback", "profile", "settings", "notifications"]),
+  client: new Set(["home", "requests", "assignments", "communications", "billing", "documents", "feedback", "profile", "notifications"]),
+  interpreter: new Set(["home", "work", "payments", "communications", "schedule", "documents", "learning", "feedback", "profile", "notifications"]),
 };
 
 const legacySectionMap = {
-  admin: { overview: "home", schedule: "assignments", clients: "people", interpreters: "people", documents: "compliance", training: "compliance", bids: "assignments", messages: "communications", feedback: "reports" },
-  client: { overview: "home", request: "requests", schedule: "assignments", messages: "communications", feedback: "assignments" },
+  admin: { overview: "home", schedule: "assignments", clients: "people", interpreters: "people", documents: "compliance", training: "compliance", bids: "assignments", messages: "communications" },
+  client: { overview: "home", request: "requests", schedule: "assignments", messages: "communications" },
   interpreter: { overview: "home", opportunities: "work", training: "learning", messages: "communications" },
 };
 
@@ -51,7 +52,7 @@ export default function MLSWebAppHub() {
   const v2 = useOperationsV2({ initialData: controller.operationsV2, deferInitialLoad: true });
   const {
     isLoaded, workspace, operations, app, role, section, setSection,
-    loading, refreshing, savingTimeZone, busyDoc, message, error, setMessage, setError,
+    loading, refreshing, saving, savingTimeZone, busyDoc, message, error, setMessage, setError,
     load, actions, setModal,
   } = controller;
   const roleSelection = usePortalRoleSelection({ enabled: Boolean(isLoaded && workspace && !workspace.user?.isAdmin) });
@@ -119,8 +120,9 @@ export default function MLSWebAppHub() {
       {v2.error && <Toast message={v2.error} type="error" dismiss={() => v2.setError("")} />}
 
       {activeSection === "home" && <PortalHomeSnapshot role={role} workspace={workspace} operations={operations} app={app} v2={v2.data} actions={combinedActions} layout={app.layout} identityName={personalization?.display_name || [workspace.user?.firstName, workspace.user?.lastName].filter(Boolean).join(" ")} />}
+      {activeSection === "feedback" && <PortalFeedback role={role} saving={saving} submit={actions.submitPortalFeedback} />}
 
-      {role === "admin" && !["home", "notifications"].includes(activeSection) && <AdminV2Workspace section={activeSection} workspace={workspace} operations={operations} app={app} v2={v2.data} loading={v2.loading} saving={v2.saving} actions={combinedActions} />}
+      {role === "admin" && !["home", "feedback", "notifications"].includes(activeSection) && <AdminV2Workspace section={activeSection} workspace={workspace} operations={operations} app={app} v2={v2.data} loading={v2.loading} saving={v2.saving} actions={combinedActions} />}
       {role === "admin" && activeSection === "notifications" && <AdminWorkspace section="notifications" workspace={workspace} operations={operations} app={app} actions={combinedActions} />}
 
       {role === "client" && ["requests", "assignments", "communications", "billing"].includes(activeSection) && <ClientV2Workspace section={activeSection} workspace={workspace} operations={operations} app={app} v2={v2.data} loading={v2.loading} saving={v2.saving} actions={combinedActions} />}

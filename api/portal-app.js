@@ -1,5 +1,6 @@
 import { createClerkClient } from "@clerk/backend";
 import { createClient } from "@supabase/supabase-js";
+import { deliverPortalFeedback } from "./_shared/portal-feedback-email.js";
 import { sendPushNotification, vapidPublicKey } from "./_shared/web-push.js";
 
 const dbUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
@@ -12,6 +13,21 @@ const adminEmails = (process.env.VITE_ADMIN_EMAILS || "")
 
 const assignmentStatuses = new Set(["draft", "pending_confirmation", "confirmed", "completed", "cancelled"]);
 const paymentStatuses = new Set(["not_invoiced", "pending_payment", "paid", "void"]);
+const portalFeedbackTypes = new Set(["request_new_feature", "update_existing_feature", "remove_existing_feature"]);
+const portalFeedbackCategories = new Set([
+  "Home & Dashboard",
+  "Assignments & Opportunities",
+  "Requests & Scheduling",
+  "Communications & Notifications",
+  "People & Profiles",
+  "Payments, Billing & Finance",
+  "Documents & Compliance",
+  "Learning & Resources",
+  "Settings & Customization",
+  "Mobile App & Push Notifications",
+  "Accessibility & Usability",
+  "Other",
+]);
 
 function send(res, status, payload) {
   res.status(status).setHeader("content-type", "application/json");
@@ -53,6 +69,8 @@ async function signedInUser(req) {
   return {
     id: record.id,
     email,
+    firstName: record.firstName || "",
+    lastName: record.lastName || "",
     isAdmin: adminEmails.includes(email),
     metadataRole: String(record.publicMetadata?.portalRole || "").toLowerCase(),
   };
@@ -75,6 +93,11 @@ async function clientFor(db, userId) {
   const result = await db.from("clients").select("*").eq("clerk_user_id", userId).maybeSingle();
   if (result.error) throw result.error;
   return result.data;
+}
+
+async function portalRoleFor(db, user) {
+  if (user.isAdmin) return "admin";
+  return (await clientFor(db, user.id)) ? "client" : "interpreter";
 }
 
 async function createNotification(db, recipient, values) {
@@ -189,7 +212,7 @@ async function loadAssignments(db, user) {
 export async function loadApp(db, user) {
   const assignments = await loadAssignments(db, user);
   const assignmentIds = assignments.map((item) => item.id).filter(Boolean);
-  const role = user.isAdmin ? "admin" : (await clientFor(db, user.id)) ? "client" : "interpreter";
+  const role = await portalRoleFor(db, user);
 
   const [notificationResult, messageResult, layoutResult] = await Promise.all([
     db.from("notifications").select("*").eq("recipient_clerk_user_id", user.id).order("created_at", { ascending: false }).limit(50),
@@ -213,9 +236,9 @@ export async function loadApp(db, user) {
 }
 
 const layoutKeys = {
-  admin: { nav: ["home", "assignments", "communications", "people", "finance", "compliance", "reports", "profile", "settings"], home: ["hero", "metrics", "decision_queue", "staffed_schedule", "announcements"] },
-  client: { nav: ["home", "requests", "assignments", "communications", "billing", "documents", "profile"], home: ["hero", "metrics", "action_queue", "upcoming_services", "announcements"] },
-  interpreter: { nav: ["home", "work", "payments", "communications", "schedule", "documents", "learning", "profile"], home: ["hero", "metrics", "recommended", "readiness", "schedule", "announcements"] },
+  admin: { nav: ["home", "assignments", "communications", "people", "finance", "compliance", "reports", "feedback", "profile", "settings"], home: ["hero", "metrics", "decision_queue", "staffed_schedule", "announcements"] },
+  client: { nav: ["home", "requests", "assignments", "communications", "billing", "documents", "feedback", "profile"], home: ["hero", "metrics", "action_queue", "upcoming_services", "announcements"] },
+  interpreter: { nav: ["home", "work", "payments", "communications", "schedule", "documents", "learning", "feedback", "profile"], home: ["hero", "metrics", "recommended", "readiness", "schedule", "announcements"] },
 };
 
 function orderedSelection(values, allowed) {
@@ -224,7 +247,7 @@ function orderedSelection(values, allowed) {
 }
 
 async function savePortalLayout(db, user, payload) {
-  const role = user.isAdmin ? "admin" : (await clientFor(db, user.id)) ? "client" : "interpreter";
+  const role = await portalRoleFor(db, user);
   const allowed = layoutKeys[role];
   const navOrder = orderedSelection(payload.navOrder, allowed.nav);
   const homeOrder = orderedSelection(payload.homeOrder, allowed.home);
@@ -232,6 +255,69 @@ async function savePortalLayout(db, user, payload) {
   const result = await db.from("portal_layout_preferences").upsert({ clerk_user_id: user.id, role, nav_order: navOrder, home_order: homeOrder, hidden_home_sections: hidden, updated_at: new Date().toISOString() }, { onConflict: "clerk_user_id,role" }).select("nav_order,home_order,hidden_home_sections").single();
   if (result.error) throw result.error;
   return { status: 200, payload: { layout: result.data } };
+}
+
+async function submitPortalFeedback(db, user, payload) {
+  const requestType = String(payload.requestType || "").trim();
+  const category = String(payload.category || "").trim();
+  const comments = String(payload.comments || "").trim();
+  if (!portalFeedbackTypes.has(requestType)) {
+    return { status: 400, payload: { error: "Choose a valid feedback request type." } };
+  }
+  if (!portalFeedbackCategories.has(category)) {
+    return { status: 400, payload: { error: "Choose a valid portal category." } };
+  }
+  if (comments.length < 10 || comments.length > 4000) {
+    return { status: 400, payload: { error: "Feedback must be between 10 and 4,000 characters." } };
+  }
+
+  const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+  const recent = await db.from("portal_feedback")
+    .select("id", { count: "exact", head: true })
+    .eq("clerk_user_id", user.id)
+    .gte("created_at", oneHourAgo);
+  if (recent.error) throw recent.error;
+  if ((recent.count || 0) >= 20) {
+    return { status: 429, payload: { error: "Too many feedback submissions. Please try again later." } };
+  }
+
+  const role = await portalRoleFor(db, user);
+  const userName = [user.firstName, user.lastName].filter(Boolean).join(" ") || user.email || "MLS Portal user";
+  const inserted = await db.from("portal_feedback").insert({
+    clerk_user_id: user.id,
+    role,
+    user_name: userName,
+    user_email: user.email || null,
+    request_type: requestType,
+    category,
+    comments,
+  }).select("*").single();
+  if (inserted.error) throw inserted.error;
+
+  let delivery;
+  try {
+    delivery = await deliverPortalFeedback(db, inserted.data);
+  } catch (deliveryError) {
+    delivery = { sent: false, status: "failed", error: deliveryError.message || "Gmail feedback delivery failed." };
+    const failed = await db.from("portal_feedback").update({
+      gmail_delivery_status: "failed",
+      gmail_delivery_error: delivery.error,
+      updated_at: new Date().toISOString(),
+    }).eq("id", inserted.data.id);
+    if (failed.error) throw failed.error;
+  }
+
+  return {
+    status: 201,
+    payload: {
+      feedback: { id: inserted.data.id, createdAt: inserted.data.created_at },
+      delivery: {
+        sent: Boolean(delivery.sent),
+        filed: Boolean(delivery.labeled),
+        status: delivery.status,
+      },
+    },
+  };
 }
 
 function selectedNotificationIds(payload) {
@@ -478,6 +564,10 @@ export default async function handler(req, res) {
     if (action === "loadApp") return send(res, 200, await loadApp(db, user));
     if (action === "savePortalLayout") {
       const result = await savePortalLayout(db, user, payload);
+      return send(res, result.status, result.payload);
+    }
+    if (action === "submitPortalFeedback") {
+      const result = await submitPortalFeedback(db, user, payload);
       return send(res, result.status, result.payload);
     }
     if (action.startsWith("push")) {
