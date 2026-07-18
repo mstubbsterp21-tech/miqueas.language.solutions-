@@ -15,7 +15,7 @@ import { getPortalTimeZone, timeZoneAbbreviation } from "./timezones";
 const roleNavigation = {
   admin: [["home", "Home", LayoutDashboard], ["assignments", "Assignments", ClipboardCheck], ["communications", "Communications", MessageSquare], ["people", "People", Users], ["finance", "Finance", CircleDollarSign], ["compliance", "Compliance", ShieldCheck], ["reports", "Reports", BarChart3], ["profile", "My Profile", UserRound], ["settings", "Settings", Settings2]],
   client: [["home", "Home", LayoutDashboard], ["requests", "Requests", ClipboardCheck], ["assignments", "Assignments", CalendarDays], ["communications", "Communications", MessageSquare], ["billing", "Billing", CircleDollarSign], ["documents", "Documents", FileText], ["profile", "Profile", Building2]],
-  interpreter: [["home", "Home", LayoutDashboard], ["work", "Assignments", ClipboardCheck], ["communications", "Communications", MessageSquare], ["schedule", "Schedule", CalendarDays], ["documents", "Documents", FileText], ["learning", "Learning", BookOpen], ["profile", "My Profile", UserRound]],
+  interpreter: [["home", "Home", LayoutDashboard], ["work", "Assignments", ClipboardCheck], ["payments", "Payments", CircleDollarSign], ["communications", "Communications", MessageSquare], ["schedule", "Schedule", CalendarDays], ["documents", "Documents", FileText], ["learning", "Learning", BookOpen], ["profile", "My Profile", UserRound]],
 };
 
 function BadgeCount({ value, active, accent }) {
@@ -63,7 +63,7 @@ export default function AppShell({ role, section, setSection, user, personalizat
   const primary = personalization?.theme_primary || "#721100";
   const secondary = personalization?.theme_secondary || "#24130e";
   const accent = personalization?.theme_accent || "#dd7d00";
-  const displayName = personalization?.display_name || user?.firstName || user?.email;
+  const displayName = personalization?.display_name || (user?.firstName ? [user.firstName, user.lastName].filter(Boolean).join(" ") : user?.email);
   const initials = String(displayName || "M").split(/\s+/).map((part) => part[0]).join("").slice(0, 2).toUpperCase();
   const backgroundStyle = personalization?.background_style || "soft";
   const cardStyle = personalization?.card_style || "rounded";

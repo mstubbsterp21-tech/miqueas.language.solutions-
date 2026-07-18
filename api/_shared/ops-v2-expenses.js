@@ -12,6 +12,19 @@ export async function interpreterSubmitExpense(db, user, payload) {
   if (link.error) throw link.error;
   if (!link.data) return { status: 403, payload: { error: "You are not assigned to that assignment." } };
 
+  const receiptPath = String(payload.receiptStoragePath || "").trim();
+  if (!receiptPath) return { status: 400, payload: { error: "A receipt is required for every assignment expense." } };
+  const receipt = await db.from("assignment_documents")
+    .select("id,storage_path")
+    .eq("assignment_id", payload.assignmentId)
+    .eq("category", "expense_receipt")
+    .eq("storage_path", receiptPath)
+    .eq("uploaded_by_clerk_user_id", user.id)
+    .is("archived_at", null)
+    .maybeSingle();
+  if (receipt.error) throw receipt.error;
+  if (!receipt.data) return { status: 400, payload: { error: "Upload a valid receipt for this assignment before submitting the expense." } };
+
   const result = await db.from("expenses").insert({
     assignment_id: payload.assignmentId,
     interpreter_id: interpreter.id,
@@ -19,7 +32,7 @@ export async function interpreterSubmitExpense(db, user, payload) {
     description: payload.description || null,
     amount: money(payload.amount),
     mileage: payload.mileage ? money(payload.mileage) : null,
-    receipt_storage_path: payload.receiptStoragePath || null,
+    receipt_storage_path: receiptPath,
     status: "submitted",
   }).select().single();
   if (result.error) throw result.error;
@@ -56,7 +69,7 @@ export async function adminReviewExpense(db, user, payload) {
     category: "expense",
     title: `Expense ${payload.status}`,
     body: `${result.data.expense_type} · $${money(result.data.amount).toFixed(2)}`,
-    section: "work",
+    section: "payments",
     relatedType: "expense",
     relatedId: result.data.id,
   });

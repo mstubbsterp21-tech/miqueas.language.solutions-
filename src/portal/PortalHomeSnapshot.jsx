@@ -159,7 +159,7 @@ function ClientHome({ workspace, app, v2, actions }) {
   </div>;
 }
 
-function InterpreterHome({ workspace, operations, app, v2, actions }) {
+function InterpreterHome({ workspace, operations, app, v2, actions, identityName }) {
   const profile = workspace.interpreter?.profile || {};
   const assignments = app?.assignments || [];
   const upcoming = assignments.filter((item) => new Date(item.start_at).getTime() >= SNAPSHOT_NOW && !["cancelled", "closed"].includes(item.lifecycle_status)).sort((a, b) => new Date(a.start_at) - new Date(b.start_at));
@@ -178,18 +178,18 @@ function InterpreterHome({ workspace, operations, app, v2, actions }) {
   const nextAssignment = upcoming[0];
 
   return <div className="space-y-6">
-    <Hero title={`Welcome back${profile.first_name ? `, ${profile.first_name}` : ""}`} text={tasks.length ? `${tasks.length} readiness task${tasks.length === 1 ? "" : "s"} need attention. Opportunities and assigned work are separated below.` : "You’re assignment-ready. Review matched opportunities or prepare for your next service."} actions={<><Action tone="gold" onClick={() => actions.go("work")}>Open work center</Action><Action onClick={() => actions.go("schedule")}>Update availability</Action></>} />
+    <Hero title={`Welcome back${identityName ? `, ${identityName.split(/\s+/)[0]}` : ""}`} text={tasks.length ? `${tasks.length} readiness task${tasks.length === 1 ? "" : "s"} need attention. Opportunities and assigned work are separated below.` : "You’re assignment-ready. Review matched opportunities or prepare for your next service."} actions={<><Action tone="gold" onClick={() => actions.go("work")}>Open work center</Action><Action onClick={() => actions.go("schedule")}>Update availability</Action></>} />
     <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
       <Metric icon={CalendarDays} name="Assigned work" value={upcoming.length} note={nextAssignment ? `Next: ${formatDate(nextAssignment.start_at, { month: "short", day: "numeric" })}` : "No upcoming assignments"} onClick={() => actions.go("work")} />
       <Metric icon={Sparkles} name="Recommended" value={opportunities.length} note="Open assignments matched to you" color="#4338ca" onClick={() => actions.go("work")} />
       <Metric icon={ClipboardCheck} name="Readiness tasks" value={tasks.length} note="Documents, learning, compliance" color="#be123c" onClick={() => actions.go("documents")} />
-      <Metric icon={CircleDollarSign} name="Payment activity" value={payments.length} note="Ready or processing" color="#15803d" onClick={() => actions.go("work")} />
+      <Metric icon={CircleDollarSign} name="Payment activity" value={payments.length} note="Ready or processing" color="#15803d" onClick={() => actions.go("payments")} />
     </div>
     <div className="grid gap-6 xl:grid-cols-[minmax(0,1.35fr)_minmax(340px,.8fr)]">
       <div className="space-y-6">
         <Card>
           <SectionHeader title="Recommended for you" text="Open opportunities only—assigned work stays in your schedule." action={<ViewAll onClick={() => actions.go("work")}>Browse work</ViewAll>} />
-          <div className="mt-5 space-y-3">{opportunities.slice(0, 5).map((item) => <QueueItem key={item.id} icon={Sparkles} title={item.service_type || item.title || "Interpreter opportunity"} text={`${formatDate(item.start_at)}${item.delivery_mode ? ` · ${item.delivery_mode}` : ""}${item.city || item.state ? ` · ${[item.city, item.state].filter(Boolean).join(", ")}` : ""}`} badge={item.status || "open"} onClick={() => actions.go("work")} tone="green" />)}{!opportunities.length && <CompactEmpty icon={Sparkles} title="No matches right now" text="New opportunities will appear when they match your profile and availability." />}</div>
+          <div className="mt-5 space-y-3">{opportunities.slice(0, 5).map((item) => { const assignment = item.assignments || {}; return <QueueItem key={item.id} icon={Sparkles} title={assignment.service_type || "Interpreter opportunity"} text={`${formatDate(assignment.start_at)}${assignment.delivery_mode ? ` · ${assignment.delivery_mode}` : ""}${assignment.city || assignment.state ? ` · ${[assignment.city, assignment.state].filter(Boolean).join(", ")}` : ""}`} badge={item.status || "open"} onClick={() => actions.submitBid(item)} tone="green" />; })}{!opportunities.length && <CompactEmpty icon={Sparkles} title="No matches right now" text="New opportunities will appear when they match your profile and availability." />}</div>
         </Card>
         {tasks.length > 0 && <Card>
           <SectionHeader title="Readiness tasks" text="Profile and compliance work that can affect assignment matching." />
@@ -207,8 +207,8 @@ function InterpreterHome({ workspace, operations, app, v2, actions }) {
   </div>;
 }
 
-export default function PortalHomeSnapshot({ role, workspace, operations, app, v2, actions }) {
+export default function PortalHomeSnapshot({ role, workspace, operations, app, v2, actions, identityName }) {
   if (role === "admin") return <AdminHome workspace={workspace} app={app} v2={v2} actions={actions} />;
   if (role === "client") return <ClientHome workspace={workspace} app={app} v2={v2} actions={actions} />;
-  return <InterpreterHome workspace={workspace} operations={operations} app={app} v2={v2} actions={actions} />;
+  return <InterpreterHome workspace={workspace} operations={operations} app={app} v2={v2} actions={actions} identityName={identityName} />;
 }

@@ -79,7 +79,7 @@ export async function adminReviewTime(db, user, payload) {
     category: "time",
     title: `Time entry ${payload.status}`,
     body: payload.notes || `${result.data.billable_hours} hours`,
-    section: "work",
+    section: "payments",
     relatedType: "time_entry",
     relatedId: result.data.id,
   });

@@ -1,11 +1,15 @@
 import { useMemo, useState } from "react";
-import { Ban, CalendarDays, Check, CircleDollarSign, ClipboardCheck, Clock3, MapPin, Pencil, ShieldCheck, X } from "lucide-react";
+import { useSession } from "@clerk/clerk-react";
+import { Ban, CalendarDays, Check, CircleDollarSign, ClipboardCheck, Clock3, List, MapPin, Pencil, ShieldCheck, X } from "lucide-react";
 import { Badge, Card, EmptyState, Field, Hero, INPUT, Metric, SectionHeader, cx, formatDate, formatMoney } from "../ui";
 import { ActionButton, AssignmentRow, LoadingPanel, SelectField } from "./shared";
 import { getPortalTimeZone, timeZoneAbbreviation, timeZoneLabel, zonedDateTimeToUtc, zonedInputValue } from "../timezones";
+import AssignmentDocumentCenter from "../AssignmentDocumentCenter";
+import { createPortalSupabaseClient } from "../../lib/supabaseClient";
+import { createMLSApi } from "../api";
 
 const emptyTime = { assignmentId: "", actualStartAt: "", actualEndAt: "", breakMinutes: 0, notes: "" };
-const emptyExpense = { assignmentId: "", expenseType: "mileage", amount: "", mileage: "", description: "" };
+const emptyExpense = { assignmentId: "", expenseType: "mileage", amount: "", mileage: "", description: "", receipt: null };
 const emptyUnavailable = { startAt: "", endAt: "", availabilityType: "unavailable", notes: "" };
 const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 const BY_DAY = ["SU", "MO", "TU", "WE", "TH", "FR", "SA"];
@@ -83,13 +87,41 @@ function Home({ workspace, operations, app, v2, actions }) {
   );
 }
 
-function Work({ operations, app, v2, actions, saving }) {
+function AssignmentCalendar({ assignments, onOpen }) {
+  const grouped = assignments.reduce((map, item) => {
+    const key = new Date(item.start_at).toLocaleDateString("en-US", { year: "numeric", month: "long", timeZone: getPortalTimeZone() });
+    if (!map[key]) map[key] = [];
+    map[key].push(item);
+    return map;
+  }, {});
+  return <div className="space-y-5">{Object.entries(grouped).map(([month, items]) => <section key={month}><h3 className="mb-3 text-sm font-black uppercase tracking-[.1em] text-slate-500">{month}</h3><div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">{items.map((item) => <button key={item.id} type="button" onClick={() => onOpen(item)} className="min-w-0 rounded-2xl border border-slate-200 bg-slate-50 p-4 text-left transition hover:border-[#dd7d00]/40 hover:bg-white"><p className="text-xs font-black uppercase tracking-[.1em] text-[#721100]">{new Date(item.start_at).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", timeZone: getPortalTimeZone() })}</p><p className="mt-2 break-words font-black text-slate-950">{item.service_type}</p><p className="mt-1 text-xs text-slate-500">{new Date(item.start_at).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", timeZone: getPortalTimeZone() })} · {item.delivery_mode}</p><div className="mt-3"><Badge value={item.lifecycle_status || item.status} /></div></button>)}</div></section>)}{!assignments.length && <EmptyState icon={CalendarDays} title="No assigned work" text="Accepted opportunities and direct assignments will appear here." />}</div>;
+}
+
+function Work({ operations, app, actions }) {
+  const assignments = app?.assignments || [];
+  const opportunities = operations?.opportunities || [];
+  const [view, setView] = useState("list");
+  return (
+    <div className="space-y-6">
+      <Hero title="Assignments" text="Review matched opportunities first, then manage work already assigned to you." />
+      <Card><SectionHeader eyebrow="Pre-commitment" title="Recommended Opportunities" text="Review the service, schedule, general location, participants, language, setting, and teaming needs before expressing interest." /><div className="mt-5 grid gap-3 lg:grid-cols-2">{opportunities.map((opportunity) => { const item = opportunity.assignments || {}; return <button type="button" key={opportunity.id} onClick={() => actions.submitBid(opportunity)} className="min-w-0 rounded-2xl border border-slate-200 bg-slate-50 p-5 text-left transition hover:border-[#dd7d00]/50 hover:bg-white hover:shadow-lg"><div className="flex min-w-0 items-start justify-between gap-3"><div className="min-w-0"><p className="break-words font-black text-slate-950">{item.service_type || "Interpreter opportunity"}</p><p className="mt-1 break-words text-xs leading-5 text-slate-500">{formatDate(item.start_at)} · {item.delivery_mode || "Delivery pending"}{item.city || item.state ? ` · ${[item.city, item.state].filter(Boolean).join(", ")}` : ""}</p></div><Badge value={opportunity.status} /></div><p className="mt-4 text-xs font-black text-[#721100]">Review pre-commitment details →</p></button>; })}{!opportunities.length && <EmptyState icon={ClipboardCheck} title="No recommended opportunities" text="New work will appear when it matches your profile and availability." />}</div></Card>
+      <Card><SectionHeader eyebrow="Your work" title="Assignments" text="Accepted opportunities and assignments made directly by MLS." action={<div className="flex rounded-xl border border-slate-200 bg-slate-50 p-1"><button type="button" onClick={() => setView("list")} className={cx("inline-flex min-h-9 items-center gap-1.5 rounded-lg px-3 text-xs font-black", view === "list" ? "bg-[#721100] text-white" : "text-slate-500")}><List size={14} />List</button><button type="button" onClick={() => setView("calendar")} className={cx("inline-flex min-h-9 items-center gap-1.5 rounded-lg px-3 text-xs font-black", view === "calendar" ? "bg-[#721100] text-white" : "text-slate-500")}><CalendarDays size={14} />Calendar</button></div>} /><div className="mt-5">{view === "list" ? <div className="space-y-3">{assignments.map((item) => <AssignmentRow key={item.id} assignment={item} onOpen={actions.openAssignment} />)}{!assignments.length && <EmptyState icon={CalendarDays} title="No assigned work" text="Accepted opportunities and direct assignments will appear here." />}</div> : <AssignmentCalendar assignments={assignments} onOpen={actions.openAssignment} />}</div></Card>
+    </div>
+  );
+}
+
+function Payments({ app, v2, actions, saving }) {
+  const { session } = useSession();
+  const api = useMemo(() => createMLSApi(session), [session]);
+  const storage = useMemo(() => createPortalSupabaseClient(null), []);
   const assignments = app?.assignments || [];
   const timeZone = getPortalTimeZone();
   const zone = timeZoneAbbreviation(timeZone);
   const [time, setTime] = useState(emptyTime);
   const [expense, setExpense] = useState(emptyExpense);
+  const [documentAssignmentId, setDocumentAssignmentId] = useState("");
   const assignmentOptions = useMemo(() => assignments.map((item) => ({ value: item.id, label: `${item.service_type} · ${formatDate(item.start_at)}` })), [assignments]);
+  const documentAssignment = assignments.find((item) => item.id === documentAssignmentId);
   async function submitTime(event) {
     event.preventDefault();
     await actions.submitTime({
@@ -99,19 +131,31 @@ function Work({ operations, app, v2, actions, saving }) {
     });
     setTime(emptyTime);
   }
-  async function submitExpense(event) { event.preventDefault(); await actions.submitExpense(expense); setExpense(emptyExpense); }
+  async function submitExpense(event) {
+    event.preventDefault();
+    const file = expense.receipt;
+    if (!file) return;
+    if (file.size > 15 * 1024 * 1024) throw new Error("Receipts must be 15 MB or smaller.");
+    const signed = await api.automations("createDocumentUploadUrl", "POST", { assignmentId: expense.assignmentId, category: "expense_receipt", fileName: file.name, fileSize: file.size });
+    const upload = await storage.storage.from(signed.bucket).uploadToSignedUrl(signed.path, signed.token, file, { contentType: file.type || undefined });
+    if (upload.error) throw upload.error;
+    await api.automations("recordDocumentUpload", "POST", { assignmentId: expense.assignmentId, category: "expense_receipt", title: `${expense.expenseType} receipt`, visibility: "specific_interpreter", fileName: file.name, fileSize: file.size, mimeType: file.type || null, storagePath: signed.path });
+    await actions.submitExpense({ ...expense, receipt: undefined, receiptStoragePath: signed.path });
+    setExpense(emptyExpense);
+  }
   return (
     <div className="space-y-6">
-      <Hero title="Assignments" text="Assigned services, opportunities, time, expenses, and payment status in one place." />
+      <Hero title="Payments" text="Submit time, expenses, receipts, and invoices, then follow contractor payment status." />
       <div className="grid gap-5 xl:grid-cols-2">
         <Card><SectionHeader title="Submit actual time" text={`Enter both times in ${timeZoneLabel(timeZone)}.`} /><form onSubmit={submitTime} className="mt-6 grid gap-4"><Field name="Assignment" required><SelectField value={time.assignmentId} onChange={(event) => setTime({ ...time, assignmentId: event.target.value })} options={assignmentOptions} /></Field><div className="grid gap-3 sm:grid-cols-2"><Field name={`Actual start · ${zone}`} required><input className={INPUT} type="datetime-local" value={time.actualStartAt} onChange={(event) => setTime({ ...time, actualStartAt: event.target.value })} /></Field><Field name={`Actual end · ${zone}`} required><input className={INPUT} type="datetime-local" value={time.actualEndAt} onChange={(event) => setTime({ ...time, actualEndAt: event.target.value })} /></Field></div><Field name="Break minutes"><input className={INPUT} type="number" min="0" value={time.breakMinutes} onChange={(event) => setTime({ ...time, breakMinutes: event.target.value })} /></Field><Field name="Notes"><textarea className={INPUT} rows={3} value={time.notes} onChange={(event) => setTime({ ...time, notes: event.target.value })} /></Field><ActionButton type="submit" disabled={saving || !time.assignmentId || !time.actualStartAt || !time.actualEndAt}>Submit time</ActionButton></form></Card>
-        <Card><SectionHeader eyebrow="Expenses" title="Submit assignment expense" text="Mileage, parking, tolls, lodging, airfare, and approved costs can be reviewed before reimbursement or client billing." /><form onSubmit={submitExpense} className="mt-6 grid gap-4"><Field name="Assignment" required><SelectField value={expense.assignmentId} onChange={(event) => setExpense({ ...expense, assignmentId: event.target.value })} options={assignmentOptions} /></Field><div className="grid gap-3 sm:grid-cols-2"><Field name="Expense type"><SelectField value={expense.expenseType} onChange={(event) => setExpense({ ...expense, expenseType: event.target.value })} options={["mileage", "parking", "toll", "airfare", "lodging", "per_diem", "rideshare", "supplies", "other"]} /></Field><Field name="Amount"><input className={INPUT} type="number" step="0.01" value={expense.amount} onChange={(event) => setExpense({ ...expense, amount: event.target.value })} /></Field></div>{expense.expenseType === "mileage" && <Field name="Miles"><input className={INPUT} type="number" step="0.1" value={expense.mileage} onChange={(event) => setExpense({ ...expense, mileage: event.target.value })} /></Field>}<Field name="Description"><textarea className={INPUT} rows={3} value={expense.description} onChange={(event) => setExpense({ ...expense, description: event.target.value })} /></Field><ActionButton type="submit" disabled={saving || !expense.assignmentId}>Submit expense</ActionButton></form></Card>
+        <Card><SectionHeader eyebrow="Expenses" title="Submit assignment expense" text="Every expense requires a receipt. Upload PDF, Word, spreadsheet, PNG, or JPG files up to 15 MB." /><form onSubmit={submitExpense} className="mt-6 grid gap-4"><Field name="Assignment" required><SelectField value={expense.assignmentId} onChange={(event) => setExpense({ ...expense, assignmentId: event.target.value })} options={assignmentOptions} /></Field><div className="grid gap-3 sm:grid-cols-2"><Field name="Expense type"><SelectField value={expense.expenseType} onChange={(event) => setExpense({ ...expense, expenseType: event.target.value })} options={["mileage", "parking", "toll", "airfare", "lodging", "per_diem", "rideshare", "supplies", "other"]} /></Field><Field name="Amount" required><input className={INPUT} type="number" min="0" step="0.01" value={expense.amount} onChange={(event) => setExpense({ ...expense, amount: event.target.value })} /></Field></div>{expense.expenseType === "mileage" && <Field name="Miles"><input className={INPUT} type="number" step="0.1" value={expense.mileage} onChange={(event) => setExpense({ ...expense, mileage: event.target.value })} /></Field>}<Field name="Receipt" required><input className={INPUT} type="file" required accept=".pdf,.doc,.docx,.xls,.xlsx,.csv,.png,.jpg,.jpeg" onChange={(event) => setExpense({ ...expense, receipt: event.target.files?.[0] || null })} /><p className="mt-1 text-xs font-bold text-slate-500">Required for all expense types, including mileage and per diem.</p></Field><Field name="Description"><textarea className={INPUT} rows={3} value={expense.description} onChange={(event) => setExpense({ ...expense, description: event.target.value })} /></Field><ActionButton type="submit" disabled={saving || !expense.assignmentId || !expense.amount || !expense.receipt}>Upload receipt and submit expense</ActionButton></form></Card>
       </div>
       <div className="grid gap-5 xl:grid-cols-2">
         <Card><SectionHeader eyebrow="Submitted" title="Time entries" text="Admin review and client verification status." /><div className="mt-5 space-y-3">{(v2?.timeEntries || []).map((item) => <div key={item.id} className="rounded-2xl bg-slate-50 p-4"><div className="flex justify-between gap-3"><div><p className="font-black">{item.assignments?.service_type}</p><p className="mt-1 text-xs text-slate-500">{item.billable_hours} hours · {formatDate(item.actual_start_at)}</p></div><Badge value={item.status} /></div></div>)}{!(v2?.timeEntries || []).length && <EmptyState icon={Clock3} title="No time submitted" text="Completed assignment time will appear here." />}</div></Card>
         <Card><SectionHeader eyebrow="Found payment tracking" title="Contractor payments" text="These are references to the payment status maintained in Found." /><div className="mt-5 space-y-3">{(v2?.payments || []).map((item) => <div key={item.id} className="rounded-2xl bg-slate-50 p-4"><div className="flex justify-between gap-3"><div><p className="font-black">{item.assignments?.service_type}</p><p className="mt-1 text-xs text-slate-500">{formatMoney(item.contractor_payment_amount)} · Due {item.contractor_payment_due_date || "not set"}</p></div><Badge value={item.contractor_payment_status} /></div>{item.found_payment_url && <a href={item.found_payment_url} target="_blank" rel="noreferrer" className="mt-3 inline-block text-xs font-black text-[#721100] hover:underline">Open payment record in Found</a>}</div>)}{!(v2?.payments || []).length && <EmptyState icon={CircleDollarSign} title="No payment records" text="Found payment references appear after admin prepares contractor payment." />}</div></Card>
       </div>
-      <Card><SectionHeader eyebrow="Marketplace" title="Recommended opportunities" text="Review open assignments and submit a bid to MLS." /><div className="mt-5 grid gap-3 lg:grid-cols-2">{(operations?.opportunities || []).map((opportunity) => <div key={opportunity.id} className="rounded-2xl bg-slate-50 p-5"><div className="flex justify-between gap-3"><div><p className="font-black">{opportunity.assignments?.service_type}</p><p className="mt-1 text-xs text-slate-500">{formatDate(opportunity.assignments?.start_at)} · {opportunity.assignments?.delivery_mode}</p></div><Badge value={opportunity.status} /></div><div className="mt-4"><ActionButton onClick={() => actions.submitBid(opportunity)}>Bid for assignment</ActionButton></div></div>)}{!(operations?.opportunities || []).length && <EmptyState icon={ClipboardCheck} title="No open opportunities" text="Recommended work will appear here." />}</div></Card>
+      <Card><SectionHeader eyebrow="Financial documents" title="Upload invoice or receipt" text="Choose the related assignment, then upload an invoice, expense receipt, timesheet, or other supporting record." /><div className="mt-5"><Field name="Assignment"><SelectField value={documentAssignmentId} onChange={(event) => setDocumentAssignmentId(event.target.value)} options={assignmentOptions} /></Field></div></Card>
+      {documentAssignment && <AssignmentDocumentCenter assignment={documentAssignment} role="interpreter" />}
     </div>
   );
 }
@@ -206,7 +250,8 @@ function Schedule({ workspace, app, v2, actions, saving }) {
 export default function InterpreterV2Workspace({ section, workspace, operations, app, v2, loading, saving, actions }) {
   if (loading && !v2) return <LoadingPanel />;
   if (section === "home") return <Home workspace={workspace} operations={operations} app={app} v2={v2} actions={actions} />;
-  if (section === "work") return <Work operations={operations} app={app} v2={v2} actions={actions} saving={saving} />;
+  if (section === "work") return <Work operations={operations} app={app} actions={actions} />;
+  if (section === "payments") return <Payments app={app} v2={v2} actions={actions} saving={saving} />;
   if (section === "schedule") return <Schedule workspace={workspace} app={app} v2={v2} actions={actions} saving={saving} />;
   return null;
 }

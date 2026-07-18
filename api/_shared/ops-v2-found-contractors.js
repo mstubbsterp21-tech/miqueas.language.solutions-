@@ -27,7 +27,7 @@ export async function adminLinkFoundContractorPayment(db, user, payload) {
     category: "payment",
     title: payload.status === "paid" ? "Contractor payment completed" : "Contractor payment scheduled",
     body: `${result.data.assignments?.service_type || "MLS assignment"} · $${money(payload.amount).toFixed(2)}`,
-    section: "work",
+    section: "payments",
     relatedType: "assignment",
     relatedId: result.data.assignment_id,
   });

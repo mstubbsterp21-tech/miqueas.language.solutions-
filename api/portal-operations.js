@@ -157,7 +157,7 @@ export async function loadOperations(database, user) {
   if (interpreter) {
     const [courses, opportunities, bids] = await Promise.all([
       database.from("training_courses").select("*, training_progress(*)").eq("is_published", true).order("sort_order"),
-      database.from("assignment_opportunities").select("*, assignments(*)").eq("status", "open").order("opens_at", { ascending: false }),
+      database.from("assignment_opportunities").select("id,assignment_id,status,opens_at,closes_at,notes,assignments(id,service_type,specialty,start_at,end_at,timezone,delivery_mode,city,state,deaf_participants,hearing_participants,language_preferences,team_requested,cdi_requested,required_interpreter_count)").eq("status", "open").order("opens_at", { ascending: false }),
       database.from("assignment_bids").select("*, assignment_opportunities(*, assignments(*))").eq("interpreter_id", interpreter.id).order("created_at", { ascending: false }),
     ]);
     for (const result of [courses, opportunities, bids]) if (result.error) throw result.error;

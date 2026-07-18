@@ -37,7 +37,8 @@ export function notificationSection(role, notification = {}) {
     if (/training|learning|course/.test(signal)) return "learning";
     if (/availability|schedule|calendar/.test(signal)) return "schedule";
     if (/document|credential|compliance|onboarding/.test(signal)) return "documents";
-    if (/assignment|opportunit|bid|payment|expense|time entry|work/.test(signal)) return "work";
+    if (/payment|expense|invoice|time entry/.test(signal)) return "payments";
+    if (/assignment|opportunit|bid|work/.test(signal)) return "work";
   }
 
   return ROLE_FALLBACK[role] || "home";

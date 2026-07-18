@@ -27,7 +27,7 @@ import { navBadgesFor, notificationSection } from "../portal/notificationRouting
 const allowedSections = {
   admin: new Set(["home", "assignments", "communications", "people", "finance", "compliance", "reports", "profile", "settings", "notifications"]),
   client: new Set(["home", "requests", "assignments", "communications", "billing", "documents", "profile", "notifications"]),
-  interpreter: new Set(["home", "work", "communications", "schedule", "documents", "learning", "profile", "notifications"]),
+  interpreter: new Set(["home", "work", "payments", "communications", "schedule", "documents", "learning", "profile", "notifications"]),
 };
 
 const legacySectionMap = {
@@ -118,7 +118,7 @@ export default function MLSWebAppHub() {
       {v2.message && <Toast message={v2.message} dismiss={() => v2.setMessage("")} />}
       {v2.error && <Toast message={v2.error} type="error" dismiss={() => v2.setError("")} />}
 
-      {activeSection === "home" && <PortalHomeSnapshot role={role} workspace={workspace} operations={operations} app={app} v2={v2.data} actions={combinedActions} />}
+      {activeSection === "home" && <PortalHomeSnapshot role={role} workspace={workspace} operations={operations} app={app} v2={v2.data} actions={combinedActions} identityName={personalization?.display_name || [workspace.user?.firstName, workspace.user?.lastName].filter(Boolean).join(" ")} />}
 
       {role === "admin" && !["home", "notifications"].includes(activeSection) && <AdminV2Workspace section={activeSection} workspace={workspace} operations={operations} app={app} v2={v2.data} loading={v2.loading} saving={v2.saving} actions={combinedActions} />}
       {role === "admin" && activeSection === "notifications" && <AdminWorkspace section="notifications" workspace={workspace} operations={operations} app={app} actions={combinedActions} />}
@@ -127,7 +127,7 @@ export default function MLSWebAppHub() {
       {role === "client" && activeSection === "profile" && <div className="space-y-6"><ProfileMessageShortcut profileType="client" profile={workspace.client?.profile || {}} selfService onNavigate={setSection} /><ProfileStudio profileType="client" profile={workspace.client?.profile || {}} customization={v2.data?.profileCustomization} actions={combinedActions} ownerId={workspace.client?.profile?.id} /></div>}
       {role === "client" && ["documents", "notifications"].includes(activeSection) && <ClientWorkspace section={legacyClientSection} workspace={workspace} operations={operations} app={app} actions={combinedActions} busyDoc={busyDoc} />}
 
-      {role === "interpreter" && ["work", "schedule"].includes(activeSection) && <InterpreterV2Workspace section={activeSection} workspace={workspace} operations={operations} app={app} v2={v2.data} loading={v2.loading} saving={v2.saving} actions={combinedActions} />}
+      {role === "interpreter" && ["work", "payments", "schedule"].includes(activeSection) && <InterpreterV2Workspace section={activeSection} workspace={workspace} operations={operations} app={app} v2={v2.data} loading={v2.loading} saving={v2.saving} actions={combinedActions} />}
       {role === "interpreter" && activeSection === "communications" && <CommunicationsCenter workspace={workspace} onRefresh={refreshAll} />}
       {role === "interpreter" && activeSection === "profile" && <div className="space-y-6"><ProfileMessageShortcut profileType="interpreter" profile={workspace.interpreter?.profile || {}} selfService onNavigate={setSection} /><ProfileStudio profileType="interpreter" profile={workspace.interpreter?.profile || {}} customization={v2.data?.profileCustomization} actions={combinedActions} ownerId={workspace.interpreter?.profile?.id} /></div>}
       {role === "interpreter" && ["documents", "learning", "notifications"].includes(activeSection) && <InterpreterWorkspace section={legacyInterpreterSection} workspace={workspace} operations={operations} app={app} actions={combinedActions} busyDoc={busyDoc} />}

@@ -34,7 +34,7 @@ const ROLE_CATEGORIES = {
     "communication_record", "accessibility_plan", "other",
   ],
   interpreter: [
-    "interpreter_agreement", "timesheet", "expense_receipt",
+    "interpreter_agreement", "timesheet", "expense_receipt", "invoice",
     "preparation_material", "communication_record", "other",
   ],
 };
