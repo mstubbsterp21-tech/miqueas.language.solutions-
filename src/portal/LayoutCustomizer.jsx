@@ -6,7 +6,7 @@ export const PORTAL_WIDGETS = [
   ["clock", "Date & Time", Clock3],
   ["weather", "Weather", CloudSun],
   ["map", "Map", MapPinned],
-  ["news", "News", Newspaper],
+  ["news", "MLS Blog", Newspaper],
 ];
 
 export const LAYOUT_DEFAULTS = {
