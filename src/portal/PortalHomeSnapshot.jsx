@@ -15,6 +15,7 @@ import {
 import { Badge, Card, Hero, Metric, SectionHeader, formatDate, formatMoney } from "./ui";
 import { formatInPortalTimeZone } from "./timezones";
 import { orderedLayoutKeys } from "./LayoutCustomizer";
+import PortalWidgets from "./PortalWidgets";
 
 const SNAPSHOT_NOW = Date.now();
 
@@ -109,6 +110,7 @@ function AdminHome({ workspace, app, v2, actions, layout }) {
       <Metric icon={ShieldCheck} name="Onboarding" value={pendingOnboarding.length} note="Interpreter records in progress" color="#6d28d9" onClick={() => actions.go("compliance")} />
       <Metric icon={Bell} name="Unread updates" value={app?.unreadCount || 0} note="Across the MLS portal" color="#dd7d00" onClick={() => actions.go("notifications")} />
     </div>,
+    widgets: layout?.enabled_widgets?.length ? <PortalWidgets layout={layout} /> : null,
     decision_queue: <Card>
         <SectionHeader title="Decision queue" text="Only work that needs an admin action appears here." action={<ViewAll onClick={() => actions.go("assignments")}>Assignments</ViewAll>} />
         <div className="mt-5 space-y-3">{queue.slice(0, 8).map((item, index) => <QueueItem key={`${item.title}-${index}`} {...item} />)}{!queue.length && <CompactEmpty icon={ShieldCheck} title="Queue cleared" text="There are no staffing, finance, onboarding, or document decisions waiting." />}</div>
@@ -146,6 +148,7 @@ function ClientHome({ workspace, app, v2, actions, layout }) {
       <Metric icon={FileWarning} name="Requested files" value={docs.length} note="Secure document requests" color="#6d28d9" onClick={() => actions.go("documents")} />
       <Metric icon={CircleDollarSign} name="Balance due" value={formatMoney(due)} note={`${invoices.length} open invoice${invoices.length === 1 ? "" : "s"}`} color="#c2410c" onClick={() => actions.go("billing")} />
     </div>,
+    widgets: layout?.enabled_widgets?.length ? <PortalWidgets layout={layout} /> : null,
     action_queue: <Card>
         <SectionHeader title="Your action queue" text="Approvals, requested documents, and billing tasks—nothing else." action={<ViewAll onClick={() => actions.go("requests")}>Open requests</ViewAll>} />
         <div className="mt-5 space-y-3">{queue.slice(0, 8).map((item, index) => <QueueItem key={`${item.title}-${index}`} {...item} />)}{!queue.length && <CompactEmpty icon={ShieldCheck} title="You’re caught up" text="No quotes, agreements, documents, or payments are waiting." />}</div>
@@ -166,12 +169,16 @@ function InterpreterHome({ workspace, operations, app, v2, actions, identityName
   const payments = (v2?.payments || []).filter((item) => !["paid", "void"].includes(item.contractor_payment_status));
   const expiring = (v2?.credentials || []).filter((item) => item.expires_on && new Date(item.expires_on).getTime() <= SNAPSHOT_NOW + 60 * 864e5);
   const docs = (workspace.interpreter?.documentRequests || []).filter((item) => ["requested", "viewed", "overdue"].includes(item.status));
+  const uploadedDocumentTypes = new Set((workspace.interpreter?.documents || []).map((item) => item.document_type));
+  const requiredDocumentTypes = ["resume", "w9", "credential_proof", "liability_insurance", "ic_agreement"];
+  const missingRequiredDocuments = requiredDocumentTypes.filter((type) => !uploadedDocumentTypes.has(type));
   const training = (operations?.training || []).filter((course) => course.progress?.status !== "completed");
   const onboardingIncomplete = v2?.onboarding && !["completed", "declined"].includes(v2.onboarding.status);
   const tasks = [
     ...(onboardingIncomplete ? [{ icon: Users, title: "Complete your MLS onboarding", text: `Current stage: ${v2.onboarding.stage || "profile review"}.`, badge: v2.onboarding.status || "in_progress", onClick: () => actions.go("documents"), tone: "violet" }] : []),
     ...(training.length ? [{ icon: BookOpenCheck, title: `${training.length} learning item${training.length === 1 ? "" : "s"} to complete`, text: "Review required and recommended MLS material.", badge: "in_progress", onClick: () => actions.go("learning"), tone: "blue" }] : []),
     ...(docs.length ? [{ icon: FileWarning, title: `Upload ${docs.length} requested document${docs.length === 1 ? "" : "s"}`, text: "Open Documents to send the requested files securely.", badge: "requested", onClick: () => actions.go("documents"), tone: "gold" }] : []),
+    ...(missingRequiredDocuments.length ? [{ icon: FileWarning, title: `${missingRequiredDocuments.length} required document${missingRequiredDocuments.length === 1 ? "" : "s"} missing`, text: "Complete Required Documents to receive broadcasts and recommended opportunities.", badge: "required", onClick: () => actions.go("documents"), tone: "rose" }] : []),
     ...expiring.slice(0, 2).map((item) => ({ icon: FileWarning, title: `${item.credential_type || "Credential"} expires soon`, text: `Expires ${item.expires_on}.`, badge: "overdue", onClick: () => actions.go("documents"), tone: "rose" })),
   ];
   const nextAssignment = upcoming[0];
@@ -184,6 +191,7 @@ function InterpreterHome({ workspace, operations, app, v2, actions, identityName
       <Metric icon={ClipboardCheck} name="Readiness tasks" value={tasks.length} note="Documents, learning, compliance" color="#be123c" onClick={() => actions.go("documents")} />
       <Metric icon={CircleDollarSign} name="Payment activity" value={payments.length} note="Ready or processing" color="#15803d" onClick={() => actions.go("payments")} />
     </div>,
+    widgets: layout?.enabled_widgets?.length ? <PortalWidgets layout={layout} /> : null,
     recommended: <Card>
           <SectionHeader title="Recommended for you" text="Open opportunities only—assigned work stays in your schedule." action={<ViewAll onClick={() => actions.go("work")}>Browse work</ViewAll>} />
           <div className="mt-5 space-y-3">{opportunities.slice(0, 5).map((item) => { const assignment = item.assignments || {}; return <QueueItem key={item.id} icon={Sparkles} title={assignment.service_type || "Interpreter opportunity"} text={`${formatDate(assignment.start_at)}${assignment.delivery_mode ? ` · ${assignment.delivery_mode}` : ""}${assignment.city || assignment.state ? ` · ${[assignment.city, assignment.state].filter(Boolean).join(", ")}` : ""}`} badge={item.status || "open"} onClick={() => actions.submitBid(item)} tone="green" />; })}{!opportunities.length && <CompactEmpty icon={Sparkles} title="No matches right now" text="New opportunities will appear when they match your profile and availability." />}</div>

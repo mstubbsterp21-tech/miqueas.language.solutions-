@@ -219,7 +219,7 @@ export async function loadApp(db, user) {
     assignmentIds.length
       ? db.from("assignment_messages").select("*").in("assignment_id", assignmentIds).order("created_at", { ascending: true }).limit(500)
       : Promise.resolve({ data: [], error: null }),
-    db.from("portal_layout_preferences").select("nav_order,home_order,hidden_home_sections").eq("clerk_user_id", user.id).eq("role", role).maybeSingle(),
+    db.from("portal_layout_preferences").select("nav_order,home_order,hidden_home_sections,widget_order,enabled_widgets,tab_card_preferences").eq("clerk_user_id", user.id).eq("role", role).maybeSingle(),
   ]);
   if (notificationResult.error) throw notificationResult.error;
   if (messageResult.error) throw messageResult.error;
@@ -231,15 +231,19 @@ export async function loadApp(db, user) {
     messages: messageResult.data || [],
     notifications: notificationResult.data || [],
     unreadCount: (notificationResult.data || []).filter((item) => !item.is_read).length,
-    layout: layoutResult.data || { nav_order: [], home_order: [], hidden_home_sections: [] },
+    layout: layoutResult.data || { nav_order: [], home_order: [], hidden_home_sections: [], widget_order: [], enabled_widgets: [], tab_card_preferences: {} },
   };
 }
 
 const layoutKeys = {
-  admin: { nav: ["home", "assignments", "communications", "people", "finance", "compliance", "reports", "feedback", "profile", "settings"], home: ["hero", "metrics", "decision_queue", "staffed_schedule", "announcements"] },
-  client: { nav: ["home", "requests", "assignments", "communications", "billing", "documents", "feedback", "profile"], home: ["hero", "metrics", "action_queue", "upcoming_services", "announcements"] },
-  interpreter: { nav: ["home", "work", "payments", "communications", "schedule", "documents", "learning", "feedback", "profile"], home: ["hero", "metrics", "recommended", "readiness", "schedule", "announcements"] },
+  admin: { nav: ["home", "assignments", "communications", "people", "finance", "compliance", "reports", "feedback", "profile", "settings"], home: ["hero", "metrics", "widgets", "decision_queue", "staffed_schedule", "announcements"] },
+  client: { nav: ["home", "requests", "assignments", "communications", "billing", "documents", "feedback", "profile"], home: ["hero", "metrics", "widgets", "action_queue", "upcoming_services", "announcements"] },
+  interpreter: { nav: ["home", "work", "payments", "communications", "schedule", "documents", "learning", "feedback", "profile"], home: ["hero", "metrics", "widgets", "recommended", "readiness", "schedule", "announcements"] },
 };
+
+const widgetKeys = ["clock", "weather", "map", "news"];
+const cardSizes = new Set(["compact", "standard", "spacious"]);
+const cardShapes = new Set(["soft", "rounded", "square"]);
 
 function orderedSelection(values, allowed) {
   const selected = [...new Set((Array.isArray(values) ? values : []).map(String))].filter((value) => allowed.includes(value));
@@ -252,7 +256,28 @@ async function savePortalLayout(db, user, payload) {
   const navOrder = orderedSelection(payload.navOrder, allowed.nav);
   const homeOrder = orderedSelection(payload.homeOrder, allowed.home);
   const hidden = [...new Set((Array.isArray(payload.hiddenHomeSections) ? payload.hiddenHomeSections : []).map(String))].filter((value) => allowed.home.includes(value) && value !== "hero");
-  const result = await db.from("portal_layout_preferences").upsert({ clerk_user_id: user.id, role, nav_order: navOrder, home_order: homeOrder, hidden_home_sections: hidden, updated_at: new Date().toISOString() }, { onConflict: "clerk_user_id,role" }).select("nav_order,home_order,hidden_home_sections").single();
+  const widgetOrder = orderedSelection(payload.widgetOrder, widgetKeys);
+  const enabledWidgets = [...new Set((Array.isArray(payload.enabledWidgets) ? payload.enabledWidgets : []).map(String))].filter((value) => widgetKeys.includes(value));
+  const rawPreferences = payload.tabCardPreferences && typeof payload.tabCardPreferences === "object" && !Array.isArray(payload.tabCardPreferences) ? payload.tabCardPreferences : {};
+  const tabCardPreferences = {};
+  allowed.nav.forEach((key) => {
+    const value = rawPreferences[key];
+    if (!value || typeof value !== "object") return;
+    const size = cardSizes.has(String(value.size)) ? String(value.size) : "standard";
+    const shape = cardShapes.has(String(value.shape)) ? String(value.shape) : "soft";
+    tabCardPreferences[key] = { size, shape };
+  });
+  const result = await db.from("portal_layout_preferences").upsert({
+    clerk_user_id: user.id,
+    role,
+    nav_order: navOrder,
+    home_order: homeOrder,
+    hidden_home_sections: hidden,
+    widget_order: widgetOrder,
+    enabled_widgets: enabledWidgets,
+    tab_card_preferences: tabCardPreferences,
+    updated_at: new Date().toISOString(),
+  }, { onConflict: "clerk_user_id,role" }).select("nav_order,home_order,hidden_home_sections,widget_order,enabled_widgets,tab_card_preferences").single();
   if (result.error) throw result.error;
   return { status: 200, payload: { layout: result.data } };
 }

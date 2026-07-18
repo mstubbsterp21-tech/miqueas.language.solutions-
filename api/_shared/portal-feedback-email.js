@@ -42,11 +42,18 @@ export async function deliverPortalFeedback(db, feedback) {
     footerNote: `Filed under the ${portalFeedbackLabel} Gmail label.`,
   });
   const subject = `[MLS Portal Feedback] ${requestType} · ${feedback.category}`;
+  const knownLabel = await db.from("portal_feedback")
+    .select("gmail_label_id")
+    .not("gmail_label_id", "is", null)
+    .order("emailed_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
   const delivery = await sendGmailEmail(db, {
     to: recipient,
     subject,
     ...copy,
     labelName: portalFeedbackLabel,
+    labelIdHint: knownLabel.data?.gmail_label_id || null,
   });
 
   const deliveryStatus = delivery.sent

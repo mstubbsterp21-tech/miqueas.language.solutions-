@@ -108,6 +108,9 @@ export default function MLSWebAppHub() {
   const refreshAll = () => load(true);
   const combinedActions = { ...actions, ...v2.actions, refreshPortal: refreshAll };
   const personalization = role === "admin" ? v2.data?.personalProfileCustomization : v2.data?.profileCustomization;
+  const signedInName = role === "interpreter"
+    ? [workspace.interpreter?.profile?.first_name, workspace.interpreter?.profile?.last_name].filter(Boolean).join(" ")
+    : [workspace.user?.firstName, workspace.user?.lastName].filter(Boolean).join(" ");
   const legacyClientSection = activeSection === "notifications" ? "notifications" : activeSection;
   const legacyInterpreterSection = activeSection === "learning" ? "training" : activeSection;
 
@@ -119,7 +122,7 @@ export default function MLSWebAppHub() {
       {v2.message && <Toast message={v2.message} dismiss={() => v2.setMessage("")} />}
       {v2.error && <Toast message={v2.error} type="error" dismiss={() => v2.setError("")} />}
 
-      {activeSection === "home" && <PortalHomeSnapshot role={role} workspace={workspace} operations={operations} app={app} v2={v2.data} actions={combinedActions} layout={app.layout} identityName={personalization?.display_name || [workspace.user?.firstName, workspace.user?.lastName].filter(Boolean).join(" ")} />}
+      {activeSection === "home" && <PortalHomeSnapshot role={role} workspace={workspace} operations={operations} app={app} v2={v2.data} actions={combinedActions} layout={app.layout} identityName={signedInName || personalization?.display_name} />}
       {activeSection === "feedback" && <PortalFeedback role={role} saving={saving} submit={actions.submitPortalFeedback} />}
 
       {role === "admin" && !["home", "feedback", "notifications"].includes(activeSection) && <AdminV2Workspace section={activeSection} workspace={workspace} operations={operations} app={app} v2={v2.data} loading={v2.loading} saving={v2.saving} actions={combinedActions} />}

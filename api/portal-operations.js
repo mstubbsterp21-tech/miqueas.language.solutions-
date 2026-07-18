@@ -155,18 +155,28 @@ export async function loadOperations(database, user) {
   const response = { training: [], opportunities: [], bids: [], feedback: [], admin: null };
 
   if (interpreter) {
-    const [courses, opportunities, bids] = await Promise.all([
+    const [courses, opportunities, bids, documents] = await Promise.all([
       database.from("training_courses").select("*, training_progress(*)").eq("is_published", true).order("sort_order"),
-      database.from("assignment_opportunities").select("id,assignment_id,status,opens_at,closes_at,notes,assignments(id,service_type,specialty,start_at,end_at,timezone,delivery_mode,city,state,deaf_participants,hearing_participants,language_preferences,team_requested,cdi_requested,required_interpreter_count)").eq("status", "open").order("opens_at", { ascending: false }),
+      database.from("assignment_opportunities").select("id,assignment_id,status,opens_at,closes_at,notes,assignments(id,service_type,specialty,start_at,end_at,timezone,delivery_mode,city,state,deaf_participants,hearing_participants,language_preferences,team_requested,cdi_requested,required_interpreter_count,assignment_interpreters(id,status))").eq("status", "open").order("opens_at", { ascending: false }),
       database.from("assignment_bids").select("*, assignment_opportunities(*, assignments(*))").eq("interpreter_id", interpreter.id).order("created_at", { ascending: false }),
+      database.from("interpreter_documents").select("document_type,status").eq("interpreter_id", interpreter.id),
     ]);
-    for (const result of [courses, opportunities, bids]) if (result.error) throw result.error;
+    for (const result of [courses, opportunities, bids, documents]) if (result.error) throw result.error;
     response.training = (courses.data || []).map((course) => ({
       ...course,
       progress: (course.training_progress || []).find((x) => x.interpreter_id === interpreter.id) || null,
       training_progress: undefined,
     }));
-    response.opportunities = opportunities.data || [];
+    const requiredDocumentTypes = ["resume", "w9", "credential_proof", "liability_insurance", "ic_agreement"];
+    const uploadedTypes = new Set((documents.data || []).filter((item) => ["uploaded", "approved"].includes(item.status)).map((item) => item.document_type));
+    const missingRequiredDocuments = requiredDocumentTypes.filter((type) => !uploadedTypes.has(type));
+    response.missingRequiredDocuments = missingRequiredDocuments;
+    response.opportunities = missingRequiredDocuments.length ? [] : (opportunities.data || []).filter((opportunity) => {
+      const assignment = opportunity.assignments || {};
+      const required = Math.max(1, Number(assignment.required_interpreter_count || 1));
+      const staffed = (assignment.assignment_interpreters || []).filter((item) => !["removed", "declined", "cancelled"].includes(item.status)).length;
+      return staffed < required;
+    });
     response.bids = bids.data || [];
   }
 
@@ -217,9 +227,21 @@ async function updateTraining(database, user, payload) {
 async function submitBid(database, user, payload) {
   const interpreter = await interpreterFor(database, user);
   if (!interpreter) return { status: 403, payload: { error: "Interpreter profile required." } };
-  const opportunity = await database.from("assignment_opportunities").select("*").eq("id", payload.opportunityId).eq("status", "open").maybeSingle();
+  const [opportunity, documents] = await Promise.all([
+    database.from("assignment_opportunities").select("*, assignments(required_interpreter_count,assignment_interpreters(id,status))").eq("id", payload.opportunityId).eq("status", "open").maybeSingle(),
+    database.from("interpreter_documents").select("document_type,status").eq("interpreter_id", interpreter.id),
+  ]);
   if (opportunity.error) throw opportunity.error;
+  if (documents.error) throw documents.error;
   if (!opportunity.data) return { status: 404, payload: { error: "Opportunity is not open." } };
+  const requiredDocuments = ["resume", "w9", "credential_proof", "liability_insurance", "ic_agreement"];
+  const uploaded = new Set((documents.data || []).filter((item) => ["uploaded", "approved"].includes(item.status)).map((item) => item.document_type));
+  const missing = requiredDocuments.filter((type) => !uploaded.has(type));
+  if (missing.length) return { status: 403, payload: { error: "Upload all Required Documents before responding to recommended opportunities." } };
+  const assignment = opportunity.data.assignments || {};
+  const required = Math.max(1, Number(assignment.required_interpreter_count || 1));
+  const staffed = (assignment.assignment_interpreters || []).filter((item) => !["removed", "declined", "cancelled"].includes(item.status)).length;
+  if (staffed >= required) return { status: 409, payload: { error: "This assignment has already been fully staffed." } };
   const result = await database.from("assignment_bids").upsert({
     opportunity_id: payload.opportunityId,
     interpreter_id: interpreter.id,

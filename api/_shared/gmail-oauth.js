@@ -333,23 +333,29 @@ async function applyGmailLabel(accessToken, messageId, labelId) {
   if (!response.ok) throw new Error(data.error?.message || "The Gmail feedback label could not be applied.");
 }
 
-export async function sendGmailEmail(db, { to, subject, text, html, threadId = null, labelName = "" }) {
-  const access = await refreshAccessToken(db, labelName ? [gmailScope, gmailModifyScope] : [gmailScope]);
+export async function sendGmailEmail(db, { to, subject, text, html, threadId = null, labelName = "", labelIdHint = null }) {
+  // Sending is the critical path. Folder management is deliberately best-effort so
+  // a missing gmail.modify grant can never prevent a portal email from arriving.
+  const access = await refreshAccessToken(db, [gmailScope]);
   if (!access.accessToken) {
     return { sent: false, status: access.status || "failed", error: access.error || "Gmail access is unavailable." };
   }
 
-  let labelId = null;
-  if (labelName) {
+  let labelId = String(labelIdHint || "").match(/^[A-Za-z0-9_-]+$/)?.[0] || null;
+  let labelError = null;
+  const grantedScopes = new Set(String(access.scope || "").split(/\s+/).filter(Boolean));
+  if (labelName && grantedScopes.has(gmailModifyScope)) {
     try {
       labelId = await ensureGmailLabel(access.accessToken, labelName);
-    } catch (labelError) {
-      return { sent: false, status: "failed", error: labelError.message, labelName };
+    } catch (error) {
+      labelError = error.message;
     }
+  } else if (labelName && !labelId) {
+    labelError = "Gmail folder filing is pending Google Workspace reconnection; the email was still sent.";
   }
 
   const message = buildRawMessage({ to, subject, text, html });
-  const response = await fetch("https://gmail.googleapis.com/gmail/v1/users/me/messages/send", {
+  const sendRequest = (includeLabel) => fetch("https://gmail.googleapis.com/gmail/v1/users/me/messages/send", {
     method: "POST",
     headers: {
       authorization: `Bearer ${access.accessToken}`,
@@ -358,9 +364,17 @@ export async function sendGmailEmail(db, { to, subject, text, html, threadId = n
     body: JSON.stringify({
       raw: message.raw,
       ...(threadId ? { threadId } : {}),
+      ...(includeLabel && labelId ? { labelIds: [labelId] } : {}),
     }),
   });
-  const data = await response.json().catch(() => ({}));
+  let response = await sendRequest(Boolean(labelId && !grantedScopes.has(gmailModifyScope)));
+  let data = await response.json().catch(() => ({}));
+  if (!response.ok && labelId && !grantedScopes.has(gmailModifyScope)) {
+    labelError = data.error?.message || "The Gmail folder label could not be applied while sending.";
+    labelId = null;
+    response = await sendRequest(false);
+    data = await response.json().catch(() => ({}));
+  }
   if (!response.ok || !data.id) {
     const error = data.error?.message || "Gmail could not send the message.";
     await db.from("gmail_integrations").update({
@@ -370,8 +384,7 @@ export async function sendGmailEmail(db, { to, subject, text, html, threadId = n
     return { sent: false, status: "failed", error };
   }
 
-  let labelError = null;
-  if (labelId) {
+  if (labelId && grantedScopes.has(gmailModifyScope)) {
     try {
       await applyGmailLabel(access.accessToken, data.id, labelId);
     } catch (error) {

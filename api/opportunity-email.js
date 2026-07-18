@@ -9,6 +9,12 @@ const BLOCKS = {
   afternoon: [720, 1080],
   evening: [1080, 1440],
 };
+const REQUIRED_DOCUMENT_TYPES = ["resume", "w9", "credential_proof", "liability_insurance", "ic_agreement"];
+
+function hasRequiredDocuments(interpreter) {
+  const uploaded = new Set((interpreter.interpreter_documents || []).filter((item) => ["uploaded", "approved"].includes(item.status)).map((item) => item.document_type));
+  return REQUIRED_DOCUMENT_TYPES.every((type) => uploaded.has(type));
+}
 
 function escapeHtml(value) {
   return String(value || "")
@@ -132,11 +138,13 @@ export default async function handler(req, res) {
     if (!opportunity?.assignments) return send(res, 404, { error: "Assignment opportunity not found." });
 
     const interpreterResult = await db.from("interpreters")
-      .select("id,first_name,last_name,email,roster_status,availability_timezone,availability_status")
+      .select("id,first_name,last_name,email,roster_status,availability_timezone,availability_status,interpreter_documents(document_type,status)")
       .eq("roster_status", "active")
       .not("email", "is", null);
     if (interpreterResult.error) throw interpreterResult.error;
-    const interpreters = (interpreterResult.data || []).filter((item) => item.availability_status !== "not_accepting");
+    const activeInterpreters = (interpreterResult.data || []).filter((item) => item.availability_status !== "not_accepting");
+    const interpreters = activeInterpreters.filter(hasRequiredDocuments);
+    const missingDocuments = activeInterpreters.length - interpreters.length;
     const ids = interpreters.map((item) => item.id);
     const availabilityResult = ids.length
       ? await db.from("interpreter_availability").select("*").in("interpreter_id", ids)
@@ -154,7 +162,7 @@ export default async function handler(req, res) {
 
     const gmail = await getGmailStatus(db);
     if (!gmail.connected) {
-      return send(res, 200, { sent: 0, failed: eligible.length, suppressed: suppressed.length, eligible: eligible.length, configured: false, error: "Gmail is not connected." });
+      return send(res, 200, { sent: 0, failed: eligible.length, suppressed: suppressed.length, missingDocuments, eligible: eligible.length, configured: false, error: "Gmail is not connected." });
     }
 
     let sentCount = 0;
@@ -169,6 +177,7 @@ export default async function handler(req, res) {
       sent: sentCount,
       failed: failedCount,
       suppressed: suppressed.length,
+      missingDocuments,
       eligible: eligible.length,
       configured: true,
     });

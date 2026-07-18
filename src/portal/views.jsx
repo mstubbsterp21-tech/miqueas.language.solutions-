@@ -12,7 +12,7 @@ import {
 } from "./ui";
 import {
   CLIENT_DOCUMENTS, CREDENTIAL_OPTIONS, EXPERIENCE_OPTIONS, INTERPRETER_DOCUMENTS,
-  MODALITY_OPTIONS, SETTING_OPTIONS,
+  INTERPRETER_OPTIONAL_DOCUMENTS, INTERPRETER_REQUIRED_DOCUMENTS, MODALITY_OPTIONS, SETTING_OPTIONS,
 } from "./forms";
 import { displayRequestSetting, requestDefaultsFromClient } from "../requestFormConfig";
 
@@ -77,6 +77,34 @@ function DocumentsPanel({ audience, view, busyDoc, upload, open, remove, admin =
   const definitions = audience === "client" ? CLIENT_DOCUMENTS : INTERPRETER_DOCUMENTS;
   const documents = Object.fromEntries((view?.documents || []).map((item) => [item.document_type, item]));
   const requests = Object.fromEntries((view?.documentRequests || []).map((item) => [item.document_type, item]));
+  const [customName, setCustomName] = useState("");
+  const [customFile, setCustomFile] = useState(null);
+  const customDocuments = (view?.documents || []).filter((item) => String(item.document_type || "").startsWith("other_"));
+  const uploadedRequired = audience === "interpreter" ? INTERPRETER_REQUIRED_DOCUMENTS.filter(([type]) => documents[type]).length : 0;
+  async function uploadCustom(event) {
+    event.preventDefault();
+    if (!customName.trim() || !customFile) return;
+    const form = event.currentTarget;
+    const safeName = customName.trim().toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "").slice(0, 40) || "document";
+    await upload(`other_${safeName}_${Date.now()}`, customFile, null, { documentLabel: customName.trim() });
+    setCustomName("");
+    setCustomFile(null);
+    form.reset();
+  }
+  if (audience === "interpreter") return (
+    <div className="space-y-5">
+      <Card>
+        <SectionHeader title="Required Documents" text={admin ? "Review required interpreter compliance files." : "Upload all five required documents before MLS sends assignment broadcasts or recommended opportunities."} />
+        {!admin && <div className="mt-5 rounded-2xl border border-amber-200 bg-amber-50 p-4"><p className="font-black text-amber-950">{uploadedRequired} of {INTERPRETER_REQUIRED_DOCUMENTS.length} required documents uploaded</p><p className="mt-1 text-xs leading-5 text-amber-800">Résumé, W-9, Credentials, Liability Insurance, and IC Agreement are required.</p></div>}
+        <div className="mt-6 grid gap-4 lg:grid-cols-2">{INTERPRETER_REQUIRED_DOCUMENTS.map(([type, title]) => <DocumentCard key={type} type={type} title={title} document={documents[type]} request={requests[type]} busy={busyDoc} upload={upload} open={open} remove={remove} readOnly={admin} />)}</div>
+      </Card>
+      <Card>
+        <SectionHeader title="Optional Documents" text={admin ? "Review additional files supplied by this interpreter." : "Add licenses, work samples, or another named document that supports your MLS profile."} />
+        <div className="mt-6 grid gap-4 lg:grid-cols-2">{INTERPRETER_OPTIONAL_DOCUMENTS.map(([type, title]) => <DocumentCard key={type} type={type} title={title} document={documents[type]} request={requests[type]} busy={busyDoc} upload={upload} open={open} remove={remove} readOnly={admin} />)}{customDocuments.map((document) => <DocumentCard key={document.id} type={document.document_type} title={document.notes || document.file_name || "Other document"} document={document} busy={busyDoc} upload={upload} open={open} remove={remove} readOnly={admin} />)}</div>
+        {!admin && <form onSubmit={uploadCustom} className="mt-6 grid gap-3 rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-4 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] sm:items-end"><Field name="Other document name" required><input className={INPUT} required value={customName} onChange={(event) => setCustomName(event.target.value)} placeholder="Example: BEI certificate" /></Field><Field name="Choose file" required><input className={INPUT} type="file" required onChange={(event) => setCustomFile(event.target.files?.[0] || null)} /></Field><Button type="submit" icon={Plus} disabled={!customName.trim() || !customFile || Boolean(busyDoc)}>Upload document</Button></form>}
+      </Card>
+    </div>
+  );
   return (
     <Card>
       <SectionHeader eyebrow="Secure files" title="Document center" text={admin ? "Review the files tied to this account." : "Upload requested records and replace outdated versions without emailing attachments."} />

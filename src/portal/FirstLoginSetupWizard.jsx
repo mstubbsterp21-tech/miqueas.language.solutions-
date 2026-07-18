@@ -426,7 +426,7 @@ function InterpreterSteps({ step, draft, setDraft }) {
         </>
       ) : (
         <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-5 text-sm leading-6 text-emerald-900">
-          You can finish setup now. MLS will use this preference until you add a weekly schedule from the Schedule page.
+          You can finish setup now. MLS will use this preference until you add weekly availability from the Availability page.
         </div>
       )}
     </div>

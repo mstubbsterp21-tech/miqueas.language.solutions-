@@ -1,19 +1,26 @@
 import { useEffect, useState } from "react";
-import { Eye, EyeOff, GripVertical, LayoutPanelTop, RotateCcw, Save } from "lucide-react";
+import { CloudSun, Clock3, Eye, EyeOff, GripVertical, LayoutPanelTop, MapPinned, Newspaper, RotateCcw, Save } from "lucide-react";
 import { Modal, cx } from "./ui";
+
+export const PORTAL_WIDGETS = [
+  ["clock", "Date & time", Clock3],
+  ["weather", "Local weather", CloudSun],
+  ["map", "GPS map", MapPinned],
+  ["news", "Interpreter industry news", Newspaper],
+];
 
 export const LAYOUT_DEFAULTS = {
   admin: {
     nav: [["home", "Home"], ["assignments", "Assignments"], ["communications", "Communications"], ["people", "People"], ["finance", "Finance"], ["compliance", "Compliance"], ["reports", "Reports"], ["feedback", "Feedback"], ["profile", "My Profile"], ["settings", "Settings"]],
-    home: [["hero", "Command center"], ["metrics", "Key metrics"], ["decision_queue", "Decision queue"], ["staffed_schedule", "Staffed schedule"], ["announcements", "Announcements"]],
+    home: [["hero", "Command center"], ["metrics", "Key metrics"], ["widgets", "Optional widgets"], ["decision_queue", "Decision queue"], ["staffed_schedule", "Staffed schedule"], ["announcements", "Announcements"]],
   },
   client: {
     nav: [["home", "Home"], ["requests", "Requests"], ["assignments", "Assignments"], ["communications", "Communications"], ["billing", "Billing"], ["documents", "Documents"], ["feedback", "Feedback"], ["profile", "Profile"]],
-    home: [["hero", "Service hub"], ["metrics", "Key metrics"], ["action_queue", "Action queue"], ["upcoming_services", "Upcoming services"], ["announcements", "Announcements"]],
+    home: [["hero", "Service hub"], ["metrics", "Key metrics"], ["widgets", "Optional widgets"], ["action_queue", "Action queue"], ["upcoming_services", "Upcoming services"], ["announcements", "Announcements"]],
   },
   interpreter: {
-    nav: [["home", "Home"], ["work", "Assignments"], ["payments", "Payments"], ["communications", "Communications"], ["schedule", "Schedule"], ["documents", "Documents"], ["learning", "Learning"], ["feedback", "Feedback"], ["profile", "My Profile"]],
-    home: [["hero", "Welcome and shortcuts"], ["metrics", "Key metrics"], ["recommended", "Recommended opportunities"], ["readiness", "Readiness tasks"], ["schedule", "Assigned schedule"], ["announcements", "Announcements"]],
+    nav: [["home", "Home"], ["work", "Assignments"], ["payments", "Payments"], ["communications", "Communications"], ["schedule", "Availability"], ["documents", "Documents"], ["learning", "Learning"], ["feedback", "Feedback"], ["profile", "My Profile"]],
+    home: [["hero", "Welcome and shortcuts"], ["metrics", "Key metrics"], ["widgets", "Optional widgets"], ["recommended", "Recommended opportunities"], ["readiness", "Readiness tasks"], ["schedule", "Assigned schedule"], ["announcements", "Announcements"]],
   },
 };
 
@@ -39,9 +46,44 @@ export default function LayoutCustomizer({ open, close, role, layout, save }) {
   const [nav, setNav] = useState([]);
   const [home, setHome] = useState([]);
   const [hidden, setHidden] = useState([]);
+  const [widgetOrder, setWidgetOrder] = useState([]);
+  const [enabledWidgets, setEnabledWidgets] = useState([]);
+  const [tabCardPreferences, setTabCardPreferences] = useState({});
   const [saving, setSaving] = useState(false);
-  useEffect(() => { if (!open) return; setNav(normalize(layout?.nav_order, defaults.nav)); setHome(normalize(layout?.home_order, defaults.home)); setHidden(layout?.hidden_home_sections || []); }, [defaults, layout, open]);
-  const reset = () => { setNav(defaults.nav.map(([key]) => key)); setHome(defaults.home.map(([key]) => key)); setHidden([]); };
-  const submit = async () => { setSaving(true); try { await save({ navOrder: nav, homeOrder: home, hiddenHomeSections: hidden }); close(); } finally { setSaving(false); } };
-  return <Modal open={open} close={close} title="Customize your MLS Portal" subtitle="Your tab and homepage priorities are saved to this account on every device."><div className="grid gap-6 lg:grid-cols-2"><section><div className="mb-3 flex items-center gap-2"><LayoutPanelTop size={18} className="text-[#721100]" /><h3 className="font-black text-slate-950">Navigation tabs</h3></div><p className="mb-4 text-xs leading-5 text-slate-500">Drag tabs or use the arrow controls. The first five become your mobile navigation bar.</p><ReorderList items={defaults.nav} order={nav} setOrder={setNav} /></section><section><div className="mb-3 flex items-center gap-2"><LayoutPanelTop size={18} className="text-[#721100]" /><h3 className="font-black text-slate-950">Homepage cards</h3></div><p className="mb-4 text-xs leading-5 text-slate-500">Reorder cards and use the eye control to hide or restore sections.</p><ReorderList items={defaults.home} order={home} setOrder={setHome} hidden={hidden} setHidden={setHidden} /></section></div><div className="mt-6 flex flex-col-reverse gap-3 border-t border-slate-200 pt-5 sm:flex-row sm:justify-between"><button type="button" onClick={reset} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-2xl border border-slate-200 px-4 text-sm font-black text-slate-600"><RotateCcw size={16} />Restore defaults</button><button type="button" onClick={submit} disabled={saving} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-2xl bg-[#721100] px-5 text-sm font-black text-white disabled:opacity-50"><Save size={16} />{saving ? "Saving…" : "Save layout"}</button></div></Modal>;
+  useEffect(() => {
+    if (!open) return;
+    setNav(normalize(layout?.nav_order, defaults.nav));
+    setHome(normalize(layout?.home_order, defaults.home));
+    setHidden(layout?.hidden_home_sections || []);
+    setWidgetOrder(normalize(layout?.widget_order, PORTAL_WIDGETS));
+    setEnabledWidgets(layout?.enabled_widgets || []);
+    setTabCardPreferences(layout?.tab_card_preferences || {});
+  }, [defaults, layout, open]);
+  const reset = () => {
+    setNav(defaults.nav.map(([key]) => key));
+    setHome(defaults.home.map(([key]) => key));
+    setHidden([]);
+    setWidgetOrder(PORTAL_WIDGETS.map(([key]) => key));
+    setEnabledWidgets([]);
+    setTabCardPreferences({});
+  };
+  const updateCard = (key, field, value) => setTabCardPreferences((current) => ({ ...current, [key]: { size: current[key]?.size || "standard", shape: current[key]?.shape || "soft", [field]: value } }));
+  const submit = async () => {
+    setSaving(true);
+    try {
+      await save({ navOrder: nav, homeOrder: home, hiddenHomeSections: hidden, widgetOrder, enabledWidgets, tabCardPreferences });
+      close();
+    } finally { setSaving(false); }
+  };
+  const widgetLabels = PORTAL_WIDGETS.map(([key, label]) => [key, label]);
+  const widgetIcons = Object.fromEntries(PORTAL_WIDGETS.map(([key, , Icon]) => [key, Icon]));
+  return <Modal open={open} close={close} wide title="Customize your MLS Portal" subtitle="Priorities, widgets, and card appearance are saved to this account on every device.">
+    <div className="grid gap-6 lg:grid-cols-2">
+      <section><div className="mb-3 flex items-center gap-2"><LayoutPanelTop size={18} className="text-[#721100]" /><h3 className="font-black text-slate-950">Navigation tabs</h3></div><p className="mb-4 text-xs leading-5 text-slate-500">Drag tabs or use the arrow controls. The first five become your mobile navigation bar.</p><ReorderList items={defaults.nav} order={nav} setOrder={setNav} /></section>
+      <section><div className="mb-3 flex items-center gap-2"><LayoutPanelTop size={18} className="text-[#721100]" /><h3 className="font-black text-slate-950">Homepage cards</h3></div><p className="mb-4 text-xs leading-5 text-slate-500">Reorder cards and use the eye control to hide or restore sections.</p><ReorderList items={defaults.home} order={home} setOrder={setHome} hidden={hidden} setHidden={setHidden} /></section>
+      <section><div className="mb-3 flex items-center gap-2"><CloudSun size={18} className="text-[#721100]" /><h3 className="font-black text-slate-950">Optional widgets</h3></div><p className="mb-4 text-xs leading-5 text-slate-500">Turn widgets on, then reorder them. Weather and maps ask for location only when you choose to share it.</p><div className="space-y-2">{widgetOrder.map((key) => { const Icon = widgetIcons[key]; const enabled = enabledWidgets.includes(key); const label = Object.fromEntries(widgetLabels)[key]; return <div key={key} className="flex min-w-0 items-center gap-3 rounded-2xl border border-slate-200 bg-white p-3"><span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#721100]/10 text-[#721100]">{Icon && <Icon size={17} />}</span><span className="min-w-0 flex-1 break-words text-sm font-black text-slate-800">{label}</span><button type="button" role="switch" aria-label={`${enabled ? "Disable" : "Enable"} ${label}`} aria-checked={enabled} onClick={() => setEnabledWidgets((current) => enabled ? current.filter((item) => item !== key) : [...current, key])} className={cx("relative h-7 w-12 shrink-0 rounded-full transition", enabled ? "bg-[#721100]" : "bg-slate-200")}><span className={cx("absolute top-1 h-5 w-5 rounded-full bg-white shadow transition", enabled ? "left-6" : "left-1")} /></button></div>; })}</div><div className="mt-3"><ReorderList items={widgetLabels} order={widgetOrder} setOrder={setWidgetOrder} /></div></section>
+      <section><div className="mb-3 flex items-center gap-2"><LayoutPanelTop size={18} className="text-[#721100]" /><h3 className="font-black text-slate-950">Cards by tab</h3></div><p className="mb-4 text-xs leading-5 text-slate-500">Density changes internal spacing; shape changes corner style. Widths remain responsive so layouts stay stable.</p><div className="space-y-3">{nav.map((key) => { const label = Object.fromEntries(defaults.nav)[key] || key; const preference = tabCardPreferences[key] || {}; return <div key={key} className="grid min-w-0 gap-2 rounded-2xl border border-slate-200 bg-white p-3 sm:grid-cols-[minmax(0,1fr)_140px_140px] sm:items-center"><span className="min-w-0 break-words text-sm font-black text-slate-800">{label}</span><select aria-label={`${label} card size`} value={preference.size || "standard"} onChange={(event) => updateCard(key, "size", event.target.value)} className="min-h-10 min-w-0 rounded-xl border border-slate-200 bg-white px-3 text-sm font-bold"><option value="compact">Compact</option><option value="standard">Standard</option><option value="spacious">Spacious</option></select><select aria-label={`${label} card shape`} value={preference.shape || "soft"} onChange={(event) => updateCard(key, "shape", event.target.value)} className="min-h-10 min-w-0 rounded-xl border border-slate-200 bg-white px-3 text-sm font-bold"><option value="soft">Soft</option><option value="rounded">Rounded</option><option value="square">Square</option></select></div>; })}</div></section>
+    </div>
+    <div className="mt-6 flex flex-col-reverse gap-3 border-t border-slate-200 pt-5 sm:flex-row sm:justify-between"><button type="button" onClick={reset} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-2xl border border-slate-200 px-4 text-sm font-black text-slate-600"><RotateCcw size={16} />Restore defaults</button><button type="button" onClick={submit} disabled={saving} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-2xl bg-[#721100] px-5 text-sm font-black text-white disabled:opacity-50"><Save size={16} />{saving ? "Saving…" : "Save layout"}</button></div>
+  </Modal>;
 }

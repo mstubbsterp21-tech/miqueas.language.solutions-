@@ -353,18 +353,20 @@ async function recordUpload(db, user, body) {
 
   let document;
   if (existing) {
+    const updateValues = {
+      document_type: body.documentType,
+      file_name: body.fileName,
+      storage_path: body.storagePath,
+      status: "uploaded",
+      uploaded_by: user.id,
+      uploaded_at: new Date().toISOString(),
+      reviewed_by: null,
+      reviewed_at: null,
+    };
+    if (String(body.documentLabel || "").trim()) updateValues.notes = String(body.documentLabel).trim().slice(0, 160);
     const result = await db
       .from(table)
-      .update({
-        document_type: body.documentType,
-        file_name: body.fileName,
-        storage_path: body.storagePath,
-        status: "uploaded",
-        uploaded_by: user.id,
-        uploaded_at: new Date().toISOString(),
-        reviewed_by: null,
-        reviewed_at: null,
-      })
+      .update(updateValues)
       .eq("id", existing.id)
       .select()
       .single();
@@ -383,6 +385,7 @@ async function recordUpload(db, user, body) {
         storage_path: body.storagePath,
         status: "uploaded",
         uploaded_by: user.id,
+        notes: String(body.documentLabel || "").trim().slice(0, 160) || null,
       })
       .select()
       .single();

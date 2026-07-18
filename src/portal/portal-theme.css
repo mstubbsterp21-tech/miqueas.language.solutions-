@@ -24,6 +24,13 @@
 .mls-portal-theme select,
 .mls-portal-theme textarea { touch-action: manipulation; }
 
+/* Per-tab card preferences change visual density without changing grid widths. */
+.mls-portal-theme main[data-card-size="compact"] .mls-card { padding: .9rem !important; }
+.mls-portal-theme main[data-card-size="spacious"] .mls-card { padding: clamp(1.35rem, 3vw, 2rem) !important; }
+.mls-portal-theme main[data-card-shape="soft"] .mls-card { border-radius: 1.75rem !important; }
+.mls-portal-theme main[data-card-shape="rounded"] .mls-card { border-radius: 1.1rem !important; }
+.mls-portal-theme main[data-card-shape="square"] .mls-card { border-radius: .55rem !important; }
+
 @media (min-width: 1024px) {
   .mls-shell-content { padding-bottom: 0; }
   .mls-floating-action { bottom: 2rem; }

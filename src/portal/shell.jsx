@@ -16,7 +16,7 @@ import { getPortalTimeZone, timeZoneAbbreviation } from "./timezones";
 const roleNavigation = {
   admin: [["home", "Home", LayoutDashboard], ["assignments", "Assignments", ClipboardCheck], ["communications", "Communications", MessageSquare], ["people", "People", Users], ["finance", "Finance", CircleDollarSign], ["compliance", "Compliance", ShieldCheck], ["reports", "Reports", BarChart3], ["feedback", "Feedback", Lightbulb], ["profile", "My Profile", UserRound], ["settings", "Settings", Settings2]],
   client: [["home", "Home", LayoutDashboard], ["requests", "Requests", ClipboardCheck], ["assignments", "Assignments", CalendarDays], ["communications", "Communications", MessageSquare], ["billing", "Billing", CircleDollarSign], ["documents", "Documents", FileText], ["feedback", "Feedback", Lightbulb], ["profile", "Profile", Building2]],
-  interpreter: [["home", "Home", LayoutDashboard], ["work", "Assignments", ClipboardCheck], ["payments", "Payments", CircleDollarSign], ["communications", "Communications", MessageSquare], ["schedule", "Schedule", CalendarDays], ["documents", "Documents", FileText], ["learning", "Learning", BookOpen], ["feedback", "Feedback", Lightbulb], ["profile", "My Profile", UserRound]],
+  interpreter: [["home", "Home", LayoutDashboard], ["work", "Assignments", ClipboardCheck], ["payments", "Payments", CircleDollarSign], ["communications", "Communications", MessageSquare], ["schedule", "Availability", CalendarDays], ["documents", "Documents", FileText], ["learning", "Learning", BookOpen], ["feedback", "Feedback", Lightbulb], ["profile", "My Profile", UserRound]],
 };
 
 function BadgeCount({ value, active, accent }) {
@@ -69,11 +69,15 @@ export default function AppShell({ role, section, setSection, user, personalizat
   const primary = personalization?.theme_primary || "#721100";
   const secondary = personalization?.theme_secondary || "#24130e";
   const accent = personalization?.theme_accent || "#dd7d00";
-  const displayName = personalization?.display_name || (user?.firstName ? [user.firstName, user.lastName].filter(Boolean).join(" ") : user?.email);
+  const accountName = user?.firstName ? [user.firstName, user.lastName].filter(Boolean).join(" ") : "";
+  const displayName = accountName || personalization?.display_name || user?.email;
   const initials = String(displayName || "M").split(/\s+/).map((part) => part[0]).join("").slice(0, 2).toUpperCase();
   const backgroundStyle = personalization?.background_style || "soft";
   const cardStyle = personalization?.card_style || "rounded";
   const selectedTimeZone = timeZone || getPortalTimeZone();
+  const cardPreference = layout?.tab_card_preferences?.[section] || {};
+  const cardSize = ["compact", "standard", "spacious"].includes(cardPreference.size) ? cardPreference.size : "standard";
+  const cardShape = ["soft", "rounded", "square"].includes(cardPreference.shape) ? cardPreference.shape : "soft";
 
   const navigate = (value) => {
     setSection(value);
@@ -150,7 +154,7 @@ export default function AppShell({ role, section, setSection, user, personalizat
               </button>
             </div>
           </header>
-          <main className="relative min-w-0 max-w-full overflow-x-hidden p-3 sm:p-4 md:p-6 lg:p-8">
+          <main data-card-size={cardSize} data-card-shape={cardShape} className="relative min-w-0 max-w-full overflow-x-hidden p-3 sm:p-4 md:p-6 lg:p-8">
             <AnimatePresence mode="wait">
               <motion.div key={`${role}-${section}`} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.2 }}>{children}</motion.div>
             </AnimatePresence>

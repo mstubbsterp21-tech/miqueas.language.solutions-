@@ -58,7 +58,7 @@ function patchDocumentActions(code) {
       if (result.error) throw result.error;
       await api.core("recordUpload", "POST", {
         audienceType, ownerId, documentType: type, fileName: file.name,
-        storagePath: signed.path, replaceDocumentId,
+        storagePath: signed.path, replaceDocumentId, documentLabel: context.documentLabel || "",
       });
       flash(replaceDocumentId ? "Document replaced." : "Document uploaded.");
       await load(true);

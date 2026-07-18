@@ -65,7 +65,7 @@ export function Badge({ value, className = "" }) {
 export function Card({ children, className = "", hover = false, onClick }) {
   const Element = onClick ? motion.button : motion.div;
   return (
-    <Element layout initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} whileHover={hover ? { y: -3 } : undefined} transition={{ duration: 0.2 }} onClick={onClick} className={cx("min-w-0 max-w-full overflow-hidden rounded-[1.35rem] border border-black/5 bg-white p-4 text-left shadow-[0_18px_55px_rgba(40,25,18,.07)] sm:rounded-[1.75rem] sm:p-5 md:p-6", onClick && "w-full cursor-pointer transition hover:shadow-[0_22px_65px_rgba(40,25,18,.12)]", className)}>
+    <Element layout initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} whileHover={hover ? { y: -3 } : undefined} transition={{ duration: 0.2 }} onClick={onClick} className={cx("mls-card min-w-0 max-w-full overflow-hidden rounded-[1.35rem] border border-black/5 bg-white p-4 text-left shadow-[0_18px_55px_rgba(40,25,18,.07)] sm:rounded-[1.75rem] sm:p-5 md:p-6", onClick && "w-full cursor-pointer transition hover:shadow-[0_22px_65px_rgba(40,25,18,.12)]", className)}>
       {children}
     </Element>
   );
@@ -73,7 +73,7 @@ export function Card({ children, className = "", hover = false, onClick }) {
 
 export function Metric({ icon: Icon, name, value, note, color = BRAND.burgundy, onClick }) {
   return (
-    <motion.button type="button" onClick={onClick} whileHover={{ y: -3 }} className={cx("rounded-[1.35rem] border border-black/5 bg-white p-4 text-left shadow-[0_16px_50px_rgba(40,25,18,.07)] sm:rounded-[1.55rem] sm:p-5", onClick ? "cursor-pointer" : "cursor-default")}>
+    <motion.button type="button" onClick={onClick} whileHover={{ y: -3 }} className={cx("mls-card rounded-[1.35rem] border border-black/5 bg-white p-4 text-left shadow-[0_16px_50px_rgba(40,25,18,.07)] sm:rounded-[1.55rem] sm:p-5", onClick ? "cursor-pointer" : "cursor-default")}>
       <div className="flex justify-between gap-4">
         <div className="min-w-0"><p className="text-sm font-black text-slate-500">{name}</p><p className="mt-2 text-2xl font-black text-slate-900 sm:text-3xl">{value}</p>{note && <p className="mt-1 text-xs leading-5 text-slate-500">{note}</p>}</div>
         <span className="flex h-11 w-11 items-center justify-center rounded-2xl text-white" style={{ background: color }}><Icon size={20} /></span>

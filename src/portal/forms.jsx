@@ -20,15 +20,20 @@ export const CLIENT_DOCUMENTS = [
   ["other", "Other document"],
 ];
 
-export const INTERPRETER_DOCUMENTS = [
+export const INTERPRETER_REQUIRED_DOCUMENTS = [
   ["resume", "Résumé"],
   ["w9", "W-9"],
-  ["credential_proof", "Credential proof"],
+  ["credential_proof", "Credentials"],
   ["liability_insurance", "Liability insurance"],
-  ["ic_agreement", "Independent contractor agreement"],
+  ["ic_agreement", "IC Agreement"],
+];
+
+export const INTERPRETER_OPTIONAL_DOCUMENTS = [
   ["state_license", "State license"],
   ["work_sample", "Work sample"],
 ];
+
+export const INTERPRETER_DOCUMENTS = [...INTERPRETER_REQUIRED_DOCUMENTS, ...INTERPRETER_OPTIONAL_DOCUMENTS];
 
 export const CREDENTIAL_OPTIONS = [
   "National Interpreter Certification (NIC)",
