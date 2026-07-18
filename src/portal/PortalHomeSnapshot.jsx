@@ -17,6 +17,7 @@ import { formatInPortalTimeZone } from "./timezones";
 import { orderedLayoutKeys } from "./LayoutCustomizer";
 import PortalWidgets from "./PortalWidgets";
 import { firstNameFromDisplayName, portalDisplayName } from "./portalIdentity";
+import { ClientAssignmentCard, ClientRequestRoadmap } from "./clientServiceExperience";
 
 const SNAPSHOT_NOW = Date.now();
 
@@ -154,10 +155,12 @@ function ClientHome({ workspace, app, v2, actions, layout }) {
         <SectionHeader title="Your action queue" text="Approvals, requested documents, and billing tasks—nothing else." action={<ViewAll onClick={() => actions.go("requests")}>Open requests</ViewAll>} />
         <div className="mt-5 space-y-3">{queue.slice(0, 8).map((item, index) => <QueueItem key={`${item.title}-${index}`} {...item} />)}{!queue.length && <CompactEmpty icon={ShieldCheck} title="You’re caught up" text="No quotes, agreements, documents, or payments are waiting." />}</div>
       </Card>,
+    next_service: upcoming[0] ? <section><SectionHeader title="Your next service" text="Everything you need for confirmation, preparation, arrival, and support." /><div className="mt-4"><ClientAssignmentCard assignment={upcoming[0]} onOpen={actions.openAssignment} onRepeat={actions.openRepeatRequest} onMessage={() => actions.go("communications")} /></div></section> : null,
     upcoming_services: <Card>
-          <SectionHeader title="Upcoming services" text="Your schedule appears once—right here." action={<ViewAll onClick={() => actions.go("assignments")} />} />
-          <div className="mt-5 space-y-3">{upcoming.slice(0, 4).map((item) => <ScheduleItem key={item.id} assignment={item} onClick={() => actions.openAssignment(item)} />)}{!upcoming.length && <CompactEmpty icon={CalendarDays} title="Nothing scheduled" text="Submit a request whenever communication access is needed." />}</div>
+          <SectionHeader title="Upcoming services" text="Your live service schedule after the next booking." action={<ViewAll onClick={() => actions.go("assignments")} />} />
+          <div className="mt-5 space-y-3">{upcoming.slice(1, 5).map((item) => <ScheduleItem key={item.id} assignment={item} onClick={() => actions.openAssignment(item)} />)}{upcoming.length <= 1 && <CompactEmpty icon={CalendarDays} title={upcoming.length ? "No other services scheduled" : "Nothing scheduled"} text="Submit a request whenever communication access is needed." />}</div>
         </Card>,
+    request_roadmap: <ClientRequestRoadmap actions={actions} />,
     announcements: <Announcements items={v2?.announcements} actions={actions} />,
   };
   return <DashboardSections role="client" layout={layout} sections={sections} />;

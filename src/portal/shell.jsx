@@ -15,7 +15,7 @@ import { getPortalTimeZone, timeZoneAbbreviation } from "./timezones";
 
 const roleNavigation = {
   admin: [["home", "Home", LayoutDashboard], ["assignments", "Assignments", ClipboardCheck], ["communications", "Communications", MessageSquare], ["people", "People", Users], ["finance", "Finance", CircleDollarSign], ["compliance", "Compliance", ShieldCheck], ["reports", "Reports", BarChart3], ["feedback", "Feedback", Lightbulb], ["profile", "My Profile", UserRound], ["settings", "Settings", Settings2]],
-  client: [["home", "Home", LayoutDashboard], ["requests", "Requests", ClipboardCheck], ["assignments", "Assignments", CalendarDays], ["communications", "Communications", MessageSquare], ["billing", "Billing", CircleDollarSign], ["documents", "Documents", FileText], ["feedback", "Feedback", Lightbulb], ["profile", "Profile", Building2]],
+  client: [["home", "Home", LayoutDashboard], ["requests", "Requests", ClipboardCheck], ["assignments", "Services", CalendarDays], ["communications", "Communications", MessageSquare], ["billing", "Billing", CircleDollarSign], ["documents", "Documents", FileText], ["feedback", "Feedback", Lightbulb], ["profile", "Profile", Building2]],
   interpreter: [["home", "Home", LayoutDashboard], ["work", "Assignments", ClipboardCheck], ["payments", "Payments", CircleDollarSign], ["communications", "Communications", MessageSquare], ["schedule", "Availability", CalendarDays], ["documents", "Documents", FileText], ["learning", "Learning", BookOpen], ["feedback", "Feedback", Lightbulb], ["profile", "My Profile", UserRound]],
 };
 
