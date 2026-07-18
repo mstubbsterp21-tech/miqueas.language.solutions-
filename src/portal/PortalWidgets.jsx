@@ -1,10 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSession } from "@clerk/clerk-react";
+import { Link } from "react-router-dom";
 import {
   CalendarDays, Cloud, CloudFog, CloudLightning, CloudRain, CloudSnow, CloudSun,
   Clock3, Droplets, ExternalLink, Gauge, Globe2, Loader2, LocateFixed, MapPinned, Moon,
   Newspaper, RefreshCcw, Sun, Timer, Wind,
 } from "lucide-react";
+import { formatBlogDate, getPublishedBlogPosts } from "../content/blogPostsLive";
 import { Card, SectionHeader } from "./ui";
 import { PORTAL_WIDGETS } from "./LayoutCustomizer";
 import { getPortalTimeZone, timeZoneLabel } from "./timezones";
@@ -94,8 +96,13 @@ function MapWidget({ location, error, loading, requestLocation }) {
   return <Card><SectionHeader title="Map" text="A live map centered on your current location." />{location ? <div className="mt-5"><div className="overflow-hidden rounded-2xl border border-slate-200 bg-slate-100"><iframe key={embedUrl} src={embedUrl} title="Map centered on your current location" loading="lazy" referrerPolicy="no-referrer" allowFullScreen className="h-72 w-full border-0" /></div><div className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-slate-50 p-3"><div className="flex min-w-0 items-center gap-3"><span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700"><MapPinned size={18} /></span><div className="min-w-0"><p className="text-sm font-black">Current location</p><p className="mt-0.5 break-all text-xs text-slate-500">{location.latitude.toFixed(4)}, {location.longitude.toFixed(4)}</p></div></div><button type="button" onClick={requestLocation} disabled={loading} className="inline-flex min-h-10 items-center gap-2 rounded-xl px-3 text-xs font-black text-[#721100] disabled:opacity-50">{loading ? <Loader2 size={14} className="animate-spin" /> : <LocateFixed size={14} />}Refresh location</button></div><div className="mt-3 grid gap-2 sm:grid-cols-2"><a href={appleUrl} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-2xl bg-[#721100] px-4 text-sm font-black text-white">Open in Apple Maps <ExternalLink size={14} /></a><a href={googleUrl} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 text-sm font-black text-[#721100]">Open in Google Maps <ExternalLink size={14} /></a></div>{error && <p className="mt-3 text-xs font-bold leading-5 text-rose-700">{error}</p>}</div> : <div className="mt-5"><LocationButton loading={loading} request={requestLocation} />{error && <p className="mt-3 text-xs font-bold leading-5 text-rose-700">{error}</p>}</div>}</Card>;
 }
 
-function NewsWidget({ news, error, loading, refresh }) {
-  return <Card><SectionHeader title="News" text="Recent interpreting and Deaf-community headlines. Four stories are visible at a time; scroll for more." action={<button type="button" onClick={refresh} disabled={loading} aria-label="Refresh news" className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 text-[#721100]"><RefreshCcw size={15} className={loading ? "animate-spin" : ""} /></button>} /><div className="mt-5 max-h-[56.25rem] overflow-y-auto overscroll-contain pr-1 sm:max-h-[27.75rem] sm:pr-2"><div className="grid gap-3 sm:grid-cols-2">{news.map((item, index) => <a key={`${item.url}-${item.title}`} href={item.url} target="_blank" rel="noopener noreferrer" className="group flex h-[13.5rem] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white transition hover:-translate-y-0.5 hover:border-[#dd7d00]/50 hover:shadow-lg"><span className={`relative flex h-28 shrink-0 items-end overflow-hidden bg-gradient-to-br ${NEWS_VISUALS[index % NEWS_VISUALS.length]} p-3 text-white`}>{item.imageUrl && <img src={item.imageUrl} alt="" className="absolute inset-0 h-full w-full object-cover opacity-60 mix-blend-luminosity" />}<span className="absolute -right-4 -top-5 h-20 w-20 rounded-full bg-white/15" /><Newspaper size={54} strokeWidth={1.2} className="absolute right-3 top-3 text-white/25" /><span className="relative rounded-full bg-black/20 px-2.5 py-1 text-[10px] font-black uppercase tracking-[.1em] backdrop-blur-sm">{item.source || "News"}</span></span><span className="flex min-h-0 flex-1 flex-col p-4"><span className="line-clamp-2 block break-words text-sm font-black leading-5 text-slate-900 group-hover:text-[#721100]">{item.title}</span><span className="mt-auto flex items-center justify-between gap-2 pt-2 text-[10px] font-bold text-slate-400"><span>{item.publishedAt ? new Date(item.publishedAt).toLocaleDateString() : "Latest update"}</span><ExternalLink size={13} /></span></span></a>)}{loading && !news.length && [0, 1, 2, 3].map((item) => <div key={item} className="h-[13.5rem] overflow-hidden rounded-2xl border border-slate-200"><div className="h-28 animate-pulse bg-slate-200" /><div className="space-y-2 p-4"><div className="h-3 animate-pulse rounded bg-slate-200" /><div className="h-3 w-3/4 animate-pulse rounded bg-slate-200" /></div></div>)}{!loading && !news.length && <div className="sm:col-span-2"><p className="rounded-2xl bg-slate-50 p-4 text-sm text-slate-500">News is temporarily unavailable.</p></div>}{error && <p className="text-xs font-bold leading-5 text-rose-700 sm:col-span-2">{error}</p>}</div></div></Card>;
+function firstBlogImage(html = "") {
+  return html.match(/<img[^>]+src=["']([^"']+)["']/i)?.[1] || "";
+}
+
+function BlogWidget() {
+  const posts = getPublishedBlogPosts();
+  return <Card><SectionHeader title="MLS Blog" text="Insights from Miqueas Language Solutions on interpreting, accessibility, and communication access. Four articles are visible at a time; scroll for more." action={<Link to="/blog" className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-slate-200 px-3 text-xs font-black text-[#721100] transition hover:border-[#dd7d00]/50 hover:bg-[#fff8ee]">View all <ExternalLink size={13} /></Link>} /><div className="mt-5 max-h-[56.25rem] overflow-y-auto overscroll-contain pr-1 sm:max-h-[27.75rem] sm:pr-2"><div className="grid gap-3 sm:grid-cols-2">{posts.map((post, index) => { const imageUrl = firstBlogImage(post.html); return <Link key={post.slug} to={`/blog/${post.slug}`} className="group flex h-[13.5rem] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white transition hover:-translate-y-0.5 hover:border-[#dd7d00]/50 hover:shadow-lg"><span className={`relative flex h-28 shrink-0 items-end overflow-hidden bg-gradient-to-br ${NEWS_VISUALS[index % NEWS_VISUALS.length]} p-3 text-white`}>{imageUrl ? <img src={imageUrl} alt="" loading="lazy" className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105" /> : <Newspaper size={54} strokeWidth={1.2} className="absolute right-3 top-3 text-white/35" />}<span className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" /><span className="relative rounded-full bg-[#721100]/90 px-2.5 py-1 text-[10px] font-black uppercase tracking-[.1em] shadow-sm backdrop-blur-sm">{post.category || "MLS Blog"}</span></span><span className="flex min-h-0 flex-1 flex-col p-4"><span className="line-clamp-2 block break-words text-sm font-black leading-5 text-slate-900 group-hover:text-[#721100]">{post.title}</span><span className="mt-auto flex items-center justify-between gap-2 pt-2 text-[10px] font-bold text-slate-400"><span>{formatBlogDate(post.publishDate)} · {post.readTime}</span><ExternalLink size={13} /></span></span></Link>; })}</div></div></Card>;
 }
 
 export default function PortalWidgets({ layout }) {
@@ -109,12 +116,9 @@ export default function PortalWidgets({ layout }) {
   const [now, setNow] = useState(new Date());
   const [location, setLocation] = useState(null);
   const [weather, setWeather] = useState(null);
-  const [news, setNews] = useState([]);
   const [locationLoading, setLocationLoading] = useState(false);
   const [weatherLoading, setWeatherLoading] = useState(false);
-  const [newsLoading, setNewsLoading] = useState(false);
   const [locationError, setLocationError] = useState("");
-  const [newsError, setNewsError] = useState("");
   const timeZone = getPortalTimeZone();
 
   useEffect(() => { const timer = window.setInterval(() => setNow(new Date()), 1000); return () => window.clearInterval(timer); }, []);
@@ -134,20 +138,12 @@ export default function PortalWidgets({ layout }) {
       if (enabled.has("weather")) await loadWeather(next);
     }, (error) => { setLocationLoading(false); setLocationError(error.code === 1 ? "Location permission was not granted. Enable Location for this site in your browser settings." : "Your current location could not be determined."); }, { enableHighAccuracy: true, timeout: 12000, maximumAge: 300000 });
   }, [enabled, loadWeather]);
-  const loadNews = useCallback(async () => {
-    if (!session || !enabled.has("news")) return;
-    setNewsLoading(true);
-    try { const result = await widgetRequest(session, { type: "news" }); setNews(result.news || []); setNewsError(""); }
-    catch (error) { setNewsError(error.message); }
-    finally { setNewsLoading(false); }
-  }, [enabled, session]);
-  useEffect(() => { loadNews(); }, [loadNews]);
   if (!order.length) return null;
   const widgets = {
     clock: <ClockWidget now={now} timeZone={timeZone} />,
     weather: <WeatherWidget weather={weather} error={locationError} loading={locationLoading || weatherLoading} requestLocation={requestLocation} refresh={() => location ? loadWeather(location) : requestLocation()} />,
     map: <MapWidget location={location} error={locationError} loading={locationLoading} requestLocation={requestLocation} />,
-    news: <NewsWidget news={news} error={newsError} loading={newsLoading} refresh={loadNews} />,
+    news: <BlogWidget />,
   };
   const columns = [order.filter((_, index) => index % 2 === 0), order.filter((_, index) => index % 2 === 1)];
   return <div className="grid gap-4 lg:grid-cols-2 lg:items-start">{columns.map((keys, columnIndex) => <div key={columnIndex} className="contents lg:block lg:space-y-4">{keys.map((key) => <div key={key} className="min-w-0" style={{ order: order.indexOf(key) }}>{widgets[key]}</div>)}</div>)}</div>;
