@@ -188,7 +188,7 @@ function matchesAvailability(interpreter, selectedDays, selectedBlocks) {
 
 function SearchBar({ value, setValue, placeholder }) {
   return (
-    <label className="flex flex-1 items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 focus-within:border-[#dd7d00] focus-within:ring-4 focus-within:ring-[#dd7d00]/10">
+    <label className="flex min-w-0 flex-1 items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 focus-within:border-[#dd7d00] focus-within:ring-4 focus-within:ring-[#dd7d00]/10">
       <Search size={18} className="text-[#dd7d00]" />
       <input value={value} onChange={(event) => setValue(event.target.value)} placeholder={placeholder} className="w-full bg-transparent text-sm font-semibold text-slate-800 outline-none placeholder:text-slate-400" />
     </label>
@@ -239,12 +239,12 @@ function OptionGroup({ label, options, values, onToggle, format = (value) => val
 function DirectoryTabs({ active, setActive, clients, interpreters }) {
   return (
     <div className="grid gap-3 sm:grid-cols-2">
-      <button type="button" onClick={() => setActive("clients")} className={cx("flex items-center justify-between rounded-[1.4rem] border p-4 text-left transition", active === "clients" ? "border-[#dd7d00] bg-[#fff8ec] shadow-lg" : "border-slate-200 bg-white hover:border-[#dd7d00]/40")}>
-        <span className="flex items-center gap-3"><span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#721100]/10 text-[#721100]"><Building2 size={18} /></span><span><span className="block font-black text-slate-950">Clients</span><span className="block text-xs text-slate-500">Organizations and contacts</span></span></span>
+      <button type="button" onClick={() => setActive("clients")} className={cx("flex min-w-0 items-center justify-between gap-3 rounded-[1.4rem] border p-4 text-left transition", active === "clients" ? "border-[#dd7d00] bg-[#fff8ec] shadow-lg" : "border-slate-200 bg-white hover:border-[#dd7d00]/40")}>
+        <span className="flex min-w-0 items-center gap-3"><span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[#721100]/10 text-[#721100]"><Building2 size={18} /></span><span className="min-w-0"><span className="block font-black text-slate-950">Clients</span><span className="block break-words text-xs text-slate-500">Organizations and contacts</span></span></span>
         <span className="text-2xl font-black text-[#721100]">{clients}</span>
       </button>
-      <button type="button" onClick={() => setActive("interpreters")} className={cx("flex items-center justify-between rounded-[1.4rem] border p-4 text-left transition", active === "interpreters" ? "border-[#dd7d00] bg-[#fff8ec] shadow-lg" : "border-slate-200 bg-white hover:border-[#dd7d00]/40")}>
-        <span className="flex items-center gap-3"><span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#721100]/10 text-[#721100]"><Users size={18} /></span><span><span className="block font-black text-slate-950">Interpreters</span><span className="block text-xs text-slate-500">Roster and onboarding</span></span></span>
+      <button type="button" onClick={() => setActive("interpreters")} className={cx("flex min-w-0 items-center justify-between gap-3 rounded-[1.4rem] border p-4 text-left transition", active === "interpreters" ? "border-[#dd7d00] bg-[#fff8ec] shadow-lg" : "border-slate-200 bg-white hover:border-[#dd7d00]/40")}>
+        <span className="flex min-w-0 items-center gap-3"><span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[#721100]/10 text-[#721100]"><Users size={18} /></span><span className="min-w-0"><span className="block font-black text-slate-950">Interpreters</span><span className="block break-words text-xs text-slate-500">Roster and onboarding</span></span></span>
         <span className="text-2xl font-black text-[#721100]">{interpreters}</span>
       </button>
     </div>
@@ -253,13 +253,13 @@ function DirectoryTabs({ active, setActive, clients, interpreters }) {
 
 function PersonCard({ icon: Icon, title, subtitle, status, lines, onClick }) {
   return (
-    <button type="button" onClick={onClick} className="rounded-[1.5rem] border border-slate-200 bg-white p-5 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-[#dd7d00]/40 hover:shadow-xl">
-      <div className="flex items-start gap-3">
+    <button type="button" onClick={onClick} className="block w-full min-w-0 max-w-full overflow-hidden rounded-[1.5rem] border border-slate-200 bg-white p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-[#dd7d00]/40 hover:shadow-xl sm:p-5">
+      <div className="grid min-w-0 grid-cols-[auto_minmax(0,1fr)] items-start gap-3 sm:grid-cols-[auto_minmax(0,1fr)_auto]">
         <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#721100]/10 text-[#721100]"><Icon size={18} /></span>
-        <span className="min-w-0 flex-1"><span className="block truncate font-black text-slate-950">{title}</span><span className="mt-1 block truncate text-xs text-slate-500">{subtitle}</span></span>
-        <Badge value={status || "active"} />
+        <span className="min-w-0"><span className="block break-words font-black leading-5 text-slate-950">{title}</span><span className="mt-1 block break-words text-xs leading-5 text-slate-500">{subtitle}</span></span>
+        <span className="col-start-2 max-w-full sm:col-auto"><Badge value={status || "active"} /></span>
       </div>
-      <div className="mt-4 space-y-1 text-xs leading-5 text-slate-600">{lines.filter(Boolean).map((line, index) => <p key={`${line}-${index}`}>{line}</p>)}</div>
+      <div className="mt-4 min-w-0 space-y-1 text-xs leading-5 text-slate-600">{lines.filter(Boolean).map((line, index) => <p className="break-words" key={`${line}-${index}`}>{line}</p>)}</div>
     </button>
   );
 }
@@ -268,7 +268,7 @@ function ClientTable({ clients, openClient }) {
   const headings = ["Organization", "Primary Contact", "Email", "Phone", "Location", "Industry", "Default Service", "Default Setting", "Status", "Actions"];
   return (
     <>
-      <div className="grid gap-3 sm:grid-cols-2 lg:hidden">
+      <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-3 sm:grid-cols-2 lg:hidden">
         {clients.map((client) => (
           <PersonCard
             key={client.id}
@@ -308,7 +308,7 @@ function InterpreterTable({ interpreters, onboarding, openInterpreter }) {
   const headings = ["First Name", "Last Name", "Email", "Phone", "Location", "Credentials", "Modalities", "Settings", "Experience", "Assignment Preference", "On-site Rate", "VRI Rate", "Status", "Actions"];
   return (
     <>
-      <div className="grid gap-3 sm:grid-cols-2 lg:hidden">
+      <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-3 sm:grid-cols-2 lg:hidden">
         {interpreters.map((interpreter) => {
           const pipeline = onboarding.get(interpreter.id);
           return (

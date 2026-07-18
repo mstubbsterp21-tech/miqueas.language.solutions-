@@ -52,6 +52,30 @@ textarea {
   text-overflow: ellipsis;
 }
 
+/* Grid and flex children otherwise keep an intrinsic minimum width on Safari. */
+.mls-portal-theme main .grid > *,
+.mls-portal-theme main .flex > * {
+  min-width: 0;
+}
+
+.mls-portal-theme main button,
+.mls-portal-theme main a,
+.mls-portal-theme main input,
+.mls-portal-theme main textarea,
+.mls-portal-theme main select {
+  max-width: 100%;
+}
+
+.mls-portal-theme main button,
+.mls-portal-theme main a,
+.mls-portal-theme main p,
+.mls-portal-theme main span,
+.mls-portal-theme main h1,
+.mls-portal-theme main h2,
+.mls-portal-theme main h3 {
+  overflow-wrap: anywhere;
+}
+
 .mls-login-clerk > *,
 .mls-login-clerk [class*="cl-rootBox"],
 .mls-login-clerk [class*="cl-cardBox"],

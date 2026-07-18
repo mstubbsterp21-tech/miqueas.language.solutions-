@@ -217,7 +217,9 @@ export function Toast({ message, type = "success", dismiss }) {
 
 export function InstallAppButton({ compact = false }) {
   const [prompt, setPrompt] = useState(null);
-  const [installed, setInstalled] = useState(false);
+  const [guideOpen, setGuideOpen] = useState(false);
+  const [installed, setInstalled] = useState(() => window.matchMedia?.("(display-mode: standalone)").matches || window.navigator.standalone === true);
+  const isIOS = /iPad|iPhone|iPod/.test(window.navigator.userAgent) || (window.navigator.platform === "MacIntel" && window.navigator.maxTouchPoints > 1);
   useEffect(() => {
     const handlePrompt = (event) => { event.preventDefault(); setPrompt(event); };
     const handleInstalled = () => { setInstalled(true); setPrompt(null); };
@@ -225,8 +227,24 @@ export function InstallAppButton({ compact = false }) {
     window.addEventListener("appinstalled", handleInstalled);
     return () => { window.removeEventListener("beforeinstallprompt", handlePrompt); window.removeEventListener("appinstalled", handleInstalled); };
   }, []);
-  if (!prompt || installed) return null;
-  return <button type="button" onClick={async () => { await prompt.prompt(); await prompt.userChoice; setPrompt(null); }} className={cx("inline-flex items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/5 font-black text-white/80 transition hover:bg-white/10 hover:text-white", compact ? "h-10 w-10" : "w-full px-4 py-3 text-sm")} title="Install MLS app"><Smartphone size={16} />{!compact && "Install app"}</button>;
+  if ((!prompt && !isIOS) || installed) return null;
+
+  async function install() {
+    if (isIOS) return setGuideOpen(true);
+    await prompt.prompt();
+    await prompt.userChoice;
+    setPrompt(null);
+  }
+
+  return <>
+    <button type="button" onClick={install} className={cx("inline-flex items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/5 font-black text-white/80 transition hover:bg-white/10 hover:text-white", compact ? "h-10 w-10" : "w-full px-4 py-3 text-sm")} title="Install MLS app"><Smartphone size={16} />{!compact && "Install MLS app"}</button>
+    <Modal open={guideOpen} close={() => setGuideOpen(false)} title="Install MLS on iPhone or iPad" subtitle="Safari installs MLS as a standalone Home Screen app.">
+      <ol className="space-y-3">
+        {["Open this portal in Safari.", "Tap Safari’s Share button (the square with an upward arrow).", "Scroll down and tap Add to Home Screen.", "Keep the name MLS, then tap Add."].map((step, index) => <li key={step} className="flex min-w-0 gap-3 rounded-2xl border border-slate-200 bg-white p-4"><span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#721100] text-sm font-black text-white">{index + 1}</span><span className="min-w-0 break-words text-sm font-bold leading-6 text-slate-700">{step}</span></li>)}
+      </ol>
+      <div className="mt-5 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-900"><b>For Apple-style push alerts:</b> install the Home Screen app first. MLS still needs a Web Push subscription service before alerts can arrive while the portal is closed.</div>
+    </Modal>
+  </>;
 }
 
 export function FloatingAction({ onClick, label, icon: Icon = Plus }) {

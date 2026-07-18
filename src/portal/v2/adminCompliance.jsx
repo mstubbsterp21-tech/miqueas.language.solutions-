@@ -67,8 +67,8 @@ export default function AdminComplianceV2({ workspace, operations, v2, actions, 
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-start justify-between gap-2">
                     <div className="min-w-0">
-                      <p className="truncate font-black text-slate-950">{request.title}</p>
-                      <p className="mt-1 text-xs text-slate-500">{requestRecipient(request)} · Due {request.due_date || "not set"}</p>
+                      <p className="break-words font-black text-slate-950">{request.title}</p>
+                      <p className="mt-1 break-words text-xs leading-5 text-slate-500">{requestRecipient(request)} · Due {request.due_date || "not set"}</p>
                     </div>
                     <Badge value={request.status} />
                   </div>

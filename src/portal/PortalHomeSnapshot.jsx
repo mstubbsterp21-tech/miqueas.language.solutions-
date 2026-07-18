@@ -39,8 +39,8 @@ function QueueItem({ icon: Icon = ClipboardCheck, title, text, badge, onClick, t
   return <button type="button" onClick={onClick} className="group grid w-full grid-cols-[auto_minmax(0,1fr)] items-start gap-3 rounded-2xl border border-slate-200 bg-white p-4 text-left transition hover:border-[#dd7d00]/45 hover:shadow-md sm:grid-cols-[auto_minmax(0,1fr)_auto]">
     <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${colors[tone] || colors.gold}`}><Icon size={17} /></span>
     <span className="min-w-0 flex-1">
-      <span className="block font-black text-slate-900">{title}</span>
-      {text && <span className="mt-1 block text-xs leading-5 text-slate-500">{text}</span>}
+      <span className="block break-words font-black text-slate-900">{title}</span>
+      {text && <span className="mt-1 block break-words text-xs leading-5 text-slate-500">{text}</span>}
     </span>
     <span className="col-start-2 sm:col-auto">{badge ? <Badge value={badge} /> : <ArrowRight size={16} className="mt-1 shrink-0 text-slate-300 transition group-hover:translate-x-1 group-hover:text-[#721100]" />}</span>
   </button>;
@@ -67,7 +67,7 @@ function Announcements({ items = [], actions }) {
     <div className="mt-5 space-y-3">
       {items.slice(0, 3).map((item) => <button key={item.id} type="button" onClick={() => actions.go("communications")} className="flex w-full gap-3 rounded-2xl bg-slate-50 p-4 text-left transition hover:bg-[#fff8f2]">
         <span className={`mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full ${item.read_at ? "bg-slate-300" : "bg-[#dd7d00]"}`} />
-        <span className="min-w-0 flex-1"><span className="block truncate text-sm font-black text-slate-900">{item.title}</span><span className="mt-1 line-clamp-2 block text-xs leading-5 text-slate-500">{item.body}</span></span>
+        <span className="min-w-0 flex-1"><span className="block break-words text-sm font-black text-slate-900">{item.title}</span><span className="mt-1 line-clamp-3 block break-words text-xs leading-5 text-slate-500">{item.body}</span></span>
         {!item.read_at && <span className="text-[10px] font-black uppercase tracking-[.1em] text-[#dd7d00]">New</span>}
       </button>)}
       {!items.length && <CompactEmpty icon={Megaphone} title="All quiet" text="New MLS announcements will appear here." />}
