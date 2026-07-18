@@ -359,7 +359,14 @@ export default function useMLSController() {
 
   async function updateAssignment(assignment, patch) {
     try {
-      const result = await api.app("adminUpdateAssignment", "POST", { assignmentId: assignment.id, ...patch });
+      const assignmentChanges = patch.assignment || {
+        ...(Object.prototype.hasOwnProperty.call(patch, "status") ? { status: patch.status } : {}),
+        ...(Object.prototype.hasOwnProperty.call(patch, "paymentStatus") ? { payment_status: patch.paymentStatus } : {}),
+        ...(Object.prototype.hasOwnProperty.call(patch, "invoiceNumber") ? { invoice_number: patch.invoiceNumber } : {}),
+        ...(Object.prototype.hasOwnProperty.call(patch, "invoiceAmount") ? { invoice_amount: patch.invoiceAmount === "" ? null : patch.invoiceAmount } : {}),
+        ...(Object.prototype.hasOwnProperty.call(patch, "adminNotes") ? { admin_notes: patch.adminNotes } : {}),
+      };
+      const result = await api.app("adminUpdateAssignment", "POST", { assignmentId: assignment.id, assignment: assignmentChanges });
       let automation = null;
       if (patch.status === "confirmed") {
         automation = await runAssignmentAutomation("confirmed", { assignmentId: result.assignment.id });

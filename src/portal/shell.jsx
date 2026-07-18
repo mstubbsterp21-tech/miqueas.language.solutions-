@@ -164,9 +164,8 @@ export default function AppShell({ role, section, setSection, user, personalizat
 
       <nav className="fixed inset-x-3 z-50 grid grid-flow-col auto-cols-fr rounded-[1.5rem] border border-black/5 bg-white/95 p-2 shadow-2xl backdrop-blur-xl lg:hidden" style={{ bottom: "max(.75rem, env(safe-area-inset-bottom))" }} aria-label="Primary navigation">
         {mobileNavigation.map(([value, label, Icon]) => (
-          <button key={value} type="button" onClick={() => navigate(value)} style={section === value ? { backgroundColor: primary } : undefined} className={cx("relative flex min-h-12 min-w-0 flex-col items-center justify-center gap-1 rounded-xl px-1.5 py-1.5 text-[9px] font-black transition sm:text-[10px]", section === value ? "text-white" : "text-slate-500")}>
-            <Icon size={18} />
-            <span className="line-clamp-2 max-w-full break-words text-center leading-[1.15]">{label}</span>
+          <button key={value} type="button" title={label} aria-label={label} onClick={() => navigate(value)} style={section === value ? { backgroundColor: primary } : undefined} className={cx("relative flex min-h-14 min-w-0 items-center justify-center rounded-xl px-1.5 py-1.5 transition", section === value ? "text-white" : "text-slate-500")}>
+            <Icon size={22} />
             {navBadges[value] > 0 && <span className="absolute right-1 top-1 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[8px] font-black text-white" style={{ backgroundColor: accent }}>{navBadges[value] > 99 ? "99+" : navBadges[value]}</span>}
           </button>
         ))}

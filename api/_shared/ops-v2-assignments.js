@@ -9,6 +9,7 @@ const editableFields = [
   "team_requested", "cdi_requested", "onsite_contact_name", "onsite_contact_phone",
   "description", "preparation_materials", "purchase_order_number", "client_reference",
   "request_source", "request_form_version", "request_form_data",
+  "status", "payment_status", "invoice_number", "invoice_amount", "admin_notes",
 ];
 
 function cleanAssignment(input = {}) {

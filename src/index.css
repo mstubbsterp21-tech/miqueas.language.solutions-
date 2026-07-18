@@ -36,6 +36,22 @@ textarea {
   max-width: 100%;
 }
 
+.mls-portal-theme main,
+.mls-portal-theme main > *,
+.mls-portal-theme main p,
+.mls-portal-theme main h1,
+.mls-portal-theme main h2,
+.mls-portal-theme main h3,
+.mls-portal-theme main label {
+  min-width: 0;
+  overflow-wrap: break-word;
+}
+
+.mls-portal-theme select {
+  min-width: 0;
+  text-overflow: ellipsis;
+}
+
 .mls-login-clerk > *,
 .mls-login-clerk [class*="cl-rootBox"],
 .mls-login-clerk [class*="cl-cardBox"],
