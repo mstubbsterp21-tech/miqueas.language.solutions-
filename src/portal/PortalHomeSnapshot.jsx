@@ -18,6 +18,7 @@ import { orderedLayoutKeys } from "./LayoutCustomizer";
 import PortalWidgets from "./PortalWidgets";
 import { firstNameFromDisplayName, portalDisplayName } from "./portalIdentity";
 import { ClientAssignmentCard, ClientRequestRoadmap } from "./clientServiceExperience";
+import { AgencyWorkflowCard, AdminOperationsCard, InterpreterWorkCard, adminAssignmentMeta, recordsForAssignment } from "./agencyWorkflowExperience";
 
 const SNAPSHOT_NOW = Date.now();
 
@@ -95,8 +96,9 @@ function AdminHome({ workspace, app, v2, actions, layout }) {
   const pendingOnboarding = (v2?.onboarding || []).filter((item) => !["completed", "declined"].includes(item.status));
   const pendingDocs = (workspace.admin?.documentRequests || []).filter((item) => ["requested", "viewed", "overdue"].includes(item.status));
   const financeReviews = pendingTimes.length + pendingExpenses.length;
+  const operationalActions = active.map((assignment) => { const records = recordsForAssignment(v2, assignment.id); return { assignment, records, meta: adminAssignmentMeta(assignment, records) }; }).filter(({ meta }) => meta.stage !== 3 && meta.title !== "Archived").sort((a, b) => a.meta.stage - b.meta.stage);
   const queue = [
-    ...unstaffed.slice(0, 4).map((item) => ({ icon: Users, title: `Staff ${item.service_type}`, text: `${formatDate(item.start_at)} · ${item.clients?.organization_name || item.clients?.primary_contact_name || "Client"}`, badge: "pending_confirmation", onClick: () => actions.openAssignment(item), tone: "rose" })),
+    ...operationalActions.slice(0, 4).map(({ assignment, meta }) => ({ icon: meta.stage <= 1 ? FileSignature : meta.stage === 2 ? Users : CircleDollarSign, title: meta.title, text: `${assignment.service_type} · ${assignment.clients?.organization_name || assignment.clients?.primary_contact_name || "Client"}`, badge: assignment.lifecycle_status || assignment.status, onClick: () => actions.openAssignment(assignment), tone: meta.tone === "rose" ? "rose" : meta.tone === "violet" ? "violet" : meta.tone === "blue" ? "blue" : "gold" })),
     ...(pendingTimes.length ? [{ icon: CircleDollarSign, title: `${pendingTimes.length} time entr${pendingTimes.length === 1 ? "y" : "ies"} ready for review`, text: "Approve actual time before billing and contractor payment.", badge: "submitted", onClick: () => actions.go("finance"), tone: "blue" }] : []),
     ...(pendingExpenses.length ? [{ icon: CircleDollarSign, title: `${pendingExpenses.length} expense${pendingExpenses.length === 1 ? "" : "s"} ready for review`, text: "Confirm reimbursement and client-billing eligibility.", badge: "submitted", onClick: () => actions.go("finance"), tone: "blue" }] : []),
     ...(pendingOnboarding.length ? [{ icon: Users, title: `${pendingOnboarding.length} onboarding record${pendingOnboarding.length === 1 ? "" : "s"} in progress`, text: "Screening, credentials, insurance, or agreements need attention.", badge: "in_progress", onClick: () => actions.go("compliance"), tone: "violet" }] : []),
@@ -113,10 +115,12 @@ function AdminHome({ workspace, app, v2, actions, layout }) {
       <Metric icon={Bell} name="Unread updates" value={app?.unreadCount || 0} note="Across the MLS portal" color="#dd7d00" onClick={() => actions.go("notifications")} />
     </div>,
     widgets: layout?.enabled_widgets?.length ? <PortalWidgets layout={layout} /> : null,
+    workflow: <AgencyWorkflowCard role="admin" />,
     decision_queue: <Card>
         <SectionHeader title="Decision queue" text="Only work that needs an admin action appears here." action={<ViewAll onClick={() => actions.go("assignments")}>Assignments</ViewAll>} />
         <div className="mt-5 space-y-3">{queue.slice(0, 8).map((item, index) => <QueueItem key={`${item.title}-${index}`} {...item} />)}{!queue.length && <CompactEmpty icon={ShieldCheck} title="Queue cleared" text="There are no staffing, finance, onboarding, or document decisions waiting." />}</div>
       </Card>,
+    priority_services: operationalActions.length ? <section><SectionHeader title="Priority services" text="The highest-priority handoffs across authorization, staffing, and closeout." action={<ViewAll onClick={() => actions.go("assignments")}>Open operations</ViewAll>} /><div className="mt-4 space-y-4">{operationalActions.slice(0, 2).map(({ assignment, records }) => <AdminOperationsCard key={assignment.id} assignment={assignment} records={records} onOpen={actions.openAssignment} />)}</div></section> : null,
     staffed_schedule: <Card>
           <SectionHeader title="Staffed schedule" text="The next confirmed services—unstaffed work stays in the queue." action={<ViewAll onClick={() => actions.go("assignments")} />} />
           <div className="mt-5 space-y-3">{staffed.slice(0, 4).map((item) => <ScheduleItem key={item.id} assignment={item} onClick={() => actions.openAssignment(item)} note={`${formatDate(item.start_at)} · ${(item.assignment_interpreters || []).length} assigned`} />)}{!staffed.length && <CompactEmpty icon={CalendarDays} title="No staffed assignments ahead" text="Once an assignment is staffed, it will move here automatically." />}</div>
@@ -179,12 +183,15 @@ function InterpreterHome({ workspace, operations, app, v2, actions, identityName
   const requiredDocumentTypes = ["resume", "w9", "credential_proof", "liability_insurance", "ic_agreement"];
   const missingRequiredDocuments = requiredDocumentTypes.filter((type) => !uploadedDocumentTypes.has(type));
   const training = (operations?.training || []).filter((course) => course.progress?.status !== "completed");
+  const timeEntries = v2?.timeEntries || [];
+  const completedNeedingTime = assignments.filter((assignment) => assignment.end_at && new Date(assignment.end_at).getTime() < SNAPSHOT_NOW && !timeEntries.some((entry) => (entry.assignment_id || entry.assignments?.id) === assignment.id));
   const onboardingIncomplete = v2?.onboarding && !["completed", "declined"].includes(v2.onboarding.status);
   const tasks = [
     ...(onboardingIncomplete ? [{ icon: Users, title: "Complete your MLS onboarding", text: `Current stage: ${v2.onboarding.stage || "profile review"}.`, badge: v2.onboarding.status || "in_progress", onClick: () => actions.go("documents"), tone: "violet" }] : []),
     ...(training.length ? [{ icon: BookOpenCheck, title: `${training.length} learning item${training.length === 1 ? "" : "s"} to complete`, text: "Review required and recommended MLS material.", badge: "in_progress", onClick: () => actions.go("learning"), tone: "blue" }] : []),
     ...(docs.length ? [{ icon: FileWarning, title: `Upload ${docs.length} requested document${docs.length === 1 ? "" : "s"}`, text: "Open Documents to send the requested files securely.", badge: "requested", onClick: () => actions.go("documents"), tone: "gold" }] : []),
     ...(missingRequiredDocuments.length ? [{ icon: FileWarning, title: `${missingRequiredDocuments.length} required document${missingRequiredDocuments.length === 1 ? "" : "s"} missing`, text: "Complete Required Documents to receive broadcasts and recommended opportunities.", badge: "required", onClick: () => actions.go("documents"), tone: "rose" }] : []),
+    ...(completedNeedingTime.length ? [{ icon: CircleDollarSign, title: `${completedNeedingTime.length} service closeout${completedNeedingTime.length === 1 ? "" : "s"} need actual time`, text: "Submit time and any approved expenses so MLS can complete billing and prepare your payment.", badge: "time_submitted", onClick: () => actions.go("payments"), tone: "rose" }] : []),
     ...expiring.slice(0, 2).map((item) => ({ icon: FileWarning, title: `${item.credential_type || "Credential"} expires soon`, text: `Expires ${item.expires_on}.`, badge: "overdue", onClick: () => actions.go("documents"), tone: "rose" })),
   ];
   const nextAssignment = upcoming[0];
@@ -198,6 +205,8 @@ function InterpreterHome({ workspace, operations, app, v2, actions, identityName
       <Metric icon={CircleDollarSign} name="Payment activity" value={payments.length} note="Ready or processing" color="#15803d" onClick={() => actions.go("payments")} />
     </div>,
     widgets: layout?.enabled_widgets?.length ? <PortalWidgets layout={layout} /> : null,
+    workflow: <AgencyWorkflowCard role="interpreter" />,
+    next_work: nextAssignment ? <section><SectionHeader title="Your next service" text="Role-safe logistics, preparation, team information, calendar tools, and your next action." /><div className="mt-4"><InterpreterWorkCard assignment={nextAssignment} records={recordsForAssignment(v2, nextAssignment.id)} onOpen={actions.openAssignment} onTimePay={() => actions.go("payments")} /></div></section> : null,
     recommended: <Card>
           <SectionHeader title="Recommended for you" text="Open opportunities only—assigned work stays in your schedule." action={<ViewAll onClick={() => actions.go("work")}>Browse work</ViewAll>} />
           <div className="mt-5 space-y-3">{opportunities.slice(0, 5).map((item) => { const assignment = item.assignments || {}; return <QueueItem key={item.id} icon={Sparkles} title={assignment.service_type || "Interpreter opportunity"} text={`${formatDate(assignment.start_at)}${assignment.delivery_mode ? ` · ${assignment.delivery_mode}` : ""}${assignment.city || assignment.state ? ` · ${[assignment.city, assignment.state].filter(Boolean).join(", ")}` : ""}`} badge={item.status || "open"} onClick={() => actions.submitBid(item)} tone="green" />; })}{!opportunities.length && <CompactEmpty icon={Sparkles} title="No matches right now" text="New opportunities will appear when they match your profile and availability." />}</div>
