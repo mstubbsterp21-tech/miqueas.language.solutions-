@@ -1,10 +1,10 @@
 import { useMemo, useState } from "react";
-import { Copy, CircleDollarSign, ExternalLink, FileSignature, UploadCloud } from "lucide-react";
+import { AlertCircle, Copy, CircleDollarSign, Clock3, ExternalLink, FileSignature, ReceiptText, UploadCloud, WalletCards } from "lucide-react";
 import {
-  Badge, Card, EmptyState, Field, Hero, INPUT, SectionHeader,
+  Badge, Card, EmptyState, Field, Hero, INPUT, Metric, SectionHeader,
   formatDate, formatMoney,
 } from "../ui";
-import { ActionButton, ExternalRecordLink, MoneySummary, SelectField } from "./shared";
+import { ActionButton, ExternalRecordLink, SelectField } from "./shared";
 import {
   getPortalTimeZone,
   timeZoneAbbreviation,
@@ -12,6 +12,7 @@ import {
   zonedDateTimeToUtc,
   zonedInputValue,
 } from "../timezones";
+import { AgencyWorkflowCard } from "../agencyWorkflowExperience";
 
 const emptyQuote = {
   assignmentId: "",
@@ -55,6 +56,8 @@ const emptyPayment = {
   foundPaymentUrl: "",
 };
 
+const FINANCE_DASHBOARD_NOW = Date.now();
+
 function FilePicker({ label, file, onChange, existing, onOpen }) {
   return (
     <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-4">
@@ -92,11 +95,10 @@ function FilePicker({ label, file, onChange, existing, onOpen }) {
 export default function AdminFinanceV2({ workspace, app, v2, actions, saving }) {
   const timeZone = getPortalTimeZone(workspace.preferences?.timeZone);
   const zone = timeZoneAbbreviation(timeZone);
-  const assignments = app?.assignments || workspace.admin?.assignments || [];
+  const assignments = useMemo(() => app?.assignments || workspace.admin?.assignments || [], [app?.assignments, workspace.admin?.assignments]);
   const clients = workspace.admin?.clients || [];
   const agreements = v2?.agreements || [];
   const invoices = v2?.invoices || [];
-  const quotes = v2?.quotes || [];
 
   const [quote, setQuote] = useState(emptyQuote);
   const [invoice, setInvoice] = useState(emptyInvoice);
@@ -123,12 +125,14 @@ export default function AdminFinanceV2({ workspace, app, v2, actions, saving }) 
   const selectedClient = selectedAssignment
     ? clients.find((item) => item.id === selectedAssignment.client_id) || selectedAssignment.clients || null
     : null;
-  const currentAgreement = agreements.find((item) => item.assignment_id === agreement.assignmentId) || null;
-
   const receivable = invoices.reduce((sum, item) => sum + Number(item.balance_due || 0), 0);
   const contractorDue = staffing
     .filter((item) => !["paid", "void"].includes(item.contractor_payment_status))
     .reduce((sum, item) => sum + Number(item.contractor_payment_amount || 0), 0);
+  const submittedTime = (v2?.timeEntries || []).filter((item) => item.status === "submitted");
+  const submittedExpenses = (v2?.expenses || []).filter((item) => item.status === "submitted");
+  const overdueInvoices = invoices.filter((item) => item.status === "overdue" || (item.due_date && !["paid", "void", "refunded"].includes(item.status) && new Date(`${item.due_date}T23:59:59`).getTime() < FINANCE_DASHBOARD_NOW));
+  const unpaidContractors = staffing.filter((item) => !["paid", "void"].includes(item.contractor_payment_status) && Number(item.contractor_payment_amount || 0) > 0);
 
   function selectAgreementAssignment(assignmentId) {
     const existing = agreements.find((item) => item.assignment_id === assignmentId);
@@ -242,16 +246,14 @@ export default function AdminFinanceV2({ workspace, app, v2, actions, saving }) 
   return (
     <div className="space-y-6">
       <Hero
-        eyebrow="Finance and agreements"
-        title="MLS workflow connected to Found and manual BoldSign tracking."
-        text="Found remains the financial system of record. Agreements are created and sent inside BoldSign, then their status and completed files are updated manually in MLS. No BoldSign API subscription is required."
+        eyebrow="Authorization and financial closeout"
+        title="Billing, Agreements & Contractor Pay"
+        text="Prepare client authorization before staffing, verify actual service records after delivery, link the client invoice, collect payment, and track only the contractor payments tied to completed work. Found remains the financial system of record and BoldSign remains the signature system of record."
       />
 
-      <div className="grid gap-4 md:grid-cols-3">
-        <MoneySummary label="Accounts receivable" value={receivable} note="Open balances linked from Found" />
-        <MoneySummary label="Contractor pay tracked" value={contractorDue} note="Scheduled or ready in Found" />
-        <MoneySummary label="Quoted work" value={quotes.reduce((sum, item) => sum + Number(item.total_amount || 0), 0)} note="Current quote values" />
-      </div>
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4"><Metric icon={Clock3} name="Closeout reviews" value={submittedTime.length + submittedExpenses.length} note={`${submittedTime.length} time · ${submittedExpenses.length} expense`} color="#1d4ed8" /><Metric icon={ReceiptText} name="Receivables" value={formatMoney(receivable)} note={`${invoices.filter((item) => Number(item.balance_due || 0) > 0).length} open invoices`} color="#c2410c" /><Metric icon={AlertCircle} name="Overdue invoices" value={overdueInvoices.length} note={overdueInvoices.length ? formatMoney(overdueInvoices.reduce((sum, item) => sum + Number(item.balance_due || 0), 0)) : "Nothing overdue"} color="#be123c" /><Metric icon={WalletCards} name="Contractor pay" value={formatMoney(contractorDue)} note={`${unpaidContractors.length} tracked payments`} color="#15803d" /></div>
+      <AgencyWorkflowCard role="admin" currentStage={(submittedTime.length || submittedExpenses.length) ? 4 : (receivable || contractorDue) ? 5 : -1} />
+      <Card><SectionHeader title="Financial control queue" text="Complete closeout in order: approve actuals, issue the client invoice, collect payment, prepare contractor pay, and retain the final records." /><div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">{[["Time to review", submittedTime.length, "Approve service hours before billing."], ["Expenses to review", submittedExpenses.length, "Verify receipts and assignment relevance."], ["Client balances", invoices.filter((item) => Number(item.balance_due || 0) > 0).length, `${formatMoney(receivable)} outstanding.`], ["Contractor payments", unpaidContractors.length, `${formatMoney(contractorDue)} ready, scheduled, or processing.`]].map(([label, count, text]) => <div key={label} className="rounded-2xl border border-slate-200 bg-slate-50 p-4"><p className="text-xs font-black uppercase tracking-[.1em] text-slate-400">{label}</p><p className="mt-2 text-3xl font-black text-slate-950">{count}</p><p className="mt-2 text-xs leading-5 text-slate-500">{text}</p></div>)}</div></Card>
 
       <div className="grid gap-5 xl:grid-cols-2">
         <Card>
