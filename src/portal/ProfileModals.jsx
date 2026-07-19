@@ -50,7 +50,7 @@ export default function ProfileModals({ controller, v2, profileActions }) {
     <Modal open={modal === "profile"} close={() => setModal("")} title={profileType === "client" ? "Client profile" : "Interpreter profile"} wide>
       {profileType === "client" ? <ClientProfileForm draft={clientDraft} setDraft={setClientDraft} submit={saveProfile} saving={saving} admin={role === "admin"} /> : <SecureInterpreterProfileForm draft={interpreterDraft} setDraft={setInterpreterDraft} submit={saveProfile} saving={saving} admin={role === "admin"} />}
     </Modal>
-    <Modal open={modal === "assignment"} close={() => setModal("")} title="Assignment" wide><AssignmentDetail assignment={selectedAssignment} role={role} clients={workspace?.admin?.clients || []} interpreters={(workspace?.admin?.interpreters || []).filter((item) => item.roster_status !== "removed")} actions={combinedActions} /></Modal>
+    <Modal open={modal === "assignment"} close={() => setModal("")} title="Assignment" wide><AssignmentDetail assignment={selectedAssignment} role={role} clients={workspace?.admin?.clients || []} interpreters={(workspace?.admin?.interpreters || []).filter((item) => item.roster_status !== "removed")} viewerInterpreterId={workspace?.interpreter?.profile?.id || ""} v2={v2} actions={combinedActions} /></Modal>
     <Modal open={modal === "account"} close={() => { setDeleteError(""); setModal(""); }} title={accountType === "client" ? "Client account" : "Interpreter profile"} wide>
       <div className="space-y-6">
         {role === "admin" && accountRecord?.id && <ProfileMessageShortcut profileType={accountType || "interpreter"} profile={accountRecord} targetClerkUserId={accountRecord.clerk_user_id || ""} onNavigate={() => { setModal(""); setSection("communications"); }} />}
