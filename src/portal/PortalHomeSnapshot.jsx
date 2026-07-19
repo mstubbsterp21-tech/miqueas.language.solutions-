@@ -17,8 +17,8 @@ import { formatInPortalTimeZone } from "./timezones";
 import { orderedLayoutKeys } from "./LayoutCustomizer";
 import PortalWidgets from "./PortalWidgets";
 import { firstNameFromDisplayName, portalDisplayName } from "./portalIdentity";
-import { ClientAssignmentCard, ClientRequestRoadmap } from "./clientServiceExperience";
-import { AgencyWorkflowCard, AdminOperationsCard, InterpreterWorkCard, adminAssignmentMeta, recordsForAssignment } from "./agencyWorkflowExperience";
+import { ClientAssignmentCard } from "./clientServiceExperience";
+import { AdminOperationsCard, InterpreterWorkCard, adminAssignmentMeta, recordsForAssignment } from "./agencyWorkflowExperience";
 
 const SNAPSHOT_NOW = Date.now();
 
@@ -68,14 +68,14 @@ function CompactEmpty({ icon: Icon, title, text }) {
 
 function Announcements({ items = [], actions }) {
   return <Card>
-    <SectionHeader title="Announcements" text="Updates from MLS without the inbox clutter." action={<ViewAll onClick={() => actions.go("communications")}>Open all</ViewAll>} />
+    <SectionHeader title="Announcements" action={<ViewAll onClick={() => actions.go("communications")}>Open all</ViewAll>} />
     <div className="mt-5 space-y-3">
       {items.slice(0, 3).map((item) => <button key={item.id} type="button" onClick={() => actions.go("communications")} className="flex w-full gap-3 rounded-2xl bg-slate-50 p-4 text-left transition hover:bg-[#fff8f2]">
         <span className={`mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full ${item.read_at ? "bg-slate-300" : "bg-[#dd7d00]"}`} />
         <span className="min-w-0 flex-1"><span className="block break-words text-sm font-black text-slate-900">{item.title}</span><span className="mt-1 line-clamp-3 block break-words text-xs leading-5 text-slate-500">{item.body}</span></span>
         {!item.read_at && <span className="text-[10px] font-black uppercase tracking-[.1em] text-[#dd7d00]">New</span>}
       </button>)}
-      {!items.length && <CompactEmpty icon={Megaphone} title="All quiet" text="New MLS announcements will appear here." />}
+      {!items.length && <CompactEmpty icon={Megaphone} title="No announcements" />}
     </div>
   </Card>;
 }
@@ -104,10 +104,10 @@ function AdminHome({ workspace, app, v2, actions, layout }) {
     ...(pendingOnboarding.length ? [{ icon: Users, title: `${pendingOnboarding.length} onboarding record${pendingOnboarding.length === 1 ? "" : "s"} in progress`, text: "Screening, credentials, insurance, or agreements need attention.", badge: "in_progress", onClick: () => actions.go("compliance"), tone: "violet" }] : []),
     ...(pendingDocs.length ? [{ icon: FileWarning, title: `${pendingDocs.length} document request${pendingDocs.length === 1 ? "" : "s"} outstanding`, text: "Review or follow up from Compliance.", badge: "requested", onClick: () => actions.go("compliance"), tone: "gold" }] : []),
   ];
-  const statusText = queue.length ? `${queue.length} priority item${queue.length === 1 ? "" : "s"} need a decision. Everything else is organized below.` : "Staffing, finance, and compliance are caught up.";
+  const statusText = queue.length ? `${queue.length} priority item${queue.length === 1 ? "" : "s"} need a decision.` : "All operational queues are clear.";
 
   const sections = {
-    hero: <Hero title="MLS command center" text={statusText} actions={<><Action tone="gold" onClick={() => actions.go("assignments")}>Manage assignments</Action><Action onClick={() => actions.go("communications")}>Communications</Action></>}><p className="mt-4 flex items-center gap-2 text-xs font-black uppercase tracking-[.14em] text-[#f6b34c]"><Sparkles size={14} /> One queue. No duplicate work.</p></Hero>,
+    hero: <Hero title="MLS command center" text={statusText} actions={<><Action tone="gold" onClick={() => actions.go("assignments")}>Operations</Action><Action onClick={() => actions.go("communications")}>Communications</Action></>} />,
     metrics: <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
       <Metric icon={Users} name="Need staffing" value={unstaffed.length} note="Assignments without a team" color="#be123c" onClick={() => actions.go("assignments")} />
       <Metric icon={CircleDollarSign} name="Financial reviews" value={financeReviews} note="Time and expenses submitted" color="#1d4ed8" onClick={() => actions.go("finance")} />
@@ -115,15 +115,14 @@ function AdminHome({ workspace, app, v2, actions, layout }) {
       <Metric icon={Bell} name="Unread updates" value={app?.unreadCount || 0} note="Across the MLS portal" color="#dd7d00" onClick={() => actions.go("notifications")} />
     </div>,
     widgets: layout?.enabled_widgets?.length ? <PortalWidgets layout={layout} /> : null,
-    workflow: <AgencyWorkflowCard role="admin" />,
     decision_queue: <Card>
-        <SectionHeader title="Decision queue" text="Only work that needs an admin action appears here." action={<ViewAll onClick={() => actions.go("assignments")}>Assignments</ViewAll>} />
-        <div className="mt-5 space-y-3">{queue.slice(0, 8).map((item, index) => <QueueItem key={`${item.title}-${index}`} {...item} />)}{!queue.length && <CompactEmpty icon={ShieldCheck} title="Queue cleared" text="There are no staffing, finance, onboarding, or document decisions waiting." />}</div>
+        <SectionHeader title="Decision queue" action={<ViewAll onClick={() => actions.go("assignments")}>Assignments</ViewAll>} />
+        <div className="mt-5 space-y-3">{queue.slice(0, 8).map((item, index) => <QueueItem key={`${item.title}-${index}`} {...item} />)}{!queue.length && <CompactEmpty icon={ShieldCheck} title="Queue cleared" />}</div>
       </Card>,
-    priority_services: operationalActions.length ? <section><SectionHeader title="Priority services" text="The highest-priority handoffs across authorization, staffing, and closeout." action={<ViewAll onClick={() => actions.go("assignments")}>Open operations</ViewAll>} /><div className="mt-4 space-y-4">{operationalActions.slice(0, 2).map(({ assignment, records }) => <AdminOperationsCard key={assignment.id} assignment={assignment} records={records} onOpen={actions.openAssignment} />)}</div></section> : null,
+    priority_services: operationalActions.length ? <section><SectionHeader title="Priority services" action={<ViewAll onClick={() => actions.go("assignments")}>Open operations</ViewAll>} /><div className="mt-4 space-y-4">{operationalActions.slice(0, 2).map(({ assignment, records }) => <AdminOperationsCard key={assignment.id} assignment={assignment} records={records} onOpen={actions.openAssignment} />)}</div></section> : null,
     staffed_schedule: <Card>
-          <SectionHeader title="Staffed schedule" text="The next confirmed services—unstaffed work stays in the queue." action={<ViewAll onClick={() => actions.go("assignments")} />} />
-          <div className="mt-5 space-y-3">{staffed.slice(0, 4).map((item) => <ScheduleItem key={item.id} assignment={item} onClick={() => actions.openAssignment(item)} note={`${formatDate(item.start_at)} · ${(item.assignment_interpreters || []).length} assigned`} />)}{!staffed.length && <CompactEmpty icon={CalendarDays} title="No staffed assignments ahead" text="Once an assignment is staffed, it will move here automatically." />}</div>
+          <SectionHeader title="Staffed schedule" action={<ViewAll onClick={() => actions.go("assignments")} />} />
+          <div className="mt-5 space-y-3">{staffed.slice(0, 4).map((item) => <ScheduleItem key={item.id} assignment={item} onClick={() => actions.openAssignment(item)} note={`${formatDate(item.start_at)} · ${(item.assignment_interpreters || []).length} assigned`} />)}{!staffed.length && <CompactEmpty icon={CalendarDays} title="No staffed assignments" />}</div>
         </Card>,
     announcements: <Announcements items={v2?.announcements} actions={actions} />,
   };
@@ -147,7 +146,7 @@ function ClientHome({ workspace, app, v2, actions, layout }) {
   ];
 
   const sections = {
-    hero: <Hero title={profile.organization_name ? `Welcome, ${profile.organization_name}` : "Your MLS service hub"} text={queue.length ? `${queue.length} item${queue.length === 1 ? "" : "s"} need your attention before your requests can keep moving.` : "You’re caught up. Upcoming services and MLS updates are ready below."} actions={<><Action tone="gold" onClick={actions.openRequest}>Request an interpreter</Action><Action onClick={() => actions.go("communications")}>Message MLS</Action></>} />,
+    hero: <Hero title={profile.organization_name ? `Welcome, ${profile.organization_name}` : "Your MLS service hub"} text={queue.length ? `${queue.length} item${queue.length === 1 ? "" : "s"} need your attention.` : "You’re caught up."} actions={<><Action tone="gold" onClick={actions.openRequest}>Request an interpreter</Action><Action onClick={() => actions.go("communications")}>Message MLS</Action></>} />,
     metrics: <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
       <Metric icon={ClipboardCheck} name="Needs action" value={queue.length} note="Approvals, files, or billing" color="#be123c" onClick={() => actions.go("requests")} />
       <Metric icon={CalendarDays} name="Upcoming services" value={upcoming.length} note="Confirmed and in progress" onClick={() => actions.go("assignments")} />
@@ -156,15 +155,14 @@ function ClientHome({ workspace, app, v2, actions, layout }) {
     </div>,
     widgets: layout?.enabled_widgets?.length ? <PortalWidgets layout={layout} /> : null,
     action_queue: <Card>
-        <SectionHeader title="Your action queue" text="Approvals, requested documents, and billing tasks—nothing else." action={<ViewAll onClick={() => actions.go("requests")}>Open requests</ViewAll>} />
+        <SectionHeader title="Your action queue" action={<ViewAll onClick={() => actions.go("requests")}>Open requests</ViewAll>} />
         <div className="mt-5 space-y-3">{queue.slice(0, 8).map((item, index) => <QueueItem key={`${item.title}-${index}`} {...item} />)}{!queue.length && <CompactEmpty icon={ShieldCheck} title="You’re caught up" text="No quotes, agreements, documents, or payments are waiting." />}</div>
       </Card>,
-    next_service: upcoming[0] ? <section><SectionHeader title="Your next service" text="Everything you need for confirmation, preparation, arrival, and support." /><div className="mt-4"><ClientAssignmentCard assignment={upcoming[0]} onOpen={actions.openAssignment} onRepeat={actions.openRepeatRequest} onMessage={() => actions.go("communications")} /></div></section> : null,
+    next_service: upcoming[0] ? <section><SectionHeader title="Your next service" /><div className="mt-4"><ClientAssignmentCard assignment={upcoming[0]} onOpen={actions.openAssignment} onRepeat={actions.openRepeatRequest} onMessage={() => actions.go("communications")} /></div></section> : null,
     upcoming_services: <Card>
-          <SectionHeader title="Upcoming services" text="Your live service schedule after the next booking." action={<ViewAll onClick={() => actions.go("assignments")} />} />
-          <div className="mt-5 space-y-3">{upcoming.slice(1, 5).map((item) => <ScheduleItem key={item.id} assignment={item} onClick={() => actions.openAssignment(item)} />)}{upcoming.length <= 1 && <CompactEmpty icon={CalendarDays} title={upcoming.length ? "No other services scheduled" : "Nothing scheduled"} text="Submit a request whenever communication access is needed." />}</div>
+          <SectionHeader title="Upcoming services" action={<ViewAll onClick={() => actions.go("assignments")} />} />
+          <div className="mt-5 space-y-3">{upcoming.slice(1, 5).map((item) => <ScheduleItem key={item.id} assignment={item} onClick={() => actions.openAssignment(item)} />)}{upcoming.length <= 1 && <CompactEmpty icon={CalendarDays} title={upcoming.length ? "No other services scheduled" : "Nothing scheduled"} />}</div>
         </Card>,
-    request_roadmap: <ClientRequestRoadmap actions={actions} />,
     announcements: <Announcements items={v2?.announcements} actions={actions} />,
   };
   return <DashboardSections role="client" layout={layout} sections={sections} />;
@@ -197,7 +195,7 @@ function InterpreterHome({ workspace, operations, app, v2, actions, identityName
   const nextAssignment = upcoming[0];
 
   const sections = {
-    hero: <Hero title={`Welcome back${firstName ? `, ${firstName}` : ""}`} text={tasks.length ? `${tasks.length} readiness task${tasks.length === 1 ? "" : "s"} need attention. Opportunities and assigned work are separated below.` : "You’re assignment-ready. Review matched opportunities or prepare for your next service."} actions={<><Action tone="gold" onClick={() => actions.go("work")}>Open work center</Action><Action onClick={() => actions.go("schedule")}>Update availability</Action></>} />,
+    hero: <Hero title={`Welcome back${firstName ? `, ${firstName}` : ""}`} text={tasks.length ? `${tasks.length} readiness task${tasks.length === 1 ? "" : "s"} need attention.` : "You’re assignment-ready."} actions={<><Action tone="gold" onClick={() => actions.go("work")}>Work</Action><Action onClick={() => actions.go("schedule")}>Availability</Action></>} />,
     metrics: <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
       <Metric icon={CalendarDays} name="Assigned work" value={upcoming.length} note={nextAssignment ? `Next: ${formatDate(nextAssignment.start_at, { month: "short", day: "numeric" })}` : "No upcoming assignments"} onClick={() => actions.go("work")} />
       <Metric icon={Sparkles} name="Recommended" value={opportunities.length} note="Open assignments matched to you" color="#4338ca" onClick={() => actions.go("work")} />
@@ -205,19 +203,18 @@ function InterpreterHome({ workspace, operations, app, v2, actions, identityName
       <Metric icon={CircleDollarSign} name="Payment activity" value={payments.length} note="Ready or processing" color="#15803d" onClick={() => actions.go("payments")} />
     </div>,
     widgets: layout?.enabled_widgets?.length ? <PortalWidgets layout={layout} /> : null,
-    workflow: <AgencyWorkflowCard role="interpreter" />,
-    next_work: nextAssignment ? <section><SectionHeader title="Your next service" text="Role-safe logistics, preparation, team information, calendar tools, and your next action." /><div className="mt-4"><InterpreterWorkCard assignment={nextAssignment} records={recordsForAssignment(v2, nextAssignment.id)} onOpen={actions.openAssignment} onTimePay={() => actions.go("payments")} /></div></section> : null,
+    next_work: nextAssignment ? <section><SectionHeader title="Your next service" /><div className="mt-4"><InterpreterWorkCard assignment={nextAssignment} records={recordsForAssignment(v2, nextAssignment.id)} onOpen={actions.openAssignment} onTimePay={() => actions.go("payments")} /></div></section> : null,
     recommended: <Card>
-          <SectionHeader title="Recommended for you" text="Open opportunities only—assigned work stays in your schedule." action={<ViewAll onClick={() => actions.go("work")}>Browse work</ViewAll>} />
-          <div className="mt-5 space-y-3">{opportunities.slice(0, 5).map((item) => { const assignment = item.assignments || {}; return <QueueItem key={item.id} icon={Sparkles} title={assignment.service_type || "Interpreter opportunity"} text={`${formatDate(assignment.start_at)}${assignment.delivery_mode ? ` · ${assignment.delivery_mode}` : ""}${assignment.city || assignment.state ? ` · ${[assignment.city, assignment.state].filter(Boolean).join(", ")}` : ""}`} badge={item.status || "open"} onClick={() => actions.submitBid(item)} tone="green" />; })}{!opportunities.length && <CompactEmpty icon={Sparkles} title="No matches right now" text="New opportunities will appear when they match your profile and availability." />}</div>
+          <SectionHeader title="Recommended for you" action={<ViewAll onClick={() => actions.go("work")}>Browse work</ViewAll>} />
+          <div className="mt-5 space-y-3">{opportunities.slice(0, 5).map((item) => { const assignment = item.assignments || {}; return <QueueItem key={item.id} icon={Sparkles} title={assignment.service_type || "Interpreter opportunity"} text={`${formatDate(assignment.start_at)}${assignment.delivery_mode ? ` · ${assignment.delivery_mode}` : ""}${assignment.city || assignment.state ? ` · ${[assignment.city, assignment.state].filter(Boolean).join(", ")}` : ""}`} badge={item.status || "open"} onClick={() => actions.submitBid(item)} tone="green" />; })}{!opportunities.length && <CompactEmpty icon={Sparkles} title="No matches" />}</div>
         </Card>,
     readiness: tasks.length > 0 ? <Card>
-          <SectionHeader title="Readiness tasks" text="Profile and compliance work that can affect assignment matching." />
+          <SectionHeader title="Readiness tasks" />
           <div className="mt-5 space-y-3">{tasks.map((item, index) => <QueueItem key={`${item.title}-${index}`} {...item} />)}</div>
-        </Card> : <Card><CompactEmpty icon={ShieldCheck} title="You’re assignment-ready" text="There are no outstanding readiness tasks." /></Card>,
+        </Card> : <Card><CompactEmpty icon={ShieldCheck} title="You’re assignment-ready" /></Card>,
     schedule: <Card>
-          <SectionHeader title="Your schedule" text="Accepted and directly assigned work appears once." action={<ViewAll onClick={() => actions.go("work")} />} />
-          <div className="mt-5 space-y-3">{upcoming.slice(0, 4).map((item) => <ScheduleItem key={item.id} assignment={item} onClick={() => actions.openAssignment(item)} />)}{!upcoming.length && <CompactEmpty icon={CalendarDays} title="No assigned work ahead" text="Accepted opportunities and direct assignments will appear here." />}</div>
+          <SectionHeader title="Your schedule" action={<ViewAll onClick={() => actions.go("work")} />} />
+          <div className="mt-5 space-y-3">{upcoming.slice(0, 4).map((item) => <ScheduleItem key={item.id} assignment={item} onClick={() => actions.openAssignment(item)} />)}{!upcoming.length && <CompactEmpty icon={CalendarDays} title="No assigned work" />}</div>
         </Card>,
     announcements: <Announcements items={v2?.announcements} actions={actions} />,
   };
