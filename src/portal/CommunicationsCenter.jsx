@@ -456,18 +456,23 @@ export default function CommunicationsCenter({ workspace, onRefresh }) {
   const selectedConversation = conversations.find((item) => item.id === selectedConversationId) || null;
   const conversationMessages = (data?.messages || []).filter((item) => item.conversation_id === selectedConversationId);
 
-  useEffect(() => {
+  async function markConversationRead() {
     if (!selectedConversationId || !selectedConversation?.unreadCount) return;
-    let active = true;
-    setData((current) => current ? {
-      ...current,
-      conversations: (current.conversations || []).map((item) => item.id === selectedConversationId ? { ...item, unreadCount: 0, lastReadAt: new Date().toISOString() } : item),
-    } : current);
-    request("markConversationRead", "POST", { conversationId: selectedConversationId })
-      .then(() => active && onRefresh?.())
-      .catch((readError) => active && setError(readError instanceof Error ? readError.message : String(readError)));
-    return () => { active = false; };
-  }, [selectedConversationId, selectedConversation?.unreadCount]);
+    setSaving(true);
+    setError("");
+    try {
+      await request("markConversationRead", "POST", { conversationId: selectedConversationId });
+      setData((current) => current ? {
+        ...current,
+        conversations: (current.conversations || []).map((item) => item.id === selectedConversationId ? { ...item, unreadCount: 0, lastReadAt: new Date().toISOString() } : item),
+      } : current);
+      await onRefresh?.();
+    } catch (readError) {
+      setError(readError instanceof Error ? readError.message : String(readError));
+    } finally {
+      setSaving(false);
+    }
+  }
 
   function selectConversation(id) {
     setSelectedConversationId(id);
@@ -901,6 +906,11 @@ export default function CommunicationsCenter({ workspace, onRefresh }) {
                   </div>
 
                   <form onSubmit={sendDirectMessage} className="border-t border-slate-200 bg-white p-3 pb-[max(.75rem,env(safe-area-inset-bottom))] sm:p-4">
+                    {data?.role !== "admin" && selectedConversation.unreadCount > 0 && (
+                      <div className="mb-3 flex justify-end">
+                        <Button type="button" tone="soft" icon={Check} disabled={saving} onClick={markConversationRead}>Mark as read</Button>
+                      </div>
+                    )}
                     <UploadPicker files={messageFiles} setFiles={setMessageFiles} disabled={saving} />
                     <div className="mt-3 flex items-start gap-3">
                       <MentionComposer
@@ -1042,6 +1052,11 @@ export default function CommunicationsCenter({ workspace, onRefresh }) {
                   {item.attachments.map((attachment) => (
                     <AttachmentChip key={attachment.id} attachment={attachment} openAttachment={openAttachment} />
                   ))}
+                </div>
+              )}
+              {data?.role !== "admin" && !item.read_at && (
+                <div className="mt-4 flex justify-end border-t border-[#dd7d00]/15 pt-4">
+                  <Button type="button" tone="soft" icon={Check} disabled={saving} onClick={() => readAnnouncement(item)}>Mark as read</Button>
                 </div>
               )}
             </Card>
