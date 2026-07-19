@@ -136,7 +136,6 @@ function NewConversationPanel({ role, contacts, saving, close, create }) {
       <div className="flex items-start justify-between gap-4">
         <div>
           <h3 className="text-lg font-black text-slate-950">New conversation</h3>
-          <p className="mt-1 text-sm text-slate-500">Choose a person or create a focused group chat.</p>
         </div>
         <button type="button" onClick={close} className="rounded-xl p-2 text-slate-400 hover:bg-white">
           <X size={18} />
@@ -203,7 +202,7 @@ function NewConversationPanel({ role, contacts, saving, close, create }) {
             </button>
           );
         })}
-        {!filtered.length && <EmptyState icon={Users} title="No contacts available" text="Portal users appear after their accounts are activated." />}
+        {!filtered.length && <EmptyState icon={Users} title="No contacts available" />}
       </div>
 
       <div className="mt-5 flex justify-end">
@@ -684,7 +683,6 @@ export default function CommunicationsCenter({ workspace, onRefresh }) {
     <div className="space-y-6">
       <Hero
         title="Communications"
-        text="Messages and announcements stay inside MLS Portal while Google Workspace keeps the email record."
         actions={data?.role === "admin" ? (
           <Button tone="gold" icon={Megaphone} onClick={() => { setShowAnnouncementComposer(true); setTab("announcements"); }}>
             New announcement
@@ -727,11 +725,6 @@ export default function CommunicationsCenter({ workspace, onRefresh }) {
               <div className="flex items-center justify-between gap-3">
                 <SectionHeader
                   title="Messages"
-                  text={data?.role === "admin"
-                    ? "Direct and group conversations."
-                    : data?.role === "interpreter"
-                      ? "Message MLS or other interpreters."
-                      : "Message MLS directly."}
                 />
                 <button
                   type="button"
@@ -811,7 +804,7 @@ export default function CommunicationsCenter({ workspace, onRefresh }) {
                     </button>
                   );
                 })}
-                {!conversations.length && <EmptyState icon={Users} title="No conversations" text="Start a message above." />}
+                {!conversations.length && <EmptyState icon={Users} title="No conversations" />}
               </div>
             </aside>
 
@@ -843,7 +836,6 @@ export default function CommunicationsCenter({ workspace, onRefresh }) {
                             )}
                           </div>
                         </div>
-                        <p className="text-xs text-slate-400">Everyone in this conversation will see the same name.</p>
                       </div>
                     ) : (
                       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
@@ -905,7 +897,7 @@ export default function CommunicationsCenter({ workspace, onRefresh }) {
                         </div>
                       );
                     })}
-                    {!conversationMessages.length && <EmptyState icon={MessageSquare} title="Start the conversation" text="Messages are private to the people in this thread." />}
+                    {!conversationMessages.length && <EmptyState icon={MessageSquare} title="No messages yet" />}
                   </div>
 
                   <form onSubmit={sendDirectMessage} className="border-t border-slate-200 bg-white p-3 pb-[max(.75rem,env(safe-area-inset-bottom))] sm:p-4">
@@ -933,7 +925,7 @@ export default function CommunicationsCenter({ workspace, onRefresh }) {
                 </>
               ) : (
                 <div className="flex flex-1 items-center justify-center p-8">
-                  <EmptyState icon={MessageSquare} title="Choose a conversation" text="Select a thread or start a new one." />
+                  <EmptyState icon={MessageSquare} title="Choose a conversation" />
                 </div>
               )}
             </section>
@@ -944,7 +936,7 @@ export default function CommunicationsCenter({ workspace, onRefresh }) {
           {data?.role === "admin" && showAnnouncementComposer && (
             <Card>
               <div className="flex items-start justify-between gap-4">
-                <SectionHeader title="Publish announcement" text="The announcement appears in the portal and is emailed through Google Workspace." />
+                <SectionHeader title="Publish announcement" />
                 <button type="button" onClick={() => setShowAnnouncementComposer(false)} className="rounded-xl p-2 text-slate-400 hover:bg-slate-100">
                   <X size={18} />
                 </button>
@@ -1058,7 +1050,6 @@ export default function CommunicationsCenter({ workspace, onRefresh }) {
             <EmptyState
               icon={Bell}
               title="No announcements"
-              text={data?.role === "admin" ? "Publish an announcement when MLS has an important update." : "MLS announcements will appear here."}
             />
           )}
         </div>
