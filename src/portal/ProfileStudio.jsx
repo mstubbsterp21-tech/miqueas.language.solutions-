@@ -314,7 +314,7 @@ export default function ProfileStudio({ profileType, profile = {}, customization
 
         <div className="grid gap-5 xl:grid-cols-2">{shownSections.map((section) => <SectionCard key={section.key} section={section} theme={draft} dark={dark} />)}</div>
 
-        {!shownSections.length && <div className={cx("border p-8 text-center", cardClasses(draft.card_style))} style={surfaceFor(draft, dark)}><Settings2 className="mx-auto" style={{ color: dark ? "rgba(255,255,255,.35)" : `${draft.theme_primary}55` }} /><p className={cx("mt-3 font-black", dark ? "text-white" : "text-slate-800")}>No profile details to show.</p><p className={cx("mt-1 text-sm", dark ? "text-white/55" : "text-slate-500")}>Add account details or turn sections back on in Customize.</p></div>}
+        {!shownSections.length && <div className={cx("border p-8 text-center", cardClasses(draft.card_style))} style={surfaceFor(draft, dark)}><Settings2 className="mx-auto" style={{ color: dark ? "rgba(255,255,255,.35)" : `${draft.theme_primary}55` }} /><p className={cx("mt-3 font-black", dark ? "text-white" : "text-slate-800")}>No profile details</p></div>}
       </div>
     </div>
   );
