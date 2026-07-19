@@ -84,13 +84,7 @@ export default function ProfileMessageShortcut({
           </span>
           <div>
             <h3 className="font-black text-slate-950">{selfService ? "Message MLS" : `Message ${label}`}</h3>
-            <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-500">
-              {selfService
-                ? "Open your private conversation with an MLS administrator."
-                : unavailable
-                  ? "Messaging becomes available after this person activates their portal login."
-                  : `Open or start the private MLS conversation for this ${profileType}.`}
-            </p>
+            {unavailable && <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-500">Portal account not active</p>}
           </div>
         </div>
         <button
