@@ -20,7 +20,7 @@ export default function WorkflowModals({ controller, actions }) {
 
   return (
     <>
-      <Modal open={modal === "request"} close={() => setModal("")} title={requestTemplateAssignment ? "Request this service again" : "Request an interpreter"} subtitle={requestTemplateAssignment ? "The prior service details are filled in. Update the date, time, location, participants, and anything else that changed." : "Complete the same Interpreter Request form available on the MLS website."} wide>
+      <Modal open={modal === "request"} close={() => setModal("")} title={requestTemplateAssignment ? "Request this service again" : "Request an interpreter"} wide>
         {client
           ? <PortalInterpreterRequestForm key={`${client.id || client.email}:${requestTemplateAssignment?.id || "new"}`} client={client} source={requestTemplateAssignment ? "client_portal_repeat" : "client_portal"} initialValues={requestTemplateAssignment ? initialValuesFromAssignment(requestTemplateAssignment, client) : undefined} submitLabel={requestTemplateAssignment ? "Submit repeated request" : "Submit request"} onSubmit={(assignment) => actions.createAssignment({ assignment })} />
           : <div className="rounded-[1.5rem] border border-dashed border-slate-300 bg-slate-50 p-8 text-center text-sm font-bold text-slate-500">Complete your client profile before submitting an Interpreter Request.</div>}
@@ -34,7 +34,7 @@ export default function WorkflowModals({ controller, actions }) {
         <InviteUserForm draft={inviteDraft} setDraft={setInviteDraft} submit={inviteUser} saving={saving} />
       </Modal>
 
-      <Modal open={modal === "documentRequest"} close={() => setModal("")} title="Request a document" subtitle="Create the portal request and email the recipient in one step.">
+      <Modal open={modal === "documentRequest"} close={() => setModal("")} title="Request a document">
         <DocumentRequestEmailForm controller={controller} />
       </Modal>
 
@@ -42,7 +42,7 @@ export default function WorkflowModals({ controller, actions }) {
         <CourseForm draft={courseDraft} setDraft={setCourseDraft} submit={saveCourse} saving={saving} />
       </Modal>
 
-      <Modal open={modal === "opportunity"} close={() => setModal("")} title="Publish assignment opportunity" subtitle="Email only interpreters whose saved availability matches the assignment.">
+      <Modal open={modal === "opportunity"} close={() => setModal("")} title="Publish assignment opportunity">
         <OpportunityEmailForm controller={controller} />
       </Modal>
     </>

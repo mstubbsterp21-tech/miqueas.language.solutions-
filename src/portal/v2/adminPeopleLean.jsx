@@ -486,14 +486,14 @@ export default function AdminPeopleLean({ workspace, v2, actions }) {
 
   return (
     <div className="space-y-6">
-      <Hero eyebrow="People" title="Clients, interpreters, and applicants in one directory." text="Search, filter, sort, and open profiles without digging through unnecessary filter fields." actions={<ActionButton tone="gold" onClick={actions.openInvite}>Invite user</ActionButton>} />
+      <Hero title="People" actions={<ActionButton tone="gold" onClick={actions.openInvite}>Invite user</ActionButton>} />
 
       <DirectoryTabs active={directory} setActive={setDirectory} clients={clients.length} interpreters={interpreters.length} />
 
       {directory === "clients" ? (
         <>
           <Card>
-            <SectionHeader eyebrow="Client filters" title="Find a client quickly." text="Search the full profile, then narrow by the few fields that matter most." />
+            <SectionHeader title="Clients" />
             <div className="mt-6 flex flex-col gap-3 xl:flex-row xl:items-center">
               <SearchBar value={clientQuery} setValue={setClientQuery} placeholder="Search organization, contact, email, phone, or location" />
               <ViewToggle mode={clientView} setMode={setClientView} />
@@ -514,12 +514,12 @@ export default function AdminPeopleLean({ workspace, v2, actions }) {
             <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-3">
               {filteredClients.map((client) => <PersonCard key={client.id} icon={Building2} title={client.organization_name || client.email} subtitle={client.primary_contact_name || client.email} status={client.account_status} lines={[[getLocation(client), client.industry].filter(Boolean).join(" · "), client.email, client.phone, client.default_service_type && `${client.default_service_type} · ${client.default_delivery_mode || "Setting not set"}`]} onClick={() => actions.openClient(client)} />)}
             </div>
-          ) : <EmptyState icon={Building2} title="No clients match these filters" text="Clear one or more filters to see additional client accounts." action={<ActionButton tone="soft" onClick={clearClients}>Clear filters</ActionButton>} />}
+          ) : <EmptyState icon={Building2} title="No clients match" action={<ActionButton tone="soft" onClick={clearClients}>Clear filters</ActionButton>} />}
         </>
       ) : (
         <>
           <Card>
-            <SectionHeader eyebrow="Interpreter filters" title="Find the right interpreter." text="Only the core matching filters remain. Contact, compliance, and profile details are still available after opening a record." />
+            <SectionHeader title="Interpreters" />
             <div className="mt-6 flex flex-col gap-3 xl:flex-row xl:items-center">
               <SearchBar value={interpreterQuery} setValue={setInterpreterQuery} placeholder="Search name, email, phone, location, credentials, or experience" />
               <ViewToggle mode={interpreterView} setMode={setInterpreterView} />
@@ -554,7 +554,7 @@ export default function AdminPeopleLean({ workspace, v2, actions }) {
                 return <PersonCard key={interpreter.id} icon={Users} title={`${interpreter.first_name || ""} ${interpreter.last_name || ""}`.trim() || interpreter.email} subtitle={getLocation(interpreter) || interpreter.email} status={interpreter.roster_status} lines={[interpreter.email, interpreter.phone, interpreter.credentials && `Credentials: ${interpreter.credentials}`, interpreter.modalities && `Modalities: ${interpreter.modalities}`, interpreter.years_experience && `Experience: ${interpreter.years_experience}`, pipeline && `Onboarding: ${pretty(pipeline.stage)}`]} onClick={() => actions.openInterpreter(interpreter)} />;
               })}
             </div>
-          ) : <EmptyState icon={Users} title="No interpreters match these filters" text="Clear one or more filters to see additional roster profiles." action={<ActionButton tone="soft" onClick={clearInterpreters}>Clear filters</ActionButton>} />}
+          ) : <EmptyState icon={Users} title="No interpreters match" action={<ActionButton tone="soft" onClick={clearInterpreters}>Clear filters</ActionButton>} />}
         </>
       )}
     </div>

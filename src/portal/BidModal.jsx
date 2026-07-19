@@ -23,13 +23,12 @@ export default function BidModal({ controller }) {
       open={modal === "bid"}
       close={() => setModal("")}
       title="Review opportunity"
-      subtitle="Pre-commitment information—private client and access details unlock only after MLS assigns you."
+      subtitle="Client details remain private until assignment."
     >
       <div className="mb-5 rounded-[1.4rem] border border-slate-200 bg-slate-50 p-4 sm:p-5">
         <p className="text-lg font-black text-slate-950">{assignment.service_type || "Interpreter opportunity"}</p>
         <div className="mt-4 grid gap-3 sm:grid-cols-2">{facts.map(([Icon, label, value]) => <div key={label} className="flex min-w-0 gap-3 rounded-2xl bg-white p-3"><Icon size={17} className="mt-0.5 shrink-0 text-[#721100]" /><div className="min-w-0"><p className="text-[10px] font-black uppercase tracking-[.1em] text-slate-400">{label}</p><p className="mt-1 break-words text-sm font-bold leading-5 text-slate-700">{value}</p></div></div>)}</div>
         {bidOpportunity?.notes && <div className="mt-3 rounded-2xl bg-amber-50 p-3 text-sm leading-6 text-amber-900"><b>MLS pre-commitment note:</b> {bidOpportunity.notes}</div>}
-        <p className="mt-3 text-xs leading-5 text-slate-500">Use this information to evaluate availability, competence, logistics, teaming, and potential conflicts. Ask MLS questions before submitting if anything needed for your decision is unclear.</p>
       </div>
       <form onSubmit={submitBid} className="space-y-4">
         <Field name="Requested hourly rate">

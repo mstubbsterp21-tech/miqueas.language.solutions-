@@ -12,7 +12,6 @@ import {
   zonedDateTimeToUtc,
   zonedInputValue,
 } from "../timezones";
-import { AgencyWorkflowCard } from "../agencyWorkflowExperience";
 
 const emptyQuote = {
   assignmentId: "",
@@ -245,19 +244,14 @@ export default function AdminFinanceV2({ workspace, app, v2, actions, saving }) 
 
   return (
     <div className="space-y-6">
-      <Hero
-        eyebrow="Authorization and financial closeout"
-        title="Billing, Agreements & Contractor Pay"
-        text="Prepare client authorization before staffing, verify actual service records after delivery, link the client invoice, collect payment, and track only the contractor payments tied to completed work. Found remains the financial system of record and BoldSign remains the signature system of record."
-      />
+      <Hero title="Billing & Pay" />
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4"><Metric icon={Clock3} name="Closeout reviews" value={submittedTime.length + submittedExpenses.length} note={`${submittedTime.length} time · ${submittedExpenses.length} expense`} color="#1d4ed8" /><Metric icon={ReceiptText} name="Receivables" value={formatMoney(receivable)} note={`${invoices.filter((item) => Number(item.balance_due || 0) > 0).length} open invoices`} color="#c2410c" /><Metric icon={AlertCircle} name="Overdue invoices" value={overdueInvoices.length} note={overdueInvoices.length ? formatMoney(overdueInvoices.reduce((sum, item) => sum + Number(item.balance_due || 0), 0)) : "Nothing overdue"} color="#be123c" /><Metric icon={WalletCards} name="Contractor pay" value={formatMoney(contractorDue)} note={`${unpaidContractors.length} tracked payments`} color="#15803d" /></div>
-      <AgencyWorkflowCard role="admin" currentStage={(submittedTime.length || submittedExpenses.length) ? 4 : (receivable || contractorDue) ? 5 : -1} />
-      <Card><SectionHeader title="Financial control queue" text="Complete closeout in order: approve actuals, issue the client invoice, collect payment, prepare contractor pay, and retain the final records." /><div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">{[["Time to review", submittedTime.length, "Approve service hours before billing."], ["Expenses to review", submittedExpenses.length, "Verify receipts and assignment relevance."], ["Client balances", invoices.filter((item) => Number(item.balance_due || 0) > 0).length, `${formatMoney(receivable)} outstanding.`], ["Contractor payments", unpaidContractors.length, `${formatMoney(contractorDue)} ready, scheduled, or processing.`]].map(([label, count, text]) => <div key={label} className="rounded-2xl border border-slate-200 bg-slate-50 p-4"><p className="text-xs font-black uppercase tracking-[.1em] text-slate-400">{label}</p><p className="mt-2 text-3xl font-black text-slate-950">{count}</p><p className="mt-2 text-xs leading-5 text-slate-500">{text}</p></div>)}</div></Card>
+      <Card><SectionHeader title="Closeout queue" /><div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">{[["Time", submittedTime.length, "Submitted"], ["Expenses", submittedExpenses.length, "Submitted"], ["Client balances", invoices.filter((item) => Number(item.balance_due || 0) > 0).length, `${formatMoney(receivable)} outstanding`], ["Contractor payments", unpaidContractors.length, `${formatMoney(contractorDue)} pending`]].map(([label, count, text]) => <div key={label} className="rounded-2xl border border-slate-200 bg-slate-50 p-4"><p className="text-xs font-black uppercase tracking-[.1em] text-slate-400">{label}</p><p className="mt-2 text-3xl font-black text-slate-950">{count}</p><p className="mt-2 text-xs leading-5 text-slate-500">{text}</p></div>)}</div></Card>
 
       <div className="grid gap-5 xl:grid-cols-2">
         <Card>
-          <SectionHeader eyebrow="Quote builder" title="Prepare client pricing" text="Build the operational quote before sending it to the client." />
+          <SectionHeader title="Client quote" />
           <form onSubmit={saveQuote} className="mt-6 grid gap-4">
             <Field name="Assignment" required>
               <SelectField value={quote.assignmentId} onChange={(event) => setQuote({ ...quote, assignmentId: event.target.value })} options={assignmentOptions} />
@@ -276,7 +270,7 @@ export default function AdminFinanceV2({ workspace, app, v2, actions, saving }) 
         </Card>
 
         <Card>
-          <SectionHeader eyebrow="Found" title="Link client invoice" text="Create the invoice in Found, then attach its number and link to the MLS assignment." />
+          <SectionHeader title="Client invoice" />
           <form onSubmit={saveInvoice} className="mt-6 grid gap-4">
             <Field name="Assignment" required><SelectField value={invoice.assignmentId} onChange={(event) => setInvoice({ ...invoice, assignmentId: event.target.value })} options={assignmentOptions} /></Field>
             <div className="grid gap-3 sm:grid-cols-2">
@@ -295,9 +289,7 @@ export default function AdminFinanceV2({ workspace, app, v2, actions, saving }) 
 
       <Card>
         <SectionHeader
-          eyebrow="Manual BoldSign workflow"
-          title="Track the agreement after working in BoldSign"
-          text="Open BoldSign in a separate tab, create or send the agreement there, then return here to paste the signing link, update the status, and attach the completed PDF and audit trail. MLS never claims to send or check the agreement automatically."
+          title="BoldSign agreement"
           action={(
             <a href="https://app.boldsign.com/" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-2xl bg-[#24130e] px-4 py-3 text-sm font-black text-white transition hover:-translate-y-0.5">
               Open BoldSign <ExternalLink size={16} />
@@ -312,7 +304,7 @@ export default function AdminFinanceV2({ workspace, app, v2, actions, saving }) 
 
           {selectedAssignment && (
             <div className="rounded-2xl border border-[#dd7d00]/25 bg-[#fff8ed] p-4">
-              <p className="text-xs font-black uppercase tracking-[.1em] text-[#721100]">Copy into BoldSign</p>
+              <p className="text-xs font-black uppercase tracking-[.1em] text-[#721100]">Agreement details</p>
               <p className="mt-2 text-sm font-black text-slate-900">{selectedClient?.organization_name || selectedClient?.email || "Client"}</p>
               <p className="mt-1 text-xs text-slate-600">{selectedAssignment.service_type} · {formatDate(selectedAssignment.start_at)}</p>
               <div className="mt-4 flex flex-wrap gap-2">
@@ -353,17 +345,13 @@ export default function AdminFinanceV2({ workspace, app, v2, actions, saving }) 
             <textarea className={INPUT} rows={4} value={agreement.internalNotes} onChange={(event) => setAgreement({ ...agreement, internalNotes: event.target.value })} />
           </Field>
 
-          <div className="rounded-2xl bg-slate-50 p-4 text-xs leading-5 text-slate-500">
-            Statuses are entered manually by MLS. Uploading the completed agreement or audit trail also places that file in the client’s secure Document Center.
-          </div>
-
           <ActionButton type="submit" disabled={saving || !agreement.assignmentId}>Save manual agreement record</ActionButton>
         </form>
       </Card>
 
       <div className="grid gap-5 xl:grid-cols-2">
         <Card>
-          <SectionHeader eyebrow="Found contractor pay" title="Link interpreter payment" text="Schedule or complete the payment in Found, then attach the reference here." />
+          <SectionHeader title="Interpreter payment" />
           <form onSubmit={savePayment} className="mt-6 grid gap-4">
             <Field name="Assignment / interpreter" required><SelectField value={payment.assignmentInterpreterId} onChange={(event) => setPayment({ ...payment, assignmentInterpreterId: event.target.value })} options={staffingOptions} /></Field>
             <div className="grid gap-3 sm:grid-cols-2">
@@ -376,7 +364,7 @@ export default function AdminFinanceV2({ workspace, app, v2, actions, saving }) 
         </Card>
 
         <Card>
-          <SectionHeader eyebrow="Agreements" title="Manual BoldSign register" text={`${agreements.length} agreement records`} />
+          <SectionHeader title={`Agreements (${agreements.length})`} />
           <div className="mt-5 space-y-3">
             {agreements.map((item) => (
               <div key={item.id} className="rounded-2xl bg-slate-50 p-4">
@@ -397,14 +385,14 @@ export default function AdminFinanceV2({ workspace, app, v2, actions, saving }) 
                 </div>
               </div>
             ))}
-            {!agreements.length && <EmptyState icon={FileSignature} title="No manual agreement records" text="Create the agreement in BoldSign, then track it here." />}
+            {!agreements.length && <EmptyState icon={FileSignature} title="No agreement records" />}
           </div>
         </Card>
       </div>
 
       <div className="grid gap-5 xl:grid-cols-2">
         <Card>
-          <SectionHeader eyebrow="Client billing" title="Found invoice register" text={`${invoices.length} linked invoices`} />
+          <SectionHeader title={`Invoices (${invoices.length})`} />
           <div className="mt-5 space-y-3">
             {invoices.map((item) => (
               <div key={item.id} className="rounded-2xl bg-slate-50 p-4">
@@ -418,12 +406,12 @@ export default function AdminFinanceV2({ workspace, app, v2, actions, saving }) 
                 </div>
               </div>
             ))}
-            {!invoices.length && <EmptyState icon={CircleDollarSign} title="No Found invoices linked" text="Create the invoice in Found, then attach it above." />}
+            {!invoices.length && <EmptyState icon={CircleDollarSign} title="No invoices linked" />}
           </div>
         </Card>
 
         <Card>
-          <SectionHeader eyebrow="Review queues" title="Time and expenses" text="Approve contractor submissions before client billing or Found payment preparation." />
+          <SectionHeader title="Time and expenses" />
           <div className="mt-5 grid gap-4 sm:grid-cols-2">
             <div className="space-y-3">
               {(v2?.timeEntries || []).filter((item) => item.status === "submitted").map((item) => (

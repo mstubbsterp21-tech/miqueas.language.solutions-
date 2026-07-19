@@ -6,9 +6,9 @@ import {
 import { Card, Field, INPUT, SectionHeader, cx } from "./ui";
 
 const REQUEST_TYPES = [
-  ["request_new_feature", "Request New Feature", Lightbulb, "Suggest something the portal does not offer yet."],
-  ["update_existing_feature", "Update Existing Feature", PencilLine, "Improve or change a feature that already exists."],
-  ["remove_existing_feature", "Remove Existing Feature", Trash2, "Identify something that should be removed or retired."],
+  ["request_new_feature", "Request New Feature", Lightbulb],
+  ["update_existing_feature", "Update Existing Feature", PencilLine],
+  ["remove_existing_feature", "Remove Existing Feature", Trash2],
 ];
 
 const FEEDBACK_CATEGORIES = [
@@ -52,12 +52,9 @@ export default function PortalFeedback({ role, saving = false, submit }) {
             <MessageSquareText size={22} />
           </span>
           <div className="min-w-0 flex-1">
-            <SectionHeader
-              title="Feedback"
-              text="Use this form to help MLS improve the portal for Admins, Clients, and Interpreters. Tell us whether you want a new feature, an update to something that exists, or removal of a feature, then identify the portal area and explain your recommendation."
-            />
+            <SectionHeader title="Feedback" />
             <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-xs font-medium leading-5 text-amber-900 sm:text-sm sm:leading-6">
-              For urgent assignment, communication-access, safety, or payment concerns, use <b>Communications</b> instead so MLS can respond promptly. This form is for portal product improvements.
+              For urgent service, safety, or payment concerns, contact MLS through <b>Communications</b>.
             </div>
           </div>
         </div>
@@ -68,7 +65,7 @@ export default function PortalFeedback({ role, saving = false, submit }) {
           <fieldset>
             <legend className="text-sm font-black text-slate-700">What would you like MLS to do? <span className="text-[#721100]">*</span></legend>
             <div className="mt-3 grid min-w-0 gap-3 md:grid-cols-3">
-              {REQUEST_TYPES.map(([value, label, Icon, description]) => {
+              {REQUEST_TYPES.map(([value, label, Icon]) => {
                 const selected = draft.requestType === value;
                 return (
                   <label key={value} className={cx(
@@ -88,7 +85,6 @@ export default function PortalFeedback({ role, saving = false, submit }) {
                     </span>
                     <span className="min-w-0">
                       <span className="block break-words text-sm font-black leading-5 text-slate-900">{label}</span>
-                      <span className="mt-1 block break-words text-xs leading-5 text-slate-500">{description}</span>
                     </span>
                   </label>
                 );
@@ -96,7 +92,7 @@ export default function PortalFeedback({ role, saving = false, submit }) {
             </div>
           </fieldset>
 
-          <Field name="Portal category" required help="Choose the area that best matches your feedback.">
+          <Field name="Portal category" required>
             <select
               required
               value={draft.category}
@@ -108,7 +104,7 @@ export default function PortalFeedback({ role, saving = false, submit }) {
             </select>
           </Field>
 
-          <Field name="Your feedback" required help={`${draft.comments.length}/4000 characters · Include what you expected, what happens now, and how the change would help.`}>
+          <Field name="Your feedback" required help={`${draft.comments.length}/4000 characters`}>
             <textarea
               required
               minLength={10}
@@ -122,7 +118,7 @@ export default function PortalFeedback({ role, saving = false, submit }) {
 
           <div className="flex flex-col gap-3 border-t border-slate-200 pt-5 sm:flex-row sm:items-center sm:justify-between">
             <p className="min-w-0 text-xs leading-5 text-slate-500">
-              Submitted as <b className="capitalize text-slate-700">{role}</b>. A secure record is saved and a formatted copy is routed to the MLS Portal Feedback Gmail folder.
+              Submitted as <b className="capitalize text-slate-700">{role}</b>
             </p>
             <button
               type="submit"

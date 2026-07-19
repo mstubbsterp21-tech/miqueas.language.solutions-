@@ -96,12 +96,12 @@ function DocumentsPanel({ audience, view, busyDoc, upload, open, remove, admin =
   if (audience === "interpreter") return (
     <div className="space-y-5">
       <Card>
-        <SectionHeader title="Required Documents" text={admin ? "Review required interpreter compliance files." : "Upload all five required documents before MLS sends assignment broadcasts or recommended opportunities."} />
+        <SectionHeader title="Required documents" />
         {!admin && <div className="mt-5 rounded-2xl border border-amber-200 bg-amber-50 p-4"><p className="font-black text-amber-950">{uploadedRequired} of {INTERPRETER_REQUIRED_DOCUMENTS.length} required documents uploaded</p><p className="mt-1 text-xs leading-5 text-amber-800">Résumé, W-9, Credentials, Liability Insurance, and IC Agreement are required.</p></div>}
         <div className="mt-6 grid gap-4 lg:grid-cols-2">{INTERPRETER_REQUIRED_DOCUMENTS.map(([type, title]) => <DocumentCard key={type} type={type} title={title} document={documents[type]} request={requests[type]} busy={busyDoc} upload={upload} open={open} remove={remove} readOnly={admin} />)}</div>
       </Card>
       <Card>
-        <SectionHeader title="Optional Documents" text={admin ? "Review additional files supplied by this interpreter." : "Add licenses, work samples, or another named document that supports your MLS profile."} />
+        <SectionHeader title="Optional documents" />
         <div className="mt-6 grid gap-4 lg:grid-cols-2">{INTERPRETER_OPTIONAL_DOCUMENTS.map(([type, title]) => <DocumentCard key={type} type={type} title={title} document={documents[type]} request={requests[type]} busy={busyDoc} upload={upload} open={open} remove={remove} readOnly={admin} />)}{customDocuments.map((document) => <DocumentCard key={document.id} type={document.document_type} title={document.notes || document.file_name || "Other document"} document={document} busy={busyDoc} upload={upload} open={open} remove={remove} readOnly={admin} />)}</div>
         {!admin && <form onSubmit={uploadCustom} className="mt-6 grid gap-3 rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-4 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] sm:items-end"><Field name="Other document name" required><input className={INPUT} required value={customName} onChange={(event) => setCustomName(event.target.value)} placeholder="Example: BEI certificate" /></Field><Field name="Choose file" required><input className={INPUT} type="file" required onChange={(event) => setCustomFile(event.target.files?.[0] || null)} /></Field><Button type="submit" icon={Plus} disabled={!customName.trim() || !customFile || Boolean(busyDoc)}>Upload document</Button></form>}
       </Card>
@@ -109,7 +109,7 @@ function DocumentsPanel({ audience, view, busyDoc, upload, open, remove, admin =
   );
   return (
     <Card>
-      <SectionHeader eyebrow="Secure files" title="Document center" text={admin ? "Review the files tied to this account." : "Upload requested records and replace outdated versions without emailing attachments."} />
+      <SectionHeader title="Documents" />
       <div className="mt-6 grid gap-4 lg:grid-cols-2">
         {definitions.map(([type, title]) => (
           <DocumentCard key={type} type={type} title={title} document={documents[type]} request={requests[type]} busy={busyDoc} upload={upload} open={open} remove={remove} readOnly={admin} />
@@ -123,7 +123,7 @@ function NotificationCenter({ app, markRead }) {
   const notifications = app?.notifications || [];
   return (
     <Card>
-      <SectionHeader eyebrow="Updates" title="Notifications" text="Assignment, document, training, and conversation activity stays in one place." action={notifications.some((item) => !item.is_read) ? <Button tone="soft" onClick={() => markRead()}>Mark all read</Button> : null} />
+      <SectionHeader title="Notifications" action={notifications.some((item) => !item.is_read) ? <Button tone="soft" onClick={() => markRead()}>Mark all read</Button> : null} />
       <div className="mt-6 space-y-3">
         {notifications.map((notification) => (
           <button key={notification.id} type="button" onClick={() => !notification.is_read && markRead(notification.id)} className={cx("flex w-full items-start gap-4 rounded-2xl p-4 text-left transition", notification.is_read ? "bg-slate-50" : "border border-[#dd7d00]/20 bg-[#fff9ef] shadow-sm")}>
@@ -132,7 +132,7 @@ function NotificationCenter({ app, markRead }) {
             {!notification.is_read && <span className="mt-2 h-2.5 w-2.5 rounded-full bg-[#dd7d00]" />}
           </button>
         ))}
-        {!notifications.length && <EmptyState icon={Bell} title="You are all caught up" text="New MLS activity will appear here." />}
+        {!notifications.length && <EmptyState icon={Bell} title="No notifications" />}
       </div>
     </Card>
   );
@@ -148,7 +148,7 @@ function MessagesCenter({ assignments, messages, currentUserId, sendMessage }) {
     <Card className="overflow-hidden p-0 md:p-0">
       <div className="grid min-h-[620px] lg:grid-cols-[320px_minmax(0,1fr)]">
         <div className="border-b border-slate-200 bg-slate-50 p-4 lg:border-b-0 lg:border-r">
-          <SectionHeader eyebrow="Conversations" title="Messages" text="Every conversation stays attached to the assignment." />
+          <SectionHeader title="Messages" />
           <div className="mt-5 max-h-[480px] space-y-2 overflow-y-auto">
             {assignments.map((assignment) => (
               <button key={assignment.id} type="button" onClick={() => setAssignmentId(assignment.id)} className={cx("w-full rounded-2xl p-4 text-left transition", assignmentId === assignment.id ? "bg-[#721100] text-white shadow-lg" : "bg-white text-slate-800 hover:shadow")}>
@@ -156,7 +156,7 @@ function MessagesCenter({ assignments, messages, currentUserId, sendMessage }) {
                 <p className={cx("mt-1 truncate text-xs", assignmentId === assignment.id ? "text-white/65" : "text-slate-400")}>{assignment.clients?.organization_name || assignment.clients?.email || formatDate(assignment.start_at)}</p>
               </button>
             ))}
-            {!assignments.length && <EmptyState icon={MessageSquare} title="No conversations" text="Messages become available when an assignment exists." />}
+            {!assignments.length && <EmptyState icon={MessageSquare} title="No conversations" />}
           </div>
         </div>
         <div className="flex min-w-0 flex-col">
@@ -168,11 +168,11 @@ function MessagesCenter({ assignments, messages, currentUserId, sendMessage }) {
                   const mine = message.sender_clerk_user_id === currentUserId;
                   return <div key={message.id} className={cx("flex", mine ? "justify-end" : "justify-start")}><div className={cx("max-w-[82%] rounded-[1.35rem] px-4 py-3 text-sm shadow-sm", mine ? "rounded-br-md bg-[#721100] text-white" : "rounded-bl-md bg-white text-slate-700")}><p className="leading-6">{message.body}</p><p className={cx("mt-2 text-[10px]", mine ? "text-white/55" : "text-slate-400")}>{pretty(message.sender_role)} · {formatDate(message.created_at)}</p></div></div>;
                 })}
-                {!conversation.length && <EmptyState icon={MessageSquare} title="Start the conversation" text="Use this thread for assignment logistics and preparation." />}
+                {!conversation.length && <EmptyState icon={MessageSquare} title="No messages yet" />}
               </div>
               <form onSubmit={async (event) => { event.preventDefault(); if (!body.trim()) return; await sendMessage(assignmentId, body); setBody(""); }} className="border-t border-slate-200 bg-white p-4"><div className="flex gap-3"><textarea className={cx(INPUT, "min-h-12 flex-1 resize-none")} value={body} onChange={(event) => setBody(event.target.value)} placeholder="Write an assignment message" /><button className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#721100] text-white"><Send size={18} /></button></div></form>
             </>
-          ) : <div className="flex flex-1 items-center justify-center p-8"><EmptyState icon={MessageSquare} title="Choose an assignment" text="Select a conversation from the left." /></div>}
+          ) : <div className="flex flex-1 items-center justify-center p-8"><EmptyState icon={MessageSquare} title="Choose an assignment" /></div>}
         </div>
       </div>
     </Card>
@@ -182,7 +182,7 @@ function MessagesCenter({ assignments, messages, currentUserId, sendMessage }) {
 function TrainingCenter({ courses, progressCourse, admin = false, progress = [] }) {
   return (
     <Card>
-      <SectionHeader eyebrow="Professional growth" title="Training center" text={admin ? "Publish onboarding and development content, then monitor interpreter progress." : "Complete assigned MLS onboarding and professional development."} />
+      <SectionHeader title="Learning" />
       <div className="mt-6 grid gap-4 lg:grid-cols-2">
         {courses.map((course) => {
           const percent = course.progress?.progress_percent || 0;
@@ -196,7 +196,7 @@ function TrainingCenter({ courses, progressCourse, admin = false, progress = [] 
             </div>
           );
         })}
-        {!courses.length && <EmptyState icon={GraduationCap} title="No training available" text={admin ? "Add the first course to begin." : "Published MLS courses will appear here."} />}
+        {!courses.length && <EmptyState icon={GraduationCap} title="No training available" />}
       </div>
     </Card>
   );
@@ -206,14 +206,14 @@ function Opportunities({ opportunities, bids, submitBid }) {
   const bidMap = new Map((bids || []).map((bid) => [bid.opportunity_id, bid]));
   return (
     <div className="space-y-5">
-      <Hero eyebrow="Assignment marketplace" title="Recommended MLS opportunities" text="Review open work, compare it with your profile, and submit your interest directly to MLS." />
+      <Hero title="Opportunities" />
       <div className="grid gap-4 lg:grid-cols-2">
         {opportunities.map((opportunity) => {
           const assignment = opportunity.assignments || {};
           const bid = bidMap.get(opportunity.id);
           return <Card key={opportunity.id} hover><div className="flex flex-wrap items-start justify-between gap-3"><div><p className="text-xs font-black uppercase tracking-[.1em] text-[#dd7d00]">{assignment.specialty || "Community"}</p><h3 className="mt-1 text-xl font-black text-slate-950">{assignment.service_type}</h3></div><Badge value={bid?.status || opportunity.status} /></div><p className="mt-4 text-sm font-bold text-slate-700">{formatDate(assignment.start_at)}</p><p className="mt-2 text-sm text-slate-500">{assignment.delivery_mode} · {assignment.location_name || [assignment.city, assignment.state].filter(Boolean).join(", ") || "Location pending"}</p><p className="mt-4 text-sm leading-6 text-slate-600">{opportunity.notes || assignment.description || "Review the assignment details before bidding."}</p><div className="mt-5">{bid ? <p className="text-sm font-black text-[#721100]">Bid submitted {bid.bid_rate ? `at ${formatMoney(bid.bid_rate)}/hr` : ""}</p> : <Button onClick={() => submitBid(opportunity)} icon={ClipboardCheck}>Bid for assignment</Button>}</div></Card>;
         })}
-        {!opportunities.length && <EmptyState icon={ClipboardCheck} title="No open opportunities" text="MLS will post recommended assignments here when they are available." />}
+        {!opportunities.length && <EmptyState icon={ClipboardCheck} title="No open opportunities" />}
       </div>
     </div>
   );

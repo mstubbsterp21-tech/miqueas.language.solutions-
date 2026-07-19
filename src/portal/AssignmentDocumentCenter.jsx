@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useSession, useUser } from "@clerk/clerk-react";
 import {
   Archive, CheckCircle2, Download, FileClock, FileText, FolderLock,
-  Loader2, RefreshCw, ShieldCheck, Upload, Users,
+  Loader2, RefreshCw, ShieldCheck, Upload,
 } from "lucide-react";
 import { createPortalSupabaseClient } from "../lib/supabaseClient";
 import { createMLSApi } from "./api";
@@ -106,7 +106,7 @@ function DocumentChecklist({ assignment, documents }) {
 
   return (
     <Card className="shadow-none">
-      <SectionHeader eyebrow="Agency record" title="Assignment documentation checklist" text="A practical completeness check for the records MLS may need to coordinate, pay, bill, resolve questions, and improve service quality." />
+      <SectionHeader title="Document checklist" />
       <div className="mt-5 grid gap-3 lg:grid-cols-2">
         {items.map(([label, complete, note]) => (
           <div key={label} className="flex items-start gap-3 rounded-2xl bg-slate-50 p-4">
@@ -126,12 +126,12 @@ function DocumentChecklist({ assignment, documents }) {
 
 function roleGuidance(role) {
   if (role === "client") {
-    return "You can see client-facing records for this request. Interpreter agreements, rates, timesheets, internal notes, complaints, and other MLS administrative records stay private unless MLS intentionally shares a specific document with you.";
+    return "Private: interpreter agreements, rates, timesheets, internal notes, complaints, and administrative records are restricted.";
   }
   if (role === "interpreter") {
-    return "You can see preparation and assignment records shared with the team, plus documents addressed specifically to you. Client billing, other interpreters’ agreements or timesheets, and confidential MLS quality records stay private.";
+    return "Private: client billing, other interpreters’ agreements or timesheets, and MLS quality records are restricted.";
   }
-  return "MLS administrators control each document’s audience. Keep agreements, billing, quality records, complaints, and interpreter-specific records separated from materials that the whole assignment team needs.";
+  return "Document access is controlled by the selected audience.";
 }
 
 export default function AssignmentDocumentCenter({ assignment, role }) {
@@ -334,9 +334,7 @@ export default function AssignmentDocumentCenter({ assignment, role }) {
 
       <Card className="shadow-none">
         <SectionHeader
-          eyebrow="Secure assignment record"
-          title="Documents and records"
-          text="Upload the agreements, preparation, time, billing, and communication records connected to this assignment."
+          title="Documents"
           action={<Button tone="soft" icon={RefreshCw} onClick={loadDocuments} disabled={loading}>Refresh</Button>}
         />
 
@@ -345,7 +343,6 @@ export default function AssignmentDocumentCenter({ assignment, role }) {
           <div>
             <p className="text-sm font-black text-slate-900">Role-based access</p>
             <p className="mt-1 text-sm leading-6 text-slate-600">{roleGuidance(role)}</p>
-            <p className="mt-2 text-xs leading-5 text-slate-500">Files stay in private storage and open through short-lived links. Gmail notifications link back to MLS Portal instead of attaching confidential files.</p>
           </div>
         </div>
 
@@ -392,7 +389,7 @@ export default function AssignmentDocumentCenter({ assignment, role }) {
             {clientCanShare && !replaceDocument && (
               <label className="md:col-span-2 flex items-start gap-3 rounded-2xl border border-slate-200 bg-white p-4 text-sm text-slate-700">
                 <input type="checkbox" className="mt-1" checked={draft.shareWithInterpreters} onChange={(event) => setDraft({ ...draft, shareWithInterpreters: event.target.checked })} />
-                <span><strong className="text-slate-900">Share with assigned interpreters</strong><br /><span className="text-xs leading-5 text-slate-500">Use this for preparation or logistical material the interpreting team needs. Do not use it for private consumer, billing, or personnel information.</span></span>
+                <span><strong className="text-slate-900">Share with assigned interpreters</strong><br /><span className="text-xs leading-5 text-slate-500">Do not share private consumer, billing, or personnel information.</span></span>
               </label>
             )}
 
@@ -465,18 +462,9 @@ export default function AssignmentDocumentCenter({ assignment, role }) {
               )}
             </div>
           ))}
-          {!loading && !documents.length && <EmptyState icon={FolderLock} title="No assignment documents yet" text="Upload the first agreement, preparation file, timesheet, or communication record for this assignment." />}
+          {!loading && !documents.length && <EmptyState icon={FolderLock} title="No assignment documents" />}
         </div>
       </Card>
-
-      {role !== "admin" && (
-        <Card className="shadow-none">
-          <div className="flex items-start gap-3">
-            <Users className="mt-0.5 shrink-0 text-[#721100]" size={20} />
-            <div><p className="font-black text-slate-950">Need a different record?</p><p className="mt-1 text-sm leading-6 text-slate-600">Use the assignment message thread to ask MLS for a document or clarification. That keeps the request and response attached to the same assignment.</p></div>
-          </div>
-        </Card>
-      )}
     </div>
   );
 }
