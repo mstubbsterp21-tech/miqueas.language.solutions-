@@ -19,6 +19,7 @@ import PortalWidgets from "./PortalWidgets";
 import { firstNameFromDisplayName, portalDisplayName } from "./portalIdentity";
 import { ClientAssignmentCard } from "./clientServiceExperience";
 import { AdminOperationsCard, InterpreterWorkCard, adminAssignmentMeta, recordsForAssignment } from "./agencyWorkflowExperience";
+import { INTERPRETER_REQUIRED_DOCUMENTS } from "./forms";
 
 const SNAPSHOT_NOW = Date.now();
 
@@ -178,7 +179,7 @@ function InterpreterHome({ workspace, operations, app, v2, actions, identityName
   const expiring = (v2?.credentials || []).filter((item) => item.expires_on && new Date(item.expires_on).getTime() <= SNAPSHOT_NOW + 60 * 864e5);
   const docs = (workspace.interpreter?.documentRequests || []).filter((item) => ["requested", "viewed", "overdue"].includes(item.status));
   const uploadedDocumentTypes = new Set((workspace.interpreter?.documents || []).map((item) => item.document_type));
-  const requiredDocumentTypes = ["resume", "w9", "credential_proof", "liability_insurance", "ic_agreement"];
+  const requiredDocumentTypes = INTERPRETER_REQUIRED_DOCUMENTS.map(([type]) => type);
   const missingRequiredDocuments = requiredDocumentTypes.filter((type) => !uploadedDocumentTypes.has(type));
   const training = (operations?.training || []).filter((course) => course.progress?.status !== "completed");
   const timeEntries = v2?.timeEntries || [];
@@ -195,11 +196,11 @@ function InterpreterHome({ workspace, operations, app, v2, actions, identityName
   const nextAssignment = upcoming[0];
 
   const sections = {
-    hero: <Hero title={`Welcome back${firstName ? `, ${firstName}` : ""}`} text={tasks.length ? `${tasks.length} readiness task${tasks.length === 1 ? "" : "s"} need attention.` : "You’re assignment-ready."} actions={<><Action tone="gold" onClick={() => actions.go("work")}>Work</Action><Action onClick={() => actions.go("schedule")}>Availability</Action></>} />,
+    hero: <Hero title={`Welcome back${firstName ? `, ${firstName}` : ""}`} text={tasks.length ? <button type="button" onClick={tasks[0].onClick} className="rounded-md text-left font-bold text-white underline decoration-white/40 underline-offset-4 transition hover:decoration-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white/70">{tasks.length} readiness task{tasks.length === 1 ? "" : "s"} need attention. Open the next task.</button> : "You’re assignment-ready."} actions={<><Action tone="gold" onClick={() => actions.go("work")}>Work</Action><Action onClick={() => actions.go("schedule")}>Availability</Action></>} />,
     metrics: <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
       <Metric icon={CalendarDays} name="Assigned work" value={upcoming.length} note={nextAssignment ? `Next: ${formatDate(nextAssignment.start_at, { month: "short", day: "numeric" })}` : "No upcoming assignments"} onClick={() => actions.go("work")} />
       <Metric icon={Sparkles} name="Recommended" value={opportunities.length} note="Open assignments matched to you" color="#4338ca" onClick={() => actions.go("work")} />
-      <Metric icon={ClipboardCheck} name="Readiness tasks" value={tasks.length} note="Documents, learning, compliance" color="#be123c" onClick={() => actions.go("documents")} />
+      <Metric icon={ClipboardCheck} name="Readiness tasks" value={tasks.length} note={tasks.length ? "Open the next item needing attention" : "You’re assignment-ready"} color={tasks.length ? "#be123c" : "#15803d"} onClick={tasks.length ? tasks[0].onClick : undefined} />
       <Metric icon={CircleDollarSign} name="Payment activity" value={payments.length} note="Ready or processing" color="#15803d" onClick={() => actions.go("payments")} />
     </div>,
     widgets: layout?.enabled_widgets?.length ? <PortalWidgets layout={layout} /> : null,
@@ -211,7 +212,7 @@ function InterpreterHome({ workspace, operations, app, v2, actions, identityName
     readiness: tasks.length > 0 ? <Card>
           <SectionHeader title="Readiness tasks" />
           <div className="mt-5 space-y-3">{tasks.map((item, index) => <QueueItem key={`${item.title}-${index}`} {...item} />)}</div>
-        </Card> : <Card><CompactEmpty icon={ShieldCheck} title="You’re assignment-ready" /></Card>,
+        </Card> : null,
     schedule: <Card>
           <SectionHeader title="Your schedule" action={<ViewAll onClick={() => actions.go("work")} />} />
           <div className="mt-5 space-y-3">{upcoming.slice(0, 4).map((item) => <ScheduleItem key={item.id} assignment={item} onClick={() => actions.openAssignment(item)} />)}{!upcoming.length && <CompactEmpty icon={CalendarDays} title="No assigned work" />}</div>
