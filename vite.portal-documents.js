@@ -159,18 +159,17 @@ function patchAdminDocumentCenter(code) {
   }
   updated = updated.replace(coursesLine, documentIndex);
 
-  const currentCard = /      <Card>\n        <SectionHeader eyebrow="Documents" title="Admin document center"[\s\S]*?      <\/Card>\n      <div className="grid gap-5 xl:grid-cols-2">/;
+  const currentCard = /      <Card>\n        <SectionHeader [\s\S]*?      <\/Card>\n      <div className="grid gap-5 xl:grid-cols-2">/;
   if (!currentCard.test(updated)) {
     throw new Error("MLS document controls patch could not find the admin document center card.");
   }
 
   const restoredCard = `      <Card>
-        <SectionHeader eyebrow="Documents" title="Admin document center" text={\`\${uploadedDocuments.length} uploaded file\${uploadedDocuments.length === 1 ? "" : "s"} and \${documentRequests.length} request\${documentRequests.length === 1 ? "" : "s"} across client and interpreter accounts.\`} action={<ActionButton onClick={actions.openDocumentRequest}>New request</ActionButton>} />
+        <SectionHeader title="Documents & requests" action={<ActionButton onClick={actions.openDocumentRequest}>New request</ActionButton>} />
 
         <div className="mt-7">
           <div className="flex flex-wrap items-end justify-between gap-3">
-            <div><p className="text-xs font-black uppercase tracking-[.12em] text-[#dd7d00]">Uploaded files</p><h3 className="mt-1 text-xl font-black text-slate-950">Secure account documents</h3></div>
-            <p className="text-xs font-bold text-slate-400">Open, download, delete, or manage the account.</p>
+            <h3 className="text-xl font-black text-slate-950">Documents ({uploadedDocuments.length})</h3>
           </div>
           <div className="mt-4 grid gap-3 lg:grid-cols-2">
             {uploadedDocuments.map((document) => {
@@ -195,12 +194,12 @@ function patchAdminDocumentCenter(code) {
                 </div>
               );
             })}
-            {!uploadedDocuments.length && <EmptyState icon={FileText} title="No uploaded files" text="Files uploaded by MLS, clients, or interpreters will appear here." />}
+            {!uploadedDocuments.length && <EmptyState icon={FileText} title="No uploaded files" />}
           </div>
         </div>
 
         <div className="mt-8 border-t border-slate-200 pt-7">
-          <div><p className="text-xs font-black uppercase tracking-[.12em] text-[#dd7d00]">Requests</p><h3 className="mt-1 text-xl font-black text-slate-950">Document request tracking</h3></div>
+          <h3 className="text-xl font-black text-slate-950">Requests ({documentRequests.length})</h3>
           <div className="mt-4 grid gap-3 lg:grid-cols-2">
             {documentRequests.map((request) => (
               <div key={request.id} className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
@@ -227,7 +226,7 @@ function patchAdminDocumentCenter(code) {
                 </div>
               </div>
             ))}
-            {!documentRequests.length && <EmptyState icon={FileText} title="No document requests" text="Create a request when a client or interpreter file is needed." />}
+            {!documentRequests.length && <EmptyState icon={FileText} title="No document requests" />}
           </div>
         </div>
       </Card>
