@@ -11,16 +11,16 @@ export const PORTAL_WIDGETS = [
 
 export const LAYOUT_DEFAULTS = {
   admin: {
-    nav: [["home", "Home"], ["assignments", "Assignments"], ["communications", "Communications"], ["people", "People"], ["finance", "Finance"], ["compliance", "Compliance"], ["reports", "Reports"], ["feedback", "Feedback"], ["profile", "My Profile"], ["settings", "Settings"]],
-    home: [["hero", "Command center"], ["metrics", "Key metrics"], ["widgets", "Optional widgets"], ["decision_queue", "Decision queue"], ["staffed_schedule", "Staffed schedule"], ["announcements", "Announcements"]],
+    nav: [["home", "Home"], ["assignments", "Operations"], ["communications", "Communications"], ["people", "People"], ["finance", "Billing & Pay"], ["compliance", "Compliance"], ["reports", "Reports"], ["feedback", "Feedback"], ["profile", "My Profile"], ["settings", "Settings"]],
+    home: [["hero", "Command center"], ["metrics", "Key metrics"], ["widgets", "Optional widgets"], ["workflow", "Agency workflow"], ["decision_queue", "Decision queue"], ["priority_services", "Priority services"], ["staffed_schedule", "Staffed schedule"], ["announcements", "Announcements"]],
   },
   client: {
     nav: [["home", "Home"], ["requests", "Requests"], ["assignments", "Services"], ["communications", "Communications"], ["billing", "Billing"], ["documents", "Documents"], ["feedback", "Feedback"], ["profile", "Profile"]],
     home: [["hero", "Service hub"], ["metrics", "Key metrics"], ["widgets", "Optional widgets"], ["action_queue", "Action queue"], ["next_service", "Next service"], ["upcoming_services", "Upcoming services"], ["request_roadmap", "How service works"], ["announcements", "Announcements"]],
   },
   interpreter: {
-    nav: [["home", "Home"], ["work", "Assignments"], ["payments", "Payments"], ["communications", "Communications"], ["schedule", "Availability"], ["documents", "Documents"], ["learning", "Learning"], ["feedback", "Feedback"], ["profile", "My Profile"]],
-    home: [["hero", "Welcome and shortcuts"], ["metrics", "Key metrics"], ["widgets", "Optional widgets"], ["recommended", "Recommended opportunities"], ["readiness", "Readiness tasks"], ["schedule", "Assigned schedule"], ["announcements", "Announcements"]],
+    nav: [["home", "Home"], ["work", "Work"], ["payments", "Time & Pay"], ["communications", "Communications"], ["schedule", "Availability"], ["documents", "Documents"], ["learning", "Learning"], ["feedback", "Feedback"], ["profile", "My Profile"]],
+    home: [["hero", "Welcome and shortcuts"], ["metrics", "Key metrics"], ["widgets", "Optional widgets"], ["workflow", "Work cycle"], ["next_work", "Next service"], ["recommended", "Recommended opportunities"], ["readiness", "Readiness tasks"], ["schedule", "Assigned schedule"], ["announcements", "Announcements"]],
   },
 };
 
