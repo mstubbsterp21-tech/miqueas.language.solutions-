@@ -5,6 +5,7 @@ import {
   Plus, Smartphone, Trash2, UploadCloud, X,
 } from "lucide-react";
 import { formatInPortalTimeZone } from "./timezones";
+import { readableText } from "./themeContrast";
 
 export const BRAND = {
   burgundy: "#721100",
@@ -89,7 +90,7 @@ export function Metric({ icon: Icon, name, value, note, color = BRAND.burgundy, 
     <motion.button type="button" onClick={onClick} whileHover={{ y: -3 }} className={cx("mls-card rounded-[1.35rem] border border-black/5 bg-white p-4 text-left shadow-[0_16px_50px_rgba(40,25,18,.07)] sm:rounded-[1.55rem] sm:p-5", onClick ? "cursor-pointer" : "cursor-default")}>
       <div className="flex justify-between gap-4">
         <div className="min-w-0"><p className="text-sm font-black text-slate-500">{name}</p><p className="mt-2 text-2xl font-black text-slate-900 sm:text-3xl">{value}</p>{note && <p className="mt-1 text-xs leading-5 text-slate-500">{note}</p>}</div>
-        <span className="flex h-11 w-11 items-center justify-center rounded-2xl text-white" style={{ background: color }}><Icon size={20} /></span>
+        <span className="flex h-11 w-11 items-center justify-center rounded-2xl" style={{ background: color, color: readableText(color) }}><Icon size={20} /></span>
       </div>
     </motion.button>
   );
@@ -142,8 +143,8 @@ export function Modal({ open, close, title, children, wide = false, subtitle }) 
   return (
     <AnimatePresence>
       {open && <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[120] flex items-end justify-center bg-[#1c100c]/70 p-0 backdrop-blur-sm sm:items-center sm:p-3 md:p-5" onMouseDown={(event) => event.target === event.currentTarget && close()}>
-        <motion.div initial={{ y: 24, opacity: 0, scale: 0.98 }} animate={{ y: 0, opacity: 1, scale: 1 }} exit={{ y: 18, opacity: 0, scale: 0.99 }} transition={{ type: "spring", stiffness: 260, damping: 24 }} className={cx("max-h-[96dvh] min-w-0 w-full max-w-[100vw] overflow-x-hidden overflow-y-auto rounded-t-[1.5rem] bg-[#f8f5f1] pb-[env(safe-area-inset-bottom)] shadow-2xl sm:max-h-[94vh] sm:max-w-[calc(100vw-1.5rem)] sm:rounded-[2rem]", wide ? "sm:w-full sm:max-w-6xl" : "sm:w-full sm:max-w-3xl")}>
-          <div className="sticky top-0 z-20 flex items-start justify-between gap-3 border-b border-black/5 bg-[#f8f5f1]/95 px-4 py-4 backdrop-blur sm:px-5 sm:py-5 md:px-7"><div className="min-w-0"><h2 className="text-xl font-black text-slate-950 sm:text-2xl">{title}</h2>{subtitle && <p className="mt-1 text-sm text-slate-500">{subtitle}</p>}</div><button type="button" onClick={close} className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-slate-500 shadow"><X size={18} /></button></div>
+        <motion.div initial={{ y: 24, opacity: 0, scale: 0.98 }} animate={{ y: 0, opacity: 1, scale: 1 }} exit={{ y: 18, opacity: 0, scale: 0.99 }} transition={{ type: "spring", stiffness: 260, damping: 24 }} className={cx("mls-modal-surface max-h-[96dvh] min-w-0 w-full max-w-[100vw] overflow-x-hidden overflow-y-auto rounded-t-[1.5rem] bg-[#f8f5f1] pb-[env(safe-area-inset-bottom)] shadow-2xl sm:max-h-[94vh] sm:max-w-[calc(100vw-1.5rem)] sm:rounded-[2rem]", wide ? "sm:w-full sm:max-w-6xl" : "sm:w-full sm:max-w-3xl")}>
+          <div className="mls-modal-header sticky top-0 z-20 flex items-start justify-between gap-3 border-b border-black/5 bg-[#f8f5f1]/95 px-4 py-4 backdrop-blur sm:px-5 sm:py-5 md:px-7"><div className="min-w-0"><h2 className="text-xl font-black text-slate-950 sm:text-2xl">{title}</h2>{subtitle && <p className="mt-1 text-sm text-slate-500">{subtitle}</p>}</div><button type="button" onClick={close} className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-slate-500 shadow"><X size={18} /></button></div>
           <div className="p-4 sm:p-5 md:p-8">{children}</div>
         </motion.div>
       </motion.div>}
