@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import { displayRequestSetting, requestDefaultsFromClient } from "../requestFormConfig";
 import { Badge, Field, INPUT, cx, pretty } from "./ui";
+import { normalizeHex, portalThemeTokens, readableText } from "./themeContrast";
 
 const THEMES = [
   ["MLS", "#721100", "#24130e", "#dd7d00"],
@@ -51,10 +52,11 @@ function fallbackLocation(profile) {
 }
 
 function backgroundFor(theme) {
-  if (theme.background_style === "gradient") return `linear-gradient(145deg, ${theme.theme_primary}24, ${theme.theme_accent}20 45%, ${theme.theme_secondary}14 100%)`;
-  if (theme.background_style === "dark") return `linear-gradient(145deg, ${theme.theme_secondary}, ${theme.theme_primary} 72%, ${theme.theme_secondary})`;
+  const contrast = portalThemeTokens(theme);
+  if (theme.background_style === "gradient") return `linear-gradient(145deg, ${contrast.primary}24, ${contrast.accent}20 45%, ${contrast.secondary}14 100%)`;
+  if (theme.background_style === "dark") return `linear-gradient(145deg, ${contrast.heroEnd}, ${contrast.heroStart} 72%, ${contrast.heroEnd})`;
   if (theme.background_style === "clean") return "#ffffff";
-  return `linear-gradient(145deg, #ffffff 0%, ${theme.theme_accent}10 52%, ${theme.theme_primary}0d 100%)`;
+  return `linear-gradient(145deg, #ffffff 0%, ${contrast.accent}10 52%, ${contrast.primary}0d 100%)`;
 }
 
 function cardClasses(cardStyle) {
@@ -64,29 +66,32 @@ function cardClasses(cardStyle) {
 }
 
 function surfaceFor(theme, dark) {
-  if (dark) return { backgroundColor: "rgba(255,255,255,.075)", borderColor: `${theme.theme_accent}42` };
-  if (theme.card_style === "glass") return { backgroundColor: "rgba(255,255,255,.66)", borderColor: `${theme.theme_primary}1f` };
-  if (theme.card_style === "flat") return { backgroundColor: `${theme.theme_accent}0c`, borderColor: `${theme.theme_primary}1a` };
-  return { backgroundColor: "rgba(255,255,255,.92)", borderColor: `${theme.theme_primary}18` };
+  const contrast = portalThemeTokens(theme);
+  if (dark) return { backgroundColor: "rgba(17,24,39,.88)", borderColor: `${contrast.accentOnDark}66` };
+  if (theme.card_style === "glass") return { backgroundColor: "rgba(255,255,255,.94)", borderColor: `${contrast.primaryInk}38` };
+  if (theme.card_style === "flat") return { backgroundColor: `${contrast.accent}12`, borderColor: `${contrast.primaryInk}2e` };
+  return { backgroundColor: "rgba(255,255,255,.97)", borderColor: `${contrast.primaryInk}28` };
 }
 
 function InfoItem({ label, value, theme, dark }) {
+  const contrast = portalThemeTokens(theme);
   return (
     <div
       className={cx("border p-4", theme.card_style === "flat" ? "rounded-lg" : "rounded-2xl")}
       style={{
-        backgroundColor: dark ? "rgba(255,255,255,.07)" : `${theme.theme_accent}0d`,
-        borderColor: dark ? "rgba(255,255,255,.12)" : `${theme.theme_primary}18`,
+        backgroundColor: dark ? "rgba(255,255,255,.10)" : `${contrast.accent}12`,
+        borderColor: dark ? "rgba(255,255,255,.24)" : `${contrast.primaryInk}2e`,
       }}
     >
-      <p className="text-xs font-bold" style={{ color: dark ? theme.theme_accent : theme.theme_primary }}>{label}</p>
-      <p className={cx("mt-1 whitespace-pre-wrap text-sm leading-6", dark ? "text-white/80" : "text-slate-700")}>{String(value)}</p>
+      <p className="text-xs font-bold" style={{ color: dark ? contrast.accentOnDark : contrast.primaryInk }}>{label}</p>
+      <p className={cx("mt-1 whitespace-pre-wrap text-sm leading-6", dark ? "text-white/90" : "text-slate-700")}>{String(value)}</p>
     </div>
   );
 }
 
 function SectionCard({ section, theme, dark }) {
   const Icon = section.icon;
+  const contrast = portalThemeTokens(theme);
   const items = section.items.filter(([, value]) => hasValue(value));
   if (!items.length) return null;
   return (
@@ -94,13 +99,13 @@ function SectionCard({ section, theme, dark }) {
       <div className="flex items-center gap-3">
         <span
           className={cx("flex h-10 w-10 items-center justify-center", theme.card_style === "flat" ? "rounded-lg" : "rounded-2xl")}
-          style={{ backgroundColor: dark ? "rgba(255,255,255,.10)" : `${theme.theme_accent}18`, color: dark ? theme.theme_accent : theme.theme_primary }}
+          style={{ backgroundColor: dark ? "rgba(255,255,255,.12)" : `${contrast.accent}1f`, color: dark ? contrast.accentOnDark : contrast.primaryInk }}
         >
           <Icon size={18} />
         </span>
         <h2 className={cx("flex-1 text-lg font-black", dark ? "text-white" : "text-slate-950")}>{section.label}</h2>
         {section.privateSection && (
-          <span className={cx("rounded-full px-2.5 py-1 text-[10px] font-black", dark ? "bg-white/10 text-white/65" : "bg-slate-100 text-slate-500")}>Private</span>
+          <span className={cx("rounded-full px-2.5 py-1 text-[10px] font-black", dark ? "bg-white/15 text-white/85" : "bg-slate-100 text-slate-600")}>Private</span>
         )}
       </div>
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
@@ -138,6 +143,7 @@ function EditorPanel({ children, theme }) {
 function ProfileEditor({ draft, setDraft, sections, move, toggle, save, cancel, saving, uploadMedia, removeMedia, customization }) {
   const [newLink, setNewLink] = useState({ label: "", url: "" });
   const dark = draft.background_style === "dark";
+  const contrast = portalThemeTokens(draft);
   const addLink = () => {
     if (!newLink.label.trim() || !newLink.url.trim()) return;
     setDraft((current) => ({ ...current, social_links: [...(current.social_links || []), newLink].slice(0, 8) }));
@@ -146,7 +152,7 @@ function ProfileEditor({ draft, setDraft, sections, move, toggle, save, cancel, 
 
   return (
     <div className={cx("overflow-hidden border", cardClasses(draft.card_style))} style={surfaceFor(draft, dark)}>
-      <div className="flex items-center justify-between border-b px-5 py-4 text-white" style={{ background: `linear-gradient(120deg, ${draft.theme_secondary}, ${draft.theme_primary})`, borderColor: `${draft.theme_accent}42` }}>
+      <div className="flex items-center justify-between border-b px-5 py-4" style={{ background: `linear-gradient(120deg, ${contrast.heroEnd}, ${contrast.heroStart})`, borderColor: `${contrast.accentOnDark}66`, color: contrast.onHero }}>
         <h2 className="text-xl font-black">Customize profile</h2>
         <button type="button" onClick={cancel} className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10"><X size={18} /></button>
       </div>
@@ -154,42 +160,43 @@ function ProfileEditor({ draft, setDraft, sections, move, toggle, save, cancel, 
       <div className="grid gap-5 p-3 sm:p-5 xl:grid-cols-[1.05fr_.95fr]">
         <div className="space-y-5">
           <EditorPanel theme={draft}>
-            <div className={cx("grid gap-4 sm:grid-cols-2", dark && "[&_label]:text-white/80")}>
+            <div className={cx("grid gap-4 sm:grid-cols-2", dark && "[&_label]:text-white/90")}>
               <Field name="Display name"><input className={INPUT} value={draft.display_name || ""} onChange={(event) => setDraft({ ...draft, display_name: event.target.value })} maxLength={120} /></Field>
               <Field name="Headline"><input className={INPUT} value={draft.headline || ""} onChange={(event) => setDraft({ ...draft, headline: event.target.value })} maxLength={160} /></Field>
               <Field name="Location"><input className={INPUT} value={draft.location_label || ""} onChange={(event) => setDraft({ ...draft, location_label: event.target.value })} /></Field>
               <Field name="Website"><input className={INPUT} type="url" placeholder="https://" value={draft.website_url || ""} onChange={(event) => setDraft({ ...draft, website_url: event.target.value })} /></Field>
             </div>
-            <div className={cx("mt-4", dark && "[&_label]:text-white/80")}><Field name="Bio"><textarea className={cx(INPUT, "min-h-28")} value={draft.bio || ""} onChange={(event) => setDraft({ ...draft, bio: event.target.value })} maxLength={2000} /></Field></div>
+            <div className={cx("mt-4", dark && "[&_label]:text-white/90")}><Field name="Bio"><textarea className={cx(INPUT, "min-h-28")} value={draft.bio || ""} onChange={(event) => setDraft({ ...draft, bio: event.target.value })} maxLength={2000} /></Field></div>
           </EditorPanel>
 
           <EditorPanel theme={draft}>
-            <div className="flex items-center gap-3"><Palette size={18} style={{ color: draft.theme_accent }} /><h3 className={cx("font-black", dark ? "text-white" : "text-slate-950")}>Appearance</h3></div>
+            <div className="flex items-center gap-3"><Palette size={18} style={{ color: dark ? contrast.accentOnDark : contrast.accentInk }} /><h3 className={cx("font-black", dark ? "text-white" : "text-slate-950")}>Appearance</h3></div>
+            <div className={cx("mt-4 flex items-start gap-3 rounded-2xl border p-4", dark ? "border-emerald-300/25 bg-emerald-300/10 text-emerald-50" : "border-emerald-200 bg-emerald-50 text-emerald-900")}><ShieldCheck size={19} className="mt-0.5 shrink-0" /><div><p className="text-sm font-black">Automatic contrast protection</p><p className={cx("mt-1 text-xs leading-5", dark ? "text-emerald-50/85" : "text-emerald-800")}>Text, buttons, navigation, and glass surfaces adjust automatically to stay readable.</p></div></div>
             <div className="mt-4 grid grid-cols-3 gap-2 sm:grid-cols-6">
               {THEMES.map(([name, primary, secondary, accent]) => (
-                <button key={name} type="button" onClick={() => setDraft({ ...draft, theme_primary: primary, theme_secondary: secondary, theme_accent: accent })} className={cx("border p-2 text-center text-[10px] font-black", draft.card_style === "flat" ? "rounded-lg" : "rounded-2xl", dark ? "border-white/15 bg-white/10 text-white/80" : "border-slate-200 bg-white text-slate-600")}>
-                  <span className="mx-auto flex h-8 overflow-hidden rounded-xl"><span className="flex-1" style={{ backgroundColor: primary }} /><span className="flex-1" style={{ backgroundColor: secondary }} /><span className="flex-1" style={{ backgroundColor: accent }} /></span>
+                <button key={name} type="button" aria-pressed={draft.theme_primary === primary && draft.theme_secondary === secondary && draft.theme_accent === accent} onClick={() => setDraft({ ...draft, theme_primary: primary, theme_secondary: secondary, theme_accent: accent })} className={cx("border p-2 text-center text-[10px] font-black transition", draft.card_style === "flat" ? "rounded-lg" : "rounded-2xl", draft.theme_primary === primary && draft.theme_secondary === secondary && draft.theme_accent === accent ? "border-[#721100] ring-2 ring-[#721100]/20" : dark ? "border-white/25 bg-white/10 text-white/90" : "border-slate-200 bg-white text-slate-700")}>
+                  <span className="mx-auto flex h-8 overflow-hidden rounded-xl"><span className="flex flex-1 items-center justify-center text-[9px] font-black" style={{ backgroundColor: primary, color: readableText(primary) }}>Aa</span><span className="flex-1" style={{ backgroundColor: secondary }} /><span className="flex flex-1 items-center justify-center text-[9px] font-black" style={{ backgroundColor: accent, color: readableText(accent) }}>Aa</span></span>
                   <span className="mt-1 block">{name}</span>
                 </button>
               ))}
             </div>
             <div className="mt-4 grid gap-3 sm:grid-cols-3">
               {[["Primary", "theme_primary"], ["Secondary", "theme_secondary"], ["Accent", "theme_accent"]].map(([label, key]) => (
-                <label key={key} className={cx("p-3 text-xs font-black", draft.card_style === "flat" ? "rounded-lg" : "rounded-2xl", dark ? "bg-white/10 text-white/80" : "bg-white text-slate-600")}>
-                  <span>{label}</span><span className="mt-2 flex items-center gap-2"><input type="color" value={draft[key]} onChange={(event) => setDraft({ ...draft, [key]: event.target.value })} className="h-10 w-12 rounded-lg border-0 bg-transparent" /><input className={cx(INPUT, "min-w-0 px-2 py-2 text-xs")} value={draft[key]} onChange={(event) => setDraft({ ...draft, [key]: event.target.value })} /></span>
+                <label key={key} className={cx("p-3 text-xs font-black", draft.card_style === "flat" ? "rounded-lg" : "rounded-2xl", dark ? "bg-white/15 text-white/90" : "bg-white text-slate-700")}>
+                  <span>{label}</span><span className="mt-2 flex items-center gap-2"><input type="color" value={normalizeHex(draft[key], DEFAULTS[key])} onChange={(event) => setDraft({ ...draft, [key]: event.target.value })} className="h-10 w-12 rounded-lg border-0 bg-transparent" /><input className={cx(INPUT, "min-w-0 px-2 py-2 text-xs")} value={draft[key]} onChange={(event) => setDraft({ ...draft, [key]: event.target.value })} onBlur={() => setDraft((current) => ({ ...current, [key]: normalizeHex(current[key], DEFAULTS[key]) }))} /></span>
                 </label>
               ))}
             </div>
-            <div className={cx("mt-4 grid gap-3 sm:grid-cols-2", dark && "[&_label]:text-white/80")}>
-              <Field name="Background"><select className={INPUT} value={draft.background_style} onChange={(event) => setDraft({ ...draft, background_style: event.target.value })}><option value="soft">Soft</option><option value="clean">Clean</option><option value="gradient">Gradient</option><option value="dark">Dark</option></select></Field>
-              <Field name="Cards"><select className={INPUT} value={draft.card_style} onChange={(event) => setDraft({ ...draft, card_style: event.target.value })}><option value="rounded">Rounded</option><option value="glass">Glass</option><option value="flat">Flat</option></select></Field>
+            <div className={cx("mt-4 grid gap-3 sm:grid-cols-2", dark && "[&_label]:text-white/90")}>
+              <Field name="Background"><select className={INPUT} value={draft.background_style} onChange={(event) => setDraft({ ...draft, background_style: event.target.value })}><option value="soft">Soft tint</option><option value="clean">White canvas</option><option value="gradient">Color wash</option><option value="dark">Dark mode</option></select></Field>
+              <Field name="Cards"><select className={INPUT} value={draft.card_style} onChange={(event) => setDraft({ ...draft, card_style: event.target.value })}><option value="rounded">Elevated</option><option value="glass">High-contrast glass</option><option value="flat">Flat</option></select></Field>
             </div>
           </EditorPanel>
 
           <EditorPanel theme={draft}>
             <h3 className={cx("font-black", dark ? "text-white" : "text-slate-950")}>Links</h3>
-            <div className="mt-3 space-y-2">{(draft.social_links || []).map((link, index) => <div key={`${link.label}-${index}`} className={cx("flex items-center gap-2 p-3", draft.card_style === "flat" ? "rounded-lg" : "rounded-2xl")} style={{ backgroundColor: dark ? "rgba(255,255,255,.08)" : "rgba(255,255,255,.82)" }}><Link2 size={15} style={{ color: draft.theme_accent }} /><div className="min-w-0 flex-1"><p className={cx("truncate text-sm font-black", dark ? "text-white" : "text-slate-900")}>{link.label}</p><p className={cx("truncate text-xs", dark ? "text-white/50" : "text-slate-400")}>{link.url}</p></div><button type="button" onClick={() => setDraft({ ...draft, social_links: draft.social_links.filter((_, itemIndex) => itemIndex !== index) })} className="text-rose-500"><Trash2 size={16} /></button></div>)}</div>
-            <div className="mt-3 grid gap-2 sm:grid-cols-[.6fr_1fr_auto]"><input className={INPUT} placeholder="Label" value={newLink.label} onChange={(event) => setNewLink({ ...newLink, label: event.target.value })} /><input className={INPUT} placeholder="https://" value={newLink.url} onChange={(event) => setNewLink({ ...newLink, url: event.target.value })} /><button type="button" onClick={addLink} className="flex items-center justify-center rounded-2xl px-4 text-white" style={{ backgroundColor: draft.theme_primary }}><Plus size={17} /></button></div>
+            <div className="mt-3 space-y-2">{(draft.social_links || []).map((link, index) => <div key={`${link.label}-${index}`} className={cx("flex items-center gap-2 p-3", draft.card_style === "flat" ? "rounded-lg" : "rounded-2xl")} style={{ backgroundColor: dark ? "rgba(255,255,255,.12)" : "rgba(255,255,255,.92)" }}><Link2 size={15} style={{ color: dark ? contrast.accentOnDark : contrast.accentInk }} /><div className="min-w-0 flex-1"><p className={cx("truncate text-sm font-black", dark ? "text-white" : "text-slate-900")}>{link.label}</p><p className={cx("truncate text-xs", dark ? "text-white/80" : "text-slate-500")}>{link.url}</p></div><button type="button" onClick={() => setDraft({ ...draft, social_links: draft.social_links.filter((_, itemIndex) => itemIndex !== index) })} className="text-rose-500"><Trash2 size={16} /></button></div>)}</div>
+            <div className="mt-3 grid gap-2 sm:grid-cols-[.6fr_1fr_auto]"><input className={INPUT} placeholder="Label" value={newLink.label} onChange={(event) => setNewLink({ ...newLink, label: event.target.value })} /><input className={INPUT} placeholder="https://" value={newLink.url} onChange={(event) => setNewLink({ ...newLink, url: event.target.value })} /><button type="button" onClick={addLink} className="flex items-center justify-center rounded-2xl px-4" style={{ backgroundColor: contrast.primary, color: contrast.onPrimary }}><Plus size={17} /></button></div>
           </EditorPanel>
         </div>
 
@@ -197,25 +204,25 @@ function ProfileEditor({ draft, setDraft, sections, move, toggle, save, cancel, 
           <EditorPanel theme={draft}>
             <h3 className={cx("font-black", dark ? "text-white" : "text-slate-950")}>Photos</h3>
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
-              <label className={cx("cursor-pointer border border-dashed p-5 text-center", draft.card_style === "flat" ? "rounded-lg" : "rounded-[1.5rem]", dark ? "border-white/25 bg-white/5 text-white" : "border-slate-300 bg-white/65 text-slate-900")}><Camera className="mx-auto" style={{ color: draft.theme_accent }} size={22} /><p className="mt-2 text-sm font-black">Profile photo</p><input type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={(event) => event.target.files?.[0] && uploadMedia("avatar", event.target.files[0])} /></label>
-              <label className={cx("cursor-pointer border border-dashed p-5 text-center", draft.card_style === "flat" ? "rounded-lg" : "rounded-[1.5rem]", dark ? "border-white/25 bg-white/5 text-white" : "border-slate-300 bg-white/65 text-slate-900")}><Image className="mx-auto" style={{ color: draft.theme_accent }} size={22} /><p className="mt-2 text-sm font-black">Banner</p><input type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={(event) => event.target.files?.[0] && uploadMedia("banner", event.target.files[0])} /></label>
+              <label className={cx("cursor-pointer border border-dashed p-5 text-center", draft.card_style === "flat" ? "rounded-lg" : "rounded-[1.5rem]", dark ? "border-white/35 bg-white/10 text-white" : "border-slate-300 bg-white/85 text-slate-900")}><Camera className="mx-auto" style={{ color: dark ? contrast.accentOnDark : contrast.accentInk }} size={22} /><p className="mt-2 text-sm font-black">Profile photo</p><input type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={(event) => event.target.files?.[0] && uploadMedia("avatar", event.target.files[0])} /></label>
+              <label className={cx("cursor-pointer border border-dashed p-5 text-center", draft.card_style === "flat" ? "rounded-lg" : "rounded-[1.5rem]", dark ? "border-white/35 bg-white/10 text-white" : "border-slate-300 bg-white/85 text-slate-900")}><Image className="mx-auto" style={{ color: dark ? contrast.accentOnDark : contrast.accentInk }} size={22} /><p className="mt-2 text-sm font-black">Banner</p><input type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={(event) => event.target.files?.[0] && uploadMedia("banner", event.target.files[0])} /></label>
             </div>
             {(customization?.avatar_path || customization?.banner_path) && <div className="mt-3 flex flex-wrap gap-2">{customization?.avatar_path && <button type="button" onClick={() => removeMedia("avatar")} className="rounded-xl border border-rose-200 bg-white px-3 py-2 text-xs font-black text-rose-700">Remove photo</button>}{customization?.banner_path && <button type="button" onClick={() => removeMedia("banner")} className="rounded-xl border border-rose-200 bg-white px-3 py-2 text-xs font-black text-rose-700">Remove banner</button>}</div>}
           </EditorPanel>
 
           <EditorPanel theme={draft}>
-            <div className="flex items-center gap-3"><GripVertical size={18} style={{ color: draft.theme_accent }} /><h3 className={cx("font-black", dark ? "text-white" : "text-slate-950")}>Sections</h3></div>
+            <div className="flex items-center gap-3"><GripVertical size={18} style={{ color: dark ? contrast.accentOnDark : contrast.accentInk }} /><h3 className={cx("font-black", dark ? "text-white" : "text-slate-950")}>Sections</h3></div>
             <div className="mt-4 space-y-2">
               {sections.map((section, index) => {
                 const visible = draft.section_visibility?.[section.key] !== false;
-                return <div key={section.key} draggable onDragStart={(event) => event.dataTransfer.setData("text/plain", String(index))} onDragOver={(event) => event.preventDefault()} onDrop={(event) => { event.preventDefault(); move(Number(event.dataTransfer.getData("text/plain")), index); }} className={cx("flex items-center gap-2 border p-3", draft.card_style === "flat" ? "rounded-lg" : "rounded-2xl")} style={{ backgroundColor: dark ? "rgba(255,255,255,.08)" : "rgba(255,255,255,.82)", borderColor: dark ? "rgba(255,255,255,.14)" : `${draft.theme_primary}18` }}><GripVertical size={16} className="cursor-grab opacity-40" /><span className={cx("min-w-0 flex-1 text-sm font-black", dark ? "text-white/85" : "text-slate-800")}>{section.label}</span><button type="button" onClick={() => toggle(section.key)} className={dark ? "text-white/60" : "text-slate-500"}>{visible ? <Eye size={16} /> : <EyeOff size={16} />}</button><button type="button" disabled={index === 0} onClick={() => move(index, index - 1)} className="disabled:opacity-25"><ChevronUp size={16} /></button><button type="button" disabled={index === sections.length - 1} onClick={() => move(index, index + 1)} className="disabled:opacity-25"><ChevronDown size={16} /></button></div>;
+                return <div key={section.key} draggable onDragStart={(event) => event.dataTransfer.setData("text/plain", String(index))} onDragOver={(event) => event.preventDefault()} onDrop={(event) => { event.preventDefault(); move(Number(event.dataTransfer.getData("text/plain")), index); }} className={cx("flex items-center gap-2 border p-3", draft.card_style === "flat" ? "rounded-lg" : "rounded-2xl")} style={{ backgroundColor: dark ? "rgba(255,255,255,.12)" : "rgba(255,255,255,.92)", borderColor: dark ? "rgba(255,255,255,.28)" : `${contrast.primaryInk}38` }}><GripVertical size={16} className="cursor-grab opacity-60" /><span className={cx("min-w-0 flex-1 text-sm font-black", dark ? "text-white/90" : "text-slate-800")}>{section.label}</span><button type="button" onClick={() => toggle(section.key)} className={dark ? "text-white/85" : "text-slate-600"}>{visible ? <Eye size={16} /> : <EyeOff size={16} />}</button><button type="button" disabled={index === 0} onClick={() => move(index, index - 1)} className="disabled:opacity-25"><ChevronUp size={16} /></button><button type="button" disabled={index === sections.length - 1} onClick={() => move(index, index + 1)} className="disabled:opacity-25"><ChevronDown size={16} /></button></div>;
               })}
             </div>
           </EditorPanel>
 
           <div className={cx("mls-mobile-sticky-actions sticky flex gap-3 border p-3 backdrop-blur-xl", cardClasses(draft.card_style))} style={surfaceFor(draft, dark)}>
-            <button type="button" onClick={cancel} className={cx("flex flex-1 items-center justify-center border px-4 py-3 text-sm font-black", draft.card_style === "flat" ? "rounded-lg" : "rounded-2xl", dark ? "border-white/15 text-white/80" : "border-slate-200 text-slate-700")}>Cancel</button>
-            <button type="button" onClick={save} disabled={saving} className={cx("flex flex-1 items-center justify-center gap-2 px-4 py-3 text-sm font-black text-white disabled:opacity-50", draft.card_style === "flat" ? "rounded-lg" : "rounded-2xl")} style={{ backgroundColor: draft.theme_primary }}><Save size={16} /> Save</button>
+            <button type="button" onClick={cancel} className={cx("flex flex-1 items-center justify-center border px-4 py-3 text-sm font-black", draft.card_style === "flat" ? "rounded-lg" : "rounded-2xl", dark ? "border-white/35 text-white/90" : "border-slate-200 text-slate-700")}>Cancel</button>
+            <button type="button" onClick={save} disabled={saving} className={cx("flex flex-1 items-center justify-center gap-2 px-4 py-3 text-sm font-black disabled:opacity-50", draft.card_style === "flat" ? "rounded-lg" : "rounded-2xl")} style={{ backgroundColor: contrast.primary, color: contrast.onPrimary }}><Save size={16} /> Save</button>
           </div>
         </div>
       </div>
@@ -274,38 +281,39 @@ export default function ProfileStudio({ profileType, profile = {}, customization
 
   const background = backgroundFor(draft);
   const dark = draft.background_style === "dark";
+  const contrast = portalThemeTokens(draft);
   const shownSections = orderedSections.filter((section) => draft.section_visibility?.[section.key] !== false && section.items.some(([, value]) => hasValue(value)));
   const initials = nameFor(profileType, profile, draft).split(/\s+/).map((part) => part[0]).join("").slice(0, 2).toUpperCase() || "M";
   const profileSurface = surfaceFor(draft, dark);
 
   return (
-    <div className={cx("relative overflow-hidden border p-3 sm:p-5 lg:p-6", draft.card_style === "flat" ? "rounded-2xl" : "rounded-[2.4rem]")} style={{ background, borderColor: dark ? `${draft.theme_accent}42` : `${draft.theme_primary}1f`, boxShadow: dark ? `0 28px 80px ${draft.theme_secondary}66` : `0 28px 80px ${draft.theme_primary}16` }}>
-      <div className="pointer-events-none absolute inset-0 opacity-60" style={{ background: `radial-gradient(circle at 8% 8%, ${draft.theme_accent}24, transparent 28%), radial-gradient(circle at 92% 2%, ${draft.theme_primary}20, transparent 30%)` }} />
+    <div className={cx("relative overflow-hidden border p-3 sm:p-5 lg:p-6", draft.card_style === "flat" ? "rounded-2xl" : "rounded-[2.4rem]")} style={{ background, borderColor: dark ? `${contrast.accentOnDark}66` : `${contrast.primaryInk}38`, boxShadow: dark ? `0 28px 80px ${contrast.heroEnd}88` : `0 28px 80px ${contrast.primary}1f` }}>
+      <div className="pointer-events-none absolute inset-0 opacity-60" style={{ background: `radial-gradient(circle at 8% 8%, ${contrast.accent}24, transparent 28%), radial-gradient(circle at 92% 2%, ${contrast.primary}20, transparent 30%)` }} />
       <input ref={avatarInput} type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={(event) => { uploadMedia("avatar", event.target.files?.[0]); event.target.value = ""; }} />
       <input ref={bannerInput} type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={(event) => { uploadMedia("banner", event.target.files?.[0]); event.target.value = ""; }} />
 
       <div className="relative space-y-5">
-        <div className={cx("overflow-hidden border", draft.card_style === "flat" ? "rounded-xl" : "rounded-[2rem]")} style={{ ...profileSurface, boxShadow: draft.card_style === "flat" ? "none" : `0 20px 50px ${draft.theme_secondary}20` }}>
-          <div className="relative h-44 sm:h-56" style={{ background: customization?.banner_url ? undefined : `linear-gradient(120deg, ${draft.theme_secondary}, ${draft.theme_primary} 55%, ${draft.theme_accent})` }}>
+        <div className={cx("overflow-hidden border", draft.card_style === "flat" ? "rounded-xl" : "rounded-[2rem]")} style={{ ...profileSurface, boxShadow: draft.card_style === "flat" ? "none" : `0 20px 50px ${contrast.secondary}24` }}>
+          <div className="relative h-44 sm:h-56" style={{ background: customization?.banner_url ? undefined : `linear-gradient(120deg, ${contrast.heroEnd}, ${contrast.heroStart} 58%, ${contrast.accentInk})` }}>
             {customization?.banner_url && <img src={customization.banner_url} alt="Profile banner" className="h-full w-full object-cover" />}
             <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-black/5" />
-            {editable && <div className="absolute right-3 top-3 flex flex-wrap justify-end gap-2 sm:right-4 sm:top-4"><button type="button" onClick={() => bannerInput.current?.click()} disabled={mediaBusy === "banner"} className={cx("inline-flex min-h-10 items-center gap-2 bg-white/90 px-3 py-2 text-xs font-black shadow-lg backdrop-blur disabled:opacity-50", draft.card_style === "flat" ? "rounded-lg" : "rounded-2xl")} style={{ color: draft.theme_secondary }}><Upload size={15} /><span className="hidden sm:inline">{mediaBusy === "banner" ? "Uploading…" : "Change banner"}</span></button><button type="button" onClick={() => setEditing((value) => !value)} className={cx("inline-flex min-h-10 items-center gap-2 bg-white/90 px-3 py-2 text-xs font-black shadow-lg backdrop-blur", draft.card_style === "flat" ? "rounded-lg" : "rounded-2xl")} style={{ color: draft.theme_secondary }}><Palette size={15} /><span className="hidden sm:inline">Customize</span></button></div>}
+            {editable && <div className="absolute right-3 top-3 flex flex-wrap justify-end gap-2 sm:right-4 sm:top-4"><button type="button" onClick={() => bannerInput.current?.click()} disabled={mediaBusy === "banner"} className={cx("inline-flex min-h-10 items-center gap-2 bg-white/95 px-3 py-2 text-xs font-black shadow-lg backdrop-blur disabled:opacity-50", draft.card_style === "flat" ? "rounded-lg" : "rounded-2xl")} style={{ color: contrast.secondaryInk }}><Upload size={15} /><span className="hidden sm:inline">{mediaBusy === "banner" ? "Uploading…" : "Change banner"}</span></button><button type="button" onClick={() => setEditing((value) => !value)} className={cx("inline-flex min-h-10 items-center gap-2 bg-white/95 px-3 py-2 text-xs font-black shadow-lg backdrop-blur", draft.card_style === "flat" ? "rounded-lg" : "rounded-2xl")} style={{ color: contrast.secondaryInk }}><Palette size={15} /><span className="hidden sm:inline">Customize</span></button></div>}
           </div>
 
           <div className="relative px-5 pb-6 sm:px-7">
             <div className="-mt-16 flex flex-col gap-4 sm:-mt-14 sm:flex-row sm:items-end sm:justify-between">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-end">
-                <button type="button" disabled={!editable || Boolean(mediaBusy)} onClick={() => editable && avatarInput.current?.click()} className={cx("group relative flex h-32 w-32 shrink-0 items-center justify-center overflow-hidden border-[6px] text-3xl font-black shadow-xl disabled:cursor-default", draft.card_style === "flat" ? "rounded-xl" : "rounded-[2rem]")} style={{ color: draft.theme_primary, backgroundColor: dark ? draft.theme_secondary : "#ffffff", borderColor: dark ? `${draft.theme_accent}66` : "#ffffff" }} aria-label={customization?.avatar_url ? "Change profile photo" : "Add profile photo"}>
-                  {customization?.avatar_url ? <img src={customization.avatar_url} alt="Profile" className="h-full w-full object-cover" /> : <span style={{ backgroundColor: dark ? "rgba(255,255,255,.08)" : `${draft.theme_primary}14` }} className="flex h-full w-full items-center justify-center">{initials}</span>}
+                <button type="button" disabled={!editable || Boolean(mediaBusy)} onClick={() => editable && avatarInput.current?.click()} className={cx("group relative flex h-32 w-32 shrink-0 items-center justify-center overflow-hidden border-[6px] text-3xl font-black shadow-xl disabled:cursor-default", draft.card_style === "flat" ? "rounded-xl" : "rounded-[2rem]")} style={{ color: dark ? contrast.primaryOnDark : contrast.primaryInk, backgroundColor: dark ? contrast.heroEnd : "#ffffff", borderColor: dark ? `${contrast.accentOnDark}7a` : "#ffffff" }} aria-label={customization?.avatar_url ? "Change profile photo" : "Add profile photo"}>
+                  {customization?.avatar_url ? <img src={customization.avatar_url} alt="Profile" className="h-full w-full object-cover" /> : <span style={{ backgroundColor: dark ? "rgba(255,255,255,.12)" : `${contrast.primary}14` }} className="flex h-full w-full items-center justify-center">{initials}</span>}
                   {editable && <span className="absolute inset-x-2 bottom-2 flex items-center justify-center gap-1 rounded-xl bg-black/70 px-2 py-1.5 text-[10px] font-black text-white opacity-100 transition sm:opacity-0 sm:group-hover:opacity-100"><Camera size={13} />{mediaBusy === "avatar" ? "Uploading…" : customization?.avatar_url ? "Change photo" : "Add photo"}</span>}
                 </button>
-                <div className="min-w-0 pb-1"><h1 className={cx("break-words text-2xl font-black sm:text-3xl", dark ? "text-white" : "text-slate-950")}>{nameFor(profileType, profile, draft)}</h1><p className={cx("mt-2 text-sm font-semibold", dark ? "text-white/70" : "text-slate-600")}>{draft.headline || fallbackHeadline(profileType, profile)}</p></div>
+                <div className="min-w-0 pb-1"><h1 className={cx("break-words text-2xl font-black sm:text-3xl", dark ? "text-white" : "text-slate-950")}>{nameFor(profileType, profile, draft)}</h1><p className={cx("mt-2 text-sm font-semibold", dark ? "text-white/85" : "text-slate-600")}>{draft.headline || fallbackHeadline(profileType, profile)}</p></div>
               </div>
-              {editable && <button type="button" onClick={actions.openProfile} className={cx("inline-flex items-center justify-center gap-2 px-4 py-3 text-sm font-black text-white shadow-lg", draft.card_style === "flat" ? "rounded-lg" : "rounded-2xl")} style={{ backgroundColor: draft.theme_primary }}><Pencil size={16} /> Edit details</button>}
+              {editable && <button type="button" onClick={actions.openProfile} className={cx("inline-flex items-center justify-center gap-2 px-4 py-3 text-sm font-black shadow-lg", draft.card_style === "flat" ? "rounded-lg" : "rounded-2xl")} style={{ backgroundColor: contrast.primary, color: contrast.onPrimary }}><Pencil size={16} /> Edit details</button>}
             </div>
 
-            <div className={cx("mt-5 flex flex-wrap gap-x-5 gap-y-2 text-sm font-semibold", dark ? "text-white/70" : "text-slate-600")}>{draft.location_label && <span className="inline-flex items-center gap-1.5"><MapPin size={15} />{draft.location_label}</span>}{draft.website_url && <a href={draft.website_url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 hover:underline"><Globe2 size={15} />Website</a>}{(draft.social_links || []).map((link) => <a key={`${link.label}-${link.url}`} href={link.url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 hover:underline"><Link2 size={15} />{link.label}</a>)}</div>
-            {draft.bio && <p className={cx("mt-5 max-w-4xl whitespace-pre-wrap text-sm leading-7", dark ? "text-white/80" : "text-slate-700")}>{draft.bio}</p>}
+            <div className={cx("mt-5 flex flex-wrap gap-x-5 gap-y-2 text-sm font-semibold", dark ? "text-white/85" : "text-slate-600")}>{draft.location_label && <span className="inline-flex items-center gap-1.5"><MapPin size={15} />{draft.location_label}</span>}{draft.website_url && <a href={draft.website_url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 hover:underline"><Globe2 size={15} />Website</a>}{(draft.social_links || []).map((link) => <a key={`${link.label}-${link.url}`} href={link.url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 hover:underline"><Link2 size={15} />{link.label}</a>)}</div>
+            {draft.bio && <p className={cx("mt-5 max-w-4xl whitespace-pre-wrap text-sm leading-7", dark ? "text-white/90" : "text-slate-700")}>{draft.bio}</p>}
             <div className="mt-5"><Badge value={profileType === "client" ? profile.account_status || "active" : profile.roster_status || "pending_profile"} /></div>
           </div>
         </div>
@@ -314,7 +322,7 @@ export default function ProfileStudio({ profileType, profile = {}, customization
 
         <div className="grid gap-5 xl:grid-cols-2">{shownSections.map((section) => <SectionCard key={section.key} section={section} theme={draft} dark={dark} />)}</div>
 
-        {!shownSections.length && <div className={cx("border p-8 text-center", cardClasses(draft.card_style))} style={surfaceFor(draft, dark)}><Settings2 className="mx-auto" style={{ color: dark ? "rgba(255,255,255,.35)" : `${draft.theme_primary}55` }} /><p className={cx("mt-3 font-black", dark ? "text-white" : "text-slate-800")}>No profile details</p></div>}
+        {!shownSections.length && <div className={cx("border p-8 text-center", cardClasses(draft.card_style))} style={surfaceFor(draft, dark)}><Settings2 className="mx-auto" style={{ color: dark ? contrast.primaryOnDark : contrast.primaryInk }} /><p className={cx("mt-3 font-black", dark ? "text-white" : "text-slate-800")}>No profile details</p></div>}
       </div>
     </div>
   );
