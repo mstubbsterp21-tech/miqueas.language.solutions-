@@ -108,7 +108,7 @@ function AdminHome({ workspace, app, v2, actions, layout }) {
   const statusText = queue.length ? `${queue.length} priority item${queue.length === 1 ? "" : "s"} need a decision.` : "All operational queues are clear.";
 
   const sections = {
-    hero: <Hero title="MLS command center" text={statusText} actions={<><Action tone="gold" onClick={() => actions.go("assignments")}>Operations</Action><Action onClick={() => actions.go("communications")}>Communications</Action></>} />,
+    hero: <Hero title="MLS command center" text={statusText} actions={<><Action tone="gold" onClick={() => actions.go("assignments")}>Operations</Action><Action onClick={() => actions.go("communications")}>Communications</Action><Action onClick={() => actions.go("settings")}>Customize home</Action></>} />,
     metrics: <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
       <Metric icon={Users} name="Need staffing" value={unstaffed.length} note="Assignments without a team" color="#be123c" onClick={() => actions.go("assignments")} />
       <Metric icon={CircleDollarSign} name="Financial reviews" value={financeReviews} note="Time and expenses submitted" color="#1d4ed8" onClick={() => actions.go("finance")} />
@@ -147,7 +147,7 @@ function ClientHome({ workspace, app, v2, actions, layout }) {
   ];
 
   const sections = {
-    hero: <Hero title={profile.organization_name ? `Welcome, ${profile.organization_name}` : "Your MLS service hub"} text={queue.length ? `${queue.length} item${queue.length === 1 ? "" : "s"} need your attention.` : "You’re caught up."} actions={<><Action tone="gold" onClick={actions.openRequest}>Request an interpreter</Action><Action onClick={() => actions.go("communications")}>Message MLS</Action></>} />,
+    hero: <Hero title={profile.organization_name ? `Welcome, ${profile.organization_name}` : "Your MLS service hub"} text={queue.length ? `${queue.length} item${queue.length === 1 ? "" : "s"} need your attention.` : "You’re caught up."} actions={<><Action tone="gold" onClick={actions.openRequest}>Request an interpreter</Action><Action onClick={() => actions.go("communications")}>Message MLS</Action><Action onClick={() => actions.go("settings")}>Customize home</Action></>} />,
     metrics: <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
       <Metric icon={ClipboardCheck} name="Needs action" value={queue.length} note="Approvals, files, or billing" color="#be123c" onClick={() => actions.go("requests")} />
       <Metric icon={CalendarDays} name="Upcoming services" value={upcoming.length} note="Confirmed and in progress" onClick={() => actions.go("assignments")} />
@@ -196,7 +196,7 @@ function InterpreterHome({ workspace, operations, app, v2, actions, identityName
   const nextAssignment = upcoming[0];
 
   const sections = {
-    hero: <Hero title={`Welcome back${firstName ? `, ${firstName}` : ""}`} text={tasks.length ? <button type="button" onClick={tasks[0].onClick} className="rounded-md text-left font-bold text-white underline decoration-white/40 underline-offset-4 transition hover:decoration-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white/70">{tasks.length} readiness task{tasks.length === 1 ? "" : "s"} need attention. Open the next task.</button> : "You’re assignment-ready."} actions={<><Action tone="gold" onClick={() => actions.go("work")}>Work</Action><Action onClick={() => actions.go("schedule")}>Availability</Action></>} />,
+    hero: <Hero title={`Welcome back${firstName ? `, ${firstName}` : ""}`} text={tasks.length ? <button type="button" onClick={tasks[0].onClick} className="rounded-md text-left font-bold text-white underline decoration-white/40 underline-offset-4 transition hover:decoration-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white/70">{tasks.length} readiness task{tasks.length === 1 ? "" : "s"} need attention. Open the next task.</button> : "You’re assignment-ready."} actions={<><Action tone="gold" onClick={() => actions.go("work")}>Work</Action><Action onClick={() => actions.go("schedule")}>Availability</Action><Action onClick={() => actions.go("settings")}>Customize home</Action></>} />,
     metrics: <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
       <Metric icon={CalendarDays} name="Assigned work" value={upcoming.length} note={nextAssignment ? `Next: ${formatDate(nextAssignment.start_at, { month: "short", day: "numeric" })}` : "No upcoming assignments"} onClick={() => actions.go("work")} />
       <Metric icon={Sparkles} name="Recommended" value={opportunities.length} note="Open assignments matched to you" color="#4338ca" onClick={() => actions.go("work")} />
