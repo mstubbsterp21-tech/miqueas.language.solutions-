@@ -7,16 +7,15 @@ import {
 } from "lucide-react";
 import { PortalSignOutButton } from "../components/AuthStatus";
 import logo from "../logo.png";
-import { InstallAppButton, cx, pretty } from "./ui";
+import { cx, pretty } from "./ui";
 import TimeZoneSelect from "./TimeZoneSelect";
-import PushNotificationButton from "./PushNotificationButton";
-import LayoutCustomizer, { orderedLayoutKeys } from "./LayoutCustomizer";
+import { orderedLayoutKeys } from "./LayoutCustomizer";
 import { getPortalTimeZone, timeZoneAbbreviation } from "./timezones";
 
 const roleNavigation = {
   admin: [["home", "Home", LayoutDashboard], ["assignments", "Operations", ClipboardCheck], ["communications", "Communications", MessageSquare], ["people", "People", Users], ["finance", "Billing & Pay", CircleDollarSign], ["compliance", "Compliance", ShieldCheck], ["reports", "Reports", BarChart3], ["feedback", "Feedback", Lightbulb], ["profile", "My Profile", UserRound], ["settings", "Settings", Settings2]],
-  client: [["home", "Home", LayoutDashboard], ["requests", "Requests", ClipboardCheck], ["assignments", "Services", CalendarDays], ["communications", "Communications", MessageSquare], ["billing", "Billing", CircleDollarSign], ["documents", "Documents", FileText], ["feedback", "Feedback", Lightbulb], ["profile", "Profile", Building2]],
-  interpreter: [["home", "Home", LayoutDashboard], ["work", "Work", ClipboardCheck], ["payments", "Time & Pay", CircleDollarSign], ["communications", "Communications", MessageSquare], ["schedule", "Availability", CalendarDays], ["documents", "Documents", FileText], ["learning", "Learning", BookOpen], ["feedback", "Feedback", Lightbulb], ["profile", "My Profile", UserRound]],
+  client: [["home", "Home", LayoutDashboard], ["requests", "Requests", ClipboardCheck], ["assignments", "Services", CalendarDays], ["communications", "Communications", MessageSquare], ["billing", "Billing", CircleDollarSign], ["documents", "Documents", FileText], ["feedback", "Feedback", Lightbulb], ["profile", "Profile", Building2], ["settings", "Settings", Settings2]],
+  interpreter: [["home", "Home", LayoutDashboard], ["work", "Work", ClipboardCheck], ["payments", "Time & Pay", CircleDollarSign], ["communications", "Communications", MessageSquare], ["schedule", "Availability", CalendarDays], ["documents", "Documents", FileText], ["learning", "Learning", BookOpen], ["feedback", "Feedback", Lightbulb], ["profile", "My Profile", UserRound], ["settings", "Settings", Settings2]],
 };
 
 function BadgeCount({ value, active, accent }) {
@@ -56,9 +55,8 @@ function pageBackground(personalization, primary, secondary, accent) {
   return `linear-gradient(145deg, #fdfbf9 0%, ${accent}0d 52%, ${primary}0c 100%)`;
 }
 
-export default function AppShell({ role, section, setSection, user, personalization, accountName, layout, saveLayout, unread = 0, navBadges = {}, refreshing, refresh, timeZone, onTimeZoneChange, savingTimeZone = false, children }) {
+export default function AppShell({ role, section, setSection, user, personalization, accountName, layout, unread = 0, navBadges = {}, refreshing, refresh, timeZone, onTimeZoneChange, savingTimeZone = false, children }) {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [customizing, setCustomizing] = useState(false);
   const defaultNavigation = roleNavigation[role] || roleNavigation.interpreter;
   const navigation = useMemo(() => {
     const byKey = new Map(defaultNavigation.map((item) => [item[0], item]));
@@ -115,9 +113,6 @@ export default function AppShell({ role, section, setSection, user, personalizat
         <button type="button" onClick={refresh} disabled={refreshing} className="mb-2 flex min-h-11 w-full items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-black text-white/70 transition hover:bg-white/10 hover:text-white disabled:opacity-50">
           <RefreshCcw size={16} className={refreshing ? "animate-spin" : ""} />Sync now
         </button>
-        <PushNotificationButton />
-        <button type="button" onClick={() => setCustomizing(true)} className="mb-2 flex min-h-11 w-full items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-black text-white/70 transition hover:bg-white/10 hover:text-white"><Settings2 size={16} />Customize layout</button>
-        <InstallAppButton />
         <div className="mt-2"><PortalSignOutButton /></div>
       </div>
     </>
@@ -147,7 +142,6 @@ export default function AppShell({ role, section, setSection, user, personalizat
                 <TimeZoneSelect value={selectedTimeZone} onChange={onTimeZoneChange} disabled={savingTimeZone} className="hidden w-[230px] border-0 p-2 shadow-none sm:block xl:w-[260px]" />
               </div>
               <div className="hidden md:block">{avatar}</div>
-              <button type="button" onClick={() => setCustomizing(true)} style={{ color: primary }} className="hidden h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-black/5 bg-white shadow-sm transition hover:border-black/10 sm:flex" aria-label="Customize portal layout" title="Customize layout"><Settings2 size={19} /></button>
               <button type="button" onClick={() => navigate("notifications")} style={{ color: primary }} className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-black/5 bg-white shadow-sm" aria-label="Open notifications">
                 <Bell size={19} />
                 {unread > 0 && <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-[9px] font-black text-white" style={{ backgroundColor: accent }}>{unread > 99 ? "99+" : unread}</span>}
@@ -181,7 +175,6 @@ export default function AppShell({ role, section, setSection, user, personalizat
           </button>
         ))}
       </nav>
-      <LayoutCustomizer open={customizing} close={() => setCustomizing(false)} role={role} layout={layout} save={saveLayout} />
     </div>
   );
 }
