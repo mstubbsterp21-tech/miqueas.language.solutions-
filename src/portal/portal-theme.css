@@ -1,14 +1,18 @@
-.mls-portal-theme [class~="bg-[#721100]"] { background-color: var(--mls-primary) !important; }
-.mls-portal-theme [class~="text-[#721100]"] { color: var(--mls-primary) !important; }
+.mls-portal-theme [class~="bg-[#721100]"] { background-color: var(--mls-primary) !important; color: var(--mls-on-primary) !important; }
+.mls-portal-theme [class~="text-[#721100]"] { color: var(--mls-primary-ink) !important; }
 .mls-portal-theme [class~="border-[#721100]"] { border-color: var(--mls-primary) !important; }
-.mls-portal-theme [class~="bg-[#dd7d00]"] { background-color: var(--mls-accent) !important; }
-.mls-portal-theme [class~="text-[#dd7d00]"] { color: var(--mls-accent) !important; }
+.mls-portal-theme [class~="bg-[#dd7d00]"] { background-color: var(--mls-accent) !important; color: var(--mls-on-accent) !important; }
+.mls-portal-theme [class~="text-[#dd7d00]"] { color: var(--mls-accent-ink) !important; }
 .mls-portal-theme [class~="border-[#dd7d00]"] { border-color: var(--mls-accent) !important; }
 .mls-portal-theme [class~="focus:border-[#dd7d00]"]:focus { border-color: var(--mls-accent) !important; }
 .mls-portal-theme [class~="focus:ring-[#dd7d00]/10"]:focus { --tw-ring-color: color-mix(in srgb, var(--mls-accent) 18%, transparent) !important; }
 .mls-portal-theme [class~="from-[#721100]"][class~="to-[#24130e]"] {
-  background-image: linear-gradient(135deg, var(--mls-primary), color-mix(in srgb, var(--mls-primary) 68%, var(--mls-secondary)), var(--mls-secondary)) !important;
+  background-image: linear-gradient(135deg, var(--mls-hero-start), color-mix(in srgb, var(--mls-hero-start) 68%, var(--mls-hero-end)), var(--mls-hero-end)) !important;
+  color: var(--mls-on-hero) !important;
 }
+.mls-portal-theme [class~="from-[#721100]"][class~="to-[#24130e]"] [class~="text-white/72"],
+.mls-portal-theme [class~="from-[#721100]"][class~="to-[#24130e]"] [class~="text-white/70"],
+.mls-portal-theme [class~="from-[#721100]"][class~="to-[#24130e]"] [class~="text-white/65"] { color: color-mix(in srgb, var(--mls-on-hero) 88%, transparent) !important; }
 .mls-portal-theme input[type="checkbox"],
 .mls-portal-theme input[type="radio"] { accent-color: var(--mls-primary); }
 
@@ -23,6 +27,10 @@
 .mls-portal-theme input,
 .mls-portal-theme select,
 .mls-portal-theme textarea { touch-action: manipulation; }
+.mls-portal-theme :focus-visible {
+  outline: 3px solid var(--mls-accent-ink);
+  outline-offset: 3px;
+}
 
 /* Per-tab card preferences change visual density without changing grid widths. */
 .mls-portal-theme main[data-card-size="compact"] .mls-card { padding: .9rem !important; }
@@ -50,10 +58,10 @@
 }
 .mls-portal-theme[data-card-style="glass"] main [class~="rounded-[1.75rem]"],
 .mls-portal-theme[data-card-style="glass"] main [class~="rounded-[1.55rem]"] {
-  background-color: rgba(255,255,255,.68) !important;
-  border-color: color-mix(in srgb, var(--mls-primary) 20%, transparent) !important;
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
+  background-color: rgba(255,255,255,.94) !important;
+  border-color: color-mix(in srgb, var(--mls-primary-ink) 28%, transparent) !important;
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
 }
 .mls-portal-theme[data-card-style="rounded"] main [class~="rounded-[1.75rem]"],
 .mls-portal-theme[data-card-style="rounded"] main [class~="rounded-[1.55rem]"] {
@@ -65,26 +73,37 @@
 .mls-dark-theme main [class~="bg-white/90"],
 .mls-dark-theme main [class~="bg-slate-50"],
 .mls-dark-theme main [class~="bg-[#faf8f6]"] {
-  background-color: rgba(255,255,255,.075) !important;
-  border-color: color-mix(in srgb, var(--mls-accent) 28%, transparent) !important;
+  background-color: rgba(255,255,255,.13) !important;
+  border-color: color-mix(in srgb, var(--mls-accent-on-dark) 42%, transparent) !important;
 }
 .mls-dark-theme main .text-slate-950,
 .mls-dark-theme main .text-slate-900,
 .mls-dark-theme main .text-slate-800,
-.mls-dark-theme main .text-slate-700 { color: rgba(255,255,255,.92) !important; }
+.mls-dark-theme main .text-slate-700 { color: rgba(255,255,255,.96) !important; }
 .mls-dark-theme main .text-slate-600,
-.mls-dark-theme main .text-slate-500,
-.mls-dark-theme main .text-slate-400 { color: rgba(255,255,255,.62) !important; }
+.mls-dark-theme main .text-slate-500 { color: rgba(255,255,255,.84) !important; }
+.mls-dark-theme main .text-slate-400 { color: rgba(255,255,255,.74) !important; }
+.mls-dark-theme main [class~="text-[#721100]"] { color: var(--mls-primary-on-dark) !important; }
+.mls-dark-theme main [class~="text-[#dd7d00]"] { color: var(--mls-accent-on-dark) !important; }
 .mls-dark-theme main input,
 .mls-dark-theme main select,
 .mls-dark-theme main textarea {
-  background-color: rgba(255,255,255,.08) !important;
-  border-color: rgba(255,255,255,.16) !important;
+  background-color: rgba(255,255,255,.14) !important;
+  border-color: rgba(255,255,255,.32) !important;
   color: #fff !important;
 }
 .mls-dark-theme main input::placeholder,
-.mls-dark-theme main textarea::placeholder { color: rgba(255,255,255,.42) !important; }
+.mls-dark-theme main textarea::placeholder { color: rgba(255,255,255,.68) !important; }
 .mls-dark-theme main option { color: #24130e; background: #fff; }
+
+.mls-dark-theme[data-card-style="glass"] main [class~="rounded-[1.75rem]"],
+.mls-dark-theme[data-card-style="glass"] main [class~="rounded-[1.55rem]"] {
+  background-color: rgba(17,24,39,.9) !important;
+  border-color: color-mix(in srgb, var(--mls-accent-on-dark) 42%, transparent) !important;
+}
+
+.mls-dark-theme main .mls-modal-surface,
+.mls-dark-theme main .mls-modal-header { background-color: rgba(17,24,39,.98) !important; }
 
 .mls-portal-theme a:hover { color: var(--mls-accent); }
 .mls-portal-theme ::selection { background: color-mix(in srgb, var(--mls-accent) 35%, transparent); }
