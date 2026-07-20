@@ -15,11 +15,11 @@ export const LAYOUT_DEFAULTS = {
     home: [["hero", "Command center"], ["metrics", "Key metrics"], ["widgets", "Widgets"], ["decision_queue", "Decision queue"], ["priority_services", "Priority services"], ["staffed_schedule", "Staffed schedule"], ["announcements", "Announcements"]],
   },
   client: {
-    nav: [["home", "Home"], ["requests", "Requests"], ["assignments", "Services"], ["communications", "Communications"], ["billing", "Billing"], ["documents", "Documents"], ["feedback", "Feedback"], ["profile", "Profile"]],
+    nav: [["home", "Home"], ["requests", "Requests"], ["assignments", "Services"], ["communications", "Communications"], ["billing", "Billing"], ["documents", "Documents"], ["feedback", "Feedback"], ["profile", "Profile"], ["settings", "Settings"]],
     home: [["hero", "Service hub"], ["metrics", "Key metrics"], ["widgets", "Widgets"], ["action_queue", "Action queue"], ["next_service", "Next service"], ["upcoming_services", "Upcoming services"], ["announcements", "Announcements"]],
   },
   interpreter: {
-    nav: [["home", "Home"], ["work", "Work"], ["payments", "Time & Pay"], ["communications", "Communications"], ["schedule", "Availability"], ["documents", "Documents"], ["learning", "Learning"], ["feedback", "Feedback"], ["profile", "My Profile"]],
+    nav: [["home", "Home"], ["work", "Work"], ["payments", "Time & Pay"], ["communications", "Communications"], ["schedule", "Availability"], ["documents", "Documents"], ["learning", "Learning"], ["feedback", "Feedback"], ["profile", "My Profile"], ["settings", "Settings"]],
     home: [["hero", "Welcome"], ["metrics", "Key metrics"], ["widgets", "Widgets"], ["next_work", "Next service"], ["recommended", "Recommended opportunities"], ["readiness", "Readiness tasks"], ["schedule", "Assigned schedule"], ["announcements", "Announcements"]],
   },
 };

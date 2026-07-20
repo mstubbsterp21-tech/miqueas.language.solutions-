@@ -17,7 +17,7 @@ function isAppleMobile() {
   return /iPhone|iPad|iPod/i.test(window.navigator.userAgent) || (window.navigator.platform === "MacIntel" && window.navigator.maxTouchPoints > 1);
 }
 
-export default function PushNotificationButton() {
+export default function PushNotificationButton({ variant = "dark" }) {
   const { session } = useSession();
   const [state, setState] = useState("loading");
   const [message, setMessage] = useState("");
@@ -107,11 +107,11 @@ export default function PushNotificationButton() {
   const actionable = state === "enabled" || state === "disabled";
 
   return (
-    <div className="mb-2">
-      <button type="button" onClick={state === "enabled" ? disable : enable} disabled={!actionable} className="flex min-h-11 w-full items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-black text-white/75 transition hover:bg-white/10 hover:text-white disabled:cursor-default disabled:opacity-70" title={state === "install" ? "On iPhone or iPad, add MLS to your Home Screen first." : undefined}>
+    <div className={variant === "dark" ? "mb-2" : ""}>
+      <button type="button" onClick={state === "enabled" ? disable : enable} disabled={!actionable} className={`flex min-h-11 w-full items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-black transition disabled:cursor-default disabled:opacity-70 ${variant === "light" ? "border border-slate-200 bg-white text-[#721100] hover:border-[#721100]/30 hover:bg-[#fff8f2]" : "border border-white/10 bg-white/5 text-white/75 hover:bg-white/10 hover:text-white"}`} title={state === "install" ? "On iPhone or iPad, add MLS to your Home Screen first." : undefined}>
         <Icon size={16} className={iconClass} />{label}
       </button>
-      {message && <p className="mt-1 px-2 text-center text-[10px] leading-4 text-amber-200">{message}</p>}
+      {message && <p className={`mt-1 px-2 text-center text-[10px] leading-4 ${variant === "light" ? "text-amber-700" : "text-amber-200"}`}>{message}</p>}
     </div>
   );
 }

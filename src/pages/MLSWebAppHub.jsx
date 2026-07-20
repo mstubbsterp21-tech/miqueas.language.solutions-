@@ -14,6 +14,7 @@ import PortalRoleSelection from "../portal/PortalRoleSelection";
 import ProfileMessageShortcut from "../portal/ProfileMessageShortcut";
 import ProfileModals from "../portal/ProfileModals";
 import ProfileStudio from "../portal/ProfileStudio";
+import PortalSettings from "../portal/PortalSettings";
 import WorkflowModals from "../portal/WorkflowModals";
 import useMLSController from "../portal/useMLSController";
 import useOperationsV2 from "../portal/useOperationsV2";
@@ -28,8 +29,8 @@ import { portalDisplayName } from "../portal/portalIdentity";
 
 const allowedSections = {
   admin: new Set(["home", "assignments", "communications", "people", "finance", "compliance", "reports", "feedback", "profile", "settings", "notifications"]),
-  client: new Set(["home", "requests", "assignments", "communications", "billing", "documents", "feedback", "profile", "notifications"]),
-  interpreter: new Set(["home", "work", "payments", "communications", "schedule", "documents", "learning", "feedback", "profile", "notifications"]),
+  client: new Set(["home", "requests", "assignments", "communications", "billing", "documents", "feedback", "profile", "settings", "notifications"]),
+  interpreter: new Set(["home", "work", "payments", "communications", "schedule", "documents", "learning", "feedback", "profile", "settings", "notifications"]),
 };
 
 const legacySectionMap = {
@@ -115,7 +116,7 @@ export default function MLSWebAppHub() {
 
   return <>
     <PortalRealtimeBridge topic={v2.data?.realtimeTopic} refresh={refreshAll} />
-    <AppShell role={role} section={activeSection} setSection={setSection} user={workspace.user} personalization={personalization} accountName={signedInName} layout={app.layout} saveLayout={actions.savePortalLayout} unread={app.unreadCount || 0} navBadges={navBadges} refreshing={refreshing || v2.loading} refresh={refreshAll} timeZone={workspace.preferences?.timeZone} onTimeZoneChange={actions.saveTimeZone} savingTimeZone={savingTimeZone}>
+    <AppShell role={role} section={activeSection} setSection={setSection} user={workspace.user} personalization={personalization} accountName={signedInName} layout={app.layout} unread={app.unreadCount || 0} navBadges={navBadges} refreshing={refreshing || v2.loading} refresh={refreshAll} timeZone={workspace.preferences?.timeZone} onTimeZoneChange={actions.saveTimeZone} savingTimeZone={savingTimeZone}>
       {message && <Toast message={message} dismiss={() => setMessage("")} />}
       {error && <Toast message={error} type="error" dismiss={() => setError("")} />}
       {v2.message && <Toast message={v2.message} dismiss={() => v2.setMessage("")} />}
@@ -123,8 +124,9 @@ export default function MLSWebAppHub() {
 
       {activeSection === "home" && <PortalHomeSnapshot role={role} workspace={workspace} operations={operations} app={app} v2={v2.data} actions={combinedActions} layout={app.layout} identityName={signedInName || personalization?.display_name} />}
       {activeSection === "feedback" && <PortalFeedback role={role} saving={saving} submit={actions.submitPortalFeedback} />}
+      {activeSection === "settings" && <PortalSettings role={role} layout={app.layout} saveLayout={actions.savePortalLayout} timeZone={workspace.preferences?.timeZone} onTimeZoneChange={actions.saveTimeZone} savingTimeZone={savingTimeZone} v2={v2.data} onNavigate={setSection} />}
 
-      {role === "admin" && !["home", "feedback", "notifications"].includes(activeSection) && <AdminV2Workspace section={activeSection} workspace={workspace} operations={operations} app={app} v2={v2.data} loading={v2.loading} saving={v2.saving} actions={combinedActions} />}
+      {role === "admin" && !["home", "feedback", "settings", "notifications"].includes(activeSection) && <AdminV2Workspace section={activeSection} workspace={workspace} operations={operations} app={app} v2={v2.data} loading={v2.loading} saving={v2.saving} actions={combinedActions} />}
       {role === "admin" && activeSection === "notifications" && <AdminWorkspace section="notifications" workspace={workspace} operations={operations} app={app} actions={combinedActions} />}
 
       {role === "client" && ["requests", "assignments", "communications", "billing"].includes(activeSection) && <ClientV2Workspace section={activeSection} workspace={workspace} operations={operations} app={app} v2={v2.data} loading={v2.loading} saving={v2.saving} actions={combinedActions} />}
