@@ -57,10 +57,10 @@ export default function PortalSettings({ role, layout, saveLayout, timeZone, onT
         </div>
       </SettingsCard>
 
-      <SettingsCard icon={role === "client" ? Building2 : UserRound} title="Profile">
+      <SettingsCard icon={role === "client" ? Building2 : UserRound} title="Profile & appearance">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-sm leading-6 text-slate-600">Account details, contact information, and profile appearance.</p>
-          <SettingsButton onClick={() => onNavigate?.("profile")}>Open profile</SettingsButton>
+          <p className="text-sm leading-6 text-slate-600">Account details, color scheme, background, and profile cards.</p>
+          <SettingsButton onClick={() => onNavigate?.("profile")}>Profile & colors</SettingsButton>
         </div>
       </SettingsCard>
     </div>
