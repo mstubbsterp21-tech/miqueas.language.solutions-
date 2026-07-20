@@ -228,7 +228,7 @@ export function Toast({ message, type = "success", dismiss }) {
   return <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className={cx("mb-5 flex items-start gap-3 rounded-2xl border p-4 text-sm shadow-sm", success ? "border-emerald-200 bg-emerald-50 font-bold text-emerald-800" : "border-rose-200 bg-rose-50 text-rose-800")}>{success ? <CheckCircle2 size={18} /> : <Bell size={18} />}<span className="flex-1">{message}</span>{dismiss && <button type="button" onClick={dismiss}><X size={16} /></button>}</motion.div>;
 }
 
-export function InstallAppButton({ compact = false }) {
+export function InstallAppButton({ compact = false, variant = "dark" }) {
   const [prompt, setPrompt] = useState(null);
   const [guideOpen, setGuideOpen] = useState(false);
   const [installed, setInstalled] = useState(() => window.matchMedia?.("(display-mode: standalone)").matches || window.navigator.standalone === true);
@@ -250,7 +250,7 @@ export function InstallAppButton({ compact = false }) {
   }
 
   return <>
-    <button type="button" onClick={install} className={cx("inline-flex items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/5 font-black text-white/80 transition hover:bg-white/10 hover:text-white", compact ? "h-10 w-10" : "w-full px-4 py-3 text-sm")} title="Install MLS app"><Smartphone size={16} />{!compact && "Install MLS app"}</button>
+    <button type="button" onClick={install} className={cx("inline-flex items-center justify-center gap-2 rounded-2xl border font-black transition", variant === "light" ? "border-slate-200 bg-white text-[#721100] hover:border-[#721100]/30 hover:bg-[#fff8f2]" : "border-white/10 bg-white/5 text-white/80 hover:bg-white/10 hover:text-white", compact ? "h-10 w-10" : "w-full px-4 py-3 text-sm")} title="Install MLS app"><Smartphone size={16} />{!compact && "Install MLS app"}</button>
     <Modal open={guideOpen} close={() => setGuideOpen(false)} title="Install MLS on iPhone or iPad" subtitle="Safari installs MLS as a standalone Home Screen app.">
       <ol className="space-y-3">
         {["Open this portal in Safari.", "Tap Safari’s Share button (the square with an upward arrow).", "Scroll down and tap Add to Home Screen.", "Keep the name MLS, then tap Add."].map((step, index) => <li key={step} className="flex min-w-0 gap-3 rounded-2xl border border-slate-200 bg-white p-4"><span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#721100] text-sm font-black text-white">{index + 1}</span><span className="min-w-0 break-words text-sm font-bold leading-6 text-slate-700">{step}</span></li>)}
