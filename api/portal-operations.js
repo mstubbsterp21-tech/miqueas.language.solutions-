@@ -1,13 +1,13 @@
-import { createClerkClient } from "@clerk/backend";
 import { createClient } from "@supabase/supabase-js";
+import { signedInUser } from "./_shared/ops-v2-core.js";
 
 const dbUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
 const dbAdminKey = process.env["SUPABASE_" + "SERVICE_ROLE_KEY"];
-const clerkKey = process.env["CLERK_" + "SECRET_KEY"];
-const adminEmails = (process.env.VITE_ADMIN_EMAILS || "").split(",").map((x) => x.trim().toLowerCase()).filter(Boolean);
 
 function send(res, status, payload) {
   res.status(status).setHeader("content-type", "application/json");
+  res.setHeader("cache-control", "private, no-store, max-age=0");
+  res.setHeader("pragma", "no-cache");
   res.end(JSON.stringify(payload));
 }
 
@@ -17,33 +17,6 @@ function body(req) {
     try { return JSON.parse(req.body); } catch { return {}; }
   }
   return req.body;
-}
-
-function token(req) {
-  const match = String(req.headers.authorization || "").match(/^Bearer\s+(.+)$/i);
-  return match?.[1] || "";
-}
-
-function decode(jwt) {
-  return JSON.parse(Buffer.from(jwt.split(".")[1] || "", "base64url").toString("utf8"));
-}
-
-async function signedInUser(req) {
-  const jwt = token(req);
-  if (!jwt || !clerkKey) return null;
-  const claims = decode(jwt);
-  if (!claims?.sid || !claims?.sub) return null;
-  const clerk = createClerkClient({ secretKey: clerkKey });
-  const session = await clerk.sessions.getSession(claims.sid);
-  if (session?.userId !== claims.sub) return null;
-  const record = await clerk.users.getUser(claims.sub);
-  const email = record.primaryEmailAddress?.emailAddress?.toLowerCase() || "";
-  return {
-    id: record.id,
-    email,
-    isAdmin: adminEmails.includes(email),
-    role: String(record.publicMetadata?.portalRole || "").toLowerCase(),
-  };
 }
 
 function db() {
