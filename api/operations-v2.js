@@ -3,6 +3,7 @@ import { loadOperationsV2 } from "./_shared/ops-v2-load.js";
 import { adminCreateQuote, adminSendQuote, clientRespondQuote } from "./_shared/ops-v2-quotes.js";
 import { adminLinkFoundInvoice } from "./_shared/ops-v2-found-invoices.js";
 import { adminLinkFoundContractorPayment } from "./_shared/ops-v2-found-contractors.js";
+import { interpreterSubmitInvoice, adminReviewContractorInvoice, openContractorInvoice } from "./_shared/ops-v2-contractor-invoices.js";
 import { interpreterSubmitTime, adminReviewTime } from "./_shared/ops-v2-time.js";
 import { interpreterSubmitExpense, adminReviewExpense } from "./_shared/ops-v2-expenses.js";
 import { interpreterSaveAvailability, interpreterSaveWeeklyAvailability, interpreterDeleteAvailability } from "./_shared/ops-v2-availability.js";
@@ -54,6 +55,9 @@ const actions = {
   clientRespondQuote,
   adminLinkFoundInvoice,
   adminLinkFoundContractorPayment,
+  interpreterSubmitInvoice,
+  adminReviewContractorInvoice,
+  openContractorInvoice,
   interpreterSubmitTime,
   adminReviewTime,
   interpreterSubmitExpense,
