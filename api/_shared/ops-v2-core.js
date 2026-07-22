@@ -14,6 +14,8 @@ const clerkUserCacheMs = 30_000;
 
 export function send(res, status, payload) {
   res.status(status).setHeader("content-type", "application/json");
+  res.setHeader("cache-control", "private, no-store, max-age=0");
+  res.setHeader("pragma", "no-cache");
   res.end(JSON.stringify(payload));
 }
 
