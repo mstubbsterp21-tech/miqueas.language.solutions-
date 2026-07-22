@@ -106,6 +106,7 @@ export default function AdminFinanceV2({ workspace, app, v2, actions, saving }) 
   const [completedFile, setCompletedFile] = useState(null);
   const [auditTrailFile, setAuditTrailFile] = useState(null);
   const [payment, setPayment] = useState(emptyPayment);
+  const [invoiceReview, setInvoiceReview] = useState({});
 
   const assignmentOptions = useMemo(() => assignments.map((item) => ({
     value: item.id,
@@ -244,6 +245,28 @@ export default function AdminFinanceV2({ workspace, app, v2, actions, saving }) 
     `Assignment ID: ${selectedAssignment.id}`,
   ].join("\n") : "";
 
+  function reviewDraft(item) {
+    return invoiceReview[item.id] || {
+      status: item.status,
+      notes: item.admin_notes || "",
+      paymentReference: item.payment_reference || "",
+    };
+  }
+
+  function updateReview(item, changes) {
+    setInvoiceReview((current) => ({ ...current, [item.id]: { ...reviewDraft(item), ...changes } }));
+  }
+
+  async function saveInvoiceReview(item) {
+    const draft = reviewDraft(item);
+    await actions.reviewContractorInvoice({ contractorInvoiceId: item.id, ...draft });
+    setInvoiceReview((current) => {
+      const next = { ...current };
+      delete next[item.id];
+      return next;
+    });
+  }
+
   return (
     <div className="space-y-6">
       <Hero title="Billing & Pay" />
@@ -291,7 +314,7 @@ export default function AdminFinanceV2({ workspace, app, v2, actions, saving }) 
 
       <Card>
         <SectionHeader title={`Interpreter invoices (${contractorInvoices.length})`} />
-        <div className="mt-5 space-y-3">{contractorInvoices.map((item) => <div key={item.id} className="rounded-2xl border border-slate-200 bg-slate-50 p-4"><div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between"><div><p className="font-black text-slate-950">{item.invoice_number} · {item.interpreters?.first_name} {item.interpreters?.last_name}</p><p className="mt-1 text-xs text-slate-500">{item.assignments?.service_type} · {formatMoney(item.amount)} · {item.invoice_date}</p>{item.interpreter_notes && <p className="mt-2 text-xs text-slate-600">{item.interpreter_notes}</p>}</div><div className="flex flex-wrap items-center gap-2"><Badge value={item.status} /><ActionButton tone="soft" onClick={() => actions.openContractorInvoice(item.id)}>Open invoice</ActionButton><select aria-label={`Update ${item.invoice_number} status`} className={INPUT} value={item.status} onChange={(event) => actions.reviewContractorInvoice({ contractorInvoiceId: item.id, status: event.target.value })}><option value="submitted">Submitted</option><option value="under_review">Under review</option><option value="approved">Approved</option><option value="scheduled_for_payment">Scheduled for payment</option><option value="paid">Paid</option><option value="rejected">Rejected</option><option value="void">Void</option></select></div></div></div>)}{!contractorInvoices.length && <EmptyState icon={ReceiptText} title="No interpreter invoices" />}</div>
+        <div className="mt-5 space-y-3">{contractorInvoices.map((item) => { const draft = reviewDraft(item); return <div key={item.id} className="rounded-2xl border border-slate-200 bg-slate-50 p-4"><div className="flex flex-col gap-4"><div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between"><div><p className="font-black text-slate-950">{item.invoice_number} · {item.interpreters?.first_name} {item.interpreters?.last_name}</p><p className="mt-1 text-xs text-slate-500">{item.assignments?.service_type} · {formatMoney(item.amount)} · {item.invoice_date}</p>{item.interpreter_notes && <p className="mt-2 text-xs text-slate-600">Interpreter note: {item.interpreter_notes}</p>}</div><div className="flex flex-wrap items-center gap-2"><Badge value={item.status} /><ActionButton tone="soft" onClick={() => actions.openContractorInvoice(item.id)}>Open invoice</ActionButton></div></div>{!["paid", "void"].includes(item.status) && <div className="grid gap-3 lg:grid-cols-[minmax(0,180px)_1fr_minmax(0,220px)_auto]"><Field name="Next status"><select aria-label={`Update ${item.invoice_number} status`} className={INPUT} value={draft.status} onChange={(event) => updateReview(item, { status: event.target.value })}><option value={item.status}>{item.status.replaceAll("_", " ")}</option>{item.status === "submitted" && <><option value="under_review">Under review</option><option value="approved">Approved</option><option value="rejected">Rejected</option><option value="void">Void</option></>}{item.status === "under_review" && <><option value="approved">Approved</option><option value="rejected">Rejected</option><option value="void">Void</option></>}{item.status === "approved" && <><option value="scheduled_for_payment">Scheduled for payment</option><option value="paid">Paid</option><option value="void">Void</option></>}{item.status === "scheduled_for_payment" && <><option value="paid">Paid</option><option value="void">Void</option></>}{item.status === "rejected" && <><option value="under_review">Under review</option><option value="void">Void</option></>}</select></Field><Field name="MLS note"><input className={INPUT} value={draft.notes} onChange={(event) => updateReview(item, { notes: event.target.value })} /></Field><Field name="Found payment reference" required={draft.status === "paid"}><input className={INPUT} value={draft.paymentReference} onChange={(event) => updateReview(item, { paymentReference: event.target.value })} /></Field><div className="self-end"><ActionButton disabled={saving || draft.status === item.status} onClick={() => saveInvoiceReview(item)}>Save</ActionButton></div></div>}</div></div>; })}{!contractorInvoices.length && <EmptyState icon={ReceiptText} title="No interpreter invoices" />}</div>
       </Card>
 
       <Card>

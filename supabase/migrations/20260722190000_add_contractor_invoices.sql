@@ -24,6 +24,10 @@ create table if not exists public.contractor_invoices (
   unique (interpreter_id, invoice_number)
 );
 
+create unique index if not exists contractor_invoices_assignment_interpreter_active_idx
+  on public.contractor_invoices(assignment_interpreter_id)
+  where status not in ('rejected', 'void');
+
 create index if not exists contractor_invoices_assignment_idx on public.contractor_invoices(assignment_id);
 create index if not exists contractor_invoices_interpreter_idx on public.contractor_invoices(interpreter_id, created_at desc);
 create index if not exists contractor_invoices_status_idx on public.contractor_invoices(status, submitted_at);
@@ -31,4 +35,3 @@ create index if not exists contractor_invoices_status_idx on public.contractor_i
 alter table public.contractor_invoices enable row level security;
 revoke all on public.contractor_invoices from anon, authenticated;
 grant select, insert, update, delete on public.contractor_invoices to service_role;
-
