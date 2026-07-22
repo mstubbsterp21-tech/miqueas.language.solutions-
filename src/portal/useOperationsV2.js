@@ -195,6 +195,12 @@ export default function useOperationsV2({ enabled = true, initialData = null, de
     respondQuote: (quoteId, response, note = "") => run("clientRespondQuote", { quoteId, response, note }, response === "approved" ? "Quote approved." : "Quote response sent."),
     linkFoundInvoice: (payload) => run("adminLinkFoundInvoice", payload, "Found invoice linked."),
     linkFoundContractorPayment: (payload) => run("adminLinkFoundContractorPayment", payload, "Found contractor payment linked."),
+    submitContractorInvoice: (payload) => run("interpreterSubmitInvoice", payload, "Invoice submitted to MLS."),
+    reviewContractorInvoice: (payload) => run("adminReviewContractorInvoice", payload, `Invoice ${payload.status.replaceAll("_", " ")}.`),
+    openContractorInvoice: async (contractorInvoiceId) => {
+      const result = await api.operationsV2("openContractorInvoice", "POST", { contractorInvoiceId });
+      window.open(result.url, "_blank", "noopener,noreferrer");
+    },
     submitTime: (payload) => run("interpreterSubmitTime", payload, "Time submitted for review."),
     reviewTime: (timeEntryId, status, notes = "") => run("adminReviewTime", { timeEntryId, status, notes }, `Time entry ${status}.`),
     submitExpense: (payload) => run("interpreterSubmitExpense", payload, "Expense submitted."),
