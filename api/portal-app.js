@@ -1,15 +1,10 @@
-import { createClerkClient } from "@clerk/backend";
 import { createClient } from "@supabase/supabase-js";
+import { signedInUser } from "./_shared/ops-v2-core.js";
 import { deliverPortalFeedback } from "./_shared/portal-feedback-email.js";
 import { sendPushNotification, vapidPublicKey } from "./_shared/web-push.js";
 
 const dbUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
 const dbAdminKey = process.env["SUPABASE_" + "SERVICE_ROLE_KEY"];
-const clerkKey = process.env["CLERK_" + "SECRET_KEY"];
-const adminEmails = (process.env.VITE_ADMIN_EMAILS || "")
-  .split(",")
-  .map((value) => value.trim().toLowerCase())
-  .filter(Boolean);
 
 const assignmentStatuses = new Set(["draft", "pending_confirmation", "confirmed", "completed", "cancelled"]);
 const paymentStatuses = new Set(["not_invoiced", "pending_payment", "paid", "void"]);
@@ -37,6 +32,8 @@ const fallbackWidgetNews = [
 
 function send(res, status, payload) {
   res.status(status).setHeader("content-type", "application/json");
+  res.setHeader("cache-control", "private, no-store, max-age=0");
+  res.setHeader("pragma", "no-cache");
   res.end(JSON.stringify(payload));
 }
 
@@ -127,36 +124,6 @@ async function widgetData(query = {}) {
   if (type === "news") return { status: 200, payload: { news: await industryWidgetNews() }, cache: "private, max-age=300" };
   if (type === "weather") return { status: 200, payload: { weather: await widgetWeather(query) }, cache: "private, max-age=120" };
   return { status: 400, payload: { error: "Unknown widget type." } };
-}
-
-function bearer(req) {
-  return String(req.headers.authorization || "").match(/^Bearer\s+(.+)$/i)?.[1] || "";
-}
-
-function decode(token) {
-  return JSON.parse(Buffer.from(token.split(".")[1] || "", "base64url").toString("utf8"));
-}
-
-async function signedInUser(req) {
-  const jwt = bearer(req);
-  if (!jwt || !clerkKey) return null;
-  const claims = decode(jwt);
-  if (!claims?.sid || !claims?.sub) return null;
-
-  const clerk = createClerkClient({ secretKey: clerkKey });
-  const session = await clerk.sessions.getSession(claims.sid);
-  if (session?.userId !== claims.sub) return null;
-
-  const record = await clerk.users.getUser(claims.sub);
-  const email = record.primaryEmailAddress?.emailAddress?.toLowerCase() || "";
-  return {
-    id: record.id,
-    email,
-    firstName: record.firstName || "",
-    lastName: record.lastName || "",
-    isAdmin: adminEmails.includes(email),
-    metadataRole: String(record.publicMetadata?.portalRole || "").toLowerCase(),
-  };
 }
 
 function database() {
