@@ -11,6 +11,7 @@ import { InterpreterWorkCard, recordsForAssignment } from "../agencyWorkflowExpe
 
 const emptyTime = { assignmentId: "", actualStartAt: "", actualEndAt: "", breakMinutes: 0, notes: "" };
 const emptyExpense = { assignmentId: "", expenseType: "mileage", amount: "", mileage: "", description: "", receipt: null };
+const emptyInvoice = { assignmentId: "", invoiceNumber: "", invoiceDate: new Date().toISOString().slice(0, 10), amount: "", notes: "", file: null };
 const emptyUnavailable = { startAt: "", endAt: "", availabilityType: "unavailable", notes: "" };
 const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 const BY_DAY = ["SU", "MO", "TU", "WE", "TH", "FR", "SA"];
@@ -130,12 +131,14 @@ function Payments({ app, v2, actions, saving }) {
   const zone = timeZoneAbbreviation(timeZone);
   const [time, setTime] = useState(emptyTime);
   const [expense, setExpense] = useState(emptyExpense);
+  const [invoice, setInvoice] = useState(emptyInvoice);
   const [documentAssignmentId, setDocumentAssignmentId] = useState("");
   const assignmentOptions = useMemo(() => assignments.map((item) => ({ value: item.id, label: `${item.service_type} · ${formatDate(item.start_at)}` })), [assignments]);
   const documentAssignment = assignments.find((item) => item.id === documentAssignmentId);
   const timeEntries = v2?.timeEntries || [];
   const expenses = v2?.expenses || [];
   const payments = v2?.payments || [];
+  const contractorInvoices = v2?.contractorInvoices || [];
   const completedNeedingTime = assignments.filter((assignment) => assignment.end_at && new Date(assignment.end_at).getTime() < INTERPRETER_DASHBOARD_NOW && !timeEntries.some((entry) => (entry.assignment_id || entry.assignments?.id) === assignment.id));
   const awaitingReview = timeEntries.filter((item) => ["submitted", "under_review"].includes(item.status)).length + expenses.filter((item) => ["submitted", "under_review"].includes(item.status)).length;
   const scheduledPayments = payments.filter((item) => ["ready", "scheduled", "processing"].includes(item.contractor_payment_status));
@@ -165,6 +168,17 @@ function Payments({ app, v2, actions, saving }) {
     await actions.submitExpense({ ...expense, receipt: undefined, receiptStoragePath: signed.path });
     setExpense(emptyExpense);
   }
+  async function submitInvoice(event) {
+    event.preventDefault();
+    const file = invoice.file;
+    if (!file) return;
+    if (file.size > 15 * 1024 * 1024) throw new Error("Invoices must be 15 MB or smaller.");
+    const signed = await api.automations("createDocumentUploadUrl", "POST", { assignmentId: invoice.assignmentId, category: "invoice", fileName: file.name, fileSize: file.size });
+    const upload = await storage.storage.from(signed.bucket).uploadToSignedUrl(signed.path, signed.token, file, { contentType: file.type || undefined });
+    if (upload.error) throw upload.error;
+    await actions.submitContractorInvoice({ ...invoice, file: undefined, storagePath: signed.path, fileName: file.name, mimeType: file.type || null });
+    setInvoice(emptyInvoice);
+  }
   return (
     <div className="space-y-6">
       <Hero title="Time, Expenses & Pay" />
@@ -174,9 +188,21 @@ function Payments({ app, v2, actions, saving }) {
         <div id="interpreter-time-entry"><Card><SectionHeader title="Actual time" text={timeZoneLabel(timeZone)} /><form onSubmit={submitTime} className="mt-6 grid gap-4"><Field name="Assignment" required><SelectField value={time.assignmentId} onChange={(event) => setTime({ ...time, assignmentId: event.target.value })} options={assignmentOptions} /></Field><div className="grid gap-3 sm:grid-cols-2"><Field name={`Actual start · ${zone}`} required><input className={INPUT} type="datetime-local" value={time.actualStartAt} onChange={(event) => setTime({ ...time, actualStartAt: event.target.value })} /></Field><Field name={`Actual end · ${zone}`} required><input className={INPUT} type="datetime-local" value={time.actualEndAt} onChange={(event) => setTime({ ...time, actualEndAt: event.target.value })} /></Field></div><Field name="Break minutes"><input className={INPUT} type="number" min="0" value={time.breakMinutes} onChange={(event) => setTime({ ...time, breakMinutes: event.target.value })} /></Field><Field name="Notes"><textarea className={INPUT} rows={3} value={time.notes} onChange={(event) => setTime({ ...time, notes: event.target.value })} /></Field><ActionButton type="submit" disabled={saving || !time.assignmentId || !time.actualStartAt || !time.actualEndAt}>Submit time</ActionButton></form></Card></div>
         <Card><SectionHeader title="Expense" text="Receipt required · 15 MB maximum" /><form onSubmit={submitExpense} className="mt-6 grid gap-4"><Field name="Assignment" required><SelectField value={expense.assignmentId} onChange={(event) => setExpense({ ...expense, assignmentId: event.target.value })} options={assignmentOptions} /></Field><div className="grid gap-3 sm:grid-cols-2"><Field name="Expense type"><SelectField value={expense.expenseType} onChange={(event) => setExpense({ ...expense, expenseType: event.target.value })} options={["mileage", "parking", "toll", "airfare", "lodging", "per_diem", "rideshare", "supplies", "other"]} /></Field><Field name="Amount" required><input className={INPUT} type="number" min="0" step="0.01" value={expense.amount} onChange={(event) => setExpense({ ...expense, amount: event.target.value })} /></Field></div>{expense.expenseType === "mileage" && <Field name="Miles"><input className={INPUT} type="number" step="0.1" value={expense.mileage} onChange={(event) => setExpense({ ...expense, mileage: event.target.value })} /></Field>}<Field name="Receipt" required><input className={INPUT} type="file" required accept=".pdf,.doc,.docx,.xls,.xlsx,.csv,.png,.jpg,.jpeg" onChange={(event) => setExpense({ ...expense, receipt: event.target.files?.[0] || null })} /></Field><Field name="Description"><textarea className={INPUT} rows={3} value={expense.description} onChange={(event) => setExpense({ ...expense, description: event.target.value })} /></Field><ActionButton type="submit" disabled={saving || !expense.assignmentId || !expense.amount || !expense.receipt}>Submit expense</ActionButton></form></Card>
       </div>
+      <Card>
+        <SectionHeader title="Invoice MLS" text="Submit your invoice after the assignment is complete and your time is accurate." />
+        <form onSubmit={submitInvoice} className="mt-6 grid gap-4 md:grid-cols-2">
+          <Field name="Assignment" required><SelectField value={invoice.assignmentId} onChange={(event) => setInvoice({ ...invoice, assignmentId: event.target.value })} options={assignmentOptions} /></Field>
+          <Field name="Invoice number" required><input className={INPUT} value={invoice.invoiceNumber} onChange={(event) => setInvoice({ ...invoice, invoiceNumber: event.target.value })} /></Field>
+          <Field name="Invoice date" required><input className={INPUT} type="date" value={invoice.invoiceDate} onChange={(event) => setInvoice({ ...invoice, invoiceDate: event.target.value })} /></Field>
+          <Field name="Invoice amount" required><input className={INPUT} type="number" min="0.01" step="0.01" value={invoice.amount} onChange={(event) => setInvoice({ ...invoice, amount: event.target.value })} /></Field>
+          <Field name="Invoice file" required><input className={INPUT} type="file" required accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" onChange={(event) => setInvoice({ ...invoice, file: event.target.files?.[0] || null })} /></Field>
+          <Field name="Notes"><textarea className={INPUT} rows={3} value={invoice.notes} onChange={(event) => setInvoice({ ...invoice, notes: event.target.value })} /></Field>
+          <div className="md:col-span-2"><ActionButton type="submit" disabled={saving || !invoice.assignmentId || !invoice.invoiceNumber || !invoice.amount || !invoice.file}>Submit invoice</ActionButton></div>
+        </form>
+      </Card>
       <div className="grid gap-5 xl:grid-cols-2">
         <Card><SectionHeader title="Time entries" /><div className="mt-5 space-y-3">{timeEntries.map((item) => <div key={item.id} className="rounded-2xl bg-slate-50 p-4"><div className="flex justify-between gap-3"><div><p className="font-black">{item.assignments?.service_type}</p><p className="mt-1 text-xs text-slate-500">{item.billable_hours} hours · {formatDate(item.actual_start_at)}</p>{item.review_notes && <p className="mt-2 text-xs leading-5 text-slate-600"><b>MLS note:</b> {item.review_notes}</p>}</div><Badge value={item.status} /></div></div>)}{!timeEntries.length && <EmptyState icon={Clock3} title="No time entries" />}</div></Card>
-        <Card><SectionHeader title="Payment status" text="Your contractor payments only" /><div className="mt-5 space-y-3">{payments.map((item) => <div key={item.id} className="rounded-2xl bg-slate-50 p-4"><div className="flex justify-between gap-3"><div><p className="font-black">{item.assignments?.service_type}</p><p className="mt-1 text-xs text-slate-500">{formatMoney(item.contractor_payment_amount)} · Due {item.contractor_payment_due_date || "not set"}</p></div><Badge value={item.contractor_payment_status} /></div>{item.found_payment_url && <a href={item.found_payment_url} target="_blank" rel="noreferrer" className="mt-3 inline-block text-xs font-black text-[#721100] hover:underline">Open in Found</a>}</div>)}{!payments.length && <EmptyState icon={CircleDollarSign} title="No payment records" />}</div></Card>
+        <Card><SectionHeader title="Invoices & payments" /><div className="mt-5 space-y-3">{contractorInvoices.map((item) => <div key={item.id} className="rounded-2xl bg-slate-50 p-4"><div className="flex justify-between gap-3"><div><p className="font-black">{item.invoice_number} · {item.assignments?.service_type}</p><p className="mt-1 text-xs text-slate-500">{formatMoney(item.amount)} · Submitted {formatDate(item.submitted_at)}</p>{item.admin_notes && <p className="mt-2 text-xs leading-5 text-slate-600"><b>MLS note:</b> {item.admin_notes}</p>}{item.payment_reference && <p className="mt-2 text-xs text-slate-600">Payment reference: {item.payment_reference}</p>}<button type="button" onClick={() => actions.openContractorInvoice(item.id)} className="mt-2 text-xs font-black text-[#721100] hover:underline">Open invoice</button></div><Badge value={item.status} /></div></div>)}{!contractorInvoices.length && <EmptyState icon={CircleDollarSign} title="No invoices submitted" />}</div></Card>
       </div>
       <Card><SectionHeader title="Documents" /><div className="mt-5"><Field name="Assignment"><SelectField value={documentAssignmentId} onChange={(event) => setDocumentAssignmentId(event.target.value)} options={assignmentOptions} /></Field></div></Card>
       {documentAssignment && <AssignmentDocumentCenter assignment={documentAssignment} role="interpreter" />}

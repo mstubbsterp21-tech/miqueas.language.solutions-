@@ -98,6 +98,7 @@ export default function AdminFinanceV2({ workspace, app, v2, actions, saving }) 
   const clients = workspace.admin?.clients || [];
   const agreements = v2?.agreements || [];
   const invoices = v2?.invoices || [];
+  const contractorInvoices = v2?.contractorInvoices || [];
 
   const [quote, setQuote] = useState(emptyQuote);
   const [invoice, setInvoice] = useState(emptyInvoice);
@@ -132,6 +133,7 @@ export default function AdminFinanceV2({ workspace, app, v2, actions, saving }) 
   const submittedExpenses = (v2?.expenses || []).filter((item) => item.status === "submitted");
   const overdueInvoices = invoices.filter((item) => item.status === "overdue" || (item.due_date && !["paid", "void", "refunded"].includes(item.status) && new Date(`${item.due_date}T23:59:59`).getTime() < FINANCE_DASHBOARD_NOW));
   const unpaidContractors = staffing.filter((item) => !["paid", "void"].includes(item.contractor_payment_status) && Number(item.contractor_payment_amount || 0) > 0);
+  const payableInvoices = contractorInvoices.filter((item) => !["paid", "void", "rejected"].includes(item.status));
 
   function selectAgreementAssignment(assignmentId) {
     const existing = agreements.find((item) => item.assignment_id === assignmentId);
@@ -246,7 +248,7 @@ export default function AdminFinanceV2({ workspace, app, v2, actions, saving }) 
     <div className="space-y-6">
       <Hero title="Billing & Pay" />
 
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4"><Metric icon={Clock3} name="Closeout reviews" value={submittedTime.length + submittedExpenses.length} note={`${submittedTime.length} time · ${submittedExpenses.length} expense`} color="#1d4ed8" /><Metric icon={ReceiptText} name="Receivables" value={formatMoney(receivable)} note={`${invoices.filter((item) => Number(item.balance_due || 0) > 0).length} open invoices`} color="#c2410c" /><Metric icon={AlertCircle} name="Overdue invoices" value={overdueInvoices.length} note={overdueInvoices.length ? formatMoney(overdueInvoices.reduce((sum, item) => sum + Number(item.balance_due || 0), 0)) : "Nothing overdue"} color="#be123c" /><Metric icon={WalletCards} name="Contractor pay" value={formatMoney(contractorDue)} note={`${unpaidContractors.length} tracked payments`} color="#15803d" /></div>
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4"><Metric icon={Clock3} name="Closeout reviews" value={submittedTime.length + submittedExpenses.length} note={`${submittedTime.length} time · ${submittedExpenses.length} expense`} color="#1d4ed8" /><Metric icon={ReceiptText} name="Accounts receivable" value={formatMoney(receivable)} note={`${invoices.filter((item) => Number(item.balance_due || 0) > 0).length} client invoices`} color="#c2410c" /><Metric icon={AlertCircle} name="Overdue invoices" value={overdueInvoices.length} note={overdueInvoices.length ? formatMoney(overdueInvoices.reduce((sum, item) => sum + Number(item.balance_due || 0), 0)) : "Nothing overdue"} color="#be123c" /><Metric icon={WalletCards} name="Accounts payable" value={formatMoney(payableInvoices.reduce((sum, item) => sum + Number(item.amount || 0), 0))} note={`${payableInvoices.length} interpreter invoices`} color="#15803d" /></div>
       <Card><SectionHeader title="Closeout queue" /><div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">{[["Time", submittedTime.length, "Submitted"], ["Expenses", submittedExpenses.length, "Submitted"], ["Client balances", invoices.filter((item) => Number(item.balance_due || 0) > 0).length, `${formatMoney(receivable)} outstanding`], ["Contractor payments", unpaidContractors.length, `${formatMoney(contractorDue)} pending`]].map(([label, count, text]) => <div key={label} className="rounded-2xl border border-slate-200 bg-slate-50 p-4"><p className="text-xs font-black uppercase tracking-[.1em] text-slate-400">{label}</p><p className="mt-2 text-3xl font-black text-slate-950">{count}</p><p className="mt-2 text-xs leading-5 text-slate-500">{text}</p></div>)}</div></Card>
 
       <div className="grid gap-5 xl:grid-cols-2">
@@ -286,6 +288,11 @@ export default function AdminFinanceV2({ workspace, app, v2, actions, saving }) 
           </form>
         </Card>
       </div>
+
+      <Card>
+        <SectionHeader title={`Interpreter invoices (${contractorInvoices.length})`} />
+        <div className="mt-5 space-y-3">{contractorInvoices.map((item) => <div key={item.id} className="rounded-2xl border border-slate-200 bg-slate-50 p-4"><div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between"><div><p className="font-black text-slate-950">{item.invoice_number} · {item.interpreters?.first_name} {item.interpreters?.last_name}</p><p className="mt-1 text-xs text-slate-500">{item.assignments?.service_type} · {formatMoney(item.amount)} · {item.invoice_date}</p>{item.interpreter_notes && <p className="mt-2 text-xs text-slate-600">{item.interpreter_notes}</p>}</div><div className="flex flex-wrap items-center gap-2"><Badge value={item.status} /><ActionButton tone="soft" onClick={() => actions.openContractorInvoice(item.id)}>Open invoice</ActionButton><select aria-label={`Update ${item.invoice_number} status`} className={INPUT} value={item.status} onChange={(event) => actions.reviewContractorInvoice({ contractorInvoiceId: item.id, status: event.target.value })}><option value="submitted">Submitted</option><option value="under_review">Under review</option><option value="approved">Approved</option><option value="scheduled_for_payment">Scheduled for payment</option><option value="paid">Paid</option><option value="rejected">Rejected</option><option value="void">Void</option></select></div></div></div>)}{!contractorInvoices.length && <EmptyState icon={ReceiptText} title="No interpreter invoices" />}</div>
+      </Card>
 
       <Card>
         <SectionHeader

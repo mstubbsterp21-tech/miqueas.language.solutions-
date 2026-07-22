@@ -29,9 +29,10 @@ async function homeAnnouncements(db, user, role) {
 
 async function loadAdmin(db, user) {
   const personalInterpreter = await interpreterFor(db, user.id);
-  const [quotes, invoices, agreements, times, expenses, credentials, availability, onboarding, auditEvents, integrations, profileCustomizations, personalProfileCustomization] = await Promise.all([
+  const [quotes, invoices, contractorInvoices, agreements, times, expenses, credentials, availability, onboarding, auditEvents, integrations, profileCustomizations, personalProfileCustomization] = await Promise.all([
     db.from("quotes").select("*, quote_items(*), clients(id,organization_name,email), assignments(id,service_type,start_at,lifecycle_status)").order("created_at", { ascending: false }),
     db.from("invoices").select("*, invoice_items(*), payments(*), clients(id,organization_name,email), assignments(id,service_type,start_at,lifecycle_status), quotes(id,quote_number)").order("created_at", { ascending: false }),
+    db.from("contractor_invoices").select("*, interpreters(id,first_name,last_name,email), assignments(id,service_type,start_at), assignment_interpreters(id,agreed_rate,contractor_payment_status)").order("created_at", { ascending: false }),
     db.from("assignment_agreements").select("*, clients(id,organization_name,email), assignments(id,service_type,start_at,lifecycle_status)").order("created_at", { ascending: false }),
     db.from("time_entries").select("*, interpreters(id,first_name,last_name,email), assignments(id,service_type,start_at,client_id)").order("created_at", { ascending: false }),
     db.from("expenses").select("*, interpreters(id,first_name,last_name,email), assignments(id,service_type,start_at,client_id)").order("created_at", { ascending: false }),
@@ -43,12 +44,12 @@ async function loadAdmin(db, user) {
     loadProfileCustomizationCollection(db),
     loadProfileCustomizationForRecord(db, "interpreter", personalInterpreter),
   ]);
-  const databaseResults = [quotes, invoices, agreements, times, expenses, credentials, availability, onboarding, auditEvents, integrations];
+  const databaseResults = [quotes, invoices, contractorInvoices, agreements, times, expenses, credentials, availability, onboarding, auditEvents, integrations];
   for (const result of databaseResults) if (result.error) throw result.error;
   return {
     role: "admin",
     realtimeTopic: await realtimeTopic(db, user, "admin"),
-    quotes: quotes.data || [], invoices: invoices.data || [], agreements: agreements.data || [], timeEntries: times.data || [], expenses: expenses.data || [], credentials: credentials.data || [], availability: availability.data || [], onboarding: onboarding.data || [], auditEvents: auditEvents.data || [], integrations: integrations.data || [], profileCustomizations, personalProfileCustomization, personalInterpreter,
+    quotes: quotes.data || [], invoices: invoices.data || [], contractorInvoices: contractorInvoices.data || [], agreements: agreements.data || [], timeEntries: times.data || [], expenses: expenses.data || [], credentials: credentials.data || [], availability: availability.data || [], onboarding: onboarding.data || [], auditEvents: auditEvents.data || [], integrations: integrations.data || [], profileCustomizations, personalProfileCustomization, personalInterpreter,
     integrationCapabilities: { found: { mode: "reference_and_manual_sync", apiAvailable: false }, boldsign: { mode: "manual", apiRequired: false, enabled: true }, googleDrive: { configured: false } },
   };
 }
@@ -73,17 +74,18 @@ async function loadClient(db, user) {
 async function loadInterpreter(db, user) {
   const interpreter = await interpreterFor(db, user.id);
   if (!interpreter) return { role: "interpreter", realtimeTopic: await realtimeTopic(db, user, "interpreter"), timeEntries: [], expenses: [], credentials: [], availability: [], onboarding: null, payments: [], profileCustomization: null };
-  const [times, expenses, credentials, availability, onboardingRows, payments, profileCustomization] = await Promise.all([
+  const [times, expenses, credentials, availability, onboardingRows, payments, contractorInvoices, profileCustomization] = await Promise.all([
     db.from("time_entries").select("*, assignments(id,service_type,start_at,end_at,delivery_mode,location_name,city,state)").eq("interpreter_id", interpreter.id).order("created_at", { ascending: false }),
     db.from("expenses").select("*, assignments(id,service_type,start_at)").eq("interpreter_id", interpreter.id).order("created_at", { ascending: false }),
     db.from("interpreter_credentials").select("*").eq("interpreter_id", interpreter.id).order("expires_on", { ascending: true, nullsFirst: false }),
     db.from("interpreter_availability").select("*").eq("interpreter_id", interpreter.id).order("start_at", { ascending: true }),
     db.from("interpreter_onboarding").select("*").eq("interpreter_id", interpreter.id),
     db.from("assignment_interpreters").select("*, assignments(id,service_type,start_at)").eq("interpreter_id", interpreter.id).order("assigned_at", { ascending: false }),
+    db.from("contractor_invoices").select("id,assignment_id,invoice_number,invoice_date,amount,currency,status,file_name,interpreter_notes,admin_notes,submitted_at,scheduled_at,paid_at,payment_reference,created_at,assignments(id,service_type,start_at)").eq("interpreter_id", interpreter.id).order("created_at", { ascending: false }),
     loadProfileCustomizationForRecord(db, "interpreter", interpreter),
   ]);
-  for (const result of [times, expenses, credentials, availability, onboardingRows, payments]) if (result.error) throw result.error;
-  return { role: "interpreter", realtimeTopic: await realtimeTopic(db, user, "interpreter"), timeEntries: times.data || [], expenses: expenses.data || [], credentials: credentials.data || [], availability: availability.data || [], onboarding: (onboardingRows.data || [])[0] || null, payments: payments.data || [], profileCustomization };
+  for (const result of [times, expenses, credentials, availability, onboardingRows, payments, contractorInvoices]) if (result.error) throw result.error;
+  return { role: "interpreter", realtimeTopic: await realtimeTopic(db, user, "interpreter"), timeEntries: times.data || [], expenses: expenses.data || [], credentials: credentials.data || [], availability: availability.data || [], onboarding: (onboardingRows.data || [])[0] || null, payments: payments.data || [], contractorInvoices: contractorInvoices.data || [], profileCustomization };
 }
 
 export async function loadOperationsV2(db, user) {
