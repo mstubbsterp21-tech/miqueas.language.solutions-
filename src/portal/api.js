@@ -101,6 +101,7 @@ async function coreRequest(session, action, method, body) {
 function appRequest(session, action, method, body) {
   if (action === "adminUpdateAssignment") return request(session, "/api/operations-v2", "adminUpdateFullAssignment", method, body);
   if (action === "adminDeleteAssignment") return request(session, "/api/operations-v2", "adminDeleteAssignment", method, body);
+  if (action === "savePortalLayout") return request(session, "/api/operations-v2", "savePortalLayoutV2", method, body);
   if (["adminAssignInterpreter", "adminRemoveInterpreter"].includes(action)) return request(session, "/api/operations-v2", action, method, body);
   return request(session, "/api/portal-app", action, method, body);
 }
