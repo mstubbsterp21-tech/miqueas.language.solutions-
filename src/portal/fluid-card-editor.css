@@ -1,9 +1,9 @@
 /* Fluid iOS-style card customization overrides. */
 
-/* Small is a summary state, not a squeezed scroll box. */
+/* Card sizes represent information density, not just smaller padding. */
 .mls-portal-theme main .mls-card[data-custom-size="small"] {
   max-height: none !important;
-  min-height: 8.75rem;
+  min-height: 9rem;
   overflow: hidden !important;
   padding: 1rem !important;
 }
@@ -20,31 +20,73 @@
   padding: clamp(1.35rem, 3vw, 2.15rem) !important;
 }
 
-/* Explicit information-density levels used by shared portal cards. */
-.mls-card[data-custom-size="small"] .mls-density-medium,
-.mls-card[data-custom-size="small"] .mls-density-large,
-.mls-card[data-custom-size="medium"] .mls-density-large {
+/* Small cards render a dedicated summary instead of squeezing the full card body. */
+.mls-card[data-custom-size="small"] > :not(.mls-card-editor):not(.mls-card-compact-runtime) {
   display: none !important;
 }
-.mls-card[data-custom-size="small"] :is(h2, h3, h4),
-.mls-card[data-custom-size="small"] p {
+.mls-card-compact-runtime {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  min-width: 0;
+  height: 100%;
+  flex-direction: column;
+  justify-content: center;
+  gap: .35rem;
+  padding-right: 1.5rem;
+  color: inherit;
+}
+.mls-card-compact-title,
+.mls-card-compact-value,
+.mls-card-compact-detail {
+  min-width: 0;
+  margin: 0 !important;
+  word-break: normal !important;
+  overflow-wrap: normal !important;
+  hyphens: none !important;
+}
+.mls-card-compact-title {
   display: -webkit-box;
   overflow: hidden;
+  color: inherit;
+  font-size: .9rem;
+  font-weight: 900;
+  line-height: 1.25rem;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
   line-clamp: 2;
 }
-.mls-card[data-custom-size="small"]:not(:has(input, select, textarea)) :is(.grid, .space-y-2, .space-y-3, .space-y-4, .space-y-5, .space-y-6) > :nth-child(n+3):not(.mls-card-editor) {
-  display: none !important;
+.mls-card-compact-value {
+  overflow: hidden;
+  color: inherit;
+  font-size: clamp(1.45rem, 2.8vw, 2rem);
+  font-weight: 900;
+  line-height: 1.08;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
-.mls-card[data-custom-size="small"] .mls-adaptive-list {
-  margin-top: .85rem !important;
+.mls-card-compact-detail {
+  display: -webkit-box;
+  overflow: hidden;
+  color: inherit;
+  font-size: .75rem;
+  font-weight: 650;
+  line-height: 1.15rem;
+  opacity: .68;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+
+/* Explicit content tiers remain available to components with expanded details. */
+.mls-card[data-custom-size="medium"] .mls-density-large {
+  display: none !important;
 }
 .mls-card[data-custom-size="large"] .mls-adaptive-list {
   margin-top: 1.5rem !important;
 }
 
-/* Let card groups pack like an iOS Home Screen while respecting useful minimum widths. */
+/* Let card groups pack like an iOS Home Screen while keeping readable widths. */
 .mls-portal-theme main :is(div, section, article):has(> .mls-card[data-custom-card="true"]) {
   grid-auto-flow: dense;
   grid-auto-rows: minmax(3.5rem, auto);
@@ -118,7 +160,7 @@
   animation: mls-editor-arrive 220ms cubic-bezier(.2,.8,.2,1) both;
 }
 
-/* The source card becomes an obvious destination placeholder while its clone follows the pointer. */
+/* The source card becomes a destination placeholder while its clone follows the pointer. */
 .mls-card-placeholder {
   opacity: .2 !important;
   filter: saturate(.25);
