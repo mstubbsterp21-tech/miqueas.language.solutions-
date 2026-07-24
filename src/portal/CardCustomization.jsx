@@ -18,25 +18,58 @@ export function normalizeCardShape(value, fallback = "soft") {
 }
 
 function normalizeCardRecord(value = {}, fallbackSize = "medium", fallbackShape = "soft") {
-  const order = Number.isInteger(value.order) ? Math.max(0, Math.min(value.order, 999)) : undefined;
+  const order = Number.isInteger(value?.order) ? Math.max(0, Math.min(value.order, 999)) : undefined;
   return {
-    size: normalizeCardSize(value.size, fallbackSize),
-    shape: normalizeCardShape(value.shape, fallbackShape),
+    size: normalizeCardSize(value?.size, fallbackSize),
+    shape: normalizeCardShape(value?.shape, fallbackShape),
     ...(order === undefined ? {} : { order }),
   };
 }
 
 function normalizePagePreference(value = {}) {
-  const size = normalizeCardSize(value.size);
-  const shape = normalizeCardShape(value.shape);
-  const rawCards = value.cards && typeof value.cards === "object" && !Array.isArray(value.cards) ? value.cards : {};
-  const cards = Object.fromEntries(Object.entries(rawCards).slice(0, 150).map(([key, card]) => [key, normalizeCardRecord(card, size, shape)]));
+  const size = normalizeCardSize(value?.size);
+  const shape = normalizeCardShape(value?.shape);
+  const rawCards = value?.cards && typeof value.cards === "object" && !Array.isArray(value.cards) ? value.cards : {};
+  const cards = Object.fromEntries(
+    Object.entries(rawCards)
+      .slice(0, 150)
+      .map(([key, card]) => [key, normalizeCardRecord(card, size, shape)]),
+  );
   return { size, shape, cards };
 }
 
 function normalizePreferences(value = {}) {
   if (!value || typeof value !== "object" || Array.isArray(value)) return {};
   return Object.fromEntries(Object.entries(value).map(([key, preference]) => [key, normalizePagePreference(preference)]));
+}
+
+function cardFamily(cardId) {
+  const value = String(cardId || "");
+  return value.replace(/-[^-]+$/, "") || value;
+}
+
+function cardRecordFor(page, cardId) {
+  const exact = page.cards?.[cardId];
+  if (exact) return normalizeCardRecord(exact, page.size, page.shape);
+
+  const family = cardFamily(cardId);
+  const legacyEntry = Object.entries(page.cards || {})
+    .filter(([key]) => key === family || cardFamily(key) === family)
+    .sort(([, left], [, right]) => {
+      const leftHasOrder = Number.isInteger(left?.order) ? 1 : 0;
+      const rightHasOrder = Number.isInteger(right?.order) ? 1 : 0;
+      return rightHasOrder - leftHasOrder;
+    })[0];
+
+  return normalizeCardRecord(legacyEntry?.[1] || {}, page.size, page.shape);
+}
+
+function removeLegacyFamilyRecords(cards, cardIds) {
+  const currentIds = new Set(cardIds);
+  const families = new Set(cardIds.map(cardFamily));
+  Object.keys(cards).forEach((key) => {
+    if (!currentIds.has(key) && families.has(cardFamily(key))) delete cards[key];
+  });
 }
 
 export function useLongPress(onLongPress, { delay = 520, disabled = false } = {}) {
@@ -97,6 +130,117 @@ function orderedCardIds(parent) {
     .sort((a, b) => a.order - b.order || a.index - b.index)
     .map(({ item }) => item.getAttribute("data-custom-card-id"))
     .filter(Boolean);
+}
+
+function cleanText(value, maxLength = 120) {
+  const text = String(value || "").replace(/\s+/g, " ").trim();
+  if (text.length <= maxLength) return text;
+  return `${text.slice(0, Math.max(0, maxLength - 1)).trimEnd()}…`;
+}
+
+function isRuntimeNode(node) {
+  return node?.closest?.(".mls-card-editor, .mls-card-compact-runtime, button, a, input, select, textarea") !== null;
+}
+
+function firstUsefulNode(card, selectors, excluded = new Set()) {
+  return [...card.querySelectorAll(selectors)].find((node) => {
+    if (excluded.has(node) || isRuntimeNode(node)) return false;
+    return cleanText(node.textContent, 200).length > 0;
+  });
+}
+
+function compactSummaryFor(card) {
+  const titleNode = firstUsefulNode(
+    card,
+    "[data-card-summary-title], h1, h2, h3, h4, .font-black, .font-bold",
+  );
+  const valueNode = firstUsefulNode(
+    card,
+    "[data-card-summary-value], .text-5xl, .text-4xl, .text-3xl, .text-2xl",
+    new Set(titleNode ? [titleNode] : []),
+  );
+  const excluded = new Set([titleNode, valueNode].filter(Boolean));
+  const detailNode = firstUsefulNode(
+    card,
+    "[data-card-summary-detail], p, .text-sm, .text-xs, span.block",
+    excluded,
+  );
+
+  const title = cleanText(titleNode?.textContent || card.getAttribute("aria-label") || "Portal card", 72);
+  const value = cleanText(valueNode?.textContent, 52);
+  let detail = cleanText(detailNode?.textContent, 112);
+  if (detail === title || detail === value) detail = "";
+
+  return { title, value, detail };
+}
+
+function syncCompactSummary(card) {
+  const existing = card.querySelector(":scope > .mls-card-compact-runtime");
+  if (card.getAttribute("data-custom-size") !== "small") {
+    existing?.remove();
+    return;
+  }
+
+  const summary = compactSummaryFor(card);
+  const signature = JSON.stringify(summary);
+  if (existing?.dataset.signature === signature) return;
+
+  const runtime = existing || document.createElement("div");
+  runtime.className = "mls-card-compact-runtime";
+  runtime.dataset.signature = signature;
+  runtime.replaceChildren();
+
+  const title = document.createElement("p");
+  title.className = "mls-card-compact-title";
+  title.textContent = summary.title;
+  runtime.appendChild(title);
+
+  if (summary.value) {
+    const value = document.createElement("p");
+    value.className = "mls-card-compact-value";
+    value.textContent = summary.value;
+    runtime.appendChild(value);
+  }
+
+  if (summary.detail) {
+    const detail = document.createElement("p");
+    detail.className = "mls-card-compact-detail";
+    detail.textContent = summary.detail;
+    runtime.appendChild(detail);
+  }
+
+  if (!existing) card.appendChild(runtime);
+}
+
+function CompactCardSummaryRuntime({ section, preferences }) {
+  useEffect(() => {
+    const main = document.querySelector(".mls-portal-theme main");
+    if (!main) return undefined;
+
+    let frame = 0;
+    const sync = () => {
+      window.cancelAnimationFrame(frame);
+      frame = window.requestAnimationFrame(() => {
+        main.querySelectorAll('.mls-card[data-custom-card="true"]').forEach(syncCompactSummary);
+      });
+    };
+
+    const observer = new MutationObserver(sync);
+    observer.observe(main, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ["data-custom-size"],
+    });
+    sync();
+
+    return () => {
+      observer.disconnect();
+      window.cancelAnimationFrame(frame);
+    };
+  }, [section, preferences]);
+
+  return null;
 }
 
 function FluidCardEditorRuntime({ editing, setSelectedCardId, setDraggingCardId, setCardOrder, flushSave }) {
@@ -170,9 +314,11 @@ function FluidCardEditorRuntime({ editing, setSelectedCardId, setDraggingCardId,
         .map((item) => item.closest?.('[data-custom-card="true"]'))
         .find((item) => item && item !== gesture.card && item.parentElement === gesture.parent);
       if (!target) return;
+
       const targetId = target.getAttribute("data-custom-card-id");
       if (!targetId || targetId === gesture.lastTargetId) return;
       gesture.lastTargetId = targetId;
+
       const ids = orderedCardIds(gesture.parent);
       const targetIndex = ids.indexOf(targetId);
       if (targetIndex < 0) return;
@@ -229,6 +375,7 @@ function FluidCardEditorRuntime({ editing, setSelectedCardId, setDraggingCardId,
       if (!card) return;
       const cardId = card.getAttribute("data-custom-card-id");
       if (!cardId) return;
+
       const rect = card.getBoundingClientRect();
       setSelectedCardId(cardId);
       gestureRef.current = {
@@ -271,26 +418,27 @@ export function CardCustomizationProvider({ role, section, layout, children }) {
   const [draggingCardId, setDraggingCardId] = useState("");
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState("");
+
   const tabPreferencesRef = useRef(tabPreferences);
   const navOrderRef = useRef(navOrder);
   const saveTimerRef = useRef(null);
-  const pendingSaveRef = useRef(null);
-  const requestSequenceRef = useRef(0);
+  const pendingSavesRef = useRef(new Map());
+  const requestQueueRef = useRef(Promise.resolve());
+  const activeSavesRef = useRef(0);
+  const hydrationKeyRef = useRef("");
+  const previousSectionRef = useRef(section);
 
   useEffect(() => {
+    const identity = `${session?.user?.id || session?.id || "anonymous"}:${role}`;
+    if (!layout || hydrationKeyRef.current === identity) return;
     const nextPreferences = normalizePreferences(layout?.tab_card_preferences);
     const nextNavOrder = Array.isArray(layout?.nav_order) ? layout.nav_order : [];
     tabPreferencesRef.current = nextPreferences;
     navOrderRef.current = nextNavOrder;
     setTabPreferences(nextPreferences);
     setNavOrder(nextNavOrder);
-  }, [layout]);
-
-  useEffect(() => {
-    setCardEditing(false);
-    setSelectedCardId("");
-    setDraggingCardId("");
-  }, [section]);
+    hydrationKeyRef.current = identity;
+  }, [layout, role, session?.id, session?.user?.id]);
 
   useEffect(() => {
     if (!cardEditing) return undefined;
@@ -307,45 +455,58 @@ export function CardCustomizationProvider({ role, section, layout, children }) {
     return () => document.removeEventListener("click", blockCardAction, true);
   }, [cardEditing]);
 
-  const persist = useCallback(async (payload) => {
-    if (!session || !payload) return;
-    const sequence = ++requestSequenceRef.current;
-    setSaving(true);
-    setSaveError("");
-    try {
-      const bearer = await session.getToken();
-      const response = await fetch("/api/operations-v2?action=savePortalLayoutV2", {
-        method: "POST",
-        headers: { Authorization: `Bearer ${bearer}`, "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      const data = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error(data.error || `Layout save failed (${response.status}).`);
-    } catch (error) {
-      if (sequence === requestSequenceRef.current) setSaveError(error instanceof Error ? error.message : String(error));
-    } finally {
-      if (sequence === requestSequenceRef.current) setSaving(false);
-    }
-  }, [session]);
+  const persist = useCallback((payload) => {
+    if (!session || !payload) return Promise.resolve();
 
-  const scheduleSave = useCallback((payload) => {
-    pendingSaveRef.current = payload;
-    window.clearTimeout(saveTimerRef.current);
-    saveTimerRef.current = window.setTimeout(() => {
-      const next = pendingSaveRef.current;
-      pendingSaveRef.current = null;
-      persist(next);
-    }, 500);
-  }, [persist]);
+    const task = async () => {
+      activeSavesRef.current += 1;
+      setSaving(true);
+      setSaveError("");
+      try {
+        const bearer = await session.getToken();
+        const response = await fetch("/api/operations-v2?action=savePortalLayoutV2", {
+          method: "POST",
+          headers: { Authorization: `Bearer ${bearer}`, "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(data.error || `Layout save failed (${response.status}).`);
+      } catch (error) {
+        setSaveError(error instanceof Error ? error.message : String(error));
+      } finally {
+        activeSavesRef.current = Math.max(0, activeSavesRef.current - 1);
+        setSaving(activeSavesRef.current > 0);
+      }
+    };
+
+    requestQueueRef.current = requestQueueRef.current.then(task, task);
+    return requestQueueRef.current;
+  }, [session]);
 
   const flushSave = useCallback(() => {
     window.clearTimeout(saveTimerRef.current);
-    const next = pendingSaveRef.current;
-    pendingSaveRef.current = null;
-    if (next) persist(next);
+    const pending = [...pendingSavesRef.current.values()];
+    pendingSavesRef.current.clear();
+    pending.forEach((payload) => persist(payload));
   }, [persist]);
 
-  useEffect(() => () => window.clearTimeout(saveTimerRef.current), []);
+  const scheduleSave = useCallback((payload) => {
+    const key = payload?.section ? `section:${payload.section}` : payload?.navOrder ? "navigation" : "layout";
+    pendingSavesRef.current.set(key, payload);
+    window.clearTimeout(saveTimerRef.current);
+    saveTimerRef.current = window.setTimeout(flushSave, 420);
+  }, [flushSave]);
+
+  useEffect(() => () => flushSave(), [flushSave]);
+
+  useEffect(() => {
+    if (previousSectionRef.current === section) return;
+    flushSave();
+    previousSectionRef.current = section;
+    setCardEditing(false);
+    setSelectedCardId("");
+    setDraggingCardId("");
+  }, [flushSave, section]);
 
   const currentPage = tabPreferences[section] || normalizePagePreference();
 
@@ -364,26 +525,26 @@ export function CardCustomizationProvider({ role, section, layout, children }) {
 
   const cardPreference = useCallback((cardId) => {
     const page = tabPreferencesRef.current[section] || normalizePagePreference();
-    return normalizeCardRecord(page.cards?.[cardId] || {}, page.size, page.shape);
+    return cardRecordFor(page, cardId);
   }, [section]);
 
   const updateCard = useCallback((cardId, changes) => {
     setSelectedCardId(cardId);
-    updateCurrentPage((page) => ({
-      ...page,
-      cards: {
-        ...page.cards,
-        [cardId]: { ...cardPreference(cardId), ...changes },
-      },
-    }));
-  }, [cardPreference, updateCurrentPage]);
+    updateCurrentPage((page) => {
+      const cards = { ...page.cards };
+      removeLegacyFamilyRecords(cards, [cardId]);
+      cards[cardId] = { ...cardRecordFor(page, cardId), ...changes };
+      return { ...page, cards };
+    });
+  }, [updateCurrentPage]);
 
   const setCardOrder = useCallback((cardIds) => {
     if (!Array.isArray(cardIds) || !cardIds.length) return;
     updateCurrentPage((page) => {
       const cards = { ...page.cards };
+      removeLegacyFamilyRecords(cards, cardIds);
       cardIds.forEach((cardId, order) => {
-        cards[cardId] = { ...normalizeCardRecord(cards[cardId], page.size, page.shape), order };
+        cards[cardId] = { ...cardRecordFor(page, cardId), order };
       });
       return { ...page, cards };
     });
@@ -418,9 +579,10 @@ export function CardCustomizationProvider({ role, section, layout, children }) {
   }, [flushSave]);
 
   const startNavigationEditing = useCallback(() => {
+    flushSave();
     setCardEditing(false);
     setNavigationEditing(true);
-  }, []);
+  }, [flushSave]);
 
   const stopNavigationEditing = useCallback(() => {
     commitNavigation();
@@ -462,16 +624,19 @@ export function CardCustomizationProvider({ role, section, layout, children }) {
     stopNavigationEditing, moveNavigation, commitNavigation,
   ]);
 
-  return <CardCustomizationContext.Provider value={value}>
-    {children}
-    <FluidCardEditorRuntime
-      editing={cardEditing}
-      setSelectedCardId={setSelectedCardId}
-      setDraggingCardId={setDraggingCardId}
-      setCardOrder={setCardOrder}
-      flushSave={flushSave}
-    />
-  </CardCustomizationContext.Provider>;
+  return (
+    <CardCustomizationContext.Provider value={value}>
+      {children}
+      <CompactCardSummaryRuntime section={section} preferences={currentPage} />
+      <FluidCardEditorRuntime
+        editing={cardEditing}
+        setSelectedCardId={setSelectedCardId}
+        setDraggingCardId={setDraggingCardId}
+        setCardOrder={setCardOrder}
+        flushSave={flushSave}
+      />
+    </CardCustomizationContext.Provider>
+  );
 }
 
 export function useCardCustomization() {
