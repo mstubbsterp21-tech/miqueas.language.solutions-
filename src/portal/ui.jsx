@@ -1,9 +1,10 @@
-import { useEffect, useRef, useState } from "react";
+import { isValidElement, useEffect, useId, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-  Bell, CheckCircle2, Download, FileCheck2, FileText, Loader2,
+  Bell, CheckCircle2, Download, FileCheck2, FileText, GripVertical, Loader2,
   Plus, Smartphone, Trash2, UploadCloud, X,
 } from "lucide-react";
+import { useCardCustomization, useLongPress } from "./CardCustomization";
 import { formatInPortalTimeZone } from "./timezones";
 import { readableText } from "./themeContrast";
 
@@ -76,10 +77,133 @@ export function Badge({ value, className = "" }) {
   return <span className={cx("inline-flex max-w-full shrink-0 items-center break-words rounded-full border px-2.5 py-1 text-center text-[10px] font-black uppercase leading-4 tracking-[.06em]", badgeStyles[value] || "border-slate-200 bg-slate-50 text-slate-600", className)}>{pretty(value)}</span>;
 }
 
-export function Card({ children, className = "", hover = false, onClick }) {
+function textFromNode(node, depth = 0) {
+  if (depth > 5 || node === null || node === undefined || typeof node === "boolean") return "";
+  if (typeof node === "string" || typeof node === "number") return String(node);
+  if (Array.isArray(node)) return node.map((item) => textFromNode(item, depth + 1)).filter(Boolean).join(" ");
+  if (!isValidElement(node)) return "";
+  if (typeof node.props?.title === "string") return node.props.title;
+  if (typeof node.props?.name === "string") return node.props.name;
+  return textFromNode(node.props?.children, depth + 1);
+}
+
+function cardKey(value, fallback) {
+  const base = String(value || "card")
+    .toLowerCase()
+    .replace(/\d+/g, "n")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "")
+    .slice(0, 80) || "card";
+  return `${base}-${fallback}`;
+}
+
+export function Card({ children, className = "", hover = false, onClick, customizationKey = "", disableCustomization = false, style, ...props }) {
+  const customization = useCardCustomization();
+  const generatedId = useId().replace(/[^a-zA-Z0-9_-]/g, "");
+  const label = useMemo(() => textFromNode(children), [children]);
+  const cardId = useMemo(() => cardKey(customizationKey || label, generatedId), [customizationKey, generatedId, label]);
+  const cardRef = useRef(null);
+  const dragPointerRef = useRef(null);
+  const lastTargetRef = useRef("");
+  const customizable = Boolean(customization && !disableCustomization);
+  const preference = customizable ? customization.cardPreference(cardId) : { size: "medium", shape: "soft" };
+  const selected = customizable && customization.selectedCardId === cardId;
+  const editing = customizable && customization.cardEditing;
+  const longPress = useLongPress(() => {
+    if (!cardRef.current?.closest(".mls-modal-surface")) customization?.startCardEditing(cardId);
+  }, { disabled: !customizable || editing });
   const Element = onClick ? motion.button : motion.div;
+
+  const startDrag = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    dragPointerRef.current = event.pointerId;
+    lastTargetRef.current = "";
+    customization.setSelectedCardId(cardId);
+    customization.setDraggingCardId(cardId);
+    event.currentTarget.setPointerCapture?.(event.pointerId);
+  };
+
+  const dragCard = (event) => {
+    if (dragPointerRef.current !== event.pointerId || !cardRef.current) return;
+    const target = document.elementFromPoint(event.clientX, event.clientY)?.closest?.("[data-custom-card-id]");
+    if (!target || target === cardRef.current || target.parentElement !== cardRef.current.parentElement) return;
+    const targetId = target.getAttribute("data-custom-card-id");
+    if (!targetId || targetId === lastTargetRef.current) return;
+    lastTargetRef.current = targetId;
+    const siblings = [...cardRef.current.parentElement.children].filter((item) => item.hasAttribute?.("data-custom-card-id"));
+    const indexed = siblings.map((item, index) => ({
+      item,
+      index,
+      order: Number.isFinite(Number(item.style.order)) && item.style.order !== "" ? Number(item.style.order) : index,
+    })).sort((a, b) => a.order - b.order || a.index - b.index);
+    const ids = indexed.map(({ item }) => item.getAttribute("data-custom-card-id"));
+    const fromIndex = ids.indexOf(cardId);
+    const toIndex = ids.indexOf(targetId);
+    if (fromIndex < 0 || toIndex < 0) return;
+    const next = ids.filter((id) => id !== cardId);
+    next.splice(toIndex, 0, cardId);
+    customization.setCardOrder(next);
+  };
+
+  const endDrag = (event) => {
+    if (dragPointerRef.current !== event.pointerId) return;
+    dragPointerRef.current = null;
+    lastTargetRef.current = "";
+    customization.setDraggingCardId("");
+    customization.flushSave();
+  };
+
+  const handleClick = (event) => {
+    if (longPress.consumeTriggered() || editing) {
+      event.preventDefault();
+      event.stopPropagation();
+      if (editing) customization.setSelectedCardId(cardId);
+      return;
+    }
+    onClick?.(event);
+  };
+
+  const cycleShape = () => {
+    const shapes = ["soft", "rounded", "square"];
+    const next = shapes[(shapes.indexOf(preference.shape) + 1) % shapes.length];
+    customization.updateCard(cardId, { shape: next });
+  };
+
   return (
-    <Element layout initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} whileHover={hover ? { y: -3 } : undefined} transition={{ duration: 0.2 }} onClick={onClick} className={cx("mls-card min-w-0 max-w-full overflow-hidden rounded-[1.35rem] border border-black/5 bg-white p-4 text-left shadow-[0_18px_55px_rgba(40,25,18,.07)] sm:rounded-[1.75rem] sm:p-5 md:p-6", onClick && "w-full cursor-pointer transition hover:shadow-[0_22px_65px_rgba(40,25,18,.12)]", className)}>
+    <Element
+      ref={cardRef}
+      layout
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      whileHover={hover && !editing ? { y: -3 } : undefined}
+      transition={{ duration: 0.2 }}
+      type={onClick ? "button" : undefined}
+      onClick={handleClick}
+      {...(!editing ? longPress.handlers : {})}
+      {...props}
+      data-custom-card={customizable ? "true" : undefined}
+      data-custom-card-id={customizable ? cardId : undefined}
+      data-custom-size={customizable ? preference.size : undefined}
+      data-custom-shape={customizable ? preference.shape : undefined}
+      style={{ ...style, ...(customizable && Number.isInteger(preference.order) ? { order: preference.order } : {}) }}
+      className={cx(
+        "mls-card relative min-w-0 max-w-full overflow-hidden rounded-[1.35rem] border border-black/5 bg-white p-4 text-left shadow-[0_18px_55px_rgba(40,25,18,.07)] sm:rounded-[1.75rem] sm:p-5 md:p-6",
+        onClick && "w-full cursor-pointer transition hover:shadow-[0_22px_65px_rgba(40,25,18,.12)]",
+        editing && "mls-card-jiggle cursor-default ring-2 ring-[#dd7d00]/25",
+        customization?.draggingCardId === cardId && "z-20 scale-[1.02] opacity-80 shadow-2xl",
+        className,
+      )}
+    >
+      {editing && (
+        <div className="mls-card-editor absolute right-2 top-2 z-30 flex max-w-[calc(100%-1rem)] items-center gap-1 rounded-2xl border border-black/10 bg-white/95 p-1.5 text-slate-700 shadow-xl backdrop-blur" onClick={(event) => event.stopPropagation()}>
+          <button type="button" aria-label="Drag card" title="Drag card" className="flex h-8 w-8 touch-none items-center justify-center rounded-xl bg-slate-100 text-slate-500 active:cursor-grabbing" onPointerDown={startDrag} onPointerMove={dragCard} onPointerUp={endDrag} onPointerCancel={endDrag} onLostPointerCapture={endDrag}><GripVertical size={16} /></button>
+          {selected ? <>
+            {["small", "medium", "large"].map((size) => <button key={size} type="button" onClick={() => customization.updateCard(cardId, { size })} className={cx("flex h-8 min-w-8 items-center justify-center rounded-xl px-2 text-[10px] font-black uppercase", preference.size === size ? "bg-[#721100] text-white" : "bg-slate-100 text-slate-600")} aria-label={`Make card ${size}`}>{size[0]}</button>)}
+            <button type="button" onClick={cycleShape} className="flex h-8 items-center justify-center rounded-xl bg-slate-100 px-2 text-[10px] font-black uppercase text-slate-600" aria-label={`Change card shape. Current shape ${preference.shape}`} title={`Shape: ${preference.shape}`}>▢</button>
+          </> : <button type="button" onClick={() => customization.setSelectedCardId(cardId)} className="h-8 rounded-xl bg-slate-100 px-2 text-[10px] font-black uppercase text-slate-600">{preference.size[0]}</button>}
+        </div>
+      )}
       {children}
     </Element>
   );
@@ -87,12 +211,12 @@ export function Card({ children, className = "", hover = false, onClick }) {
 
 export function Metric({ icon: Icon, name, value, note, color = BRAND.burgundy, onClick }) {
   return (
-    <motion.button type="button" onClick={onClick} whileHover={{ y: -3 }} className={cx("mls-card rounded-[1.35rem] border border-black/5 bg-white p-4 text-left shadow-[0_16px_50px_rgba(40,25,18,.07)] sm:rounded-[1.55rem] sm:p-5", onClick ? "cursor-pointer" : "cursor-default")}>
+    <Card customizationKey={`metric-${name}`} onClick={onClick} hover={Boolean(onClick)} className={cx("rounded-[1.35rem] p-4 shadow-[0_16px_50px_rgba(40,25,18,.07)] sm:rounded-[1.55rem] sm:p-5", onClick ? "cursor-pointer" : "cursor-default")}>
       <div className="flex justify-between gap-4">
         <div className="min-w-0"><p className="text-sm font-black text-slate-500">{name}</p><p className="mt-2 text-2xl font-black text-slate-900 sm:text-3xl">{value}</p>{note && <p className="mt-1 text-xs leading-5 text-slate-500">{note}</p>}</div>
         <span className="flex h-11 w-11 items-center justify-center rounded-2xl" style={{ background: color, color: readableText(color) }}><Icon size={20} /></span>
       </div>
-    </motion.button>
+    </Card>
   );
 }
 

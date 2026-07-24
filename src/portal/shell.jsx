@@ -1,12 +1,13 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-  BarChart3, Bell, BookOpen, Building2, CalendarDays, ChevronRight,
-  CircleDollarSign, ClipboardCheck, Clock3, FileText, LayoutDashboard, Menu,
+  BarChart3, Bell, BookOpen, Building2, CalendarDays, Check, ChevronRight,
+  CircleDollarSign, ClipboardCheck, Clock3, FileText, GripVertical, LayoutDashboard, Menu,
   Lightbulb, MessageSquare, RefreshCcw, Settings2, ShieldCheck, UserRound, Users, X,
 } from "lucide-react";
 import { PortalSignOutButton } from "../components/AuthStatus";
 import logo from "../logo.png";
+import { CardCustomizationProvider, useCardCustomization, useLongPress } from "./CardCustomization";
 import { cx, pretty } from "./ui";
 import TimeZoneSelect from "./TimeZoneSelect";
 import { orderedLayoutKeys } from "./LayoutCustomizer";
@@ -31,19 +32,89 @@ function BadgeCount({ value, active, accent, onAccent }) {
   );
 }
 
-function NavButton({ item, active, onClick, accent, accentInk, onAccent, onSidebar, badge = 0 }) {
+function NavButton({ item, active, onClick, accent, accentInk, onAccent, onSidebar, badge = 0, editing, onLongPress, onMove, onCommit }) {
   const [value, label, Icon] = item;
+  const buttonRef = useRef(null);
+  const pointerRef = useRef(null);
+  const lastTargetRef = useRef("");
+  const longPress = useLongPress(onLongPress, { disabled: editing });
+
+  const startDrag = (event) => {
+    if (!editing || event.button > 0) return;
+    event.preventDefault();
+    pointerRef.current = event.pointerId;
+    lastTargetRef.current = "";
+    event.currentTarget.setPointerCapture?.(event.pointerId);
+  };
+
+  const drag = (event) => {
+    if (!editing || pointerRef.current !== event.pointerId || !buttonRef.current) return;
+    const target = document.elementFromPoint(event.clientX, event.clientY)?.closest?.("[data-nav-key]");
+    if (!target || target === buttonRef.current || target.parentElement !== buttonRef.current.parentElement) return;
+    const targetKey = target.getAttribute("data-nav-key");
+    if (!targetKey || targetKey === lastTargetRef.current) return;
+    lastTargetRef.current = targetKey;
+    onMove(value, targetKey);
+  };
+
+  const endDrag = (event) => {
+    if (pointerRef.current !== event.pointerId) return;
+    pointerRef.current = null;
+    lastTargetRef.current = "";
+    onCommit();
+  };
+
+  const activate = (event) => {
+    if (longPress.consumeTriggered() || editing) {
+      event.preventDefault();
+      event.stopPropagation();
+      return;
+    }
+    onClick(value);
+  };
+
   return (
     <button
+      ref={buttonRef}
       type="button"
-      onClick={() => onClick(value)}
+      data-nav-key={value}
+      onClick={activate}
+      {...(!editing ? longPress.handlers : {})}
+      onPointerDown={editing ? startDrag : longPress.handlers.onPointerDown}
+      onPointerMove={editing ? drag : longPress.handlers.onPointerMove}
+      onPointerUp={editing ? endDrag : longPress.handlers.onPointerUp}
+      onPointerCancel={editing ? endDrag : longPress.handlers.onPointerCancel}
+      onLostPointerCapture={editing ? endDrag : undefined}
       style={active ? { backgroundColor: accent, color: onAccent } : { color: onSidebar }}
-      className={cx("group flex min-h-11 w-full items-center gap-3 rounded-2xl px-4 py-3 text-sm font-black transition", active ? "shadow-lg" : "opacity-80 hover:bg-white/10 hover:opacity-100")}
+      className={cx(
+        "group flex min-h-11 w-full touch-none items-center gap-3 rounded-2xl px-4 py-3 text-sm font-black transition",
+        active ? "shadow-lg" : "opacity-80 hover:bg-white/10 hover:opacity-100",
+        editing && "mls-nav-jiggle cursor-grab border border-white/15 bg-white/5 active:cursor-grabbing",
+      )}
     >
       <Icon size={18} />
       <span className="flex-1 text-left">{label}</span>
       <BadgeCount value={badge} active={active} accent={active ? accentInk : accent} onAccent={onAccent} />
-      <ChevronRight size={15} className={cx("transition", active ? "translate-x-0 opacity-100" : "-translate-x-1 opacity-0 group-hover:translate-x-0 group-hover:opacity-100")} />
+      {editing ? <GripVertical size={16} className="opacity-70" /> : <ChevronRight size={15} className={cx("transition", active ? "translate-x-0 opacity-100" : "-translate-x-1 opacity-0 group-hover:translate-x-0 group-hover:opacity-100")} />}
+    </button>
+  );
+}
+
+function MobileNavButton({ item, active, badge, primary, accent, onPrimary, onAccent, onClick, onLongPress }) {
+  const [value, label, Icon] = item;
+  const longPress = useLongPress(onLongPress);
+  const activate = (event) => {
+    if (longPress.consumeTriggered()) {
+      event.preventDefault();
+      event.stopPropagation();
+      return;
+    }
+    onClick(value);
+  };
+  return (
+    <button type="button" title={label} aria-label={label} onClick={activate} {...longPress.handlers} style={active ? { backgroundColor: primary, color: onPrimary } : undefined} className={cx("relative flex min-h-14 min-w-0 items-center justify-center rounded-xl px-1.5 py-1.5 transition", !active && "text-slate-600")}>
+      <Icon size={22} />
+      {badge > 0 && <span className="absolute right-1 top-1 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[8px] font-black" style={{ backgroundColor: accent, color: onAccent }}>{badge > 99 ? "99+" : badge}</span>}
     </button>
   );
 }
@@ -56,13 +127,14 @@ function pageBackground(personalization, theme) {
   return `linear-gradient(145deg, #fdfbf9 0%, ${theme.accent}0d 52%, ${theme.primary}0c 100%)`;
 }
 
-export default function AppShell({ role, section, setSection, user, personalization, accountName, layout, unread = 0, navBadges = {}, refreshing, refresh, timeZone, onTimeZoneChange, savingTimeZone = false, children }) {
+function AppShellContent({ role, section, setSection, user, personalization, accountName, unread = 0, navBadges = {}, refreshing, refresh, timeZone, onTimeZoneChange, savingTimeZone = false, children }) {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const customization = useCardCustomization();
   const defaultNavigation = roleNavigation[role] || roleNavigation.interpreter;
   const navigation = useMemo(() => {
     const byKey = new Map(defaultNavigation.map((item) => [item[0], item]));
-    return orderedLayoutKeys(role, "nav", layout?.nav_order).map((key) => byKey.get(key)).filter(Boolean);
-  }, [defaultNavigation, layout?.nav_order, role]);
+    return orderedLayoutKeys(role, "nav", customization.navOrder).map((key) => byKey.get(key)).filter(Boolean);
+  }, [customization.navOrder, defaultNavigation, role]);
   const active = navigation.find(([value]) => value === section) || (section === "notifications" ? ["notifications", "Notifications", Bell] : navigation[0]);
   const mobileNavigation = useMemo(() => navigation.slice(0, 5), [navigation]);
   const theme = portalThemeTokens(personalization);
@@ -73,13 +145,18 @@ export default function AppShell({ role, section, setSection, user, personalizat
   const backgroundStyle = personalization?.background_style || "soft";
   const cardStyle = personalization?.card_style || "rounded";
   const selectedTimeZone = timeZone || getPortalTimeZone();
-  const cardPreference = layout?.tab_card_preferences?.[section] || {};
-  const cardSize = ["compact", "standard", "spacious"].includes(cardPreference.size) ? cardPreference.size : "standard";
-  const cardShape = ["soft", "rounded", "square"].includes(cardPreference.shape) ? cardPreference.shape : "soft";
+  const cardSize = customization.pagePreference?.size || "medium";
+  const cardShape = customization.pagePreference?.shape || "soft";
 
   const navigate = (value) => {
+    if (customization.navigationEditing || customization.cardEditing) return;
     setSection(value);
     setMobileOpen(false);
+  };
+
+  const startNavigationEditing = (openMobile = false) => {
+    customization.startNavigationEditing();
+    if (openMobile) setMobileOpen(true);
   };
 
   const avatar = (
@@ -105,12 +182,13 @@ export default function AppShell({ role, section, setSection, user, personalizat
             <p className="truncate text-xs opacity-70">{pretty(role)}</p>
           </div>
         </div>
+        {customization.navigationEditing && <div className="mt-4 flex items-center justify-between gap-3 rounded-2xl border border-white/15 bg-white/10 p-3"><div><p className="text-xs font-black">Edit navigation</p><p className="mt-0.5 text-[10px] opacity-70">Press and drag any item.</p></div><button type="button" onClick={customization.stopNavigationEditing} className="inline-flex min-h-9 items-center gap-1 rounded-xl bg-white px-3 text-xs font-black" style={{ color: theme.primaryInk }}><Check size={14} />Done</button></div>}
       </div>
       <nav className="mls-hide-scrollbar flex-1 space-y-1.5 overflow-y-auto p-4">
-        {navigation.map((item) => <NavButton key={item[0]} item={item} active={section === item[0]} onClick={navigate} accent={accent} accentInk={theme.accentInk} onAccent={theme.onAccent} onSidebar={theme.onSidebar} badge={navBadges[item[0]] || 0} />)}
+        {navigation.map((item) => <NavButton key={item[0]} item={item} active={section === item[0]} onClick={navigate} accent={accent} accentInk={theme.accentInk} onAccent={theme.onAccent} onSidebar={theme.onSidebar} badge={navBadges[item[0]] || 0} editing={customization.navigationEditing} onLongPress={() => startNavigationEditing(false)} onMove={customization.moveNavigation} onCommit={customization.commitNavigation} />)}
       </nav>
       <div className="border-t border-white/10 p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
-        <button type="button" onClick={refresh} disabled={refreshing} style={{ color: theme.onSidebar }} className="mb-2 flex min-h-11 w-full items-center justify-center gap-2 rounded-2xl border border-white/20 bg-white/10 px-4 py-3 text-sm font-black opacity-85 transition hover:bg-white/15 hover:opacity-100 disabled:opacity-50">
+        <button type="button" onClick={refresh} disabled={refreshing || customization.navigationEditing} style={{ color: theme.onSidebar }} className="mb-2 flex min-h-11 w-full items-center justify-center gap-2 rounded-2xl border border-white/20 bg-white/10 px-4 py-3 text-sm font-black opacity-85 transition hover:bg-white/15 hover:opacity-100 disabled:opacity-50">
           <RefreshCcw size={16} className={refreshing ? "animate-spin" : ""} />Sync now
         </button>
         <div className="mt-2"><PortalSignOutButton /></div>
@@ -123,6 +201,8 @@ export default function AppShell({ role, section, setSection, user, personalizat
       className={cx("mls-portal-theme min-h-[100dvh] overflow-x-hidden text-slate-900", backgroundStyle === "dark" && "mls-dark-theme")}
       data-card-style={cardStyle}
       data-background-style={backgroundStyle}
+      data-card-editing={customization.cardEditing ? "true" : "false"}
+      data-nav-editing={customization.navigationEditing ? "true" : "false"}
       style={{ ...portalThemeVariables(theme), background: pageBackground(personalization, theme) }}
     >
       <div className="pointer-events-none fixed inset-0" style={{ background: `radial-gradient(circle at 8% 8%, ${primary}14, transparent 28%), radial-gradient(circle at 92% 2%, ${accent}1f, transparent 26%)` }} />
@@ -167,14 +247,15 @@ export default function AppShell({ role, section, setSection, user, personalizat
         )}
       </AnimatePresence>
 
-      <nav className="fixed inset-x-3 z-50 grid grid-flow-col auto-cols-fr rounded-[1.5rem] border border-black/5 bg-white/95 p-2 shadow-2xl backdrop-blur-xl lg:hidden" style={{ bottom: "max(.75rem, env(safe-area-inset-bottom))" }} aria-label="Primary navigation">
-        {mobileNavigation.map(([value, label, Icon]) => (
-          <button key={value} type="button" title={label} aria-label={label} onClick={() => navigate(value)} style={section === value ? { backgroundColor: primary, color: theme.onPrimary } : undefined} className={cx("relative flex min-h-14 min-w-0 items-center justify-center rounded-xl px-1.5 py-1.5 transition", section !== value && "text-slate-600")}>
-            <Icon size={22} />
-            {navBadges[value] > 0 && <span className="absolute right-1 top-1 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[8px] font-black" style={{ backgroundColor: accent, color: theme.onAccent }}>{navBadges[value] > 99 ? "99+" : navBadges[value]}</span>}
-          </button>
-        ))}
+      <nav className={cx("fixed inset-x-3 z-50 grid grid-flow-col auto-cols-fr rounded-[1.5rem] border border-black/5 bg-white/95 p-2 shadow-2xl backdrop-blur-xl transition lg:hidden", customization.navigationEditing && "pointer-events-none opacity-35")} style={{ bottom: "max(.75rem, env(safe-area-inset-bottom))" }} aria-label="Primary navigation">
+        {mobileNavigation.map((item) => <MobileNavButton key={item[0]} item={item} active={section === item[0]} badge={navBadges[item[0]] || 0} primary={primary} accent={accent} onPrimary={theme.onPrimary} onAccent={theme.onAccent} onClick={navigate} onLongPress={() => startNavigationEditing(true)} />)}
       </nav>
+
+      {customization.cardEditing && <div className="mls-card-edit-toolbar fixed inset-x-3 z-[100] mx-auto flex max-w-xl items-center justify-between gap-3 rounded-2xl border border-black/10 bg-white/95 p-3 text-slate-800 shadow-2xl backdrop-blur-xl" style={{ bottom: "calc(5.8rem + env(safe-area-inset-bottom))" }}><div className="min-w-0"><p className="truncate text-sm font-black">Editing page cards</p><p className="truncate text-[10px] text-slate-500">Drag the grip. Tap S, M, or L to resize.</p>{customization.saveError && <p className="mt-1 truncate text-[10px] font-bold text-rose-700">{customization.saveError}</p>}</div><button type="button" onClick={customization.stopCardEditing} className="inline-flex min-h-10 shrink-0 items-center gap-1 rounded-xl bg-[#721100] px-4 text-xs font-black text-white"><Check size={14} />{customization.saving ? "Saving…" : "Done"}</button></div>}
     </div>
   );
+}
+
+export default function AppShell(props) {
+  return <CardCustomizationProvider role={props.role} section={props.section} layout={props.layout}><AppShellContent {...props} /></CardCustomizationProvider>;
 }

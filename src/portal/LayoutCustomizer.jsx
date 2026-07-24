@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { CloudSun, Clock3, Eye, EyeOff, GripVertical, LayoutPanelTop, MapPinned, Newspaper, RotateCcw, Save } from "lucide-react";
+import { normalizeCardShape, normalizeCardSize } from "./CardCustomization";
 import { Modal, cx } from "./ui";
 
 export const PORTAL_WIDGETS = [
@@ -30,6 +31,16 @@ function normalize(order, items) {
   return [...new Set([...selected, ...keys])];
 }
 
+function normalizeTabPreferences(value = {}) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return {};
+  return Object.fromEntries(Object.entries(value).map(([key, preference = {}]) => [key, {
+    ...preference,
+    size: normalizeCardSize(preference.size),
+    shape: normalizeCardShape(preference.shape),
+    cards: preference.cards && typeof preference.cards === "object" && !Array.isArray(preference.cards) ? preference.cards : {},
+  }]));
+}
+
 function ReorderList({ items, order, setOrder, hidden = [], setHidden }) {
   const labels = Object.fromEntries(items);
   const move = (key, delta) => setOrder((current) => { const next = [...current]; const index = next.indexOf(key); const target = index + delta; if (target < 0 || target >= next.length) return current; [next[index], next[target]] = [next[target], next[index]]; return next; });
@@ -57,7 +68,7 @@ export default function LayoutCustomizer({ open, close, role, layout, save }) {
     setHidden(layout?.hidden_home_sections || []);
     setWidgetOrder(normalize(layout?.widget_order, PORTAL_WIDGETS));
     setEnabledWidgets(layout?.enabled_widgets || []);
-    setTabCardPreferences(layout?.tab_card_preferences || {});
+    setTabCardPreferences(normalizeTabPreferences(layout?.tab_card_preferences));
   }, [defaults, layout, open]);
   const reset = () => {
     setNav(defaults.nav.map(([key]) => key));
@@ -67,7 +78,16 @@ export default function LayoutCustomizer({ open, close, role, layout, save }) {
     setEnabledWidgets([]);
     setTabCardPreferences({});
   };
-  const updateCard = (key, field, value) => setTabCardPreferences((current) => ({ ...current, [key]: { size: current[key]?.size || "standard", shape: current[key]?.shape || "soft", [field]: value } }));
+  const updateCard = (key, field, value) => setTabCardPreferences((current) => ({
+    ...current,
+    [key]: {
+      ...current[key],
+      size: normalizeCardSize(current[key]?.size),
+      shape: normalizeCardShape(current[key]?.shape),
+      cards: current[key]?.cards || {},
+      [field]: value,
+    },
+  }));
   const submit = async () => {
     setSaving(true);
     try {
@@ -82,7 +102,7 @@ export default function LayoutCustomizer({ open, close, role, layout, save }) {
       <section><div className="mb-3 flex items-center gap-2"><LayoutPanelTop size={18} className="text-[#721100]" /><h3 className="font-black text-slate-950">Navigation</h3></div><ReorderList items={defaults.nav} order={nav} setOrder={setNav} /></section>
       <section><div className="mb-3 flex items-center gap-2"><LayoutPanelTop size={18} className="text-[#721100]" /><h3 className="font-black text-slate-950">Home</h3></div><ReorderList items={defaults.home} order={home} setOrder={setHome} hidden={hidden} setHidden={setHidden} /></section>
       <section><div className="mb-3 flex items-center gap-2"><CloudSun size={18} className="text-[#721100]" /><h3 className="font-black text-slate-950">Widgets</h3></div><div className="space-y-2">{widgetOrder.map((key) => { const Icon = widgetIcons[key]; const enabled = enabledWidgets.includes(key); const label = Object.fromEntries(widgetLabels)[key]; return <div key={key} className="flex min-w-0 items-center gap-3 rounded-2xl border border-slate-200 bg-white p-3"><span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#721100]/10 text-[#721100]">{Icon && <Icon size={17} />}</span><span className="min-w-0 flex-1 break-words text-sm font-black text-slate-800">{label}</span><button type="button" role="switch" aria-label={`${enabled ? "Disable" : "Enable"} ${label}`} aria-checked={enabled} onClick={() => setEnabledWidgets((current) => enabled ? current.filter((item) => item !== key) : [...current, key])} className={cx("relative h-7 w-12 shrink-0 rounded-full transition", enabled ? "bg-[#721100]" : "bg-slate-200")}><span className={cx("absolute top-1 h-5 w-5 rounded-full bg-white shadow transition", enabled ? "left-6" : "left-1")} /></button></div>; })}</div><div className="mt-3"><ReorderList items={widgetLabels} order={widgetOrder} setOrder={setWidgetOrder} /></div></section>
-      <section><div className="mb-3 flex items-center gap-2"><LayoutPanelTop size={18} className="text-[#721100]" /><h3 className="font-black text-slate-950">Cards</h3></div><div className="space-y-3">{nav.map((key) => { const label = Object.fromEntries(defaults.nav)[key] || key; const preference = tabCardPreferences[key] || {}; return <div key={key} className="grid min-w-0 gap-2 rounded-2xl border border-slate-200 bg-white p-3 sm:grid-cols-[minmax(0,1fr)_140px_140px] sm:items-center"><span className="min-w-0 break-words text-sm font-black text-slate-800">{label}</span><select aria-label={`${label} card size`} value={preference.size || "standard"} onChange={(event) => updateCard(key, "size", event.target.value)} className="min-h-10 min-w-0 rounded-xl border border-slate-200 bg-white px-3 text-sm font-bold"><option value="compact">Compact</option><option value="standard">Standard</option><option value="spacious">Spacious</option></select><select aria-label={`${label} card shape`} value={preference.shape || "soft"} onChange={(event) => updateCard(key, "shape", event.target.value)} className="min-h-10 min-w-0 rounded-xl border border-slate-200 bg-white px-3 text-sm font-bold"><option value="soft">Soft</option><option value="rounded">Rounded</option><option value="square">Square</option></select></div>; })}</div></section>
+      <section><div className="mb-3 flex items-center gap-2"><LayoutPanelTop size={18} className="text-[#721100]" /><h3 className="font-black text-slate-950">Page card defaults</h3></div><p className="mb-3 text-xs leading-5 text-slate-500">These defaults apply to each page. Long-press any card inside the portal to resize, reshape, or drag that individual card.</p><div className="space-y-3">{nav.map((key) => { const label = Object.fromEntries(defaults.nav)[key] || key; const preference = tabCardPreferences[key] || {}; return <div key={key} className="grid min-w-0 gap-2 rounded-2xl border border-slate-200 bg-white p-3 sm:grid-cols-[minmax(0,1fr)_140px_140px] sm:items-center"><span className="min-w-0 break-words text-sm font-black text-slate-800">{label}</span><select aria-label={`${label} default card size`} value={normalizeCardSize(preference.size)} onChange={(event) => updateCard(key, "size", event.target.value)} className="min-h-10 min-w-0 rounded-xl border border-slate-200 bg-white px-3 text-sm font-bold"><option value="small">Small</option><option value="medium">Medium</option><option value="large">Large</option></select><select aria-label={`${label} card shape`} value={normalizeCardShape(preference.shape)} onChange={(event) => updateCard(key, "shape", event.target.value)} className="min-h-10 min-w-0 rounded-xl border border-slate-200 bg-white px-3 text-sm font-bold"><option value="soft">Soft</option><option value="rounded">Rounded</option><option value="square">Square</option></select></div>; })}</div></section>
     </div>
     <div className="mt-6 flex flex-col-reverse gap-3 border-t border-slate-200 pt-5 sm:flex-row sm:justify-between"><button type="button" onClick={reset} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-2xl border border-slate-200 px-4 text-sm font-black text-slate-600"><RotateCcw size={16} />Restore defaults</button><button type="button" onClick={submit} disabled={saving} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-2xl bg-[#721100] px-5 text-sm font-black text-white disabled:opacity-50"><Save size={16} />{saving ? "Saving…" : "Save layout"}</button></div>
   </Modal>;
