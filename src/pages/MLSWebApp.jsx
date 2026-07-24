@@ -1,4 +1,4 @@
-import { AlertCircle, Loader2 } from "lucide-react";
+import { AlertCircle, Loader2, RefreshCw } from "lucide-react";
 import PortalSetupNotice from "../components/PortalSetupNotice";
 import { isSupabaseConfigured } from "../lib/env";
 import AppShell from "../portal/shell";
@@ -87,7 +87,23 @@ export default function MLSWebApp() {
   if (!workspace || !app) {
     return (
       <div className="flex min-h-[100dvh] items-center justify-center bg-[#f7f3ef] p-5">
-        <EmptyState icon={AlertCircle} title="Workspace unavailable" text={error || "Refresh the app and try again."} />
+        <div className="w-full max-w-xl">
+          <EmptyState
+            icon={AlertCircle}
+            title="Temporary connection issue"
+            text={error || "MLS could not load this secure workspace. Your account and data are safe. Please try again."}
+            action={(
+              <button
+                type="button"
+                onClick={() => load()}
+                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-2xl bg-[#721100] px-5 py-3 text-sm font-black text-white shadow-lg transition hover:bg-[#5d0e00] focus:outline-none focus:ring-4 focus:ring-[#dd7d00]/25"
+              >
+                <RefreshCw size={17} />
+                Try again
+              </button>
+            )}
+          />
+        </div>
       </div>
     );
   }
