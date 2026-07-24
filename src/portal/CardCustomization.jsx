@@ -201,10 +201,11 @@ export function CardCustomizationProvider({ role, section, layout, children }) {
   const moveNavigation = useCallback((from, to) => {
     if (!from || !to || from === to) return;
     setNavOrder((current) => {
-      const base = current.length ? current : [];
-      if (!base.includes(from) || !base.includes(to)) return current;
-      const next = base.filter((item) => item !== from);
-      next.splice(next.indexOf(to), 0, from);
+      const fromIndex = current.indexOf(from);
+      const targetIndex = current.indexOf(to);
+      if (fromIndex < 0 || targetIndex < 0) return current;
+      const next = current.filter((item) => item !== from);
+      next.splice(targetIndex, 0, from);
       navOrderRef.current = next;
       return next;
     });
