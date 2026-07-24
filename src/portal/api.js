@@ -1,3 +1,31 @@
+const transientStatuses = new Set([502, 503, 504]);
+const transientMessage = "MLS is temporarily unable to connect to its secure workspace. Please try again in a moment.";
+
+function wait(milliseconds) {
+  return new Promise((resolve) => window.setTimeout(resolve, milliseconds));
+}
+
+function rawError(data) {
+  return typeof data?.error === "string" ? data.error.trim() : "";
+}
+
+function isTransientPayload(data) {
+  const value = rawError(data).toLowerCase();
+  return value.includes("<!doctype html")
+    || value.includes("<html")
+    || value.includes("ssl handshake failed")
+    || value.includes("error code 525")
+    || value.includes("gateway.supabase.co")
+    || value.includes("cloudflare");
+}
+
+function safeRequestError(data, status) {
+  const value = rawError(data);
+  if (transientStatuses.has(status) || isTransientPayload(data)) return transientMessage;
+  if (!value) return `Request failed (${status}).`;
+  return value.length > 240 ? `${value.slice(0, 237)}...` : value;
+}
+
 async function token(session) {
   if (!session) throw new Error("Sign in is required.");
   return session.getToken();
@@ -5,17 +33,50 @@ async function token(session) {
 
 async function request(session, endpoint, action, method = "GET", body) {
   const bearer = await token(session);
-  const response = await fetch(`${endpoint}?action=${encodeURIComponent(action)}`, {
-    method,
-    headers: {
-      Authorization: `Bearer ${bearer}`,
-      ...(body ? { "Content-Type": "application/json" } : {}),
-    },
-    ...(body ? { body: JSON.stringify(body) } : {}),
-  });
-  const data = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(data.error || `Request failed (${response.status}).`);
-  return data;
+  const attempts = method === "GET" ? 3 : 1;
+
+  for (let attempt = 0; attempt < attempts; attempt += 1) {
+    let response;
+    try {
+      response = await fetch(`${endpoint}?action=${encodeURIComponent(action)}`, {
+        method,
+        headers: {
+          Authorization: `Bearer ${bearer}`,
+          ...(body ? { "Content-Type": "application/json" } : {}),
+        },
+        ...(body ? { body: JSON.stringify(body) } : {}),
+      });
+    } catch (networkError) {
+      if (attempt < attempts - 1) {
+        await wait(800 * (attempt + 1));
+        continue;
+      }
+      console.error("MLS portal network request failed", networkError);
+      throw new Error(transientMessage);
+    }
+
+    const responseText = await response.text();
+    let data = {};
+    if (responseText) {
+      try {
+        data = JSON.parse(responseText);
+      } catch {
+        data = { error: responseText };
+      }
+    }
+
+    if (response.ok) return data;
+
+    const shouldRetry = transientStatuses.has(response.status) || isTransientPayload(data);
+    if (shouldRetry && attempt < attempts - 1) {
+      await wait(800 * (attempt + 1));
+      continue;
+    }
+
+    throw new Error(safeRequestError(data, response.status));
+  }
+
+  throw new Error(transientMessage);
 }
 
 async function coreRequest(session, action, method, body) {
