@@ -15,6 +15,7 @@ import { saveInterpreterProfileDetails, adminUpdateInterpreterProfileDetails } f
 import { adminUpdateInterpreterRates } from "./_shared/ops-v2-rates.js";
 import { createRequestAssignment } from "./_shared/ops-v2-request-form.js";
 import { portalDeviceStatus, beginPortalDeviceVerification, verifyPortalDevice, interpreterNetworkPrefill } from "./_shared/ops-v2-security-prefill.js";
+import { savePortalLayoutV2 } from "./_shared/ops-v2-layout.js";
 import {
   createCommunicationConversation,
   createCommunicationUploadUrl,
@@ -78,6 +79,7 @@ const actions = {
   adminUpdateInterpreterRates,
   createRequestAssignment,
   interpreterNetworkPrefill,
+  savePortalLayoutV2,
   createConversation: createCommunicationConversation,
   renameConversation: renamePortalConversation,
   createCommunicationUploadUrl: createAuthorizedCommunicationUpload,
