@@ -116,6 +116,21 @@ export function CardCustomizationProvider({ role, section, layout, children }) {
     setDraggingCardId("");
   }, [section]);
 
+  useEffect(() => {
+    if (!cardEditing) return undefined;
+    const blockCardAction = (event) => {
+      const target = event.target instanceof Element ? event.target : null;
+      if (!target || target.closest(".mls-card-editor")) return;
+      const card = target.closest('[data-custom-card="true"]');
+      if (!card) return;
+      event.preventDefault();
+      event.stopPropagation();
+      setSelectedCardId(card.getAttribute("data-custom-card-id") || "");
+    };
+    document.addEventListener("click", blockCardAction, true);
+    return () => document.removeEventListener("click", blockCardAction, true);
+  }, [cardEditing]);
+
   const persist = useCallback(async (payload) => {
     if (!session || !payload) return;
     const sequence = ++requestSequenceRef.current;
