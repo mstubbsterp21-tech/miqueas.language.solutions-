@@ -32,23 +32,112 @@
   outline-offset: 3px;
 }
 
-/* Per-tab card preferences change visual density without changing grid widths. */
+/* Page defaults remain compatible with layouts saved before Small / Medium / Large. */
+.mls-portal-theme main[data-card-size="small"] .mls-card,
 .mls-portal-theme main[data-card-size="compact"] .mls-card { padding: .9rem !important; }
+.mls-portal-theme main[data-card-size="large"] .mls-card,
 .mls-portal-theme main[data-card-size="spacious"] .mls-card { padding: clamp(1.35rem, 3vw, 2rem) !important; }
 .mls-portal-theme main[data-card-shape="soft"] .mls-card { border-radius: 1.75rem !important; }
 .mls-portal-theme main[data-card-shape="rounded"] .mls-card { border-radius: 1.1rem !important; }
 .mls-portal-theme main[data-card-shape="square"] .mls-card { border-radius: .55rem !important; }
 
+/* Individual card choices override the page default. */
+.mls-portal-theme main .mls-card[data-custom-size="small"] {
+  padding: .9rem !important;
+  max-height: 13rem;
+  overflow: auto !important;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+}
+.mls-portal-theme main .mls-card[data-custom-size="medium"] {
+  padding: clamp(1rem, 2vw, 1.5rem) !important;
+  max-height: none;
+}
+.mls-portal-theme main .mls-card[data-custom-size="large"] {
+  padding: clamp(1.35rem, 3vw, 2.15rem) !important;
+  max-height: none;
+}
+.mls-portal-theme main .mls-card[data-custom-shape="soft"] { border-radius: 1.75rem !important; }
+.mls-portal-theme main .mls-card[data-custom-shape="rounded"] { border-radius: 1.1rem !important; }
+.mls-portal-theme main .mls-card[data-custom-shape="square"] { border-radius: .55rem !important; }
+.mls-card[data-custom-size="small"] .mls-card-large-only,
+.mls-card[data-custom-size="medium"] .mls-card-large-only { display: none !important; }
+.mls-card:not([data-custom-size="small"]) .mls-card-small-only { display: none !important; }
+
+/* Any direct group of customizable cards becomes a safe 12-column canvas. */
+.mls-portal-theme main :is(div, section, article):has(> .mls-card[data-custom-card="true"]) {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  align-items: start;
+  gap: clamp(.8rem, 2vw, 1.35rem);
+}
+.mls-portal-theme main :is(div, section, article):has(> .mls-card[data-custom-card="true"]) > * {
+  min-width: 0;
+  grid-column: 1 / -1;
+  margin-top: 0 !important;
+}
+.mls-portal-theme main :is(div, section, article):has(> .mls-card[data-custom-card="true"]) > .mls-card[data-custom-size="small"] {
+  grid-column: span 12;
+}
+.mls-portal-theme main :is(div, section, article):has(> .mls-card[data-custom-card="true"]) > .mls-card[data-custom-size="medium"] {
+  grid-column: span 12;
+}
+.mls-portal-theme main :is(div, section, article):has(> .mls-card[data-custom-card="true"]) > .mls-card[data-custom-size="large"] {
+  grid-column: 1 / -1;
+}
+
+.mls-portal-theme[data-card-editing="true"] main .mls-card[data-custom-card="true"] {
+  user-select: none;
+  -webkit-user-select: none;
+  transform-origin: 50% 50%;
+}
+.mls-portal-theme[data-card-editing="true"] main .mls-card[data-custom-size="small"] {
+  max-height: none;
+  overflow: visible !important;
+}
+.mls-card-editor { color: #334155 !important; }
+.mls-card-editor button { touch-action: none !important; }
+.mls-card-edit-toolbar { color: #1e293b !important; }
+
+@keyframes mls-card-wiggle {
+  0%, 100% { transform: rotate(-.16deg); }
+  50% { transform: rotate(.16deg); }
+}
+@keyframes mls-nav-wiggle {
+  0%, 100% { transform: translateX(-.35px); }
+  50% { transform: translateX(.35px); }
+}
+.mls-card-jiggle { animation: mls-card-wiggle .28s ease-in-out infinite; }
+.mls-nav-jiggle { animation: mls-nav-wiggle .3s ease-in-out infinite; }
+
+@media (min-width: 640px) {
+  .mls-portal-theme main :is(div, section, article):has(> .mls-card[data-custom-card="true"]) > .mls-card[data-custom-size="small"] {
+    grid-column: span 6;
+  }
+}
+
 @media (min-width: 1024px) {
   .mls-shell-content { padding-bottom: 0; }
   .mls-floating-action { bottom: 2rem; }
   .mls-mobile-sticky-actions { bottom: 1rem; }
+  .mls-card-edit-toolbar { bottom: 2rem !important; }
+  .mls-portal-theme main :is(div, section, article):has(> .mls-card[data-custom-card="true"]) > .mls-card[data-custom-size="small"] {
+    grid-column: span 4;
+  }
+  .mls-portal-theme main :is(div, section, article):has(> .mls-card[data-custom-card="true"]) > .mls-card[data-custom-size="medium"] {
+    grid-column: span 6;
+  }
 }
 
 @media (max-width: 639px) {
   .mls-portal-theme input,
   .mls-portal-theme select,
   .mls-portal-theme textarea { font-size: 16px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mls-card-jiggle,
+  .mls-nav-jiggle { animation: none !important; }
 }
 
 .mls-portal-theme[data-card-style="flat"] main [class~="rounded-[1.75rem]"],
@@ -104,6 +193,12 @@
 
 .mls-dark-theme main .mls-modal-surface,
 .mls-dark-theme main .mls-modal-header { background-color: rgba(17,24,39,.98) !important; }
+.mls-dark-theme main .mls-card-editor,
+.mls-dark-theme .mls-card-edit-toolbar {
+  background-color: rgba(255,255,255,.96) !important;
+  color: #1e293b !important;
+}
+.mls-dark-theme main .mls-card-editor [class~="bg-slate-100"] { background-color: #f1f5f9 !important; color: #475569 !important; }
 
 .mls-portal-theme a:hover { color: var(--mls-accent); }
 .mls-portal-theme ::selection { background: color-mix(in srgb, var(--mls-accent) 35%, transparent); }
