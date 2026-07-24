@@ -34,6 +34,9 @@
   -webkit-line-clamp: 2;
   line-clamp: 2;
 }
+.mls-card[data-custom-size="small"]:not(:has(input, select, textarea)) :is(.grid, .space-y-2, .space-y-3, .space-y-4, .space-y-5, .space-y-6) > :nth-child(n+3):not(.mls-card-editor) {
+  display: none !important;
+}
 .mls-card[data-custom-size="small"] .mls-adaptive-list {
   margin-top: .85rem !important;
 }
