@@ -21,8 +21,15 @@ export function WorkflowList({ title, eyebrow, text, items, emptyTitle, emptyTex
   return (
     <Card>
       <SectionHeader eyebrow={eyebrow} title={title} text={text} action={action} />
-      <div className="mt-6 space-y-3">
-        {items.map(renderItem)}
+      <div className="mls-adaptive-list mt-6 space-y-3">
+        {items.map((item, index) => (
+          <div
+            key={item?.id || item?.assignment_id || `${title}-${index}`}
+            className={index === 0 ? "mls-density-summary" : index < 3 ? "mls-density-medium" : "mls-density-large"}
+          >
+            {renderItem(item, index)}
+          </div>
+        ))}
         {!items.length && <EmptyState icon={CalendarDays} title={emptyTitle} text={emptyText} />}
       </div>
     </Card>
@@ -35,10 +42,10 @@ export function AssignmentRow({ assignment, onOpen, detail }) {
       <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#721100]/10 text-[#721100]"><CalendarDays size={19} /></span>
       <span className="min-w-0 flex-1">
         <span className="block break-words font-black text-slate-950">{assignment.service_type || "MLS assignment"}</span>
-        <span className="mt-1 block break-words text-xs leading-5 text-slate-500">{assignment.clients?.organization_name || assignment.clients?.email || "Client"} · {formatDate(assignment.start_at)}</span>
-        {detail && <span className="mt-2 block break-words text-xs font-bold text-[#721100]">{detail}</span>}
+        <span className="mls-density-medium mt-1 block break-words text-xs leading-5 text-slate-500">{assignment.clients?.organization_name || assignment.clients?.email || "Client"} · {formatDate(assignment.start_at)}</span>
+        {detail && <span className="mls-density-large mt-2 block break-words text-xs font-bold text-[#721100]">{detail}</span>}
       </span>
-      <span className="col-start-2 flex flex-wrap items-center gap-2 md:col-auto"><Badge value={assignment.lifecycle_status || assignment.status} /><ArrowRight size={16} className="text-slate-400" /></span>
+      <span className="col-start-2 flex flex-wrap items-center gap-2 md:col-auto"><Badge value={assignment.lifecycle_status || assignment.status} /><ArrowRight size={16} className="mls-density-medium text-slate-400" /></span>
     </button>
   );
 }
@@ -48,7 +55,7 @@ export function MoneySummary({ label, value, note }) {
     <div className="rounded-2xl bg-slate-50 p-4">
       <p className="text-[10px] font-black uppercase tracking-[.12em] text-slate-400">{label}</p>
       <p className="mt-2 text-2xl font-black text-slate-950">{formatMoney(value)}</p>
-      {note && <p className="mt-1 text-xs text-slate-500">{note}</p>}
+      {note && <p className="mls-density-medium mt-1 text-xs text-slate-500">{note}</p>}
     </div>
   );
 }

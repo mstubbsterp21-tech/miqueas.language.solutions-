@@ -85,6 +85,182 @@ export function useLongPress(onLongPress, { delay = 520, disabled = false } = {}
   return { handlers, consumeTriggered };
 }
 
+function orderedCardIds(parent) {
+  if (!parent) return [];
+  return [...parent.children]
+    .filter((item) => item.hasAttribute?.("data-custom-card-id"))
+    .map((item, index) => ({
+      item,
+      index,
+      order: Number.isFinite(Number(item.style.order)) && item.style.order !== "" ? Number(item.style.order) : index,
+    }))
+    .sort((a, b) => a.order - b.order || a.index - b.index)
+    .map(({ item }) => item.getAttribute("data-custom-card-id"))
+    .filter(Boolean);
+}
+
+function FluidCardEditorRuntime({ editing, setSelectedCardId, setDraggingCardId, setCardOrder, flushSave }) {
+  const gestureRef = useRef(null);
+  const cloneRef = useRef(null);
+  const frameRef = useRef(0);
+  const finishTimerRef = useRef(0);
+
+  useEffect(() => {
+    if (!editing) return undefined;
+
+    const clearClone = () => {
+      window.cancelAnimationFrame(frameRef.current);
+      window.clearTimeout(finishTimerRef.current);
+      cloneRef.current?.remove();
+      cloneRef.current = null;
+      gestureRef.current?.card?.classList.remove("mls-card-placeholder");
+      gestureRef.current = null;
+      document.documentElement.classList.remove("mls-card-dragging");
+    };
+
+    const startVisualDrag = (gesture) => {
+      const rect = gesture.card.getBoundingClientRect();
+      const clone = gesture.card.cloneNode(true);
+      clone.querySelectorAll(".mls-card-editor").forEach((node) => node.remove());
+      clone.querySelectorAll("[id]").forEach((node) => node.removeAttribute("id"));
+      clone.removeAttribute("data-custom-card");
+      clone.removeAttribute("data-custom-card-id");
+      clone.classList.remove("mls-card-jiggle", "mls-card-placeholder");
+      clone.classList.add("mls-card-drag-clone");
+      clone.setAttribute("aria-hidden", "true");
+      Object.assign(clone.style, {
+        position: "fixed",
+        left: `${rect.left}px`,
+        top: `${rect.top}px`,
+        width: `${rect.width}px`,
+        height: `${rect.height}px`,
+        margin: "0",
+        zIndex: "10000",
+        pointerEvents: "none",
+        transformOrigin: `${gesture.offsetX}px ${gesture.offsetY}px`,
+      });
+      document.body.appendChild(clone);
+      cloneRef.current = clone;
+      gesture.card.classList.add("mls-card-placeholder");
+      document.documentElement.classList.add("mls-card-dragging");
+      gesture.started = true;
+      setDraggingCardId(gesture.cardId);
+      navigator.vibrate?.(10);
+    };
+
+    const move = (event) => {
+      const gesture = gestureRef.current;
+      if (!gesture || gesture.pointerId !== event.pointerId) return;
+      const distance = Math.hypot(event.clientX - gesture.startX, event.clientY - gesture.startY);
+      if (!gesture.started && distance < 7) return;
+      if (!gesture.started) startVisualDrag(gesture);
+      event.preventDefault();
+
+      window.cancelAnimationFrame(frameRef.current);
+      frameRef.current = window.requestAnimationFrame(() => {
+        const dx = event.clientX - gesture.startX;
+        const dy = event.clientY - gesture.startY;
+        if (cloneRef.current) cloneRef.current.style.transform = `translate3d(${dx}px, ${dy}px, 0) scale(1.035) rotate(.35deg)`;
+      });
+
+      if (event.clientY < 92) window.scrollBy({ top: -14, behavior: "auto" });
+      else if (event.clientY > window.innerHeight - 92) window.scrollBy({ top: 14, behavior: "auto" });
+
+      const target = document.elementsFromPoint(event.clientX, event.clientY)
+        .map((item) => item.closest?.('[data-custom-card="true"]'))
+        .find((item) => item && item !== gesture.card && item.parentElement === gesture.parent);
+      if (!target) return;
+      const targetId = target.getAttribute("data-custom-card-id");
+      if (!targetId || targetId === gesture.lastTargetId) return;
+      gesture.lastTargetId = targetId;
+      const ids = orderedCardIds(gesture.parent);
+      const targetIndex = ids.indexOf(targetId);
+      if (targetIndex < 0) return;
+      const next = ids.filter((id) => id !== gesture.cardId);
+      next.splice(targetIndex, 0, gesture.cardId);
+      setCardOrder(next);
+    };
+
+    const finish = (event) => {
+      const gesture = gestureRef.current;
+      if (!gesture || (event?.pointerId !== undefined && gesture.pointerId !== event.pointerId)) return;
+      window.removeEventListener("pointermove", move, { capture: true });
+      window.removeEventListener("pointerup", finish, { capture: true });
+      window.removeEventListener("pointercancel", finish, { capture: true });
+
+      if (!gesture.started || !cloneRef.current) {
+        clearClone();
+        return;
+      }
+
+      const clone = cloneRef.current;
+      const current = clone.getBoundingClientRect();
+      const destination = gesture.card.getBoundingClientRect();
+      clone.style.transform = "none";
+      Object.assign(clone.style, {
+        left: `${current.left}px`,
+        top: `${current.top}px`,
+        width: `${current.width}px`,
+        height: `${current.height}px`,
+        transition: "left 180ms cubic-bezier(.2,.8,.2,1), top 180ms cubic-bezier(.2,.8,.2,1), width 180ms ease, height 180ms ease, opacity 180ms ease, transform 180ms ease",
+      });
+      window.requestAnimationFrame(() => {
+        Object.assign(clone.style, {
+          left: `${destination.left}px`,
+          top: `${destination.top}px`,
+          width: `${destination.width}px`,
+          height: `${destination.height}px`,
+          opacity: ".45",
+          transform: "scale(.985)",
+        });
+      });
+      finishTimerRef.current = window.setTimeout(() => {
+        clearClone();
+        setDraggingCardId("");
+        flushSave();
+      }, 190);
+    };
+
+    const down = (event) => {
+      if (event.button > 0) return;
+      const target = event.target instanceof Element ? event.target : null;
+      if (!target || target.closest(".mls-card-editor, .mls-modal-surface")) return;
+      const card = target.closest('[data-custom-card="true"]');
+      if (!card) return;
+      const cardId = card.getAttribute("data-custom-card-id");
+      if (!cardId) return;
+      const rect = card.getBoundingClientRect();
+      setSelectedCardId(cardId);
+      gestureRef.current = {
+        pointerId: event.pointerId,
+        card,
+        cardId,
+        parent: card.parentElement,
+        startX: event.clientX,
+        startY: event.clientY,
+        offsetX: event.clientX - rect.left,
+        offsetY: event.clientY - rect.top,
+        lastTargetId: "",
+        started: false,
+      };
+      window.addEventListener("pointermove", move, { capture: true, passive: false });
+      window.addEventListener("pointerup", finish, { capture: true });
+      window.addEventListener("pointercancel", finish, { capture: true });
+    };
+
+    document.addEventListener("pointerdown", down, true);
+    return () => {
+      document.removeEventListener("pointerdown", down, true);
+      window.removeEventListener("pointermove", move, { capture: true });
+      window.removeEventListener("pointerup", finish, { capture: true });
+      window.removeEventListener("pointercancel", finish, { capture: true });
+      clearClone();
+    };
+  }, [editing, flushSave, setCardOrder, setDraggingCardId, setSelectedCardId]);
+
+  return null;
+}
+
 export function CardCustomizationProvider({ role, section, layout, children }) {
   const { session } = useSession();
   const [tabPreferences, setTabPreferences] = useState(() => normalizePreferences(layout?.tab_card_preferences));
@@ -286,7 +462,16 @@ export function CardCustomizationProvider({ role, section, layout, children }) {
     stopNavigationEditing, moveNavigation, commitNavigation,
   ]);
 
-  return <CardCustomizationContext.Provider value={value}>{children}</CardCustomizationContext.Provider>;
+  return <CardCustomizationContext.Provider value={value}>
+    {children}
+    <FluidCardEditorRuntime
+      editing={cardEditing}
+      setSelectedCardId={setSelectedCardId}
+      setDraggingCardId={setDraggingCardId}
+      setCardOrder={setCardOrder}
+      flushSave={flushSave}
+    />
+  </CardCustomizationContext.Provider>;
 }
 
 export function useCardCustomization() {

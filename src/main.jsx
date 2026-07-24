@@ -8,6 +8,7 @@ import ScrollToTop from './components/ScrollToTop';
 import { clerkPublishableKey, isClerkConfigured } from './lib/env';
 import './index.css';
 import './portal/portal-theme.css';
+import './portal/fluid-card-editor.css';
 
 function RootRouter() {
   const { pathname } = useLocation();
