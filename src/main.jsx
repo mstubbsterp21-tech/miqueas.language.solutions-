@@ -4,6 +4,7 @@ import { ClerkProvider } from '@clerk/clerk-react';
 import { BrowserRouter, useLocation } from 'react-router-dom';
 import App from './App';
 import PortalAppRouterHub from './PortalAppRouterHub';
+import AccessibilityTools from './components/AccessibilityTools';
 import ScrollToTop from './components/ScrollToTop';
 import { clerkPublishableKey, isClerkConfigured } from './lib/env';
 import './index.css';
@@ -13,7 +14,15 @@ import './portal/fluid-card-editor.css';
 function RootRouter() {
   const { pathname } = useLocation();
   const isPortalPath = pathname.startsWith('/portal') || pathname.startsWith('/login') || pathname.startsWith('/admin/interpreters');
-  return isPortalPath ? <PortalAppRouterHub /> : <App />;
+
+  if (isPortalPath) return <PortalAppRouterHub />;
+
+  return (
+    <>
+      <AccessibilityTools />
+      <App />
+    </>
+  );
 }
 
 const app = (
