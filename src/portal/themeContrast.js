@@ -58,9 +58,12 @@ export function ensureContrast(color, background = WHITE, minimum = 4.5) {
 }
 
 export function portalThemeTokens(personalization = {}) {
-  const primary = normalizeHex(personalization.theme_primary, "#721100");
-  const secondary = normalizeHex(personalization.theme_secondary, "#24130e");
-  const accent = normalizeHex(personalization.theme_accent, "#dd7d00");
+  const settings = personalization && typeof personalization === "object" && !Array.isArray(personalization)
+    ? personalization
+    : {};
+  const primary = normalizeHex(settings.theme_primary, "#721100");
+  const secondary = normalizeHex(settings.theme_secondary, "#24130e");
+  const accent = normalizeHex(settings.theme_accent, "#dd7d00");
   const darkPrimary = ensureContrast(primary, WHITE, 7);
   const darkSecondary = ensureContrast(secondary, WHITE, 7);
   const darkSurface = darkSecondary;
