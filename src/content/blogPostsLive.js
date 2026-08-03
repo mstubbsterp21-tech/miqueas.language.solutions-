@@ -7,6 +7,18 @@ import handsUpConferenceHtml from "./blog/asl-healthcare-community-hands-up-conf
 import juneteenthBlackDeafExcellenceHtml from "./blog/celebrating-black-deaf-excellence-juneteenth-2026-florida.html?raw";
 import summerAccessibilityPlanningHtml from "./blog/summer-school-accessibility-professional-asl-support.html?raw";
 import healthcareMistakesHtml from "./blog/7-mistakes-sign-language-services-healthcare.html?raw";
+import hiringQualifiedInterpreterHtml from "./blog/how-to-hire-qualified-asl-interpreter-florida.html?raw";
+
+const hiringQualifiedInterpreterPost = {
+  slug: "how-to-hire-qualified-asl-interpreter-florida",
+  title: "How to Hire a Qualified ASL Interpreter: A Credential-Review Guide for Florida Organizations",
+  excerpt: "A practical credential-review guide for Florida organizations evaluating interpreter qualifications, assignment fit, preparation, and professional readiness.",
+  publishDate: "2026-07-13",
+  category: "Client Guidance",
+  readTime: "7 min read",
+  featured: false,
+  html: hiringQualifiedInterpreterHtml,
+};
 
 const healthcareMistakesPost = {
   slug: "7-mistakes-sign-language-services-healthcare",
@@ -68,6 +80,7 @@ const postOverrides = new Map([[updatedVriPost.slug, updatedVriPost]]);
 const removedPostSlugs = new Set(["how-to-prepare-for-an-interpreted-meeting"]);
 
 export const blogPosts = [
+  hiringQualifiedInterpreterPost,
   healthcareMistakesPost,
   handsUpConferencePost,
   juneteenthBlackDeafExcellencePost,
