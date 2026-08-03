@@ -1,6 +1,36 @@
+import { useEffect } from "react";
 import { Link, Navigate, useParams } from "react-router-dom";
 import { ArrowLeft, CalendarDays, Clock } from "lucide-react";
 import { formatBlogDate, getPublishedBlogPostBySlug } from "../content/blogPostsLive";
+
+function setMetaAttribute(attribute, key, content) {
+  let tag = document.head.querySelector(`meta[${attribute}="${key}"]`);
+
+  if (!tag) {
+    tag = document.createElement("meta");
+    tag.setAttribute(attribute, key);
+    document.head.appendChild(tag);
+  }
+
+  tag.setAttribute("content", content);
+}
+
+function setCanonicalUrl(url) {
+  let tag = document.head.querySelector('link[rel="canonical"]');
+
+  if (!tag) {
+    tag = document.createElement("link");
+    tag.setAttribute("rel", "canonical");
+    document.head.appendChild(tag);
+  }
+
+  tag.setAttribute("href", url);
+}
+
+function getPostImage(post) {
+  const imageMatch = post?.html?.match(/<img\b[^>]*src=["']([^"']+)["']/i);
+  return imageMatch?.[1] || `${window.location.origin}/preview.png`;
+}
 
 function renderBlock(block, index, palette) {
   if (block.type === "heading") {
@@ -34,6 +64,27 @@ function renderBlock(block, index, palette) {
 export default function BlogPost({ palette }) {
   const { slug } = useParams();
   const post = getPublishedBlogPostBySlug(slug);
+
+  useEffect(() => {
+    if (!post) return;
+
+    const canonicalUrl = `${window.location.origin}/blog/${post.slug}`;
+    const pageTitle = `${post.title} | Miqueas Language Solutions`;
+    const imageUrl = getPostImage(post);
+
+    document.title = pageTitle;
+    setMetaAttribute("name", "description", post.excerpt);
+    setMetaAttribute("name", "robots", "index, follow");
+    setCanonicalUrl(canonicalUrl);
+    setMetaAttribute("property", "og:title", pageTitle);
+    setMetaAttribute("property", "og:description", post.excerpt);
+    setMetaAttribute("property", "og:url", canonicalUrl);
+    setMetaAttribute("property", "og:type", "article");
+    setMetaAttribute("property", "og:image", imageUrl);
+    setMetaAttribute("name", "twitter:title", pageTitle);
+    setMetaAttribute("name", "twitter:description", post.excerpt);
+    setMetaAttribute("name", "twitter:image", imageUrl);
+  }, [post]);
 
   if (!post) {
     return <Navigate to="/blog" replace />;
