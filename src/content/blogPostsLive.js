@@ -9,6 +9,18 @@ import summerAccessibilityPlanningHtml from "./blog/summer-school-accessibility-
 import healthcareMistakesHtml from "./blog/7-mistakes-sign-language-services-healthcare.html?raw";
 import hiringQualifiedInterpreterHtml from "./blog/how-to-hire-qualified-asl-interpreter-florida.html?raw";
 import workplaceAccessHtml from "./blog/asl-access-workplace-employer-accommodations.html?raw";
+import communicationBreakdownCostHtml from "./blog/cost-communication-breakdown-cheap-interpreting.html?raw";
+
+const communicationBreakdownCostPost = {
+  slug: "cost-communication-breakdown-cheap-interpreting",
+  title: "The Cost of Communication Breakdown: Why Cheap Interpreting Costs More in the Long Run",
+  excerpt: "Why interpreter value should be measured by readiness, fit, reliability, and risk—not just the lowest hourly rate.",
+  publishDate: "2026-07-27",
+  category: "Client Guidance",
+  readTime: "7 min read",
+  featured: false,
+  html: communicationBreakdownCostHtml,
+};
 
 const workplaceAccessPost = {
   slug: "asl-access-workplace-employer-accommodations",
@@ -92,6 +104,7 @@ const postOverrides = new Map([[updatedVriPost.slug, updatedVriPost]]);
 const removedPostSlugs = new Set(["how-to-prepare-for-an-interpreted-meeting"]);
 
 export const blogPosts = [
+  communicationBreakdownCostPost,
   workplaceAccessPost,
   hiringQualifiedInterpreterPost,
   healthcareMistakesPost,
