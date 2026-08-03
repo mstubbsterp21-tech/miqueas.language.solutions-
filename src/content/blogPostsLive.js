@@ -6,6 +6,18 @@ import whyVriBestFitPart4Html from "./blog/why-vri-is-not-always-the-best-fit-pa
 import handsUpConferenceHtml from "./blog/asl-healthcare-community-hands-up-conference-2026-orlando.html?raw";
 import juneteenthBlackDeafExcellenceHtml from "./blog/celebrating-black-deaf-excellence-juneteenth-2026-florida.html?raw";
 import summerAccessibilityPlanningHtml from "./blog/summer-school-accessibility-professional-asl-support.html?raw";
+import healthcareMistakesHtml from "./blog/7-mistakes-sign-language-services-healthcare.html?raw";
+
+const healthcareMistakesPost = {
+  slug: "7-mistakes-sign-language-services-healthcare",
+  title: "7 Mistakes You're Making with Sign Language Services for Healthcare (And How to Fix Them)",
+  excerpt: "Seven common healthcare communication-access mistakes—and practical ways to improve ASL interpreting quality, safety, and patient experience.",
+  publishDate: "2026-07-06",
+  category: "Healthcare Access",
+  readTime: "6 min read",
+  featured: false,
+  html: healthcareMistakesHtml,
+};
 
 const handsUpConferencePost = {
   slug: "asl-healthcare-community-hands-up-conference-2026-orlando",
@@ -56,6 +68,7 @@ const postOverrides = new Map([[updatedVriPost.slug, updatedVriPost]]);
 const removedPostSlugs = new Set(["how-to-prepare-for-an-interpreted-meeting"]);
 
 export const blogPosts = [
+  healthcareMistakesPost,
   handsUpConferencePost,
   juneteenthBlackDeafExcellencePost,
   summerAccessibilityPlanningPost,
