@@ -8,6 +8,18 @@ import juneteenthBlackDeafExcellenceHtml from "./blog/celebrating-black-deaf-exc
 import summerAccessibilityPlanningHtml from "./blog/summer-school-accessibility-professional-asl-support.html?raw";
 import healthcareMistakesHtml from "./blog/7-mistakes-sign-language-services-healthcare.html?raw";
 import hiringQualifiedInterpreterHtml from "./blog/how-to-hire-qualified-asl-interpreter-florida.html?raw";
+import workplaceAccessHtml from "./blog/asl-access-workplace-employer-accommodations.html?raw";
+
+const workplaceAccessPost = {
+  slug: "asl-access-workplace-employer-accommodations",
+  title: "ASL Access in the Workplace: What Employers Need to Know About Accommodations",
+  excerpt: "A practical guide for employers and HR teams planning ASL access for interviews, onboarding, meetings, training, and everyday workplace communication.",
+  publishDate: "2026-07-20",
+  category: "Workplace Access",
+  readTime: "6 min read",
+  featured: false,
+  html: workplaceAccessHtml,
+};
 
 const hiringQualifiedInterpreterPost = {
   slug: "how-to-hire-qualified-asl-interpreter-florida",
@@ -80,6 +92,7 @@ const postOverrides = new Map([[updatedVriPost.slug, updatedVriPost]]);
 const removedPostSlugs = new Set(["how-to-prepare-for-an-interpreted-meeting"]);
 
 export const blogPosts = [
+  workplaceAccessPost,
   hiringQualifiedInterpreterPost,
   healthcareMistakesPost,
   handsUpConferencePost,
