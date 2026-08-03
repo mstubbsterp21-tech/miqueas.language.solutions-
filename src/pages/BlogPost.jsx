@@ -50,6 +50,7 @@ export default function BlogPost({ palette }) {
         .blog-html a { color: var(--mls-burgundy); font-weight: 800; text-decoration: underline; text-underline-offset: 4px; }
         .blog-html hr { margin: 2.75rem 0; border: 0; border-top: 1px solid var(--mls-border); }
         .blog-html ol { margin-top: 1.25rem; padding-left: 1.4rem; list-style: decimal; color: #555; }
+        .blog-html ul { margin-top: 1.25rem; padding-left: 1.4rem; list-style: disc; color: #555; }
         .blog-html li { margin-top: 0.85rem; padding-left: 0.25rem; font-size: 1.0625rem; line-height: 1.8; }
         .blog-html strong { color: var(--mls-charcoal); font-weight: 900; }
         .blog-html blockquote { margin-top: 2rem; border-left: 5px solid var(--mls-gold); border-radius: 1.5rem; background: #fafafa; padding: 1.25rem 1.4rem; }
