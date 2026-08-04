@@ -16,10 +16,6 @@
       name="description"
       content="Miqueas Language Solutions provides professional ASL-English interpreting, video remote interpreting, and ASL video translation services for healthcare, education, business, and community settings in Florida and remotely."
     />
-    <meta
-      name="keywords"
-      content="ASL interpreter, ASL interpreting services, sign language interpreter, Florida ASL interpreter, Ocala ASL interpreter, video remote interpreting, ASL translation, Deaf access, Miqueas Language Solutions"
-    />
 
     <meta property="og:site_name" content="Miqueas Language Solutions" />
     <meta property="og:title" content="ASL Interpreter Services in Florida | Miqueas Language Solutions" />
@@ -91,6 +87,22 @@
           "/services/video-remote-interpreting": {
             title: "Video Remote Interpreting Services | Miqueas Language Solutions",
             description: "Professional VRI services for telehealth, virtual meetings, remote appointments, and organizations that need clear visual communication access.",
+          },
+          "/services/video-remote-interpreting-nationwide": {
+            title: "Nationwide Video Remote ASL Interpreting | MLS",
+            description: "Request professional nationwide video remote ASL-English interpreting for virtual meetings, telehealth, training, appointments, and remote services.",
+          },
+          "/locations/orlando": {
+            title: "ASL Interpreting Services in Orlando, FL | MLS",
+            description: "Professional in-person ASL-English interpreting in Orlando for healthcare, business, education, conferences, appointments, and community events.",
+          },
+          "/locations/ocala": {
+            title: "ASL Interpreting Services in Ocala, FL | MLS",
+            description: "Professional in-person ASL-English interpreting in Ocala and Marion County for healthcare, education, business, legal, and community settings.",
+          },
+          "/locations/central-florida": {
+            title: "ASL Interpreting Services in Central Florida | MLS",
+            description: "Professional ASL-English interpreting across Central Florida for healthcare, education, business, legal, and community settings.",
           },
           "/services/english-asl-translation": {
             title: "English to ASL Video Translation | Miqueas Language Solutions",
@@ -237,11 +249,15 @@
 
         const path = normalizePath(window.location.pathname);
         const canonicalPath = redirectCanonicals[path] || path;
-        const meta = pageMeta[canonicalPath] || {
+        const meta = pageMeta[canonicalPath] || (canonicalPath.startsWith("/blog/") ? {
+          title: "ASL Access Article | Miqueas Language Solutions",
+          description: "Practical guidance from Miqueas Language Solutions about ASL interpreting, communication access, and professional service planning.",
+          type: "article",
+        } : {
           title: "Miqueas Language Solutions",
           description: defaultDescription,
           noindex: true,
-        };
+        });
         const canonicalUrl = absoluteUrl(canonicalPath);
         const robotsValue = meta.noindex ? "noindex, follow" : "index, follow";
 

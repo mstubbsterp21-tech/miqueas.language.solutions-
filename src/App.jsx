@@ -18,6 +18,7 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import Terms from "./pages/Terms";
 import Accessibility from "./pages/Accessibility";
 import InterpreterCommunity from "./pages/InterpreterCommunity";
+import LocationService, { NationwideVri } from "./pages/LocationService";
 import InterpreterNetworkForm from "./components/InterpreterNetworkFormOptional";
 import Login from "./pages/Login";
 import InterpreterPortal from "./pages/InterpreterPortal";
@@ -292,6 +293,8 @@ export default function App() {
           <Route path="/admin/interpreters/:interpreterId" element={isClerkConfigured ? <RequirePortalAuth><AdminInterpreterProfile palette={palette} /></RequirePortalAuth> : <PortalSetupNotice palette={palette} />} />
           <Route path="/services" element={<Services palette={palette} />} />
           <Route path="/services/:serviceId" element={<ServiceDetail palette={palette} />} />
+          <Route path="/services/video-remote-interpreting-nationwide" element={<NationwideVri palette={palette} />} />
+          <Route path="/locations/:locationId" element={<LocationService palette={palette} />} />
           <Route path="/about" element={<About palette={palette} />} />
           <Route path="/policies" element={<PoliciesLayout palette={palette} />}>
             <Route index element={<Navigate to="clients" replace />} />

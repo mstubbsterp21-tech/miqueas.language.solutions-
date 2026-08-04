@@ -170,6 +170,22 @@ export default function Services({ palette }) {
       </section>
 
       <section className="px-5 py-12 md:px-8 md:py-16">
+        <div className="mx-auto max-w-6xl rounded-[2.2rem] border bg-[#f7f3ef] p-6 md:p-9" style={{ borderColor: palette.border }}>
+          <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.gold }}>Service areas</p>
+          <h2 className="mt-3 max-w-3xl text-3xl font-black tracking-tight md:text-4xl" style={{ color: palette.charcoal }}>Local Florida coverage and nationwide remote access.</h2>
+          <p className="mt-4 max-w-3xl leading-8 text-[#5f6368]">Explore area-specific service information or request remote interpreting anywhere in the United States. Coverage remains subject to assignment fit and interpreter availability.</p>
+          <div className="mt-7 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              ["/locations/orlando", "Orlando"],
+              ["/locations/ocala", "Ocala"],
+              ["/locations/central-florida", "Central Florida"],
+              ["/services/video-remote-interpreting-nationwide", "Nationwide VRI"],
+            ].map(([path, label]) => <Link key={path} to={path} className="group inline-flex items-center justify-between rounded-2xl border bg-white px-5 py-4 text-sm font-black shadow-sm transition hover:-translate-y-0.5 hover:shadow-md" style={{ borderColor: palette.border, color: palette.burgundy }}>{label}<ArrowRight size={16} className="transition group-hover:translate-x-1" /></Link>)}
+          </div>
+        </div>
+      </section>
+
+      <section className="px-5 py-12 md:px-8 md:py-16">
         <div className="mx-auto max-w-6xl">
           <motion.div initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} variants={fadeUp} transition={{ duration: 0.45 }} className="mb-8 max-w-3xl">
             <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.gold }}>Service options</p>
