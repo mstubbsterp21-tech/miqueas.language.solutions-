@@ -11,6 +11,8 @@ import hiringQualifiedInterpreterHtml from "./blog/how-to-hire-qualified-asl-int
 import workplaceAccessHtml from "./blog/asl-access-workplace-employer-accommodations.html?raw";
 import communicationBreakdownCostHtml from "./blog/cost-communication-breakdown-cheap-interpreting.html?raw";
 
+export const FEATURED_BLOG_SLUG = "cost-communication-breakdown-cheap-interpreting";
+
 const communicationBreakdownCostPost = {
   slug: "cost-communication-breakdown-cheap-interpreting",
   title: "The Cost of Communication Breakdown: Why Cheap Interpreting Costs More in the Long Run",
@@ -103,7 +105,7 @@ const postOverrides = new Map([[updatedVriPost.slug, updatedVriPost]]);
 
 const removedPostSlugs = new Set(["how-to-prepare-for-an-interpreted-meeting"]);
 
-export const blogPosts = [
+const allBlogPosts = [
   communicationBreakdownCostPost,
   workplaceAccessPost,
   hiringQualifiedInterpreterPost,
@@ -115,10 +117,15 @@ export const blogPosts = [
     .filter((post) => !removedPostSlugs.has(post.slug))
     .map((post) => ({
       ...post,
-      featured: false,
       ...(postOverrides.get(post.slug) || {}),
     })),
 ];
+
+// Single source of truth used by both the homepage and blog page.
+export const blogPosts = allBlogPosts.map((post) => ({
+  ...post,
+  featured: post.slug === FEATURED_BLOG_SLUG,
+}));
 
 const todayInNewYork = () =>
   new Date().toLocaleDateString("en-CA", {
@@ -138,5 +145,8 @@ export const getPublishedBlogPosts = () => {
 
 export const getPublishedBlogPostBySlug = (slug) =>
   getPublishedBlogPosts().find((post) => post.slug === slug);
+
+export const getFeaturedBlogPost = () =>
+  getPublishedBlogPosts().find((post) => post.featured) || getPublishedBlogPosts()[0];
 
 export { formatBlogDate };
