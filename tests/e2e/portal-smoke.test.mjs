@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { once } from 'node:events';
 import { after, before, test } from 'node:test';
 import { spawn } from 'node:child_process';
 import { chromium } from 'playwright';
@@ -85,12 +86,10 @@ async function inspectPage(context, pathname) {
 before(async () => {
   if (!externalBaseURL) {
     previewProcess = spawn(
-      process.platform === 'win32' ? 'npm.cmd' : 'npm',
-      ['run', 'preview', '--', '--host', '127.0.0.1', '--port', '4173'],
-      { stdio: ['ignore', 'pipe', 'pipe'] },
+      process.execPath,
+      ['node_modules/vite/bin/vite.js', 'preview', '--host', '127.0.0.1', '--port', '4173'],
+      { stdio: 'inherit' },
     );
-    previewProcess.stdout.on('data', (chunk) => process.stdout.write(`[preview] ${chunk}`));
-    previewProcess.stderr.on('data', (chunk) => process.stderr.write(`[preview] ${chunk}`));
   }
 
   await waitForUrl(externalBaseURL ? '/portal' : '/');
@@ -99,7 +98,11 @@ before(async () => {
 
 after(async () => {
   await browser?.close();
-  previewProcess?.kill('SIGTERM');
+  if (previewProcess && previewProcess.exitCode === null) {
+    previewProcess.kill('SIGTERM');
+    await Promise.race([once(previewProcess, 'exit'), sleep(3_000)]);
+    if (previewProcess.exitCode === null) previewProcess.kill('SIGKILL');
+  }
 });
 
 test('portal deep links load the React application instead of a hosting 404', async () => {
