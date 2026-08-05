@@ -23,7 +23,7 @@ import {
   Video,
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { formatBlogDate, getPublishedBlogPosts } from "../content/blogPosts";
+import { formatBlogDate, getFeaturedBlogPost } from "../content/blogPostsLive";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 18 },
@@ -39,8 +39,7 @@ const serviceCards = [
 
 export default function Home({ palette }) {
   const [activeTestimonial, setActiveTestimonial] = useState(0);
-  const publishedBlogPosts = getPublishedBlogPosts();
-  const featuredArticle = publishedBlogPosts.find((post) => post.featured) || publishedBlogPosts[0];
+  const featuredArticle = getFeaturedBlogPost();
 
   const stats = [
     ["7+ Years", "Professional interpreting experience across diverse real-world settings"],
