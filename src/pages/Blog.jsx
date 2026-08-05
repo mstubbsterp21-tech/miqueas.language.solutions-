@@ -1,19 +1,20 @@
+import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import {
   ArrowRight,
-  BookOpen,
   CalendarDays,
   Clock,
   FileText,
-  FolderOpen,
-  Layers3,
-  Sparkles,
+  LayoutGrid,
+  List,
+  Search,
+  X,
 } from "lucide-react";
 import { formatBlogDate, getPublishedBlogPosts } from "../content/blogPostsLive";
 
 const fadeUp = {
-  hidden: { opacity: 0, y: 18 },
+  hidden: { opacity: 0, y: 16 },
   show: { opacity: 1, y: 0 },
 };
 
@@ -21,7 +22,7 @@ const staggerGroup = {
   hidden: {},
   show: {
     transition: {
-      staggerChildren: 0.07,
+      staggerChildren: 0.06,
     },
   },
 };
@@ -42,14 +43,10 @@ function getThemeStyles(palette) {
   const isDark = palette.white !== "#ffffff";
   const accentText = isDark ? palette.gold : palette.burgundy;
   const heroGradient = isDark
-    ? "radial-gradient(circle at 12% 10%, rgba(221,125,0,0.18), transparent 28%), radial-gradient(circle at 88% 15%, rgba(114,17,0,0.28), transparent 30%), linear-gradient(180deg, #15100e 0%, #211714 100%)"
-    : "radial-gradient(circle at 12% 10%, rgba(221,125,0,0.18), transparent 28%), radial-gradient(circle at 88% 15%, rgba(114,17,0,0.12), transparent 30%), linear-gradient(180deg, #ffffff 0%, #f7f3ef 100%)";
+    ? "radial-gradient(circle at 12% 12%, rgba(221,125,0,0.12), transparent 30%), linear-gradient(180deg, #15100e 0%, #211714 100%)"
+    : "radial-gradient(circle at 12% 12%, rgba(221,125,0,0.10), transparent 30%), linear-gradient(180deg, #ffffff 0%, #f8f5f2 100%)";
 
   return { accentText, heroGradient };
-}
-
-function getMonthKey(publishDate) {
-  return publishDate.slice(0, 7);
 }
 
 function formatMonthLabel(publishDate) {
@@ -66,7 +63,7 @@ function groupPostsByMonth(posts) {
   const groups = new Map();
 
   posts.forEach((post) => {
-    const key = getMonthKey(post.publishDate);
+    const key = post.publishDate.slice(0, 7);
 
     if (!groups.has(key)) {
       groups.set(key, {
@@ -82,117 +79,90 @@ function groupPostsByMonth(posts) {
   return Array.from(groups.values());
 }
 
-function PostMeta({ post, palette, light = false }) {
+function getSearchableText(post) {
+  const bodyText = (post.html || "")
+    .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, " ")
+    .replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, " ")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&[a-z0-9#]+;/gi, " ");
+
+  return [post.title, post.excerpt, post.category, bodyText].join(" ").toLowerCase();
+}
+
+function PostMeta({ post, palette }) {
   return (
-    <div
-      className="flex flex-wrap gap-x-4 gap-y-2 text-sm"
-      style={{ color: light ? "rgba(255,255,255,0.82)" : palette.body }}
-    >
+    <div className="flex flex-wrap gap-x-4 gap-y-2 text-sm" style={{ color: palette.body }}>
       <span className="inline-flex items-center gap-2">
-        <CalendarDays size={16} style={{ color: palette.gold }} />
+        <CalendarDays size={15} style={{ color: palette.gold }} />
         {formatBlogDate(post.publishDate)}
       </span>
       <span className="inline-flex items-center gap-2">
-        <Clock size={16} style={{ color: palette.gold }} />
+        <Clock size={15} style={{ color: palette.gold }} />
         {post.readTime}
       </span>
     </div>
   );
 }
 
-function ArticleCard({ post, palette, accentText, highlighted = false }) {
+function CardArticle({ post, palette, accentText }) {
   const postImage = getPostImage(post);
-  const linkClasses = highlighted
-    ? "grid h-full md:grid-cols-[1.08fr_0.92fr]"
-    : "flex h-full flex-col";
-  const imageClasses = highlighted
-    ? "h-56 w-full object-cover transition duration-500 group-hover:scale-105 md:h-full md:min-h-[320px]"
-    : "h-52 w-full object-cover transition duration-500 group-hover:scale-105";
 
   return (
     <motion.article
       variants={fadeUp}
-      transition={{ duration: 0.42 }}
-      className={`group overflow-hidden rounded-[1.75rem] border shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl ${
-        highlighted ? "md:col-span-2" : ""
-      }`}
+      transition={{ duration: 0.4 }}
+      className="group overflow-hidden rounded-[1.4rem] border shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg"
       style={{ borderColor: palette.border, backgroundColor: palette.white }}
     >
       <Link
         to={`/blog/${post.slug}`}
-        className={`${linkClasses} focus:outline-none focus:ring-4`}
-        style={{ "--tw-ring-color": "rgba(221, 125, 0, 0.35)" }}
+        className="flex h-full flex-col focus:outline-none focus:ring-4"
+        style={{ "--tw-ring-color": "rgba(221, 125, 0, 0.28)" }}
         aria-label={`Read ${post.title}`}
       >
-        <div className="relative overflow-hidden" style={{ backgroundColor: palette.softGray }}>
+        <div className="h-52 overflow-hidden" style={{ backgroundColor: palette.softGray }}>
           {postImage ? (
-            <img src={postImage.src} alt={postImage.alt} className={imageClasses} />
+            <img
+              src={postImage.src}
+              alt={postImage.alt}
+              loading="lazy"
+              className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+            />
           ) : (
             <div
-              className={`flex items-center justify-center ${
-                highlighted ? "h-56 md:h-full md:min-h-[320px]" : "h-52"
-              }`}
+              className="flex h-full items-center justify-center"
               style={{
                 background:
-                  "linear-gradient(135deg, rgba(221,125,0,0.20), rgba(114,17,0,0.16))",
+                  "linear-gradient(135deg, rgba(221,125,0,0.14), rgba(114,17,0,0.10))",
               }}
             >
-              <FileText size={40} style={{ color: accentText }} />
+              <FileText size={36} style={{ color: accentText }} />
             </div>
           )}
-
-          <div
-            className="absolute left-4 top-4 rounded-full border px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.15em] shadow-sm backdrop-blur"
-            style={{
-              borderColor: palette.border,
-              color: accentText,
-              backgroundColor: palette.white,
-            }}
-          >
-            {post.category}
-          </div>
         </div>
 
-        <div
-          className={`flex flex-1 flex-col ${highlighted ? "p-7 md:p-8" : "p-6"}`}
-          style={{ backgroundColor: palette.white }}
-        >
-          {highlighted && (
-            <p
-              className="mb-3 inline-flex w-fit items-center gap-2 text-xs font-black uppercase tracking-[0.18em]"
-              style={{ color: palette.gold }}
-            >
-              <Sparkles size={14} />
-              Month highlight
-            </p>
-          )}
-
+        <div className="flex flex-1 flex-col p-6">
+          <p className="text-xs font-bold uppercase tracking-[0.14em]" style={{ color: accentText }}>
+            {post.category}
+          </p>
           <h3
-            className={`font-black leading-tight tracking-tight transition group-hover:opacity-85 ${
-              highlighted ? "text-2xl md:text-3xl" : "text-xl"
-            }`}
+            className="mt-3 text-xl font-black leading-tight tracking-tight transition group-hover:opacity-85"
             style={{ color: palette.charcoal }}
           >
             {post.title}
           </h3>
-
-          <p
-            className={`mt-4 flex-1 leading-7 ${highlighted ? "text-base" : "text-sm"}`}
-            style={{ color: palette.body }}
-          >
+          <p className="mt-4 flex-1 text-sm leading-7" style={{ color: palette.body }}>
             {post.excerpt}
           </p>
-
           <div className="mt-5">
             <PostMeta post={post} palette={palette} />
           </div>
-
           <span
             className="mt-6 inline-flex items-center gap-2 text-sm font-black transition group-hover:gap-3"
             style={{ color: accentText }}
           >
-            Read Article
-            <ArrowRight size={16} />
+            Read article
+            <ArrowRight size={15} />
           </span>
         </div>
       </Link>
@@ -200,286 +170,287 @@ function ArticleCard({ post, palette, accentText, highlighted = false }) {
   );
 }
 
+function ListArticle({ post, palette, accentText }) {
+  const postImage = getPostImage(post);
+
+  return (
+    <motion.article
+      variants={fadeUp}
+      transition={{ duration: 0.4 }}
+      className="group overflow-hidden rounded-[1.25rem] border shadow-sm transition duration-300 hover:shadow-md"
+      style={{ borderColor: palette.border, backgroundColor: palette.white }}
+    >
+      <Link
+        to={`/blog/${post.slug}`}
+        className="grid focus:outline-none focus:ring-4 md:grid-cols-[220px_1fr]"
+        style={{ "--tw-ring-color": "rgba(221, 125, 0, 0.28)" }}
+        aria-label={`Read ${post.title}`}
+      >
+        <div className="h-48 overflow-hidden md:h-full md:min-h-[210px]" style={{ backgroundColor: palette.softGray }}>
+          {postImage ? (
+            <img
+              src={postImage.src}
+              alt={postImage.alt}
+              loading="lazy"
+              className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+            />
+          ) : (
+            <div
+              className="flex h-full items-center justify-center"
+              style={{
+                background:
+                  "linear-gradient(135deg, rgba(221,125,0,0.14), rgba(114,17,0,0.10))",
+              }}
+            >
+              <FileText size={34} style={{ color: accentText }} />
+            </div>
+          )}
+        </div>
+
+        <div className="flex min-w-0 items-center gap-5 p-6 md:p-7">
+          <div className="min-w-0 flex-1">
+            <p className="text-xs font-bold uppercase tracking-[0.14em]" style={{ color: accentText }}>
+              {post.category}
+            </p>
+            <h3
+              className="mt-3 text-xl font-black leading-tight tracking-tight md:text-2xl"
+              style={{ color: palette.charcoal }}
+            >
+              {post.title}
+            </h3>
+            <p className="mt-3 text-sm leading-7" style={{ color: palette.body }}>
+              {post.excerpt}
+            </p>
+            <div className="mt-4">
+              <PostMeta post={post} palette={palette} />
+            </div>
+          </div>
+          <ArrowRight
+            size={20}
+            className="hidden shrink-0 transition group-hover:translate-x-1 sm:block"
+            style={{ color: accentText }}
+          />
+        </div>
+      </Link>
+    </motion.article>
+  );
+}
+
 export default function Blog({ palette }) {
-  const posts = getPublishedBlogPosts();
-  const monthGroups = groupPostsByMonth(posts);
-  const latestPost = posts[0];
-  const latestImage = getPostImage(latestPost);
-  const categoryCount = new Set(posts.map((post) => post.category)).size;
+  const posts = useMemo(() => getPublishedBlogPosts(), []);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [viewMode, setViewMode] = useState(() => {
+    if (typeof window === "undefined") return "card";
+    return window.localStorage.getItem("mls-blog-view") === "list" ? "list" : "card";
+  });
   const { accentText, heroGradient } = getThemeStyles(palette);
+
+  useEffect(() => {
+    window.localStorage.setItem("mls-blog-view", viewMode);
+  }, [viewMode]);
+
+  const filteredPosts = useMemo(() => {
+    const query = searchTerm.trim().toLowerCase();
+    if (!query) return posts;
+
+    return posts.filter((post) => getSearchableText(post).includes(query));
+  }, [posts, searchTerm]);
+
+  const monthGroups = useMemo(() => groupPostsByMonth(filteredPosts), [filteredPosts]);
+  const hasSearch = searchTerm.trim().length > 0;
 
   return (
     <div className="overflow-hidden" style={{ backgroundColor: palette.white }}>
-      <section className="relative px-5 py-14 md:px-8 md:py-20">
+      <section className="relative px-5 py-16 md:px-8 md:py-24">
         <div className="absolute inset-0 -z-10" style={{ background: heroGradient }} />
-
-        <div className="mx-auto grid max-w-6xl items-center gap-10 lg:grid-cols-[1.05fr_0.95fr]">
-          <motion.div
-            initial="hidden"
-            animate="show"
-            variants={fadeUp}
-            transition={{ duration: 0.55 }}
+        <motion.div
+          initial="hidden"
+          animate="show"
+          variants={fadeUp}
+          transition={{ duration: 0.55 }}
+          className="mx-auto max-w-4xl text-center"
+        >
+          <h1
+            className="text-4xl font-black leading-[1.04] tracking-tight md:text-6xl"
+            style={{ color: palette.charcoal }}
           >
-            <div
-              className="mb-5 inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-black uppercase tracking-[0.18em] shadow-sm"
-              style={{
-                borderColor: palette.border,
-                color: accentText,
-                backgroundColor: palette.white,
-              }}
-            >
-              <BookOpen size={15} style={{ color: palette.gold }} />
-              MLS Blog
-            </div>
+            Practical guidance for better communication access.
+          </h1>
+          <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 md:text-xl" style={{ color: palette.body }}>
+            Articles for organizations, interpreters, and Deaf community members, organized by month for simple browsing.
+          </p>
+        </motion.div>
+      </section>
 
-            <h1
-              className="max-w-3xl text-4xl font-black leading-[1.03] tracking-tight md:text-6xl"
-              style={{ color: palette.charcoal }}
-            >
-              Communication access guidance, organized for easier reading.
-            </h1>
-
-            <p
-              className="mt-6 max-w-2xl text-lg leading-8 md:text-xl"
-              style={{ color: palette.body }}
-            >
-              Explore practical articles for organizations, interpreters, and Deaf community
-              members—now grouped by month so you can find recent guidance and revisit older
-              resources quickly.
-            </p>
-
-            <div className="mt-8 grid max-w-xl grid-cols-3 gap-3">
-              {[
-                { value: posts.length, label: "Articles" },
-                { value: monthGroups.length, label: "Months" },
-                { value: categoryCount, label: "Topics" },
-              ].map((item) => (
-                <div
-                  key={item.label}
-                  className="rounded-2xl border p-4 shadow-sm"
-                  style={{ borderColor: palette.border, backgroundColor: palette.white }}
+      <section className="border-y px-5 py-5 md:px-8" style={{ borderColor: palette.border }}>
+        <div className="mx-auto max-w-6xl">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+            <div className="relative flex-1">
+              <label htmlFor="blog-search" className="sr-only">
+                Search blog articles
+              </label>
+              <Search
+                size={19}
+                className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2"
+                style={{ color: palette.body }}
+              />
+              <input
+                id="blog-search"
+                type="search"
+                value={searchTerm}
+                onChange={(event) => setSearchTerm(event.target.value)}
+                placeholder="Search articles"
+                className="w-full rounded-xl border py-3.5 pl-12 pr-11 text-base outline-none transition focus:ring-4"
+                style={{
+                  borderColor: palette.border,
+                  color: palette.charcoal,
+                  backgroundColor: palette.white,
+                  "--tw-ring-color": "rgba(221, 125, 0, 0.22)",
+                }}
+              />
+              {hasSearch && (
+                <button
+                  type="button"
+                  onClick={() => setSearchTerm("")}
+                  className="absolute right-2.5 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-lg transition hover:opacity-70"
+                  style={{ color: palette.body }}
+                  aria-label="Clear article search"
                 >
-                  <p className="text-2xl font-black" style={{ color: palette.charcoal }}>
-                    {item.value}
-                  </p>
-                  <p
-                    className="mt-1 text-[11px] font-black uppercase tracking-[0.16em]"
-                    style={{ color: accentText }}
-                  >
-                    {item.label}
-                  </p>
-                </div>
-              ))}
+                  <X size={17} />
+                </button>
+              )}
             </div>
-          </motion.div>
 
-          {latestPost && (
-            <motion.article
-              initial={{ opacity: 0, scale: 0.97, y: 18 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.08 }}
-              className="group overflow-hidden rounded-[2rem] border shadow-2xl"
-              style={{ borderColor: palette.border, backgroundColor: palette.white }}
+            <div
+              className="inline-flex w-fit rounded-xl border p-1"
+              style={{ borderColor: palette.border, backgroundColor: palette.softGray }}
+              aria-label="Article view options"
             >
-              <Link
-                to={`/blog/${latestPost.slug}`}
-                className="block focus:outline-none focus:ring-4"
-                style={{ "--tw-ring-color": "rgba(221, 125, 0, 0.35)" }}
+              <button
+                type="button"
+                onClick={() => setViewMode("card")}
+                className="flex h-10 w-11 items-center justify-center rounded-lg transition"
+                style={{
+                  color: viewMode === "card" ? accentText : palette.body,
+                  backgroundColor: viewMode === "card" ? palette.white : "transparent",
+                  boxShadow: viewMode === "card" ? "0 1px 3px rgba(0,0,0,0.08)" : "none",
+                }}
+                aria-label="Show articles as cards"
+                aria-pressed={viewMode === "card"}
+                title="Card view"
               >
-                <div className="relative h-64 overflow-hidden bg-[#202020]">
-                  {latestImage ? (
-                    <img
-                      src={latestImage.src}
-                      alt={latestImage.alt}
-                      className="h-full w-full object-cover opacity-90 transition duration-500 group-hover:scale-105"
-                    />
-                  ) : (
-                    <div
-                      className="h-full"
-                      style={{
-                        background:
-                          "linear-gradient(135deg, #202020 0%, #721100 58%, #dd7d00 100%)",
-                      }}
-                    />
-                  )}
-                  <div
-                    className="absolute inset-0"
-                    style={{
-                      background:
-                        "linear-gradient(180deg, rgba(0,0,0,0.04) 15%, rgba(0,0,0,0.76) 100%)",
-                    }}
-                  />
-                  <div className="absolute inset-x-0 bottom-0 p-6 text-white md:p-7">
-                    <p
-                      className="text-xs font-black uppercase tracking-[0.2em]"
-                      style={{ color: palette.gold }}
-                    >
-                      Newest Article
-                    </p>
-                    <h2 className="mt-3 text-2xl font-black leading-tight md:text-3xl">
-                      {latestPost.title}
-                    </h2>
-                    <div className="mt-4">
-                      <PostMeta post={latestPost} palette={palette} light />
-                    </div>
-                  </div>
-                </div>
+                <LayoutGrid size={19} />
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode("list")}
+                className="flex h-10 w-11 items-center justify-center rounded-lg transition"
+                style={{
+                  color: viewMode === "list" ? accentText : palette.body,
+                  backgroundColor: viewMode === "list" ? palette.white : "transparent",
+                  boxShadow: viewMode === "list" ? "0 1px 3px rgba(0,0,0,0.08)" : "none",
+                }}
+                aria-label="Show articles as a list"
+                aria-pressed={viewMode === "list"}
+                title="List view"
+              >
+                <List size={20} />
+              </button>
+            </div>
+          </div>
 
-                <div className="flex items-center justify-between gap-5 p-5 md:p-6">
-                  <p className="text-sm leading-6" style={{ color: palette.body }}>
-                    {latestPost.excerpt}
-                  </p>
-                  <span
-                    className="hidden h-11 w-11 shrink-0 items-center justify-center rounded-full text-white transition group-hover:translate-x-1 sm:flex"
-                    style={{ backgroundColor: palette.burgundy }}
-                  >
-                    <ArrowRight size={18} />
-                  </span>
-                </div>
-              </Link>
-            </motion.article>
+          {!hasSearch && monthGroups.length > 1 && (
+            <nav
+              aria-label="Browse blog posts by month"
+              className="mt-4 flex gap-6 overflow-x-auto pb-1 text-sm font-bold"
+            >
+              {monthGroups.map((group) => (
+                <a
+                  key={group.key}
+                  href={`#month-${group.key}`}
+                  className="shrink-0 border-b-2 border-transparent py-1 transition hover:border-current"
+                  style={{ color: accentText }}
+                >
+                  {group.label}
+                </a>
+              ))}
+            </nav>
           )}
         </div>
       </section>
 
-      {monthGroups.length > 0 && (
-        <div
-          className="sticky top-[64px] z-20 border-y px-5 py-3 backdrop-blur-xl md:top-[72px] md:px-8"
-          style={{
-            borderColor: palette.border,
-            backgroundColor: `${palette.white}F2`,
-          }}
-        >
-          <nav
-            aria-label="Browse blog posts by month"
-            className="mx-auto flex max-w-6xl items-center gap-3 overflow-x-auto pb-1"
-          >
-            <span
-              className="mr-1 inline-flex shrink-0 items-center gap-2 text-xs font-black uppercase tracking-[0.18em]"
-              style={{ color: palette.charcoal }}
-            >
-              <FolderOpen size={15} style={{ color: palette.gold }} />
-              Browse
-            </span>
-
-            {monthGroups.map((group) => (
-              <a
-                key={group.key}
-                href={`#month-${group.key}`}
-                className="inline-flex shrink-0 items-center gap-2 rounded-full border px-4 py-2 text-sm font-bold transition hover:-translate-y-0.5 hover:shadow-sm focus:outline-none focus:ring-4"
-                style={{
-                  borderColor: palette.border,
-                  color: accentText,
-                  backgroundColor: palette.white,
-                  "--tw-ring-color": "rgba(221, 125, 0, 0.35)",
-                }}
-              >
-                {group.label}
-                <span
-                  className="rounded-full px-2 py-0.5 text-xs"
-                  style={{ color: palette.charcoal, backgroundColor: palette.softGray }}
-                >
-                  {group.posts.length}
-                </span>
-              </a>
-            ))}
-          </nav>
-        </div>
-      )}
-
       <section className="px-5 py-12 md:px-8 md:py-16">
         <div className="mx-auto max-w-6xl">
           {monthGroups.length > 0 ? (
-            <div className="space-y-16 md:space-y-20">
-              {monthGroups.map((group, groupIndex) => (
+            <div className="space-y-14 md:space-y-16">
+              {monthGroups.map((group) => (
                 <section
                   key={group.key}
                   id={`month-${group.key}`}
                   className="scroll-mt-24"
                   aria-labelledby={`month-heading-${group.key}`}
                 >
-                  <motion.div
+                  <motion.h2
                     initial="hidden"
                     whileInView="show"
-                    viewport={{ once: true, amount: 0.25 }}
+                    viewport={{ once: true, amount: 0.4 }}
                     variants={fadeUp}
                     transition={{ duration: 0.4 }}
-                    className="mb-7 flex flex-col gap-4 border-b pb-5 md:flex-row md:items-end md:justify-between"
-                    style={{ borderColor: palette.border }}
+                    id={`month-heading-${group.key}`}
+                    className="mb-7 border-b pb-4 text-3xl font-black tracking-tight md:text-4xl"
+                    style={{ color: palette.charcoal, borderColor: palette.border }}
                   >
-                    <div>
-                      <p
-                        className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.2em]"
-                        style={{ color: palette.gold }}
-                      >
-                        <Layers3 size={15} />
-                        Monthly Archive
-                      </p>
-                      <h2
-                        id={`month-heading-${group.key}`}
-                        className="mt-3 text-3xl font-black tracking-tight md:text-4xl"
-                        style={{ color: palette.charcoal }}
-                      >
-                        {group.label}
-                      </h2>
-                    </div>
-
-                    <p
-                      className="inline-flex w-fit items-center gap-2 rounded-full border px-4 py-2 text-sm font-bold"
-                      style={{
-                        borderColor: palette.border,
-                        color: accentText,
-                        backgroundColor: palette.softGray,
-                      }}
-                    >
-                      {group.posts.length} {group.posts.length === 1 ? "article" : "articles"}
-                    </p>
-                  </motion.div>
+                    {group.label}
+                  </motion.h2>
 
                   <motion.div
                     initial="hidden"
                     whileInView="show"
                     viewport={{ once: true, amount: 0.08 }}
                     variants={staggerGroup}
-                    className="grid auto-rows-fr gap-6 md:grid-cols-2 lg:grid-cols-3"
+                    className={
+                      viewMode === "card"
+                        ? "grid auto-rows-fr gap-6 md:grid-cols-2 lg:grid-cols-3"
+                        : "space-y-5"
+                    }
                   >
-                    {group.posts.map((post, postIndex) => (
-                      <ArticleCard
-                        key={post.slug}
-                        post={post}
-                        palette={palette}
-                        accentText={accentText}
-                        highlighted={postIndex === 0 && group.posts.length > 2}
-                      />
-                    ))}
+                    {group.posts.map((post) =>
+                      viewMode === "card" ? (
+                        <CardArticle
+                          key={post.slug}
+                          post={post}
+                          palette={palette}
+                          accentText={accentText}
+                        />
+                      ) : (
+                        <ListArticle
+                          key={post.slug}
+                          post={post}
+                          palette={palette}
+                          accentText={accentText}
+                        />
+                      ),
+                    )}
                   </motion.div>
-
-                  {groupIndex < monthGroups.length - 1 && (
-                    <div className="mt-12 flex items-center gap-4" aria-hidden="true">
-                      <div className="h-px flex-1" style={{ backgroundColor: palette.border }} />
-                      <div
-                        className="h-2.5 w-2.5 rounded-full"
-                        style={{ backgroundColor: palette.gold }}
-                      />
-                      <div className="h-px flex-1" style={{ backgroundColor: palette.border }} />
-                    </div>
-                  )}
                 </section>
               ))}
             </div>
           ) : (
-            <div
-              className="rounded-[2rem] border p-10 text-center"
-              style={{ borderColor: palette.border, backgroundColor: palette.softGray }}
-            >
-              <FileText size={38} className="mx-auto" style={{ color: accentText }} />
-              <h2 className="mt-5 text-2xl font-black" style={{ color: palette.charcoal }}>
-                No posts published yet.
+            <div className="py-16 text-center">
+              <h2 className="text-2xl font-black" style={{ color: palette.charcoal }}>
+                No articles found.
               </h2>
               <p className="mt-3" style={{ color: palette.body }}>
-                Approved scheduled posts will appear here automatically when their publish date
-                arrives.
+                Try a different search term.
               </p>
+              <button
+                type="button"
+                onClick={() => setSearchTerm("")}
+                className="mt-6 rounded-xl border px-5 py-2.5 text-sm font-bold transition hover:shadow-sm"
+                style={{ borderColor: palette.border, color: accentText, backgroundColor: palette.white }}
+              >
+                Clear search
+              </button>
             </div>
           )}
         </div>
