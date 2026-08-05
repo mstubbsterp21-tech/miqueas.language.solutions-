@@ -31,6 +31,11 @@ export default async function handler(req, res) {
 
     const code = String(req.query?.code || "");
     const state = String(req.query?.state || "");
+    if (!code || !state) {
+      redirect(res, "cancelled", "Google Workspace connection was not completed. Start it again when you are ready.");
+      return;
+    }
+
     const db = database();
     const result = await completeGmailAuthorization(db, { code, state });
     const feedback = await flushPendingPortalFeedback(db).catch((feedbackError) => {
