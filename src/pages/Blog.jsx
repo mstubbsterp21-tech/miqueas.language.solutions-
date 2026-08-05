@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import {
@@ -12,6 +12,8 @@ import {
   X,
 } from "lucide-react";
 import { formatBlogDate, getPublishedBlogPosts } from "../content/blogPostsLive";
+
+const FEATURED_POST_SLUG = "cost-communication-breakdown-cheap-interpreting";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 16 },
@@ -89,9 +91,12 @@ function getSearchableText(post) {
   return [post.title, post.excerpt, post.category, bodyText].join(" ").toLowerCase();
 }
 
-function PostMeta({ post, palette }) {
+function PostMeta({ post, palette, light = false }) {
   return (
-    <div className="flex flex-wrap gap-x-4 gap-y-2 text-sm" style={{ color: palette.body }}>
+    <div
+      className="flex flex-wrap gap-x-4 gap-y-2 text-sm"
+      style={{ color: light ? "rgba(255,255,255,0.82)" : palette.body }}
+    >
       <span className="inline-flex items-center gap-2">
         <CalendarDays size={15} style={{ color: palette.gold }} />
         {formatBlogDate(post.publishDate)}
@@ -101,6 +106,77 @@ function PostMeta({ post, palette }) {
         {post.readTime}
       </span>
     </div>
+  );
+}
+
+function FeaturedArticle({ post, palette, accentText }) {
+  const postImage = getPostImage(post);
+
+  return (
+    <motion.article
+      initial="hidden"
+      whileInView="show"
+      viewport={{ once: true, amount: 0.15 }}
+      variants={fadeUp}
+      transition={{ duration: 0.45 }}
+      className="group overflow-hidden rounded-[1.6rem] border shadow-sm transition hover:shadow-lg"
+      style={{ borderColor: palette.border, backgroundColor: palette.white }}
+    >
+      <Link
+        to={`/blog/${post.slug}`}
+        className="grid focus:outline-none focus:ring-4 lg:grid-cols-[1.05fr_0.95fr]"
+        style={{ "--tw-ring-color": "rgba(221, 125, 0, 0.28)" }}
+        aria-label={`Read featured article: ${post.title}`}
+      >
+        <div className="h-64 overflow-hidden lg:h-full lg:min-h-[360px]" style={{ backgroundColor: palette.softGray }}>
+          {postImage ? (
+            <img
+              src={postImage.src}
+              alt={postImage.alt}
+              className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+            />
+          ) : (
+            <div
+              className="flex h-full items-center justify-center"
+              style={{
+                background:
+                  "linear-gradient(135deg, rgba(221,125,0,0.14), rgba(114,17,0,0.10))",
+              }}
+            >
+              <FileText size={42} style={{ color: accentText }} />
+            </div>
+          )}
+        </div>
+
+        <div className="flex flex-col justify-center p-7 md:p-9">
+          <p className="text-xs font-bold uppercase tracking-[0.16em]" style={{ color: accentText }}>
+            Featured article
+          </p>
+          <p className="mt-4 text-sm font-bold" style={{ color: palette.body }}>
+            {post.category}
+          </p>
+          <h2
+            className="mt-3 text-2xl font-black leading-tight tracking-tight md:text-3xl"
+            style={{ color: palette.charcoal }}
+          >
+            {post.title}
+          </h2>
+          <p className="mt-4 text-base leading-7" style={{ color: palette.body }}>
+            {post.excerpt}
+          </p>
+          <div className="mt-5">
+            <PostMeta post={post} palette={palette} />
+          </div>
+          <span
+            className="mt-7 inline-flex items-center gap-2 text-sm font-black transition group-hover:gap-3"
+            style={{ color: accentText }}
+          >
+            Read article
+            <ArrowRight size={16} />
+          </span>
+        </div>
+      </Link>
+    </motion.article>
   );
 }
 
@@ -238,16 +314,17 @@ function ListArticle({ post, palette, accentText }) {
 
 export default function Blog({ palette }) {
   const posts = useMemo(() => getPublishedBlogPosts(), []);
+  const featuredPost =
+    posts.find((post) => post.slug === FEATURED_POST_SLUG) ||
+    posts.find((post) => post.featured) ||
+    posts[0];
   const [searchTerm, setSearchTerm] = useState("");
   const [viewMode, setViewMode] = useState(() => {
     if (typeof window === "undefined") return "card";
     return window.localStorage.getItem("mls-blog-view") === "list" ? "list" : "card";
   });
   const { accentText, heroGradient } = getThemeStyles(palette);
-
-  useEffect(() => {
-    window.localStorage.setItem("mls-blog-view", viewMode);
-  }, [viewMode]);
+  const hasSearch = searchTerm.trim().length > 0;
 
   const filteredPosts = useMemo(() => {
     const query = searchTerm.trim().toLowerCase();
@@ -256,8 +333,19 @@ export default function Blog({ palette }) {
     return posts.filter((post) => getSearchableText(post).includes(query));
   }, [posts, searchTerm]);
 
-  const monthGroups = useMemo(() => groupPostsByMonth(filteredPosts), [filteredPosts]);
-  const hasSearch = searchTerm.trim().length > 0;
+  const archivePosts = useMemo(() => {
+    if (hasSearch || !featuredPost) return filteredPosts;
+    return filteredPosts.filter((post) => post.slug !== featuredPost.slug);
+  }, [featuredPost, filteredPosts, hasSearch]);
+
+  const monthGroups = useMemo(() => groupPostsByMonth(archivePosts), [archivePosts]);
+
+  const changeViewMode = (mode) => {
+    setViewMode(mode);
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem("mls-blog-view", mode);
+    }
+  };
 
   return (
     <div className="overflow-hidden" style={{ backgroundColor: palette.white }}>
@@ -281,6 +369,14 @@ export default function Blog({ palette }) {
           </p>
         </motion.div>
       </section>
+
+      {featuredPost && (
+        <section className="px-5 py-10 md:px-8 md:py-14">
+          <div className="mx-auto max-w-6xl">
+            <FeaturedArticle post={featuredPost} palette={palette} accentText={accentText} />
+          </div>
+        </section>
+      )}
 
       <section className="border-y px-5 py-5 md:px-8" style={{ borderColor: palette.border }}>
         <div className="mx-auto max-w-6xl">
@@ -328,7 +424,7 @@ export default function Blog({ palette }) {
             >
               <button
                 type="button"
-                onClick={() => setViewMode("card")}
+                onClick={() => changeViewMode("card")}
                 className="flex h-10 w-11 items-center justify-center rounded-lg transition"
                 style={{
                   color: viewMode === "card" ? accentText : palette.body,
@@ -343,7 +439,7 @@ export default function Blog({ palette }) {
               </button>
               <button
                 type="button"
-                onClick={() => setViewMode("list")}
+                onClick={() => changeViewMode("list")}
                 className="flex h-10 w-11 items-center justify-center rounded-lg transition"
                 style={{
                   color: viewMode === "list" ? accentText : palette.body,
@@ -404,9 +500,9 @@ export default function Blog({ palette }) {
                   </motion.h2>
 
                   <motion.div
+                    key={`${group.key}-${viewMode}`}
                     initial="hidden"
-                    whileInView="show"
-                    viewport={{ once: true, amount: 0.08 }}
+                    animate="show"
                     variants={staggerGroup}
                     className={
                       viewMode === "card"
@@ -417,14 +513,14 @@ export default function Blog({ palette }) {
                     {group.posts.map((post) =>
                       viewMode === "card" ? (
                         <CardArticle
-                          key={post.slug}
+                          key={`card-${post.slug}`}
                           post={post}
                           palette={palette}
                           accentText={accentText}
                         />
                       ) : (
                         <ListArticle
-                          key={post.slug}
+                          key={`list-${post.slug}`}
                           post={post}
                           palette={palette}
                           accentText={accentText}
@@ -435,7 +531,7 @@ export default function Blog({ palette }) {
                 </section>
               ))}
             </div>
-          ) : (
+          ) : hasSearch ? (
             <div className="py-16 text-center">
               <h2 className="text-2xl font-black" style={{ color: palette.charcoal }}>
                 No articles found.
@@ -452,7 +548,7 @@ export default function Blog({ palette }) {
                 Clear search
               </button>
             </div>
-          )}
+          ) : null}
         </div>
       </section>
     </div>
