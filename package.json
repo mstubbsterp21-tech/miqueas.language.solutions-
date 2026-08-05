@@ -8,7 +8,10 @@
     "build": "vite build",
     "lint": "eslint .",
     "check": "npm run lint && npm run build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test:e2e": "npm run build && node --test tests/e2e/*.test.mjs",
+    "test:e2e:run": "node --test tests/e2e/*.test.mjs",
+    "test:portal-production": "PLAYWRIGHT_BASE_URL=https://miqueaslanguagesolutions.com PORTAL_DEPLOY_WAIT_MS=180000 npm run test:e2e:run"
   },
   "dependencies": {
     "@clerk/backend": "^2.30.3",

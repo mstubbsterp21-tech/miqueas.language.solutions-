@@ -9,6 +9,13 @@
       "schedule": "0 13 * * *"
     }
   ],
+  "redirects": [
+    {
+      "source": "/login.html",
+      "destination": "/login",
+      "permanent": true
+    }
+  ],
   "headers": [
     {
       "source": "/(.*)",
@@ -36,6 +43,15 @@
       ]
     },
     {
+      "source": "/portal/(.*)",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow, noarchive"
+        }
+      ]
+    },
+    {
       "source": "/login",
       "headers": [
         {
@@ -46,6 +62,15 @@
     },
     {
       "source": "/login/(.*)",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow, noarchive"
+        }
+      ]
+    },
+    {
+      "source": "/admin/interpreters(.*)",
       "headers": [
         {
           "key": "X-Robots-Tag",
@@ -65,7 +90,7 @@
     },
     {
       "source": "/(.*)",
-      "destination": "/index.html"
+      "destination": "/"
     }
   ]
 }

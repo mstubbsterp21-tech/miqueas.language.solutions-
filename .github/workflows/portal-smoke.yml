@@ -1,0 +1,62 @@
+name: Portal smoke tests
+
+on:
+  pull_request:
+    paths:
+      - "api/**"
+      - "src/**"
+      - "supabase/migrations/**"
+      - "tests/e2e/**"
+      - "package.json"
+      - "package-lock.json"
+      - "vercel.json"
+      - ".github/workflows/portal-smoke.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "api/**"
+      - "src/**"
+      - "supabase/migrations/**"
+      - "tests/e2e/**"
+      - "package.json"
+      - "package-lock.json"
+      - "vercel.json"
+      - ".github/workflows/portal-smoke.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  local-build-and-routing:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e
+
+  production-routing-and-auth-boundary:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: local-build-and-routing
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:portal-production
+        env:
+          MLS_ADMIN_STORAGE_STATE_JSON: ${{ secrets.MLS_ADMIN_STORAGE_STATE_JSON }}
+          MLS_INTERPRETER_STORAGE_STATE_JSON: ${{ secrets.MLS_INTERPRETER_STORAGE_STATE_JSON }}
+          MLS_CLIENT_STORAGE_STATE_JSON: ${{ secrets.MLS_CLIENT_STORAGE_STATE_JSON }}
