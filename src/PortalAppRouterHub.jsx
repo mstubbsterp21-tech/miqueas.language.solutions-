@@ -1,11 +1,12 @@
-import { useEffect } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
-import Login from "./pages/Login";
-import MLSWebAppHub from "./pages/MLSWebAppHub";
 import PortalSetupNotice from "./components/PortalSetupNotice";
 import RequirePortalAuth from "./components/RequirePortalAuth";
 import PortalSecurityGate from "./portal/PortalSecurityGate";
 import { isClerkConfigured } from "./lib/env";
+
+const Login = lazy(() => import("./pages/Login"));
+const MLSWebAppHub = lazy(() => import("./pages/MLSWebAppHub"));
 
 const appPalette = {
   burgundy: "#721100",
@@ -25,6 +26,17 @@ function ensureMeta(name, content) {
     document.head.appendChild(element);
   }
   element.setAttribute("content", content);
+}
+
+function RouteLoader() {
+  return (
+    <div className="flex min-h-[100dvh] items-center justify-center bg-[#f7f3ef] p-6" role="status" aria-live="polite">
+      <div className="rounded-3xl border border-[#d1c6bc] bg-white px-8 py-6 text-center shadow-xl">
+        <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-[#721100]/20 border-t-[#721100]" aria-hidden="true" />
+        <p className="mt-4 font-black text-slate-800">Opening your secure workspace…</p>
+      </div>
+    </div>
+  );
 }
 
 export default function PortalAppRouterHub() {
@@ -52,11 +64,20 @@ export default function PortalAppRouterHub() {
     document.documentElement.style.backgroundColor = "#f7f3ef";
   }, []);
 
-  return <Routes>
-    <Route path="/login/*" element={<Login palette={appPalette} />} />
-    <Route path="/portal" element={isClerkConfigured ? <RequirePortalAuth><PortalSecurityGate><MLSWebAppHub /></PortalSecurityGate></RequirePortalAuth> : <PortalSetupNotice palette={appPalette} />} />
-    <Route path="/admin/interpreters" element={<Navigate to="/portal?section=people" replace />} />
-    <Route path="/admin/interpreters/:interpreterId" element={<Navigate to="/portal?section=people" replace />} />
-    <Route path="*" element={<Navigate to="/portal" replace />} />
-  </Routes>;
+  return (
+    <Suspense fallback={<RouteLoader />}>
+      <Routes>
+        <Route path="/login/*" element={<Login palette={appPalette} />} />
+        <Route
+          path="/portal"
+          element={isClerkConfigured
+            ? <RequirePortalAuth><PortalSecurityGate><MLSWebAppHub /></PortalSecurityGate></RequirePortalAuth>
+            : <PortalSetupNotice palette={appPalette} />}
+        />
+        <Route path="/admin/interpreters" element={<Navigate to="/portal?section=people" replace />} />
+        <Route path="/admin/interpreters/:interpreterId" element={<Navigate to="/portal?section=people" replace />} />
+        <Route path="*" element={<Navigate to="/portal" replace />} />
+      </Routes>
+    </Suspense>
+  );
 }
