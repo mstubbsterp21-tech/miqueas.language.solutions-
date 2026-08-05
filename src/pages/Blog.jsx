@@ -13,8 +13,6 @@ import {
 } from "lucide-react";
 import { formatBlogDate, getPublishedBlogPosts } from "../content/blogPostsLive";
 
-const FEATURED_POST_SLUG = "cost-communication-breakdown-cheap-interpreting";
-
 const fadeUp = {
   hidden: { opacity: 0, y: 16 },
   show: { opacity: 1, y: 0 },
@@ -314,10 +312,7 @@ function ListArticle({ post, palette, accentText }) {
 
 export default function Blog({ palette }) {
   const posts = useMemo(() => getPublishedBlogPosts(), []);
-  const featuredPost =
-    posts.find((post) => post.slug === FEATURED_POST_SLUG) ||
-    posts.find((post) => post.featured) ||
-    posts[0];
+  const featuredPost = posts.find((post) => post.featured) || posts[0];
   const [searchTerm, setSearchTerm] = useState("");
   const [viewMode, setViewMode] = useState(() => {
     if (typeof window === "undefined") return "card";
