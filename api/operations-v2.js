@@ -43,6 +43,12 @@ import {
   removeProfileMedia,
 } from "./_shared/ops-v2-profiles.js";
 
+const deviceAccessActions = new Set([
+  "deviceStatus",
+  "beginDeviceVerification",
+  "verifyDevice",
+]);
+
 async function createAuthorizedCommunicationUpload(db, user, payload) {
   if (payload?.context === "announcement" && !user.isAdmin) {
     return { status: 403, payload: { error: "Admin access is required to upload announcement attachments." } };
@@ -105,10 +111,15 @@ const actions = {
 
 export default async function handler(req, res) {
   try {
-    const user = await signedInUser(req);
-    if (!user) return send(res, 401, { error: "Sign in is required." });
-    const db = database();
     const action = String(req.query?.action || "loadOperationsV2");
+    const deviceAccessAction = deviceAccessActions.has(action);
+    const user = await signedInUser(req, {
+      allowUntrustedDevice: deviceAccessAction,
+      allowInactiveInterpreter: deviceAccessAction,
+    });
+    if (!user) return send(res, 401, { error: "Sign in or device verification is required." });
+
+    const db = database();
     if (action === "deviceStatus") {
       const result = await portalDeviceStatus(db, user, req);
       return send(res, result.status, result.payload);
