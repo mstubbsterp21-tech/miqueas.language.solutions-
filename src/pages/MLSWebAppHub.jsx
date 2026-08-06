@@ -7,6 +7,7 @@ import AppShell from "../portal/shell";
 import BidModal from "../portal/BidModal";
 import CommunicationsCenter from "../portal/CommunicationsCenter";
 import FirstLoginSetupWizard, { needsFirstLoginSetup } from "../portal/ClerkFirstLoginSetupWizard";
+import { normalizeWorkspaceDocumentRecords } from "../portal/documentRecords";
 import PortalHomeSnapshot from "../portal/PortalHomeSnapshot";
 import PortalFeedback from "../portal/PortalFeedback";
 import PortalRealtimeBridge from "../portal/PortalRealtimeBridge";
@@ -53,10 +54,11 @@ export default function MLSWebAppHub() {
   const controller = useMLSController();
   const v2 = useOperationsV2({ initialData: controller.operationsV2, deferInitialLoad: true });
   const {
-    isLoaded, workspace, operations, app, role, section, setSection,
+    isLoaded, workspace: rawWorkspace, operations, app, role, section, setSection,
     loading, refreshing, saving, savingTimeZone, busyDoc, message, error, setMessage, setError,
     load, actions, setModal,
   } = controller;
+  const workspace = useMemo(() => normalizeWorkspaceDocumentRecords(rawWorkspace), [rawWorkspace]);
   const roleSelection = usePortalRoleSelection({ enabled: Boolean(isLoaded && workspace && !workspace.user?.isAdmin) });
   const activeSection = normalizeSection(role, section);
   const markingRead = useRef(new Set());
