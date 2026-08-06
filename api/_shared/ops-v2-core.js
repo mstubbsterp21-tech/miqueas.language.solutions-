@@ -1,5 +1,7 @@
+import crypto from "node:crypto";
 import { createClerkClient, verifyToken } from "@clerk/backend";
 import { createClient } from "@supabase/supabase-js";
+import { isBlockedInterpreterRosterStatus } from "./portal-access-policy.js";
 import { sendPushNotification } from "./web-push.js";
 
 const dbUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
@@ -11,6 +13,7 @@ const adminEmails = (process.env.VITE_ADMIN_EMAILS || "")
   .filter(Boolean);
 const clerkUserCache = new Map();
 const clerkUserCacheMs = 30_000;
+const trustedDeviceCookie = "mls_trusted_device";
 
 export function send(res, status, payload) {
   res.status(status).setHeader("content-type", "application/json");
@@ -31,11 +34,45 @@ function bearer(req) {
   return String(req.headers.authorization || "").match(/^Bearer\s+(.+)$/i)?.[1] || "";
 }
 
-export async function signedInUser(req) {
+function cookieMap(req) {
+  const values = {};
+  String(req.headers.cookie || "").split(";").forEach((part) => {
+    const index = part.indexOf("=");
+    if (index > 0) values[part.slice(0, index).trim()] = decodeURIComponent(part.slice(index + 1).trim());
+  });
+  return values;
+}
+
+function hash(value) {
+  return crypto.createHash("sha256").update(String(value)).digest("hex");
+}
+
+async function hasTrustedPortalDevice(db, userId, req) {
+  const token = cookieMap(req)[trustedDeviceCookie];
+  if (!token) return false;
+  const result = await db
+    .from("portal_trusted_devices")
+    .select("device_hash")
+    .eq("clerk_user_id", userId)
+    .eq("device_hash", hash(token))
+    .is("revoked_at", null)
+    .maybeSingle();
+  if (result.error) throw result.error;
+  return Boolean(result.data);
+}
+
+export async function signedInUser(req, options = {}) {
   const jwt = bearer(req);
   if (!jwt || !clerkKey) return null;
-  const claims = await verifyToken(jwt, { secretKey: clerkKey });
+
+  let claims;
+  try {
+    claims = await verifyToken(jwt, { secretKey: clerkKey });
+  } catch {
+    return null;
+  }
   if (!claims?.sid || !claims?.sub) return null;
+
   const cached = clerkUserCache.get(claims.sub);
   let record = cached?.expiresAt > Date.now() ? cached.record : null;
   if (!record) {
@@ -48,9 +85,10 @@ export async function signedInUser(req) {
       }
     }
   }
+
   const email = record.primaryEmailAddress?.emailAddress?.toLowerCase() || "";
   const metadataRole = String(record.publicMetadata?.portalRole || "").toLowerCase();
-  return {
+  const user = {
     id: record.id,
     email,
     firstName: record.firstName || "",
@@ -60,6 +98,24 @@ export async function signedInUser(req) {
     metadataRole,
     organizationName: String(record.publicMetadata?.organizationName || ""),
   };
+
+  let accessDb = null;
+  const getAccessDb = () => {
+    accessDb ||= database();
+    return accessDb;
+  };
+
+  if (!options.allowUntrustedDevice) {
+    const trusted = await hasTrustedPortalDevice(getAccessDb(), user.id, req);
+    if (!trusted) return null;
+  }
+
+  if (!options.allowInactiveInterpreter && !user.isAdmin && user.metadataRole !== "client") {
+    const interpreter = await interpreterFor(getAccessDb(), user.id);
+    if (interpreter && isBlockedInterpreterRosterStatus(interpreter.roster_status)) return null;
+  }
+
+  return user;
 }
 
 export function database() {
