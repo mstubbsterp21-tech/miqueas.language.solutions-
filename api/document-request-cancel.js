@@ -38,6 +38,14 @@ export default async function handler(req, res) {
     if (updated.error) throw updated.error;
     if (!updated.data) return send(res, 409, { error: "This document request changed before it could be cancelled. Refresh and try again." });
 
+    const notificationUpdate = await db
+      .from("notifications")
+      .update({ is_read: true, read_at: now })
+      .eq("related_type", "document_request")
+      .eq("related_id", updated.data.id)
+      .eq("is_read", false);
+    if (notificationUpdate.error) throw notificationUpdate.error;
+
     await audit(db, user, {
       action: "document_request.cancelled",
       entityType: "document_request",
