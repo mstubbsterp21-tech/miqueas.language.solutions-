@@ -9,9 +9,7 @@
   <style>
     :root {
       --burgundy: #721100;
-      --burgundy-dark: #4f0b00;
       --gold: #dd7d00;
-      --gold-soft: #f1d4ad;
       --charcoal: #464747;
       --text: #5c5c5c;
       --cream: #f7f3ef;
@@ -202,30 +200,45 @@
 
     /* EXPERIENCE */
 
-    .experience-grid {
+    .experience-grid,
+    .detail-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 14px;
       margin-bottom: 18px;
     }
 
-    .credential {
+    .credential,
+    .detail-card {
       padding: 17px;
       border: 1px solid var(--border);
       border-top: 4px solid var(--gold);
       background: #fcfbfa;
     }
 
-    .credential strong {
+    .credential strong,
+    .detail-card strong {
       display: block;
       margin-bottom: 5px;
       color: var(--burgundy);
       font-size: 1rem;
     }
 
-    .credential span {
+    .credential span,
+    .detail-card span {
       color: var(--text);
       font-size: .88rem;
+    }
+
+    .path-note {
+      padding: 15px 17px;
+      border-left: 4px solid var(--gold);
+      background: var(--cream);
+      color: var(--text);
+    }
+
+    .path-note strong {
+      color: var(--charcoal);
     }
 
     .focus-label {
@@ -266,6 +279,20 @@
       color: #f3d4aa;
       font-size: 1.06rem;
       font-weight: 800;
+    }
+
+    /* COMMUNITY */
+
+    .community-box {
+      padding: 20px 22px;
+      border-left: 5px solid var(--gold);
+      background: #fcfaf8;
+    }
+
+    .community-box strong {
+      display: block;
+      margin-bottom: 7px;
+      color: var(--burgundy);
     }
 
     /* STRUCTURE */
@@ -386,6 +413,7 @@
       .content { padding: 24px 16px 30px; }
       .section-body { padding: 18px; }
       .experience-grid,
+      .detail-grid,
       .clean-list { grid-template-columns: 1fr; }
     }
 
@@ -399,7 +427,9 @@
       .content { padding: 24px 28px; }
       .section,
       .credential,
+      .detail-card,
       .structure-item,
+      .community-box,
       .business-card { break-inside: avoid; }
     }
   </style>
@@ -459,9 +489,9 @@
           language, culture, communication access, and the responsibility interpreters carry in their work.
         </p>
         <p>
-          I began working professionally as a freelance ASL/English interpreter in 2018. My experience has
-          included educational, medical, community, and remote interpreting. Much of my development has come
-          through real-world experience, reflection, feedback, and mentorship.
+          I have seven years of professional ASL/English interpreting experience across educational, medical,
+          community, and remote settings. Much of my development has come through real-world experience,
+          reflection, feedback, and mentorship.
         </p>
       </div>
     </section>
@@ -495,6 +525,30 @@
 
     <section class="section">
       <div class="section-header">
+        <h2>Education & Professional Affiliations</h2>
+      </div>
+      <div class="section-body">
+        <div class="detail-grid">
+          <div class="detail-card">
+            <strong>RID</strong>
+            <span>Associate Membership</span>
+          </div>
+          <div class="detail-card">
+            <strong>Florida Registry of Interpreters (FRID)</strong>
+            <span>Organizational Membership</span>
+          </div>
+        </div>
+
+        <div class="path-note">
+          <strong>Interpreter Education:</strong> Attended the Interpreter Training Program at Community College
+          of Baltimore County (CCBC). Continued professional development through field experience, mentorship,
+          and the Alternative Pathway to Eligibility while pursuing NIC certification.
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-header">
         <h2>Why I Mentor</h2>
       </div>
       <div class="section-body">
@@ -510,6 +564,21 @@
           <p>
             I do not see mentorship as a one-way process. The mentee's goals, experiences, questions,
             and learning needs should help shape the work we do together.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-header">
+        <h2>Community Involvement</h2>
+      </div>
+      <div class="section-body">
+        <div class="community-box">
+          <strong>Volunteer Bible Education in ASL</strong>
+          <p>
+            I participate in a worldwide Bible education work focused on making Bible education accessible
+            in ASL for the Deaf community. As part of that work, I offer free Bible lessons in ASL.
           </p>
         </div>
       </div>
