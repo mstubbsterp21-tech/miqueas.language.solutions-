@@ -4,6 +4,7 @@ import Home from "./pages/Home";
 import Services from "./pages/Services";
 import ServiceDetail from "./pages/ServiceDetail";
 import About from "./pages/About";
+import MentorProfile from "./pages/MentorProfile";
 import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
 import ResourcesClients from "./pages/ResourcesClients";
@@ -296,6 +297,7 @@ export default function App() {
           <Route path="/services/video-remote-interpreting-nationwide" element={<NationwideVri palette={palette} />} />
           <Route path="/locations/:locationId" element={<LocationService palette={palette} />} />
           <Route path="/about" element={<About palette={palette} />} />
+          <Route path="/mentor-profile" element={<MentorProfile palette={palette} />} />
           <Route path="/policies" element={<PoliciesLayout palette={palette} />}>
             <Route index element={<Navigate to="clients" replace />} />
             <Route path="clients" element={<PoliciesClients palette={palette} />} />
@@ -344,6 +346,7 @@ export default function App() {
               <h2 className="mb-4 text-xs font-bold uppercase tracking-[0.22em] text-[#dd7d00]">Quick Links</h2>
               <div className="flex flex-col gap-3 text-sm text-white/75">
                 <Link to="/about" className="transition hover:text-white">About MLS</Link>
+                <Link to="/mentor-profile" className="transition hover:text-white">Mentorship</Link>
                 <Link to="/blog" className="transition hover:text-white">Blog</Link>
                 <Link to="/clients" className="transition hover:text-white">Client Information</Link>
                 <Link to="/interpreters" className="transition hover:text-white">Interpreter Information</Link>
