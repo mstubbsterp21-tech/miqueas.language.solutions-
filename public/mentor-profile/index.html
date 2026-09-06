@@ -6,114 +6,807 @@
   <title>Micah Stubbs | Mentor Profile</title>
   <meta name="robots" content="noindex,nofollow" />
   <style>
-    :root{--burgundy:#721100;--gold:#dd7d00;--charcoal:#464747;--text:#555;--cream:#f7f3ef;--border:#d1c6bc;--white:#fff}
-    *{box-sizing:border-box}
-    body{margin:0;padding:32px 16px;background:#f1ede9;font-family:Arial,Helvetica,sans-serif;color:var(--charcoal);line-height:1.6}
-    .profile{width:min(960px,100%);margin:0 auto;background:var(--white);border:1px solid var(--border);box-shadow:0 14px 40px rgba(0,0,0,.08)}
-    .brand-header{display:flex;justify-content:space-between;align-items:center;gap:24px;padding:20px 28px;border-bottom:5px solid var(--burgundy)}
-    .brand{display:flex;align-items:center;gap:14px}.brand img{width:64px;height:64px;object-fit:contain}.brand-name{margin:0;font-size:1.05rem;font-weight:700}.tagline{margin:2px 0 0;color:var(--gold);font-size:.82rem;font-weight:700}.document-title{color:var(--burgundy);font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em}
-    .intro{display:grid;grid-template-columns:1fr 220px;gap:36px;align-items:center;padding:38px 36px;background:var(--cream);border-bottom:1px solid var(--border)}
-    .intro h1{margin:0;color:var(--burgundy);font-size:3.5rem;line-height:1}.role{margin:10px 0 20px;font-size:1.05rem;font-weight:700}.intro-text{margin:0;max-width:620px;color:var(--text)}
-    .photo{padding:10px;border:1px solid var(--border);background:#fff}.photo img{display:block;width:100%;aspect-ratio:4/5;object-fit:contain;object-position:center bottom;background:#f8f6f3}
-    .content{padding:32px 36px 40px}.section{margin-bottom:24px;border:1.5px solid var(--border);background:#fff}.section:last-child{margin-bottom:0}.section-header{padding:12px 18px;border-bottom:1px solid var(--border);background:var(--cream)}.section-header h2{margin:0;color:var(--burgundy);font-size:1.05rem}.section-body{padding:20px}.section-body p{margin:0 0 14px;color:var(--text)}.section-body p:last-child{margin-bottom:0}
-    .info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.info-item{padding-bottom:10px;border-bottom:1px solid #e6dfd9}.info-label{display:block;margin-bottom:3px;color:var(--gold);font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em}.info-value{font-weight:600}
-    .credential-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px}.credential{padding:16px;border:1px solid var(--border);background:#fcfbfa}.credential strong{display:block;margin-bottom:4px;color:var(--burgundy)}.credential span{color:var(--text);font-size:.9rem}
-    ul{margin:0;padding-left:20px;color:var(--text)}li{margin-bottom:7px}li:last-child{margin-bottom:0}
-    .structure-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.structure-item{padding:16px;border:1px solid var(--border)}.structure-item h3{margin:0 0 7px;color:var(--burgundy);font-size:.95rem}.structure-item p{margin:0;color:var(--text);font-size:.88rem}
-    .connect{border-color:var(--burgundy)}.connect .section-header{background:var(--burgundy);border-bottom-color:var(--burgundy)}.connect .section-header h2{color:#fff}.business-card{margin-top:22px;width:100%;border-top:1px solid var(--border);padding-top:22px}.business-card img{display:block;width:100%;height:auto;margin:0 auto}
-    footer{padding:16px 28px;border-top:1px solid var(--border);text-align:center;color:#777;font-size:.75rem}
-    @media(max-width:700px){body{padding:0}.profile{border:0}.brand-header{align-items:flex-start}.document-title{display:none}.intro{grid-template-columns:1fr}.photo{width:190px}.intro h1{font-size:2.8rem}.content{padding:24px 18px}.info-grid,.credential-grid,.structure-grid{grid-template-columns:1fr}}
-    @media print{@page{size:Letter;margin:.4in}body{padding:0;background:#fff}.profile{width:100%;border:0;box-shadow:none}.intro{padding:24px 28px}.intro h1{font-size:2.8rem}.photo{width:180px}.content{padding:24px 28px}.section,.credential,.structure-item,.business-card{break-inside:avoid}}
+    :root {
+      --burgundy: #721100;
+      --burgundy-dark: #4f0b00;
+      --gold: #dd7d00;
+      --gold-soft: #f3d4aa;
+      --charcoal: #464747;
+      --text: #5b5b5b;
+      --cream: #f7f3ef;
+      --cream-deep: #eee6de;
+      --border: #d3c6bc;
+      --white: #ffffff;
+      --shadow: 0 18px 48px rgba(57, 34, 25, 0.12);
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      padding: 34px 18px;
+      background:
+        radial-gradient(circle at top right, rgba(221, 125, 0, .10), transparent 28%),
+        linear-gradient(180deg, #f4efea 0%, #eee8e2 100%);
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--charcoal);
+      line-height: 1.65;
+    }
+
+    .profile {
+      width: min(1080px, 100%);
+      margin: 0 auto;
+      background: var(--white);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    /* BRAND HEADER */
+
+    .brand-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 24px;
+      padding: 18px 30px;
+      background: var(--white);
+      border-bottom: 5px solid var(--burgundy);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .brand img {
+      width: 62px;
+      height: 62px;
+      object-fit: contain;
+    }
+
+    .brand-name {
+      margin: 0;
+      font-size: 1.08rem;
+      font-weight: 800;
+      color: var(--charcoal);
+    }
+
+    .tagline {
+      margin: 2px 0 0;
+      color: var(--gold);
+      font-size: .82rem;
+      font-weight: 700;
+    }
+
+    .document-title {
+      color: var(--burgundy);
+      font-size: .78rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .14em;
+    }
+
+    /* HERO */
+
+    .hero {
+      position: relative;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 245px;
+      gap: 44px;
+      align-items: center;
+      padding: 48px 44px 42px;
+      background:
+        linear-gradient(135deg, rgba(114, 17, 0, .98), rgba(79, 11, 0, .96));
+      color: var(--white);
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      right: -80px;
+      top: -80px;
+      width: 260px;
+      height: 260px;
+      border: 2px solid rgba(221, 125, 0, .28);
+      border-radius: 50%;
+    }
+
+    .hero-copy,
+    .photo-wrap {
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-kicker {
+      margin: 0 0 10px;
+      color: #f4c47f;
+      font-size: .78rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .13em;
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: clamp(3rem, 6vw, 4.5rem);
+      line-height: .95;
+      letter-spacing: -.035em;
+      color: var(--white);
+    }
+
+    .role {
+      margin: 14px 0 20px;
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: #f3d4aa;
+    }
+
+    .hero-text {
+      margin: 0;
+      max-width: 650px;
+      color: rgba(255,255,255,.88);
+      font-size: 1.02rem;
+    }
+
+    .location-line {
+      margin: 22px 0 0;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border: 1px solid rgba(255,255,255,.25);
+      background: rgba(255,255,255,.08);
+      font-size: .84rem;
+      font-weight: 700;
+    }
+
+    .location-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--gold);
+      box-shadow: 0 0 0 4px rgba(221,125,0,.18);
+    }
+
+    .photo-wrap {
+      justify-self: end;
+      width: 225px;
+      padding: 8px;
+      background: var(--white);
+      border: 3px solid var(--gold);
+      box-shadow: 0 16px 30px rgba(0,0,0,.18);
+    }
+
+    .photo-wrap img {
+      display: block;
+      width: 100%;
+      aspect-ratio: 4 / 5;
+      object-fit: contain;
+      object-position: center bottom;
+      background: #f8f6f3;
+    }
+
+    /* SNAPSHOT */
+
+    .snapshot {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      border-bottom: 1px solid var(--border);
+      background: var(--cream);
+    }
+
+    .snapshot-item {
+      padding: 20px 18px;
+      text-align: center;
+      border-right: 1px solid var(--border);
+    }
+
+    .snapshot-item:last-child { border-right: 0; }
+
+    .snapshot-number {
+      display: block;
+      color: var(--burgundy);
+      font-size: 1.55rem;
+      font-weight: 900;
+      line-height: 1.1;
+    }
+
+    .snapshot-label {
+      display: block;
+      margin-top: 5px;
+      color: var(--text);
+      font-size: .76rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+    }
+
+    /* CONTENT + SECTIONS */
+
+    .content {
+      padding: 34px 38px 44px;
+    }
+
+    .section {
+      margin-bottom: 26px;
+      border: 1.5px solid var(--border);
+      background: var(--white);
+    }
+
+    .section:last-child { margin-bottom: 0; }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      padding: 13px 18px;
+      border-bottom: 1px solid var(--border);
+      background: var(--cream);
+    }
+
+    .section-header h2 {
+      margin: 0;
+      color: var(--burgundy);
+      font-size: 1.08rem;
+    }
+
+    .section-number {
+      color: var(--gold);
+      font-size: .72rem;
+      font-weight: 900;
+      letter-spacing: .12em;
+    }
+
+    .section-body {
+      padding: 22px;
+    }
+
+    .section-body p {
+      margin: 0 0 15px;
+      color: var(--text);
+    }
+
+    .section-body p:last-child { margin-bottom: 0; }
+
+    /* ABOUT + PATH */
+
+    .about-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.35fr) minmax(260px, .65fr);
+      gap: 28px;
+      align-items: start;
+    }
+
+    .pathway {
+      background: #fcfaf8;
+      border: 1px solid var(--border);
+      padding: 18px;
+    }
+
+    .pathway h3 {
+      margin: 0 0 14px;
+      color: var(--burgundy);
+      font-size: .95rem;
+    }
+
+    .path-item {
+      position: relative;
+      padding: 0 0 18px 22px;
+      color: var(--text);
+      font-size: .88rem;
+    }
+
+    .path-item:last-child { padding-bottom: 0; }
+
+    .path-item::before {
+      content: "";
+      position: absolute;
+      left: 2px;
+      top: 5px;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--gold);
+    }
+
+    .path-item::after {
+      content: "";
+      position: absolute;
+      left: 6px;
+      top: 15px;
+      bottom: -2px;
+      width: 1px;
+      background: var(--gold-soft);
+    }
+
+    .path-item:last-child::after { display: none; }
+
+    .path-item strong {
+      display: block;
+      color: var(--charcoal);
+      margin-bottom: 2px;
+    }
+
+    /* STATUS */
+
+    .status-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    .status-card {
+      min-height: 122px;
+      padding: 17px;
+      border: 1px solid var(--border);
+      border-top: 4px solid var(--gold);
+      background: #fcfbfa;
+    }
+
+    .status-card strong {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--burgundy);
+      font-size: 1rem;
+    }
+
+    .status-card span {
+      display: block;
+      color: var(--text);
+      font-size: .88rem;
+    }
+
+    /* PRACTICE AREAS */
+
+    .focus-block + .focus-block { margin-top: 22px; }
+
+    .focus-title {
+      margin: 0 0 10px;
+      color: var(--charcoal);
+      font-size: .9rem;
+      font-weight: 800;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+    }
+
+    .chip {
+      padding: 7px 11px;
+      border: 1px solid var(--border);
+      background: var(--cream);
+      color: var(--charcoal);
+      font-size: .82rem;
+      font-weight: 700;
+    }
+
+    .chip.growth {
+      border-color: var(--gold-soft);
+      background: #fffaf3;
+      color: #815000;
+    }
+
+    /* PHILOSOPHY */
+
+    .philosophy-box {
+      padding: 24px 26px;
+      border-left: 6px solid var(--gold);
+      background: var(--burgundy);
+    }
+
+    .philosophy-box p {
+      color: rgba(255,255,255,.92);
+      font-size: 1rem;
+    }
+
+    .philosophy-box p:last-child { margin-bottom: 0; }
+
+    .philosophy-lead {
+      color: #f3d4aa !important;
+      font-size: 1.08rem !important;
+      font-weight: 800;
+    }
+
+    /* STRUCTURE */
+
+    .structure-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    .structure-item {
+      padding: 18px;
+      border: 1px solid var(--border);
+      background: #fff;
+    }
+
+    .structure-item h3 {
+      margin: 0 0 8px;
+      color: var(--burgundy);
+      font-size: .96rem;
+    }
+
+    .structure-item p {
+      margin: 0;
+      color: var(--text);
+      font-size: .88rem;
+    }
+
+    /* LIST */
+
+    .clean-list {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px 24px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .clean-list li {
+      position: relative;
+      padding-left: 20px;
+      color: var(--text);
+    }
+
+    .clean-list li::before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      color: var(--gold);
+      font-weight: 900;
+    }
+
+    /* CONNECT */
+
+    .connect {
+      border-color: var(--burgundy);
+    }
+
+    .connect .section-header {
+      background: var(--burgundy);
+      border-bottom-color: var(--burgundy);
+    }
+
+    .connect .section-header h2,
+    .connect .section-number {
+      color: var(--white);
+    }
+
+    .connect-intro {
+      max-width: 760px;
+      margin-bottom: 20px;
+    }
+
+    .business-card {
+      width: 100%;
+      margin-top: 22px;
+      padding-top: 22px;
+      border-top: 1px solid var(--border);
+    }
+
+    .business-card img {
+      display: block;
+      width: 100%;
+      height: auto;
+      margin: 0 auto;
+      border: 1px solid #e3d8d0;
+      box-shadow: 0 12px 28px rgba(64, 38, 26, .10);
+    }
+
+    footer {
+      padding: 17px 28px;
+      border-top: 1px solid var(--border);
+      background: var(--cream);
+      text-align: center;
+      color: #777;
+      font-size: .74rem;
+    }
+
+    @media (max-width: 820px) {
+      .hero {
+        grid-template-columns: 1fr 190px;
+        gap: 26px;
+        padding: 38px 28px;
+      }
+
+      .photo-wrap { width: 185px; }
+      .snapshot { grid-template-columns: repeat(2, 1fr); }
+      .snapshot-item:nth-child(2) { border-right: 0; }
+      .snapshot-item:nth-child(-n+2) { border-bottom: 1px solid var(--border); }
+      .about-grid { grid-template-columns: 1fr; }
+      .status-grid { grid-template-columns: 1fr; }
+      .structure-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 620px) {
+      body { padding: 0; }
+      .profile { border: 0; }
+      .brand-header { padding: 16px 18px; }
+      .document-title { display: none; }
+      .brand img { width: 52px; height: 52px; }
+      .hero { grid-template-columns: 1fr; padding: 34px 22px 30px; }
+      .hero h1 { font-size: 3.1rem; }
+      .photo-wrap { width: 170px; justify-self: start; }
+      .content { padding: 24px 16px 32px; }
+      .section-body { padding: 18px; }
+      .clean-list { grid-template-columns: 1fr; }
+      .snapshot-number { font-size: 1.3rem; }
+    }
+
+    @media print {
+      @page { size: Letter; margin: .38in; }
+      body { padding: 0; background: #fff; }
+      .profile { width: 100%; border: 0; box-shadow: none; }
+      .hero { padding: 24px 28px; }
+      .hero h1 { font-size: 3rem; }
+      .photo-wrap { width: 175px; }
+      .content { padding: 24px 28px; }
+      .section,
+      .status-card,
+      .structure-item,
+      .business-card { break-inside: avoid; }
+    }
   </style>
 </head>
 <body>
 <main class="profile">
+
   <header class="brand-header">
     <div class="brand">
-      <img src="https://raw.githubusercontent.com/mstubbsterp21-tech/miqueas.language.solutions-/main/src/logo.png" alt="Miqueas Language Solutions logo" />
-      <div><p class="brand-name">Miqueas Language Solutions</p><p class="tagline">Bridging Perspectives. Delivering Understanding.</p></div>
+      <img src="/logo.png" alt="Miqueas Language Solutions logo" />
+      <div>
+        <p class="brand-name">Miqueas Language Solutions</p>
+        <p class="tagline">Bridging Perspectives. Delivering Understanding.</p>
+      </div>
     </div>
     <div class="document-title">Mentor Profile</div>
   </header>
 
-  <section class="intro">
-    <div>
+  <section class="hero">
+    <div class="hero-copy">
+      <p class="hero-kicker">Interpreter Mentor Profile</p>
       <h1>Micah Stubbs</h1>
-      <p class="role">ASL/English Interpreter & Mentor</p>
-      <p class="intro-text">I approach mentorship as a collaborative process where interpreters can examine their work, identify patterns, and turn feedback into practical next steps for growth.</p>
+      <p class="role">ASL/English Interpreter • Agency Owner • Developing Mentor</p>
+      <p class="hero-text">
+        My path into interpreting has been shaped by Deaf community connection, hands-on experience,
+        mentorship, and a willingness to learn from mistakes. I bring that same practical and reflective
+        approach into the way I want to mentor other interpreters.
+      </p>
+      <p class="location-line">
+        <span class="location-dot" aria-hidden="true"></span>
+        Central Florida roots • Based in the Dominican Republic • Atlantic Standard Time
+      </p>
     </div>
-    <div class="photo"><img src="https://raw.githubusercontent.com/mstubbsterp21-tech/miqueas.language.solutions-/main/src/assets/lightX.PNG" alt="Micah Stubbs" /></div>
+
+    <div class="photo-wrap">
+      <img src="https://raw.githubusercontent.com/mstubbsterp21-tech/miqueas.language.solutions-/main/src/assets/lightX.PNG" alt="Micah Stubbs" />
+    </div>
+  </section>
+
+  <section class="snapshot" aria-label="Professional snapshot">
+    <div class="snapshot-item">
+      <span class="snapshot-number">7 Years</span>
+      <span class="snapshot-label">Professional Interpreting</span>
+    </div>
+    <div class="snapshot-item">
+      <span class="snapshot-number">Age 12</span>
+      <span class="snapshot-label">Started Learning ASL</span>
+    </div>
+    <div class="snapshot-item">
+      <span class="snapshot-number">EIPA 3.9</span>
+      <span class="snapshot-label">Performance Assessment</span>
+    </div>
+    <div class="snapshot-item">
+      <span class="snapshot-number">MLS</span>
+      <span class="snapshot-label">Interpreting Agency Owner</span>
+    </div>
   </section>
 
   <section class="content">
-    <section class="section">
-      <div class="section-header"><h2>Basic Information</h2></div>
-      <div class="section-body"><div class="info-grid">
-        <div class="info-item"><span class="info-label">Name</span><span class="info-value">Micah Stubbs</span></div>
-        <div class="info-item"><span class="info-label">Availability</span><span class="info-value">Virtual mentorship; in-person by arrangement</span></div>
-        <div class="info-item"><span class="info-label">Format</span><span class="info-value">Primarily one-on-one</span></div>
-      </div></div>
-    </section>
 
     <section class="section">
-      <div class="section-header"><h2>About Me</h2></div>
-      <div class="section-body">
-        <p>My connection to ASL and the Deaf community began through direct relationships and community involvement before interpreting became my profession. Those experiences shaped how I understand language, culture, communication access, and the responsibility interpreters carry in their work.</p>
-        <p>I began working professionally as a freelance ASL/English interpreter in 2018. My experience has included educational, medical, community, and remote interpreting settings.</p>
-        <p>Over time, I have learned that interpreting development is not only about producing a better final message. It also requires understanding our processing, decision-making, preparation, language choices, and patterns.</p>
+      <div class="section-header">
+        <h2>About Me</h2>
+        <span class="section-number">01</span>
       </div>
-    </section>
-
-    <section class="section">
-      <div class="section-header"><h2>Credentials & Experience</h2></div>
       <div class="section-body">
-        <div class="credential-grid">
-          <div class="credential"><strong>EIPA</strong><span>Performance assessment score: 3.9</span></div>
-          <div class="credential"><strong>CASLI</strong><span>Generalist Knowledge Exam passed</span></div>
+        <div class="about-grid">
+          <div>
+            <p>
+              I started learning ASL at age 12, and my language roots run deep in the Deaf community of
+              Central Florida. I did not begin interpreting professionally until 2019, when I was living in
+              Baltimore, Maryland.
+            </p>
+            <p>
+              Living in Maryland gave me access to a much larger Deaf community in the Washington, D.C. and
+              Gallaudet area. Being around many different native ASL users exposed me to a wider range of
+              signing styles and language experiences, which helped shape my interpreting development over time.
+            </p>
+            <p>
+              My path has not been perfectly linear. I gained a lot of my development through real-world
+              interpreting, making mistakes, reflecting on them, and working with an interpreter mentor who
+              helped me sharpen both my interpreting skills and my ethical decision-making.
+            </p>
+          </div>
+
+          <aside class="pathway" aria-label="Professional pathway">
+            <h3>My Professional Path</h3>
+            <div class="path-item">
+              <strong>Age 12</strong>
+              Began learning ASL through Deaf community connection in Central Florida.
+            </div>
+            <div class="path-item">
+              <strong>2019</strong>
+              Began interpreting professionally while living in Maryland.
+            </div>
+            <div class="path-item">
+              <strong>CCBC ITP</strong>
+              Started the Interpreter Training Program at Community College of Baltimore County.
+            </div>
+            <div class="path-item">
+              <strong>Alternative Pathway</strong>
+              Continued toward certification through the Alternative Pathway to Eligibility.
+            </div>
+            <div class="path-item">
+              <strong>Agency Ownership</strong>
+              Now runs Miqueas Language Solutions as an interpreting agency LLC.
+            </div>
+          </aside>
         </div>
-        <ul><li>Educational interpreting</li><li>Medical interpreting</li><li>Community interpreting</li><li>Video Remote Interpreting</li><li>ASL-to-English interpretation</li><li>English-to-ASL interpretation</li></ul>
       </div>
     </section>
 
     <section class="section">
-      <div class="section-header"><h2>Why I Mentor</h2></div>
+      <div class="section-header">
+        <h2>Professional Status & Training</h2>
+        <span class="section-number">02</span>
+      </div>
       <div class="section-body">
-        <p>I value mentorship because useful feedback should lead to something an interpreter can actually work on.</p>
-        <p>Rather than stopping at broad feedback such as “work on accuracy” or “improve your ASL,” I want to help mentees identify what happened, why it may have happened, and what specific practice or reflection can support growth.</p>
-        <p>I see mentorship as a collaborative process. The mentee's goals, experiences, and learning needs should help shape the work we do together.</p>
+        <div class="status-grid">
+          <div class="status-card">
+            <strong>EIPA</strong>
+            <span>Performance assessment score: 3.9</span>
+          </div>
+          <div class="status-card">
+            <strong>CASLI</strong>
+            <span>Generalist Knowledge Exam passed</span>
+          </div>
+          <div class="status-card">
+            <strong>Interpreter Education</strong>
+            <span>Partial ITP completion at Community College of Baltimore County; Alternative Pathway to Eligibility</span>
+          </div>
+        </div>
       </div>
     </section>
 
     <section class="section">
-      <div class="section-header"><h2>Mentorship Structure</h2></div>
-      <div class="section-body"><div class="structure-grid">
-        <div class="structure-item"><h3>Initial Conversation</h3><p>We begin by discussing your experience, goals, current challenges, and what you hope to gain from mentorship.</p></div>
-        <div class="structure-item"><h3>Sessions</h3><p>A typical session is approximately 60 minutes and may include interpreting samples, discussion, self-analysis, exercises, or goal review.</p></div>
-        <div class="structure-item"><h3>Frequency</h3><p>Mentorship can be short-term or ongoing. Frequency can be adjusted based on the goal and the amount of practice needed between sessions.</p></div>
-      </div></div>
+      <div class="section-header">
+        <h2>Interpreting Experience & Focus</h2>
+        <span class="section-number">03</span>
+      </div>
+      <div class="section-body">
+        <div class="focus-block">
+          <p class="focus-title">Primary settings</p>
+          <div class="chips">
+            <span class="chip">K–12 Education</span>
+            <span class="chip">Post-Secondary Education</span>
+            <span class="chip">Medical</span>
+            <span class="chip">Video Remote Interpreting</span>
+            <span class="chip">Cruise Interpreting</span>
+          </div>
+        </div>
+
+        <div class="focus-block">
+          <p class="focus-title">Areas I am actively growing into</p>
+          <div class="chips">
+            <span class="chip growth">Platform / Performance</span>
+            <span class="chip growth">Mental Health</span>
+            <span class="chip growth">Legal</span>
+          </div>
+        </div>
+      </div>
     </section>
 
     <section class="section">
-      <div class="section-header"><h2>Available Formats</h2></div>
-      <div class="section-body"><ul><li>One-on-one virtual mentorship</li><li>In-person mentorship by arrangement</li><li>Small-group or hybrid mentorship when appropriate</li></ul></div>
+      <div class="section-header">
+        <h2>Why I Mentor</h2>
+        <span class="section-number">04</span>
+      </div>
+      <div class="section-body">
+        <div class="philosophy-box">
+          <p class="philosophy-lead">My own growth as an interpreter was shaped significantly by mentorship.</p>
+          <p>
+            I made mistakes, gained real-world experience, and had a mentor who helped me strengthen both my
+            interpreting skills and my ethical decision-making. That experience is a major reason I want to
+            develop as a mentor for newer interpreters.
+          </p>
+          <p>
+            I see mentorship as collaborative and practical. Useful feedback should help a mentee understand
+            what happened, why it may have happened, and what specific practice, reflection, or next step can
+            support growth.
+          </p>
+        </div>
+      </div>
     </section>
 
     <section class="section">
-      <div class="section-header"><h2>What I Need From Mentees</h2></div>
-      <div class="section-body"><ul><li>Be open to reflection and feedback.</li><li>Bring questions, challenges, interpreting samples, or areas you want to examine.</li><li>Participate actively in identifying your goals.</li><li>Practice between sessions when we identify a useful next step.</li><li>Communicate when an approach is not helping you learn.</li></ul></div>
+      <div class="section-header">
+        <h2>What Mentorship Can Look Like</h2>
+        <span class="section-number">05</span>
+      </div>
+      <div class="section-body">
+        <div class="structure-grid">
+          <div class="structure-item">
+            <h3>Initial Conversation</h3>
+            <p>We start by talking about your experience, goals, current challenges, and what you hope to gain from mentorship.</p>
+          </div>
+          <div class="structure-item">
+            <h3>Sessions</h3>
+            <p>A typical session is approximately 60 minutes and may include interpreting samples, discussion, self-analysis, exercises, or goal review.</p>
+          </div>
+          <div class="structure-item">
+            <h3>Frequency & Format</h3>
+            <p>Primarily one-on-one virtual mentorship, with in-person, small-group, or hybrid options by arrangement when appropriate.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-header">
+        <h2>What I Need From Mentees</h2>
+        <span class="section-number">06</span>
+      </div>
+      <div class="section-body">
+        <ul class="clean-list">
+          <li>Be open to reflection and feedback.</li>
+          <li>Bring questions, challenges, or interpreting samples.</li>
+          <li>Participate actively in identifying your goals.</li>
+          <li>Practice between sessions when we identify a useful next step.</li>
+          <li>Communicate when an approach is not helping you learn.</li>
+          <li>Be willing to examine both interpreting skills and decision-making.</li>
+        </ul>
+      </div>
     </section>
 
     <section class="section connect">
-      <div class="section-header"><h2>How to Connect</h2></div>
+      <div class="section-header">
+        <h2>How to Connect</h2>
+        <span class="section-number">07</span>
+      </div>
       <div class="section-body">
-        <p>Send me a short introduction with your current interpreting experience, what you want to work on, and what you hope to gain from mentorship.</p>
-        <p>From there, we can have an initial conversation and decide whether my mentoring approach is a good fit for what you need.</p>
-        <div class="business-card"><img src="/Business%20Card%20.png" alt="Miqueas Language Solutions business card for Micah Stubbs" /></div>
+        <div class="connect-intro">
+          <p>
+            Send me a short introduction with your current interpreting experience, what you want to work on,
+            and what you hope to gain from mentorship.
+          </p>
+          <p>
+            From there, we can have an initial conversation and decide whether my mentoring approach is a good
+            fit for what you need.
+          </p>
+        </div>
+
+        <div class="business-card">
+          <img src="/Business%20Card%20.png" alt="Miqueas Language Solutions business card for Micah Stubbs" />
+        </div>
       </div>
     </section>
+
   </section>
 
-  <footer>Miqueas Language Solutions LLC • Bridging Perspectives. Delivering Understanding. • © 2026</footer>
+  <footer>
+    Miqueas Language Solutions LLC • Bridging Perspectives. Delivering Understanding. • © 2026
+  </footer>
+
 </main>
 </body>
 </html>
