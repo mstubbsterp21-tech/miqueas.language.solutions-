@@ -1,0 +1,633 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Simple Mentoring Agreement | Miqueas Language Solutions</title>
+  <meta name="description" content="A practical mentoring agreement for interpreters working with Miqueas Language Solutions." />
+  <meta name="robots" content="noindex,nofollow,noarchive" />
+  <link rel="icon" href="/favicon-32x32.png" />
+
+  <style>
+    :root {
+      --burgundy: #721100;
+      --burgundy-dark: #4f0c02;
+      --gold: #dd7d00;
+      --charcoal: #3d3f40;
+      --text: #55595b;
+      --cream: #f7f3ef;
+      --paper: #ffffff;
+      --border: #d7c9bf;
+      --focus: #1d64c8;
+      --shadow: 0 18px 46px rgba(57, 34, 25, 0.12);
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      background: #f1ece7;
+      color: var(--charcoal);
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 16px;
+      line-height: 1.55;
+    }
+
+    button,
+    input,
+    textarea { font: inherit; }
+
+    .toolbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 18px;
+      padding: 12px max(18px, calc((100vw - 980px) / 2));
+      background: rgba(61, 63, 64, 0.97);
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+    }
+
+    .toolbar p {
+      margin: 0;
+      font-size: 0.9rem;
+    }
+
+    .toolbar-actions {
+      display: flex;
+      flex: 0 0 auto;
+      gap: 9px;
+    }
+
+    .button {
+      min-height: 42px;
+      padding: 9px 14px;
+      border: 1px solid transparent;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .button-primary {
+      background: var(--gold);
+      color: #23170a;
+    }
+
+    .button-secondary {
+      border-color: rgba(255, 255, 255, 0.45);
+      background: transparent;
+      color: #fff;
+    }
+
+    .button:hover { filter: brightness(0.96); }
+
+    .button:focus-visible,
+    input:focus-visible,
+    textarea:focus-visible,
+    a:focus-visible {
+      outline: 3px solid var(--focus);
+      outline-offset: 2px;
+    }
+
+    .page {
+      width: min(980px, calc(100% - 36px));
+      margin: 30px auto 54px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      background: var(--paper);
+      box-shadow: var(--shadow);
+    }
+
+    .brand-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 24px;
+      padding: 18px 30px;
+      border-bottom: 5px solid var(--burgundy);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .brand img {
+      width: 64px;
+      height: 64px;
+      object-fit: contain;
+    }
+
+    .brand-name {
+      margin: 0;
+      font-weight: 800;
+    }
+
+    .tagline {
+      margin: 2px 0 0;
+      color: #9b5700;
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+
+    .document-label {
+      color: var(--burgundy);
+      font-size: 0.76rem;
+      font-weight: 800;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+    }
+
+    .intro {
+      padding: 34px 38px 30px;
+      background: var(--burgundy);
+      color: #fff;
+    }
+
+    .intro h1 {
+      margin: 0 0 10px;
+      color: #fff;
+      font-size: clamp(2rem, 5vw, 3.1rem);
+      line-height: 1.05;
+      letter-spacing: -0.025em;
+    }
+
+    .intro p {
+      max-width: 760px;
+      margin: 0;
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .form-body { padding: 30px 38px 42px; }
+
+    .privacy-note,
+    .ethics-note {
+      margin-bottom: 24px;
+      padding: 16px 18px;
+      border-left: 5px solid var(--gold);
+      background: var(--cream);
+      color: var(--text);
+    }
+
+    .privacy-note strong,
+    .ethics-note strong { color: var(--charcoal); }
+
+    .identity-grid,
+    .signature-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px 22px;
+    }
+
+    .field {
+      display: grid;
+      gap: 7px;
+    }
+
+    label,
+    .prompt {
+      color: var(--charcoal);
+      font-weight: 700;
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      border: 1px solid #ab9b90;
+      border-radius: 3px;
+      background: #fff;
+      color: #222;
+    }
+
+    input {
+      min-height: 45px;
+      padding: 10px 12px;
+    }
+
+    textarea {
+      min-height: 108px;
+      padding: 11px 12px;
+      line-height: 1.5;
+      resize: vertical;
+    }
+
+    input::placeholder,
+    textarea::placeholder { color: #7b7d7e; opacity: 1; }
+
+    .agreement-section {
+      margin-top: 25px;
+      border: 1px solid var(--border);
+    }
+
+    .section-heading {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      margin: 0;
+      padding: 13px 17px;
+      border-bottom: 1px solid var(--border);
+      background: var(--cream);
+      color: var(--burgundy);
+      font-size: 1.12rem;
+    }
+
+    .section-number {
+      color: var(--gold);
+      font-size: 0.9rem;
+      letter-spacing: 0.08em;
+    }
+
+    .questions {
+      display: grid;
+      gap: 20px;
+      padding: 20px;
+    }
+
+    .helper {
+      display: block;
+      color: var(--text);
+      font-size: 0.86rem;
+      font-weight: 400;
+    }
+
+    .agreement-box {
+      margin-top: 26px;
+      padding: 24px;
+      border: 2px solid var(--burgundy);
+      background: #fff;
+    }
+
+    .agreement-box h2 {
+      margin: 0 0 10px;
+      color: var(--burgundy);
+      font-size: 1.28rem;
+    }
+
+    .agreement-box > p {
+      margin: 0 0 20px;
+      color: var(--text);
+    }
+
+    .acknowledgment {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin: 0 0 20px;
+      color: var(--charcoal);
+    }
+
+    .acknowledgment input {
+      width: 22px;
+      height: 22px;
+      min-height: 0;
+      margin: 1px 0 0;
+      flex: 0 0 auto;
+    }
+
+    .signature-help {
+      margin: 14px 0 0;
+      color: var(--text);
+      font-size: 0.84rem;
+    }
+
+    footer {
+      padding: 17px 28px;
+      border-top: 1px solid var(--border);
+      background: var(--cream);
+      color: #686b6c;
+      text-align: center;
+      font-size: 0.78rem;
+    }
+
+    .saved-status {
+      min-height: 1.2em;
+      margin: 10px 0 0;
+      color: #24613b;
+      font-size: 0.84rem;
+      font-weight: 700;
+    }
+
+    @media (max-width: 680px) {
+      .toolbar {
+        position: static;
+        align-items: flex-start;
+        padding: 12px 16px;
+      }
+
+      .toolbar p { display: none; }
+      .toolbar-actions { width: 100%; }
+      .button { flex: 1; }
+
+      .page {
+        width: 100%;
+        margin: 0;
+        border: 0;
+        box-shadow: none;
+      }
+
+      .brand-header { padding: 15px 18px; }
+      .brand img { width: 54px; height: 54px; }
+      .document-label { display: none; }
+      .tagline { font-size: 0.75rem; }
+      .intro { padding: 28px 20px 25px; }
+      .form-body { padding: 22px 16px 30px; }
+      .identity-grid,
+      .signature-grid { grid-template-columns: 1fr; }
+      .questions { padding: 17px; }
+    }
+
+    @media print {
+      @page { size: Letter; margin: 0.45in; }
+
+      body { background: #fff; font-size: 10.5pt; }
+      .toolbar { display: none; }
+      .page { width: 100%; margin: 0; border: 0; box-shadow: none; }
+      .brand-header { padding: 10px 16px; }
+      .brand img { width: 46px; height: 46px; }
+      .intro { padding: 19px 22px; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+      .intro h1 { font-size: 25pt; }
+      .form-body { padding: 18px 22px; }
+      .privacy-note { display: none; }
+      .ethics-note { margin-bottom: 14px; }
+      .agreement-section,
+      .agreement-box,
+      .field { break-inside: avoid; }
+      .agreement-section { margin-top: 14px; }
+      .section-heading { padding: 8px 11px; }
+      .questions { gap: 11px; padding: 12px; }
+      textarea { min-height: 68px; }
+      input, textarea { border-color: #777; }
+      .saved-status { display: none; }
+      footer { padding: 10px; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="toolbar" aria-label="Agreement actions">
+    <p>Your answers save automatically on this device.</p>
+    <div class="toolbar-actions">
+      <button class="button button-secondary" type="button" id="clear-form">Clear</button>
+      <button class="button button-primary" type="button" id="print-form">Print / Save PDF</button>
+    </div>
+  </div>
+
+  <main class="page">
+    <header class="brand-header">
+      <div class="brand">
+        <img src="/logo.png" alt="Miqueas Language Solutions logo" />
+        <div>
+          <p class="brand-name">Miqueas Language Solutions</p>
+          <p class="tagline">Bridging Perspectives. Delivering Understanding.</p>
+        </div>
+      </div>
+      <div class="document-label">Mentoring Agreement</div>
+    </header>
+
+    <section class="intro">
+      <h1>Simple Mentoring Agreement</h1>
+      <p>Use these questions to talk through how you will work together. Keep your answers brief, honest, and practical.</p>
+    </section>
+
+    <form class="form-body" id="mentoring-agreement" autocomplete="off">
+      <div class="privacy-note">
+        <strong>Privacy:</strong> Nothing entered on this page is sent to MLS. Your draft is stored only in this browser until you clear it. Use “Print / Save PDF” when you are ready to keep or share a copy.
+      </div>
+
+      <div class="identity-grid">
+        <div class="field">
+          <label for="mentor-name">Mentor</label>
+          <input id="mentor-name" name="mentorName" type="text" placeholder="Full name" />
+        </div>
+        <div class="field">
+          <label for="mentee-name">Mentee</label>
+          <input id="mentee-name" name="menteeName" type="text" placeholder="Full name" />
+        </div>
+        <div class="field">
+          <label for="start-date">Start Date</label>
+          <input id="start-date" name="startDate" type="date" />
+        </div>
+        <div class="field">
+          <label for="review-date">End / Review Date</label>
+          <input id="review-date" name="reviewDate" type="date" />
+        </div>
+      </div>
+
+      <div class="ethics-note">
+        <strong>Professional and ethical practice:</strong> Mentoring conversations should respect the NAD-RID Code of Professional Conduct, applicable law, and workplace policies. Interpreting samples and discussions must be de-identified unless proper permission has been obtained. Mentoring supports professional growth; it does not replace independent professional judgment, supervision, legal advice, or mental-health care.
+      </div>
+
+      <section class="agreement-section" aria-labelledby="goals-heading">
+        <h2 class="section-heading" id="goals-heading"><span class="section-number">01</span> Goals</h2>
+        <div class="questions">
+          <div class="field">
+            <label for="goals">What would you like to accomplish through this mentoring relationship?</label>
+            <textarea id="goals" name="goals"></textarea>
+          </div>
+          <div class="field">
+            <label for="progress">How will we know that progress is being made?</label>
+            <textarea id="progress" name="progress" placeholder="Consider observable changes, completed practice, reflection, or other evidence of growth."></textarea>
+          </div>
+        </div>
+      </section>
+
+      <section class="agreement-section" aria-labelledby="roles-heading">
+        <h2 class="section-heading" id="roles-heading"><span class="section-number">02</span> Roles &amp; Expectations</h2>
+        <div class="questions">
+          <div class="field">
+            <label for="expectations">What do you expect from your mentoring partner?</label>
+            <textarea id="expectations" name="expectations"></textarea>
+          </div>
+          <div class="field">
+            <label for="success-actions">What will each of us do to help this relationship succeed?</label>
+            <textarea id="success-actions" name="successActions"></textarea>
+          </div>
+        </div>
+      </section>
+
+      <section class="agreement-section" aria-labelledby="meetings-heading">
+        <h2 class="section-heading" id="meetings-heading"><span class="section-number">03</span> Meetings &amp; Communication</h2>
+        <div class="questions">
+          <div class="field">
+            <label for="meeting-plan">How and when will we usually meet or communicate?</label>
+            <textarea id="meeting-plan" name="meetingPlan" placeholder="Include frequency, meeting format, typical length, and preferred communication method."></textarea>
+          </div>
+          <div class="field">
+            <label for="meeting-changes">What should we do if a meeting needs to change or be canceled?</label>
+            <textarea id="meeting-changes" name="meetingChanges"></textarea>
+          </div>
+        </div>
+      </section>
+
+      <section class="agreement-section" aria-labelledby="boundaries-heading">
+        <h2 class="section-heading" id="boundaries-heading"><span class="section-number">04</span> Ground Rules &amp; Boundaries</h2>
+        <div class="questions">
+          <div class="field">
+            <label for="guidelines">What guidelines will help us work well together?</label>
+            <textarea id="guidelines" name="guidelines"></textarea>
+          </div>
+          <div class="field">
+            <label for="boundaries">What boundaries are important for us to respect?</label>
+            <textarea id="boundaries" name="boundaries" placeholder="Consider time, communication, professional roles, scope, and use of interpreting samples."></textarea>
+          </div>
+        </div>
+      </section>
+
+      <section class="agreement-section" aria-labelledby="confidentiality-heading">
+        <h2 class="section-heading" id="confidentiality-heading"><span class="section-number">05</span> Confidentiality</h2>
+        <div class="questions">
+          <div class="field">
+            <label for="private-information">What information should stay private between us?</label>
+            <textarea id="private-information" name="privateInformation"></textarea>
+          </div>
+          <div class="field">
+            <label for="disclosure">Are there any situations when information may need to be shared with someone else?</label>
+            <textarea id="disclosure" name="disclosure" placeholder="Discuss permission, legal requirements, professional obligations, or an immediate safety concern."></textarea>
+          </div>
+        </div>
+      </section>
+
+      <section class="agreement-section" aria-labelledby="accountability-heading">
+        <h2 class="section-heading" id="accountability-heading"><span class="section-number">06</span> Accountability &amp; Follow-Through</h2>
+        <div class="questions">
+          <div class="field">
+            <label for="commitments">How will we keep track of commitments or action steps?</label>
+            <textarea id="commitments" name="commitments"></textarea>
+          </div>
+          <div class="field">
+            <label for="follow-through">What should we do if one of us is not able to follow through?</label>
+            <textarea id="follow-through" name="followThrough"></textarea>
+          </div>
+        </div>
+      </section>
+
+      <section class="agreement-section" aria-labelledby="feedback-heading">
+        <h2 class="section-heading" id="feedback-heading"><span class="section-number">07</span> Feedback &amp; Challenges</h2>
+        <div class="questions">
+          <div class="field">
+            <label for="feedback">How would you like to give and receive feedback?</label>
+            <textarea id="feedback" name="feedback" placeholder="Consider directness, timing, written or signed feedback, and time to reflect."></textarea>
+          </div>
+          <div class="field">
+            <label for="challenges">How will we handle concerns, misunderstandings, or other challenges?</label>
+            <textarea id="challenges" name="challenges"></textarea>
+          </div>
+        </div>
+      </section>
+
+      <section class="agreement-section" aria-labelledby="moving-forward-heading">
+        <h2 class="section-heading" id="moving-forward-heading"><span class="section-number">08</span> Moving Forward</h2>
+        <div class="questions">
+          <div class="field">
+            <label for="next-actions">What is one action each of us will take before our next meeting?</label>
+            <textarea id="next-actions" name="nextActions"></textarea>
+          </div>
+          <div class="field">
+            <label for="agreement-review">When and how will we review this agreement and make changes if needed?</label>
+            <textarea id="agreement-review" name="agreementReview"></textarea>
+          </div>
+        </div>
+      </section>
+
+      <section class="agreement-box" aria-labelledby="agreement-heading">
+        <h2 id="agreement-heading">Agreement</h2>
+        <p>We have discussed these questions and agree to use this document as a guide for our mentoring relationship. We understand that we may revise the agreement together as our needs or goals change.</p>
+
+        <label class="acknowledgment" for="agreement-confirmed">
+          <input id="agreement-confirmed" name="agreementConfirmed" type="checkbox" />
+          <span>We have reviewed this agreement together and agree to the expectations recorded above.</span>
+        </label>
+
+        <div class="signature-grid">
+          <div class="field">
+            <label for="mentor-signature">Mentor Signature</label>
+            <input id="mentor-signature" name="mentorSignature" type="text" placeholder="Type or print full name" />
+          </div>
+          <div class="field">
+            <label for="mentor-signature-date">Date</label>
+            <input id="mentor-signature-date" name="mentorSignatureDate" type="date" />
+          </div>
+          <div class="field">
+            <label for="mentee-signature">Mentee Signature</label>
+            <input id="mentee-signature" name="menteeSignature" type="text" placeholder="Type or print full name" />
+          </div>
+          <div class="field">
+            <label for="mentee-signature-date">Date</label>
+            <input id="mentee-signature-date" name="menteeSignatureDate" type="date" />
+          </div>
+        </div>
+
+        <p class="signature-help">If your program requires handwritten or verified electronic signatures, print or save this document and complete signatures using the method your program accepts.</p>
+        <p class="saved-status" id="saved-status" role="status" aria-live="polite"></p>
+      </section>
+    </form>
+
+    <footer>Miqueas Language Solutions LLC • Bridging Perspectives. Delivering Understanding. • © 2026</footer>
+  </main>
+
+  <script>
+    (() => {
+      const form = document.getElementById('mentoring-agreement');
+      const status = document.getElementById('saved-status');
+      const storageKey = 'mls-mentoring-agreement-draft-v1';
+      let statusTimer;
+
+      const controls = Array.from(form.elements).filter((control) => control.name);
+
+      function showStatus(message) {
+        status.textContent = message;
+        window.clearTimeout(statusTimer);
+        statusTimer = window.setTimeout(() => { status.textContent = ''; }, 2400);
+      }
+
+      function saveDraft() {
+        const values = {};
+        controls.forEach((control) => {
+          values[control.name] = control.type === 'checkbox' ? control.checked : control.value;
+        });
+
+        try {
+          localStorage.setItem(storageKey, JSON.stringify(values));
+          showStatus('Draft saved on this device.');
+        } catch {
+          showStatus('This browser could not save the draft.');
+        }
+      }
+
+      function loadDraft() {
+        try {
+          const values = JSON.parse(localStorage.getItem(storageKey) || '{}');
+          controls.forEach((control) => {
+            if (!(control.name in values)) return;
+            if (control.type === 'checkbox') control.checked = Boolean(values[control.name]);
+            else control.value = values[control.name];
+          });
+        } catch {
+          localStorage.removeItem(storageKey);
+        }
+      }
+
+      form.addEventListener('input', saveDraft);
+      form.addEventListener('change', saveDraft);
+
+      document.getElementById('print-form').addEventListener('click', () => window.print());
+
+      document.getElementById('clear-form').addEventListener('click', () => {
+        if (!window.confirm('Clear every answer and signature from this agreement?')) return;
+        form.reset();
+        localStorage.removeItem(storageKey);
+        showStatus('Agreement cleared.');
+        document.getElementById('mentor-name').focus();
+      });
+
+      loadDraft();
+    })();
+  </script>
+</body>
+</html>
