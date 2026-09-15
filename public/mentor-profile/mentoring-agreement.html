@@ -220,9 +220,74 @@
     input::placeholder,
     textarea::placeholder { color: #7b7d7e; opacity: 1; }
 
+    input[readonly],
+    textarea[readonly] {
+      background: #fffaf8;
+      color: #343536;
+      cursor: default;
+    }
+
     .agreement-section {
       margin-top: 25px;
       border: 1px solid var(--border);
+    }
+
+    .workflow-note {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 20px;
+      margin-bottom: 24px;
+    }
+
+    .workflow-step {
+      padding: 13px 14px;
+      border: 1px solid var(--border);
+      background: #fff;
+      color: var(--text);
+      font-size: 0.88rem;
+    }
+
+    .workflow-step strong {
+      display: block;
+      margin-bottom: 3px;
+      color: var(--burgundy);
+    }
+
+    .section-intro {
+      margin: 0;
+      padding: 15px 20px 0;
+      color: var(--text);
+    }
+
+    .mentor-section { border-top: 5px solid var(--burgundy); }
+    .mentee-section { border-top: 5px solid var(--charcoal); }
+    .joint-section { border-top: 5px solid var(--gold); }
+
+    .mentor-section .section-heading { background: #f8eeeb; }
+    .mentee-section .section-heading { background: #eff0f0; color: var(--charcoal); }
+    .joint-section .section-heading { background: #fff6e9; }
+
+    .standard-answer {
+      border-left: 4px solid var(--burgundy);
+      background: #fffaf8;
+    }
+
+    .standard-answer textarea {
+      min-height: 125px;
+      background: #fffaf8;
+    }
+
+    .answer-note {
+      margin: 0;
+      color: #6e625b;
+      font-size: 0.82rem;
+    }
+
+    .joint-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
     }
 
     .section-heading {
@@ -381,7 +446,9 @@
       .form-body { padding: 22px 16px 30px; }
       .identity-grid,
       .signature-grid,
-      .response-grid { grid-template-columns: 1fr; }
+      .response-grid,
+      .workflow-note,
+      .joint-grid { grid-template-columns: 1fr; }
       .questions { padding: 17px; }
     }
 
@@ -405,6 +472,8 @@
       .section-heading { padding: 8px 11px; }
       .questions { gap: 11px; padding: 12px; }
       .response-grid { grid-template-columns: 1fr 1fr; }
+      .workflow-note { grid-template-columns: repeat(3, 1fr); }
+      .joint-grid { grid-template-columns: 1fr 1fr; }
       .role-response textarea { min-height: 60px; }
       textarea { min-height: 68px; }
       input, textarea { border-color: #777; }
@@ -418,7 +487,7 @@
   <div class="toolbar" aria-label="Agreement actions">
     <p>Your answers save automatically on this device.</p>
     <div class="toolbar-actions">
-      <button class="button button-secondary" type="button" id="clear-form">Clear</button>
+      <button class="button button-secondary" type="button" id="clear-form">New Agreement</button>
       <button class="button button-primary" type="button" id="print-form">Print / Save PDF</button>
     </div>
   </div>
@@ -437,7 +506,7 @@
 
     <section class="intro">
       <h1>Simple Mentoring Agreement</h1>
-      <p>Use these questions to talk through how you will work together. Keep your answers brief, honest, and practical.</p>
+      <p>Complete the mentor and mentee sections first. Finalize the shared agreement together after the initial meeting.</p>
     </section>
 
     <form class="form-body" id="mentoring-agreement" autocomplete="off">
@@ -448,278 +517,162 @@
       <div class="identity-grid">
         <div class="field">
           <label for="mentor-name">Mentor</label>
-          <input id="mentor-name" name="mentorName" type="text" placeholder="Full name" />
+          <input id="mentor-name" name="mentorName" type="text" value="Micah Stubbs" readonly />
         </div>
         <div class="field">
           <label for="mentee-name">Mentee</label>
           <input id="mentee-name" name="menteeName" type="text" placeholder="Full name" />
         </div>
-        <div class="field">
-          <label for="start-date">Start Date</label>
-          <input id="start-date" name="startDate" type="date" />
-        </div>
-        <div class="field">
-          <label for="review-date">End / Review Date</label>
-          <input id="review-date" name="reviewDate" type="date" />
-        </div>
+      </div>
+
+      <div class="workflow-note" aria-label="Agreement workflow">
+        <div class="workflow-step"><strong>1. Mentor</strong>Review the reusable mentor answers.</div>
+        <div class="workflow-step"><strong>2. Mentee</strong>Complete the mentee reflection questions.</div>
+        <div class="workflow-step"><strong>3. Together</strong>Finalize the agreement after the initial meeting.</div>
       </div>
 
       <div class="ethics-note">
         <strong>Professional and ethical practice:</strong> Mentoring conversations should respect the NAD-RID Code of Professional Conduct, applicable law, and workplace policies. Interpreting samples and discussions must be de-identified unless proper permission has been obtained. Mentoring supports professional growth; it does not replace independent professional judgment, supervision, legal advice, or mental-health care.
       </div>
 
-      <section class="agreement-section" aria-labelledby="goals-heading">
-        <h2 class="section-heading" id="goals-heading"><span class="section-number">01</span> Goals</h2>
+      <section class="agreement-section mentor-section" aria-labelledby="mentor-section-heading">
+        <h2 class="section-heading" id="mentor-section-heading"><span class="section-number">01</span> Mentor Section — Micah’s Commitments</h2>
+        <p class="section-intro">These are Micah’s standard answers and do not need to be completed again. Any relationship-specific adjustments can be recorded in the shared agreement after the initial meeting.</p>
+        <div class="questions">
+          <div class="question-block standard-answer">
+            <label class="prompt" for="mentor-support">What can the mentee expect from me as their mentor?</label>
+            <textarea id="mentor-support" name="mentorSupport" readonly>I will provide individualized support based on the mentee’s stated goals, experience, and learning needs. I will listen before assuming what they need, treat them as a competent professional peer, and offer practical resources and next steps they can continue using outside our sessions.</textarea>
+          </div>
+
+          <div class="question-block standard-answer">
+            <label class="prompt" for="mentor-feedback-approach">How will I approach feedback?</label>
+            <textarea id="mentor-feedback-approach" name="mentorFeedbackApproach" readonly>I will give honest, specific, and constructive feedback in a respectful way. Whenever possible, I will connect feedback to observable choices in the work, explain why it matters, invite the mentee’s perspective, and help turn the feedback into a realistic practice goal.</textarea>
+          </div>
+
+          <div class="question-block standard-answer">
+            <label class="prompt" for="mentor-preparation">How will I prepare and follow through?</label>
+            <textarea id="mentor-preparation" name="mentorPreparation" readonly>I will arrive prepared, review agreed-upon materials when they are provided in advance, keep track of our goals and action steps, and communicate promptly if I need clarification or cannot meet a commitment. I will not promise outcomes such as passing an exam, receiving certification, or obtaining employment.</textarea>
+          </div>
+
+          <div class="question-block standard-answer">
+            <label class="prompt" for="mentor-role-boundaries">What professional boundaries guide my role?</label>
+            <textarea id="mentor-role-boundaries" name="mentorRoleBoundaries" readonly>My role is mentor—not supervisor, evaluator, therapist, attorney, or decision-maker for the mentee. The mentee remains responsible for their professional judgment and choices. We will use de-identified interpreting samples unless proper permission has been obtained, and we will keep communication within mutually agreed channels and reasonable hours.</textarea>
+          </div>
+
+          <div class="question-block standard-answer">
+            <label class="prompt" for="mentor-confidentiality">How will I handle confidentiality?</label>
+            <textarea id="mentor-confidentiality" name="mentorConfidentiality" readonly>I will keep the mentee’s reflections, goals, feedback, and shared materials private. I will only share information with the mentee’s permission or when disclosure is required by law, professional obligation, or an immediate safety concern. Any necessary disclosure will be limited to what is needed, and I will inform the mentee when legally and safely possible.</textarea>
+          </div>
+
+          <div class="question-block standard-answer">
+            <label class="prompt" for="mentor-scheduling">What is my general approach to meetings and schedule changes?</label>
+            <textarea id="mentor-scheduling" name="mentorScheduling" readonly>Mentoring sessions are generally virtual, one-on-one, and approximately 60 minutes. The exact schedule will be agreed upon after the initial meeting. If I need to change or cancel a meeting, I will communicate as soon as reasonably possible and work with the mentee to reschedule when feasible.</textarea>
+          </div>
+          <p class="answer-note">These standard answers are locked. Use the shared agreement section for any mutually agreed changes.</p>
+        </div>
+      </section>
+
+      <section class="agreement-section mentee-section" aria-labelledby="mentee-section-heading">
+        <h2 class="section-heading" id="mentee-section-heading"><span class="section-number">02</span> Mentee Section — Before the Initial Meeting</h2>
+        <p class="section-intro">The mentee completes this section. These answers help Micah understand what the mentee needs before the two of you finalize the agreement together.</p>
         <div class="questions">
           <div class="question-block">
-            <p class="prompt">What would you like to accomplish through this mentoring relationship?</p>
-            <div class="response-grid">
-              <div class="role-response mentor">
-                <label class="role-label" for="mentor-goals">Mentor Response</label>
-                <textarea id="mentor-goals" name="mentorGoals" placeholder="What I hope to support..."></textarea>
-              </div>
-              <div class="role-response mentee">
-                <label class="role-label" for="mentee-goals">Mentee Response</label>
-                <textarea id="mentee-goals" name="menteeGoals" placeholder="What I hope to accomplish..."></textarea>
-              </div>
-            </div>
+            <label class="prompt" for="mentee-outcomes">What would you like to accomplish through mentoring?</label>
+            <textarea id="mentee-outcomes" name="menteeOutcomes" placeholder="Describe the growth, skill, decision, or outcome you hope to work toward."></textarea>
           </div>
+
           <div class="question-block">
-            <p class="prompt">How will we know that progress is being made?</p>
-            <div class="response-grid">
-              <div class="role-response mentor">
-                <label class="role-label" for="mentor-progress">Mentor Response</label>
-                <textarea id="mentor-progress" name="mentorProgress" placeholder="Evidence of growth I will look for..."></textarea>
-              </div>
-              <div class="role-response mentee">
-                <label class="role-label" for="mentee-progress">Mentee Response</label>
-                <textarea id="mentee-progress" name="menteeProgress" placeholder="Changes or milestones that will show progress..."></textarea>
-              </div>
-            </div>
+            <label class="prompt" for="mentee-experience">What experience and strengths are you bringing into mentorship?</label>
+            <textarea id="mentee-experience" name="menteeExperience" placeholder="Include settings, training, assessments, strengths, or experience that may be relevant."></textarea>
+          </div>
+
+          <div class="question-block">
+            <label class="prompt" for="mentee-challenges">What specific challenges or skills would you like to examine first?</label>
+            <textarea id="mentee-challenges" name="menteeChallenges" placeholder="Be as specific as you can; this can be refined during the initial meeting."></textarea>
+          </div>
+
+          <div class="question-block">
+            <label class="prompt" for="mentee-feedback-preferences">How do you prefer to receive feedback?</label>
+            <textarea id="mentee-feedback-preferences" name="menteeFeedbackPreferences" placeholder="Consider directness, timing, written or signed feedback, examples, and time to reflect."></textarea>
+          </div>
+
+          <div class="question-block">
+            <label class="prompt" for="mentee-learning-support">What helps you learn, practice, and stay accountable?</label>
+            <textarea id="mentee-learning-support" name="menteeLearningSupport" placeholder="For example: demonstrations, repetition, reflection questions, deadlines, check-ins, or practice resources."></textarea>
+          </div>
+
+          <div class="question-block">
+            <label class="prompt" for="mentee-needs-boundaries">What communication needs, access needs, preferences, or boundaries should your mentor know?</label>
+            <textarea id="mentee-needs-boundaries" name="menteeNeedsBoundaries" placeholder="Share anything that will help the mentoring space work well for you."></textarea>
+          </div>
+
+          <div class="question-block">
+            <label class="prompt" for="mentee-materials">Is there a question, interpreting sample, or other material you want to discuss during the initial meeting?</label>
+            <textarea id="mentee-materials" name="menteeMaterials" placeholder="Do not include identifying or confidential consumer information."></textarea>
           </div>
         </div>
       </section>
 
-      <section class="agreement-section" aria-labelledby="roles-heading">
-        <h2 class="section-heading" id="roles-heading"><span class="section-number">02</span> Roles &amp; Expectations</h2>
+      <section class="agreement-section joint-section" aria-labelledby="joint-section-heading">
+        <h2 class="section-heading" id="joint-section-heading"><span class="section-number">03</span> Shared Agreement — After the Initial Meeting</h2>
+        <p class="section-intro">Complete this section together after discussing the mentor’s commitments and the mentee’s responses.</p>
         <div class="questions">
-          <div class="question-block">
-            <p class="prompt">What do you expect from your mentoring partner?</p>
-            <div class="response-grid">
-              <div class="role-response mentor">
-                <label class="role-label" for="mentor-expectations">Mentor Response</label>
-                <textarea id="mentor-expectations" name="mentorExpectations" placeholder="What I expect from the mentee..."></textarea>
-              </div>
-              <div class="role-response mentee">
-                <label class="role-label" for="mentee-expectations">Mentee Response</label>
-                <textarea id="mentee-expectations" name="menteeExpectations" placeholder="What I expect from the mentor..."></textarea>
-              </div>
+          <div class="joint-grid">
+            <div class="field">
+              <label for="initial-meeting-date">Initial Meeting Date</label>
+              <input id="initial-meeting-date" name="initialMeetingDate" type="date" />
+            </div>
+            <div class="field">
+              <label for="review-date">Agreement Review / End Date</label>
+              <input id="review-date" name="reviewDate" type="date" />
             </div>
           </div>
-          <div class="question-block">
-            <p class="prompt">What will each of us do to help this relationship succeed?</p>
-            <div class="response-grid">
-              <div class="role-response mentor">
-                <label class="role-label" for="mentor-success-actions">Mentor Commitments</label>
-                <textarea id="mentor-success-actions" name="mentorSuccessActions" placeholder="I will..."></textarea>
-              </div>
-              <div class="role-response mentee">
-                <label class="role-label" for="mentee-success-actions">Mentee Commitments</label>
-                <textarea id="mentee-success-actions" name="menteeSuccessActions" placeholder="I will..."></textarea>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
 
-      <section class="agreement-section" aria-labelledby="meetings-heading">
-        <h2 class="section-heading" id="meetings-heading"><span class="section-number">03</span> Meetings &amp; Communication</h2>
-        <div class="questions">
           <div class="question-block">
-            <p class="prompt">How and when will we usually meet or communicate?</p>
-            <div class="response-grid">
-              <div class="role-response mentor">
-                <label class="role-label" for="mentor-meeting-plan">Mentor Preferences</label>
-                <textarea id="mentor-meeting-plan" name="mentorMeetingPlan" placeholder="My availability and preferred communication..."></textarea>
-              </div>
-              <div class="role-response mentee">
-                <label class="role-label" for="mentee-meeting-plan">Mentee Preferences</label>
-                <textarea id="mentee-meeting-plan" name="menteeMeetingPlan" placeholder="My availability and preferred communication..."></textarea>
-              </div>
-            </div>
+            <label class="prompt" for="shared-goals">What goal or goals will this mentoring relationship focus on?</label>
+            <textarea id="shared-goals" name="sharedGoals" placeholder="Write the goal you agreed to after discussing the mentee’s priorities and the mentor’s scope."></textarea>
           </div>
-          <div class="question-block">
-            <p class="prompt">What should we do if a meeting needs to change or be canceled?</p>
-            <div class="response-grid">
-              <div class="role-response mentor">
-                <label class="role-label" for="mentor-meeting-changes">Mentor Response</label>
-                <textarea id="mentor-meeting-changes" name="mentorMeetingChanges" placeholder="How I will communicate a change..."></textarea>
-              </div>
-              <div class="role-response mentee">
-                <label class="role-label" for="mentee-meeting-changes">Mentee Response</label>
-                <textarea id="mentee-meeting-changes" name="menteeMeetingChanges" placeholder="How I will communicate a change..."></textarea>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
 
-      <section class="agreement-section" aria-labelledby="boundaries-heading">
-        <h2 class="section-heading" id="boundaries-heading"><span class="section-number">04</span> Ground Rules &amp; Boundaries</h2>
-        <div class="questions">
           <div class="question-block">
-            <p class="prompt">What guidelines will help us work well together?</p>
-            <div class="response-grid">
-              <div class="role-response mentor">
-                <label class="role-label" for="mentor-guidelines">Mentor Response</label>
-                <textarea id="mentor-guidelines" name="mentorGuidelines"></textarea>
-              </div>
-              <div class="role-response mentee">
-                <label class="role-label" for="mentee-guidelines">Mentee Response</label>
-                <textarea id="mentee-guidelines" name="menteeGuidelines"></textarea>
-              </div>
-            </div>
+            <label class="prompt" for="progress-measures">How will we know that progress is being made?</label>
+            <textarea id="progress-measures" name="progressMeasures" placeholder="Identify observable changes, completed practice, reflection, assessment evidence, or other milestones."></textarea>
           </div>
-          <div class="question-block">
-            <p class="prompt">What boundaries are important for us to respect?</p>
-            <div class="response-grid">
-              <div class="role-response mentor">
-                <label class="role-label" for="mentor-boundaries">Mentor Boundaries</label>
-                <textarea id="mentor-boundaries" name="mentorBoundaries" placeholder="Time, communication, role, scope, or sample-use boundaries..."></textarea>
-              </div>
-              <div class="role-response mentee">
-                <label class="role-label" for="mentee-boundaries">Mentee Boundaries</label>
-                <textarea id="mentee-boundaries" name="menteeBoundaries" placeholder="Time, communication, role, scope, or sample-use boundaries..."></textarea>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
 
-      <section class="agreement-section" aria-labelledby="confidentiality-heading">
-        <h2 class="section-heading" id="confidentiality-heading"><span class="section-number">05</span> Confidentiality</h2>
-        <div class="questions">
           <div class="question-block">
-            <p class="prompt">What information should stay private between us?</p>
-            <div class="response-grid">
-              <div class="role-response mentor">
-                <label class="role-label" for="mentor-private-information">Mentor Response</label>
-                <textarea id="mentor-private-information" name="mentorPrivateInformation"></textarea>
-              </div>
-              <div class="role-response mentee">
-                <label class="role-label" for="mentee-private-information">Mentee Response</label>
-                <textarea id="mentee-private-information" name="menteePrivateInformation"></textarea>
-              </div>
-            </div>
+            <label class="prompt" for="meeting-plan">How and when will we meet and communicate?</label>
+            <textarea id="meeting-plan" name="meetingPlan" placeholder="Record the frequency, format, typical session length, communication method, and expectations between sessions."></textarea>
           </div>
-          <div class="question-block">
-            <p class="prompt">Are there any situations when information may need to be shared with someone else?</p>
-            <div class="response-grid">
-              <div class="role-response mentor">
-                <label class="role-label" for="mentor-disclosure">Mentor Response</label>
-                <textarea id="mentor-disclosure" name="mentorDisclosure" placeholder="Permission, legal duties, professional obligations, or immediate safety concerns..."></textarea>
-              </div>
-              <div class="role-response mentee">
-                <label class="role-label" for="mentee-disclosure">Mentee Response</label>
-                <textarea id="mentee-disclosure" name="menteeDisclosure" placeholder="My understanding, questions, or concerns..."></textarea>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
 
-      <section class="agreement-section" aria-labelledby="accountability-heading">
-        <h2 class="section-heading" id="accountability-heading"><span class="section-number">06</span> Accountability &amp; Follow-Through</h2>
-        <div class="questions">
-          <div class="question-block">
-            <p class="prompt">How will we keep track of commitments or action steps?</p>
-            <div class="response-grid">
-              <div class="role-response mentor">
-                <label class="role-label" for="mentor-commitments">Mentor Response</label>
-                <textarea id="mentor-commitments" name="mentorCommitments"></textarea>
-              </div>
-              <div class="role-response mentee">
-                <label class="role-label" for="mentee-commitments">Mentee Response</label>
-                <textarea id="mentee-commitments" name="menteeCommitments"></textarea>
-              </div>
+          <div class="joint-grid">
+            <div class="field">
+              <label for="agreed-mentor-responsibilities">Mentor Responsibilities</label>
+              <textarea id="agreed-mentor-responsibilities" name="agreedMentorResponsibilities" placeholder="Any responsibilities or adjustments agreed to beyond the standard mentor commitments."></textarea>
+            </div>
+            <div class="field">
+              <label for="agreed-mentee-responsibilities">Mentee Responsibilities</label>
+              <textarea id="agreed-mentee-responsibilities" name="agreedMenteeResponsibilities" placeholder="Preparation, practice, communication, or follow-through the mentee agrees to provide."></textarea>
             </div>
           </div>
-          <div class="question-block">
-            <p class="prompt">What should we do if one of us is not able to follow through?</p>
-            <div class="response-grid">
-              <div class="role-response mentor">
-                <label class="role-label" for="mentor-follow-through">Mentor Response</label>
-                <textarea id="mentor-follow-through" name="mentorFollowThrough"></textarea>
-              </div>
-              <div class="role-response mentee">
-                <label class="role-label" for="mentee-follow-through">Mentee Response</label>
-                <textarea id="mentee-follow-through" name="menteeFollowThrough"></textarea>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
 
-      <section class="agreement-section" aria-labelledby="feedback-heading">
-        <h2 class="section-heading" id="feedback-heading"><span class="section-number">07</span> Feedback &amp; Challenges</h2>
-        <div class="questions">
           <div class="question-block">
-            <p class="prompt">How would you like to give and receive feedback?</p>
-            <div class="response-grid">
-              <div class="role-response mentor">
-                <label class="role-label" for="mentor-feedback">Mentor Preferences</label>
-                <textarea id="mentor-feedback" name="mentorFeedback" placeholder="Directness, timing, format, and reflection time..."></textarea>
-              </div>
-              <div class="role-response mentee">
-                <label class="role-label" for="mentee-feedback">Mentee Preferences</label>
-                <textarea id="mentee-feedback" name="menteeFeedback" placeholder="Directness, timing, format, and reflection time..."></textarea>
-              </div>
-            </div>
+            <label class="prompt" for="changes-challenges">What will we do if a meeting changes, a commitment is missed, or a concern comes up?</label>
+            <textarea id="changes-challenges" name="changesChallenges" placeholder="Record your agreed communication, rescheduling, and problem-solving process."></textarea>
           </div>
-          <div class="question-block">
-            <p class="prompt">How will we handle concerns, misunderstandings, or other challenges?</p>
-            <div class="response-grid">
-              <div class="role-response mentor">
-                <label class="role-label" for="mentor-challenges">Mentor Response</label>
-                <textarea id="mentor-challenges" name="mentorChallenges"></textarea>
-              </div>
-              <div class="role-response mentee">
-                <label class="role-label" for="mentee-challenges">Mentee Response</label>
-                <textarea id="mentee-challenges" name="menteeChallenges"></textarea>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
 
-      <section class="agreement-section" aria-labelledby="moving-forward-heading">
-        <h2 class="section-heading" id="moving-forward-heading"><span class="section-number">08</span> Moving Forward</h2>
-        <div class="questions">
-          <div class="question-block">
-            <p class="prompt">What is one action each of us will take before our next meeting?</p>
-            <div class="response-grid">
-              <div class="role-response mentor">
-                <label class="role-label" for="mentor-next-actions">Mentor Action</label>
-                <textarea id="mentor-next-actions" name="mentorNextActions" placeholder="Before our next meeting, I will..."></textarea>
-              </div>
-              <div class="role-response mentee">
-                <label class="role-label" for="mentee-next-actions">Mentee Action</label>
-                <textarea id="mentee-next-actions" name="menteeNextActions" placeholder="Before our next meeting, I will..."></textarea>
-              </div>
+          <div class="joint-grid">
+            <div class="field">
+              <label for="mentor-next-step">Mentor’s Next Action</label>
+              <textarea id="mentor-next-step" name="mentorNextStep" placeholder="Before the next meeting, Micah will..."></textarea>
+            </div>
+            <div class="field">
+              <label for="mentee-next-step">Mentee’s Next Action</label>
+              <textarea id="mentee-next-step" name="menteeNextStep" placeholder="Before the next meeting, the mentee will..."></textarea>
             </div>
           </div>
+
           <div class="question-block">
-            <p class="prompt">When and how will we review this agreement and make changes if needed?</p>
-            <div class="response-grid">
-              <div class="role-response mentor">
-                <label class="role-label" for="mentor-agreement-review">Mentor Response</label>
-                <textarea id="mentor-agreement-review" name="mentorAgreementReview"></textarea>
-              </div>
-              <div class="role-response mentee">
-                <label class="role-label" for="mentee-agreement-review">Mentee Response</label>
-                <textarea id="mentee-agreement-review" name="menteeAgreementReview"></textarea>
-              </div>
-            </div>
+            <label class="prompt" for="additional-agreements">Is there anything else we agreed to or need to revisit?</label>
+            <textarea id="additional-agreements" name="additionalAgreements" placeholder="Optional"></textarea>
           </div>
         </div>
       </section>
@@ -764,10 +717,16 @@
     (() => {
       const form = document.getElementById('mentoring-agreement');
       const status = document.getElementById('saved-status');
-      const storageKey = 'mls-mentoring-agreement-draft-v2';
+      const storageKey = 'mls-mentoring-agreement-draft-v3';
       let statusTimer;
 
       const controls = Array.from(form.elements).filter((control) => control.name);
+      const textareas = Array.from(form.querySelectorAll('textarea'));
+
+      function resizeTextarea(textarea) {
+        textarea.style.height = 'auto';
+        textarea.style.height = `${Math.max(textarea.scrollHeight, 100)}px`;
+      }
 
       function showStatus(message) {
         status.textContent = message;
@@ -802,20 +761,27 @@
         }
       }
 
-      form.addEventListener('input', saveDraft);
+      form.addEventListener('input', (event) => {
+        if (event.target instanceof HTMLTextAreaElement) resizeTextarea(event.target);
+        saveDraft();
+      });
       form.addEventListener('change', saveDraft);
 
-      document.getElementById('print-form').addEventListener('click', () => window.print());
+      document.getElementById('print-form').addEventListener('click', () => {
+        textareas.forEach(resizeTextarea);
+        window.print();
+      });
 
       document.getElementById('clear-form').addEventListener('click', () => {
-        if (!window.confirm('Clear every answer and signature from this agreement?')) return;
+        if (!window.confirm('Start a new agreement? This will clear the mentee and shared answers saved on this device.')) return;
         form.reset();
         localStorage.removeItem(storageKey);
-        showStatus('Agreement cleared.');
-        document.getElementById('mentor-name').focus();
+        showStatus('New agreement ready.');
+        document.getElementById('mentee-name').focus();
       });
 
       loadDraft();
+      textareas.forEach(resizeTextarea);
     })();
   </script>
 </body>
