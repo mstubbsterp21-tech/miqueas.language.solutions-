@@ -260,7 +260,7 @@ export default function InterpreterRequestFormShared({
       await onSubmitRequest(payload);
       setSubmitted(true);
     } catch (error) {
-      setSubmitError(error instanceof Error ? error.message : "Unable to submit request. Please check your connection and try again.");
+      setSubmitError("Your request was not submitted. Please try again. If the problem continues, email MLS at m.stubbs@miqueaslanguagesolutions.com.");
     } finally {
       setIsSubmitting(false);
     }
