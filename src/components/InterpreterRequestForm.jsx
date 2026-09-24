@@ -29,5 +29,12 @@ export default function InterpreterRequestForm({ palette = defaultPalette }) {
     }
   }
 
-  return <InterpreterRequestFormShared palette={{ ...defaultPalette, ...palette }} onSubmitRequest={submitToWebsiteRequestSheet} />;
+  return (
+    <InterpreterRequestFormShared
+      palette={{ ...defaultPalette, ...palette }}
+      onSubmitRequest={submitToWebsiteRequestSheet}
+      successTitle="Request Submitted Successfully"
+      successMessage="Your interpreter request was submitted successfully. MLS will review the details and follow up with you about availability and next steps. Submitting a request does not confirm interpreter coverage."
+    />
+  );
 }
