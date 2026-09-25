@@ -1,3 +1,5 @@
+import { blogFaqs } from "./blogFaqs.js";
+
 export const SITE_URL = "https://miqueaslanguagesolutions.com";
 export const DEFAULT_IMAGE = `${SITE_URL}/preview.png`;
 
@@ -112,6 +114,7 @@ export const siteMetadata = {
 };
 
 const blogArticles = [
+  ["ongoing-interpreting-partner-beyond-one-off-bookings", "Moving Beyond One-Off Bookings: Why Your Organization Needs an Ongoing Interpreting Partner", "How an ongoing interpreting partnership supports preparation, scheduling continuity, professional standards, and consistent communication access.", "2026-08-17"],
   ["english-to-asl-video-translation-digital-accessibility", "English-to-ASL Video Translation: Making Your Digital Content Accessible", "A practical guide to English-to-ASL video translation, from script preparation and linguistic quality to accessible video integration and content updates.", "2026-08-10"],
   ["deaf-fest-2026-community-connection-accessibility", "Deaf Fest 2026 and Community Connection: Why Local Events Matter for Accessibility", "How Florida’s Deaf Fest strengthens community connection—and how organizations can support accessible local events through preparation, partnership, and professional interpreting.", "2026-08-03"],
   ["cost-communication-breakdown-cheap-interpreting", "The Cost of Communication Breakdown: Why Cheap Interpreting Costs More", "Why interpreter value should be measured by readiness, fit, reliability, and risk—not just the lowest hourly rate.", "2026-07-27"],
@@ -130,7 +133,7 @@ const blogArticles = [
 
 for (const [slug, title, description, publishDate] of blogArticles) {
   siteMetadata[`/blog/${slug}`] = {
-    title: `${title} | MLS`, description, publishDate, schemaType: "Article", priority: "0.8",
+    title: `${title} | MLS`, description, publishDate, schemaType: "BlogPosting", priority: "0.8", faq: blogFaqs[slug],
   };
 }
 
@@ -174,19 +177,27 @@ export function schemaForRoute(path, meta) {
       serviceType: "ASL-English interpreting and translation",
     }];
   }
-  if (meta.schemaType === "Article") {
+  if (meta.schemaType === "BlogPosting" || meta.schemaType === "Article") {
     return [organizationSchema, breadcrumb, {
       "@context": "https://schema.org",
-      "@type": "Article",
+      "@type": "BlogPosting",
       headline: meta.title.split("|")[0].trim(),
       description: meta.description,
       datePublished: meta.publishDate,
-      dateModified: meta.publishDate,
+      dateModified: meta.dateModified || meta.publishDate,
       mainEntityOfPage: url,
       image: DEFAULT_IMAGE,
-      author: { "@type": "Organization", name: "Miqueas Language Solutions" },
-      publisher: { "@id": `${SITE_URL}/#organization` },
-    }];
+      author: { "@type": "Person", name: "Micah Stubbs", url: `${SITE_URL}/` },
+      publisher: { "@type": "Organization", name: "Miqueas Language Solutions LLC", url: `${SITE_URL}/` },
+    }, ...(meta.faq?.length ? [{
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      mainEntity: meta.faq.map(({ question, answer }) => ({
+        "@type": "Question",
+        name: question,
+        acceptedAnswer: { "@type": "Answer", text: answer },
+      })),
+    }] : [])];
   }
   return path === "/" ? [organizationSchema] : [organizationSchema, breadcrumb];
 }

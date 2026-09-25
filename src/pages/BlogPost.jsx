@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { Link, Navigate, useParams } from "react-router-dom";
 import { ArrowLeft, CalendarDays, Clock } from "lucide-react";
 import { formatBlogDate, getPublishedBlogPostBySlug } from "../content/blogPostsLive";
+import { schemaForRoute, siteMetadata } from "../seo/siteMetadata.js";
 
 function setMetaAttribute(attribute, key, content) {
   let tag = document.head.querySelector(`meta[${attribute}="${key}"]`);
@@ -84,6 +85,29 @@ export default function BlogPost({ palette }) {
     setMetaAttribute("name", "twitter:title", pageTitle);
     setMetaAttribute("name", "twitter:description", post.excerpt);
     setMetaAttribute("name", "twitter:image", imageUrl);
+
+    const path = `/blog/${post.slug}`;
+    const metadata = {
+      ...siteMetadata[path],
+      title: post.title,
+      description: post.excerpt,
+      publishDate: post.publishDate,
+      schemaType: "BlogPosting",
+    };
+    let structuredData = document.head.querySelector('script[type="application/ld+json"]');
+    const existingScript = Boolean(structuredData);
+    const previousData = structuredData?.textContent;
+    if (!structuredData) {
+      structuredData = document.createElement("script");
+      structuredData.type = "application/ld+json";
+      document.head.appendChild(structuredData);
+    }
+    structuredData.textContent = JSON.stringify(schemaForRoute(path, metadata));
+
+    return () => {
+      if (existingScript) structuredData.textContent = previousData;
+      else structuredData.remove();
+    };
   }, [post]);
 
   if (!post) {
@@ -106,6 +130,10 @@ export default function BlogPost({ palette }) {
         .blog-html strong { color: var(--mls-charcoal); font-weight: 900; }
         .blog-html blockquote { margin-top: 2rem; border-left: 5px solid var(--mls-gold); border-radius: 1.5rem; background: #fafafa; padding: 1.25rem 1.4rem; }
         .blog-html blockquote p { margin-top: 0; }
+        .blog-html table { margin-top: 1.25rem; width: 100%; border-collapse: collapse; font-family: inherit; color: #555; line-height: 1.7; }
+        .blog-html th, .blog-html td { border: 1px solid var(--mls-border); padding: 0.75rem; text-align: left; vertical-align: top; overflow-wrap: anywhere; }
+        .blog-html th { color: var(--mls-charcoal); font-weight: 800; }
+        .blog-html thead { background: #f7f3ef; }
       `}</style>
       <section className="relative px-5 py-14 md:px-8 md:py-20">
         <div className="absolute inset-0 -z-10" style={{ background: "radial-gradient(circle at 15% 15%, rgba(221,125,0,0.18), transparent 28%), radial-gradient(circle at 85% 10%, rgba(114,17,0,0.12), transparent 32%), linear-gradient(180deg, #ffffff 0%, #f7f3ef 100%)" }} />

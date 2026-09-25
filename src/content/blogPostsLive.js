@@ -1,3 +1,4 @@
+import ongoingPartnerHtml from "./blog/ongoing-interpreting-partner-beyond-one-off-bookings.html?raw";
 import englishAslVideoHtml from "./blog/english-to-asl-video-translation-digital-accessibility.html?raw";
 import deafFestHtml from "./blog/deaf-fest-2026-community-connection-accessibility.html?raw";
 import { blogPosts as baseBlogPosts, formatBlogDate } from "./blogPosts";
@@ -13,7 +14,18 @@ import hiringQualifiedInterpreterHtml from "./blog/how-to-hire-qualified-asl-int
 import workplaceAccessHtml from "./blog/asl-access-workplace-employer-accommodations.html?raw";
 import communicationBreakdownCostHtml from "./blog/cost-communication-breakdown-cheap-interpreting.html?raw";
 
-export const FEATURED_BLOG_SLUG = "english-to-asl-video-translation-digital-accessibility";
+export const FEATURED_BLOG_SLUG = "ongoing-interpreting-partner-beyond-one-off-bookings";
+
+const ongoingPartnerPost = {
+  slug: "ongoing-interpreting-partner-beyond-one-off-bookings",
+  title: "Moving Beyond One-Off Bookings: Why Your Organization Needs an Ongoing Interpreting Partner",
+  excerpt: "How an ongoing interpreting partnership supports preparation, scheduling continuity, professional standards, and consistent communication access.",
+  publishDate: "2026-08-17",
+  category: "Client Guidance",
+  readTime: "7 min read",
+  featured: false,
+  html: ongoingPartnerHtml,
+};
 
 const englishAslVideoPost = {
   slug: "english-to-asl-video-translation-digital-accessibility",
@@ -130,6 +142,7 @@ const postOverrides = new Map([[updatedVriPost.slug, updatedVriPost]]);
 const removedPostSlugs = new Set(["how-to-prepare-for-an-interpreted-meeting"]);
 
 const allBlogPosts = [
+  ongoingPartnerPost,
   englishAslVideoPost,
   deafFestPost,
   communicationBreakdownCostPost,

@@ -8,6 +8,8 @@
 4. Add the matching slug, title, description, and date to `blogArticles` in `src/seo/siteMetadata.js`. The build uses this registry to generate article metadata pages and **overwrites** `dist/sitemap.xml`; editing `public/sitemap.xml` alone does not update the deployed sitemap.
 5. Run `npm run check` and verify the built article page and sitemap before publishing.
 
+Blog JSON-LD uses `BlogPosting`, Micah Stubbs as the Person author, and Miqueas Language Solutions LLC as publisher. Keep publication dates aligned with the visible date. Where a post has a visible FAQ, copy its exact questions and answers into `src/seo/blogFaqs.js`; metadata belongs in the document head, never in the article HTML. Verify exactly three visible questions and matching FAQ schema for new posts. Use professional ethical standards when referring to ethics, and EIPA 3.9 and 7+ years of experience for credentials.
+
 The sections below describe the original base content module and supported article formats.
 
 The MLS website now has a lightweight scheduled blog system built directly into the React/Vite site. No WordPress is required.
