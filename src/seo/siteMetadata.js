@@ -112,6 +112,8 @@ export const siteMetadata = {
 };
 
 const blogArticles = [
+  ["english-to-asl-video-translation-digital-accessibility", "English-to-ASL Video Translation: Making Your Digital Content Accessible", "A practical guide to English-to-ASL video translation, from script preparation and linguistic quality to accessible video integration and content updates.", "2026-08-10"],
+  ["deaf-fest-2026-community-connection-accessibility", "Deaf Fest 2026 and Community Connection: Why Local Events Matter for Accessibility", "How Florida’s Deaf Fest strengthens community connection—and how organizations can support accessible local events through preparation, partnership, and professional interpreting.", "2026-08-03"],
   ["cost-communication-breakdown-cheap-interpreting", "The Cost of Communication Breakdown: Why Cheap Interpreting Costs More", "Why interpreter value should be measured by readiness, fit, reliability, and risk—not just the lowest hourly rate.", "2026-07-27"],
   ["asl-access-workplace-employer-accommodations", "ASL Access in the Workplace: An Employer Accommodation Guide", "A practical guide for employers and HR teams planning ASL access for interviews, onboarding, meetings, training, and everyday workplace communication.", "2026-07-20"],
   ["how-to-hire-qualified-asl-interpreter-florida", "How to Hire a Qualified ASL Interpreter in Florida", "A practical credential-review guide for Florida organizations evaluating interpreter qualifications, assignment fit, preparation, and professional readiness.", "2026-07-13"],

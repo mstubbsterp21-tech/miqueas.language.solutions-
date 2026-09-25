@@ -1,3 +1,4 @@
+import englishAslVideoHtml from "./blog/english-to-asl-video-translation-digital-accessibility.html?raw";
 import deafFestHtml from "./blog/deaf-fest-2026-community-connection-accessibility.html?raw";
 import { blogPosts as baseBlogPosts, formatBlogDate } from "./blogPosts";
 import whyVriBestFitHtml from "./blog/why-vri-is-not-always-the-best-fit.html?raw";
@@ -12,7 +13,18 @@ import hiringQualifiedInterpreterHtml from "./blog/how-to-hire-qualified-asl-int
 import workplaceAccessHtml from "./blog/asl-access-workplace-employer-accommodations.html?raw";
 import communicationBreakdownCostHtml from "./blog/cost-communication-breakdown-cheap-interpreting.html?raw";
 
-export const FEATURED_BLOG_SLUG = "deaf-fest-2026-community-connection-accessibility";
+export const FEATURED_BLOG_SLUG = "english-to-asl-video-translation-digital-accessibility";
+
+const englishAslVideoPost = {
+  slug: "english-to-asl-video-translation-digital-accessibility",
+  title: "English-to-ASL Video Translation: Making Your Digital Content Accessible",
+  excerpt: "A practical guide to English-to-ASL video translation, from script preparation and linguistic quality to accessible video integration and content updates.",
+  publishDate: "2026-08-10",
+  category: "Digital Accessibility",
+  readTime: "6 min read",
+  featured: false,
+  html: englishAslVideoHtml,
+};
 
 const deafFestPost = {
   slug: "deaf-fest-2026-community-connection-accessibility",
@@ -118,6 +130,7 @@ const postOverrides = new Map([[updatedVriPost.slug, updatedVriPost]]);
 const removedPostSlugs = new Set(["how-to-prepare-for-an-interpreted-meeting"]);
 
 const allBlogPosts = [
+  englishAslVideoPost,
   deafFestPost,
   communicationBreakdownCostPost,
   workplaceAccessPost,

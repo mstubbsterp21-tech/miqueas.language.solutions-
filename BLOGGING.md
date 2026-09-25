@@ -1,5 +1,15 @@
 # MLS Blog Publishing Guide
 
+## Current HTML publishing workflow
+
+1. Save the article body in `src/content/blog/<slug>.html`. The page template renders the title and publication date, so omit duplicate title/date elements from the body.
+2. Import the HTML with `?raw` in `src/content/blogPostsLive.js`, define the post metadata, and add the post to `allBlogPosts`.
+3. Set `FEATURED_BLOG_SLUG` to the intended featured post. Home, blog index, and article pages use this live content module.
+4. Add the matching slug, title, description, and date to `blogArticles` in `src/seo/siteMetadata.js`. The build uses this registry to generate article metadata pages and **overwrites** `dist/sitemap.xml`; editing `public/sitemap.xml` alone does not update the deployed sitemap.
+5. Run `npm run check` and verify the built article page and sitemap before publishing.
+
+The sections below describe the original base content module and supported article formats.
+
 The MLS website now has a lightweight scheduled blog system built directly into the React/Vite site. No WordPress is required.
 
 ## Where blog posts live
