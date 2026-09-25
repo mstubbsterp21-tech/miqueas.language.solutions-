@@ -1,3 +1,4 @@
+import deafFestHtml from "./blog/deaf-fest-2026-community-connection-accessibility.html?raw";
 import { blogPosts as baseBlogPosts, formatBlogDate } from "./blogPosts";
 import whyVriBestFitHtml from "./blog/why-vri-is-not-always-the-best-fit.html?raw";
 import whyVriBestFitPart2Html from "./blog/why-vri-is-not-always-the-best-fit-part2.html?raw";
@@ -11,7 +12,18 @@ import hiringQualifiedInterpreterHtml from "./blog/how-to-hire-qualified-asl-int
 import workplaceAccessHtml from "./blog/asl-access-workplace-employer-accommodations.html?raw";
 import communicationBreakdownCostHtml from "./blog/cost-communication-breakdown-cheap-interpreting.html?raw";
 
-export const FEATURED_BLOG_SLUG = "cost-communication-breakdown-cheap-interpreting";
+export const FEATURED_BLOG_SLUG = "deaf-fest-2026-community-connection-accessibility";
+
+const deafFestPost = {
+  slug: "deaf-fest-2026-community-connection-accessibility",
+  title: "Deaf Fest 2026 and Community Connection: Why Local Events Matter for Accessibility",
+  excerpt: "How Florida’s Deaf Fest strengthens community connection—and how organizations can support accessible local events through preparation, partnership, and professional interpreting.",
+  publishDate: "2026-08-03",
+  category: "Community Access",
+  readTime: "6 min read",
+  featured: false,
+  html: deafFestHtml,
+};
 
 const communicationBreakdownCostPost = {
   slug: "cost-communication-breakdown-cheap-interpreting",
@@ -106,6 +118,7 @@ const postOverrides = new Map([[updatedVriPost.slug, updatedVriPost]]);
 const removedPostSlugs = new Set(["how-to-prepare-for-an-interpreted-meeting"]);
 
 const allBlogPosts = [
+  deafFestPost,
   communicationBreakdownCostPost,
   workplaceAccessPost,
   hiringQualifiedInterpreterPost,
