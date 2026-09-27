@@ -1,3 +1,4 @@
+import yearRoundAccessHtml from "./blog/no-access-without-sign-language-year-round-commitment.html?raw";
 import deafAwarenessHtml from "./blog/deaf-awareness-month-florida-community-events-access-wins.html?raw";
 import teamInterpretingHtml from "./blog/team-interpreting-deaf-interpreters-when-two-professionals-are-needed.html?raw";
 import ongoingPartnerHtml from "./blog/ongoing-interpreting-partner-beyond-one-off-bookings.html?raw";
@@ -16,7 +17,18 @@ import hiringQualifiedInterpreterHtml from "./blog/how-to-hire-qualified-asl-int
 import workplaceAccessHtml from "./blog/asl-access-workplace-employer-accommodations.html?raw";
 import communicationBreakdownCostHtml from "./blog/cost-communication-breakdown-cheap-interpreting.html?raw";
 
-export const FEATURED_BLOG_SLUG = "deaf-awareness-month-florida-community-events-access-wins";
+export const FEATURED_BLOG_SLUG = "no-access-without-sign-language-year-round-commitment";
+
+const yearRoundAccessPost = {
+  slug: "no-access-without-sign-language-year-round-commitment",
+  title: "No Access Without Sign Language: Turning International Week of Deaf People Into Year-Round Commitment",
+  excerpt: "A practical framework for Florida organizations to turn Deaf awareness into year-round communication access through ownership, budgeting, provider partnerships, accessible procedures, and measurable targets.",
+  publishDate: "2026-09-21",
+  category: "Accessibility Planning",
+  readTime: "10 min read",
+  featured: false,
+  html: yearRoundAccessHtml,
+};
 
 const deafAwarenessPost = {
   slug: "deaf-awareness-month-florida-community-events-access-wins",
@@ -166,6 +178,7 @@ const postOverrides = new Map([[updatedVriPost.slug, updatedVriPost]]);
 const removedPostSlugs = new Set(["how-to-prepare-for-an-interpreted-meeting"]);
 
 const allBlogPosts = [
+  yearRoundAccessPost,
   deafAwarenessPost,
   teamInterpretingPost,
   ongoingPartnerPost,

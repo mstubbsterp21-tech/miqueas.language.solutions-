@@ -1,4 +1,18 @@
 export const blogFaqs = {
+  "no-access-without-sign-language-year-round-commitment": [
+    {
+      "question": "1. How can an organization distinguish a true access commitment from a general diversity statement?",
+      "answer": "A true access commitment identifies the service standard, responsible personnel, funding source, request pathway, and method for reviewing results. It also explains how the organization will respond when a request involves unusual timing, specialized terminology, multiple departments, or a modality question. A general statement may communicate values, but it does not establish operational responsibility."
+    },
+    {
+      "question": "2. What should an organization do when a Deaf consumer prefers a communication method that differs from the organization’s usual process?",
+      "answer": "The organization should avoid assuming that its usual process is automatically the right fit. It should ask respectful, relevant questions about the communication goal and consider the consumer’s stated preference, the setting, privacy needs, timing, and complexity. When needed, the organization can consult a qualified interpreter or language services provider to assess options without shifting the burden of planning onto the consumer."
+    },
+    {
+      "question": "3. How should leadership involve Deaf people in evaluating whether year-round access is working?",
+      "answer": "Leadership should create accessible opportunities for feedback that do not require a Deaf consumer to repeatedly explain or justify a communication barrier. This may include compensated consultation, accessible surveys, structured post-service feedback, or partnership with Deaf-led organizations. The organization should document what it heard, identify changes made, and communicate how feedback influenced the process."
+    }
+  ],
   "deaf-awareness-month-florida-community-events-access-wins": [
     {
       "question": "How should an organization handle an event where the Deaf audience uses more than one sign language or communication system?",
