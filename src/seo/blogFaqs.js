@@ -82,5 +82,187 @@ export const blogFaqs = {
       "question": "3. What should an organization do when an assigned interpreter is unavailable mid-contract and a substitute is sent instead?",
       "answer": "The organization should expect a clear transition process rather than assuming a substitute can step in without preparation. At minimum, the replacement interpreter should receive prior notes, terminology, scheduling expectations, and relevant background so the level of communication access remains consistent and respectful."
     }
+  ],
+  "7-mistakes-sign-language-services-healthcare": [
+    {
+      "question": "1. When should a healthcare organization reassess whether VRI is working?",
+      "answer": "Reassess as soon as the patient or care team identifies a barrier, such as an unclear image, poor audio, difficulty seeing the interpreter, overlapping speakers, or a need for in-person interaction. Pause and address the problem. If the setup cannot provide effective communication, consider another modality that fits the encounter."
+    },
+    {
+      "question": "2. Should a family member interpret during a medical appointment?",
+      "answer": "Family members may support a patient, but they should not be treated as the default interpreter. A qualified interpreter helps maintain accuracy, confidentiality, and clear communication roles, especially when the discussion involves diagnosis, consent, treatment, or sensitive information."
+    },
+    {
+      "question": "3. What should staff do when communication access breaks down during an appointment?",
+      "answer": "Pause the exchange, identify what is preventing communication, and work with the patient and interpreter to correct it. This may mean adjusting lighting or positioning, improving audio, slowing turn-taking, clarifying a message, or changing the service modality. Continue when the patient can participate meaningfully."
+    }
+  ],
+  "ai-vs-human-asl-interpreters": [
+    {
+      "question": "1. Does the use of AI tools create a liability shield for organizations if a miscommunication occurs?",
+      "answer": "No. The organization providing the service remains responsible for effective communication, regardless of whether it uses AI tools, remote platforms, or in-person personnel. Technology does not transfer that responsibility. If a Deaf patient, client, student, or employee does not receive meaningful access, the facility still carries the legal and operational consequences."
+    },
+    {
+      "question": "2. Can AI effectively translate tactile sign language or ProTactile communication?",
+      "answer": "No. Tactile sign language and ProTactile communication depend on touch, physical orientation, and real-time environmental feedback. Current camera-based AI systems are built to process visual input, not hand-to-hand contact or touch-based backchanneling. That means this modality requires human presence and cannot be replicated by an automated visual translation system."
+    },
+    {
+      "question": "3. How can human interpreters use AI as a tool for assignment preparation without compromising privacy?",
+      "answer": "Human interpreters may use AI in limited, careful ways during preparation, such as researching publicly available terminology, organizing background concepts, or summarizing public-facing documents before an assignment. The standard is that the interpreter remains in control of judgment, does not rely on AI for the live interaction, and avoids entering confidential client-specific content into public tools. Used this way, AI can support preparation while the interpreting work itself remains human-led."
+    }
+  ],
+  "asl-access-florida-hurricane-prep-guide": [
+    {
+      "question": "Are ASL interpreters considered \"essential workers\" during a state-mandated curfew or evacuation?",
+      "answer": "In practice, interpreters may be treated as essential support personnel when they are entering hospitals, shelters, emergency briefings, or other facilities that must maintain communication access during a storm. However, that status is not automatic in every jurisdiction or every assignment. Organizations should confirm ahead of time what documentation, vendor clearance, point-of-contact information, or facility authorization an interpreter will need in order to travel during restricted conditions. If access depends on security screening or emergency management approval, that process should be resolved before landfall rather than during active curfew hours."
+    },
+    {
+      "question": "Can remote interpreting be utilized if the interpreter is located outside the affected storm zone?",
+      "answer": "Yes, but it should be treated carefully. An interpreter outside the impact area may still have stable power and internet, which can help preserve continuity. The more common problem is the local infrastructure at the facility, shelter, or clinic receiving the service. If that site has unstable bandwidth, power interruption, damaged hardware, or weak cellular backup, the connection can still fail regardless of where the interpreter is located. For that reason, off-site remote support may be part of a broader contingency plan, but it is a risky primary plan when the local environment is compromised."
+    },
+    {
+      "question": "How should shelters handle ASL access for unplanned, spontaneous evacuation updates that are not televised?",
+      "answer": "Shelters should prepare for brief, live, non-broadcast announcements before they are needed. One practical approach is to maintain a library of short pre-recorded ASL video messages covering common instructions such as intake procedures, mealtime changes, medical line updates, transport staging, and safety restrictions. Staff should also have clear visual signage ready for immediate use when conditions change faster than an interpreter can be positioned. These backup tools do not replace a qualified interpreter for complex communication, but they can reduce delay and confusion when spontaneous updates must be delivered quickly."
+    }
+  ],
+  "asl-healthcare-community-hands-up-conference-2026-orlando": [
+    {
+      "question": "1. How do I know if an interpreter is qualified for a medical setting?",
+      "answer": "Organizations should review assignment-specific qualifications, relevant experience, preparation practices, and ethical conduct. Micah Stubbs is a qualified interpreter with an EIPA 3.9 and 7+ years of experience. His practice adheres to the RID Code of Professional Conduct. Medical assignments also call for preparation with relevant terminology and attention to confidentiality."
+    },
+    {
+      "question": "2. Is VRI an appropriate substitute for in-person interpreting at a conference?",
+      "answer": "While Video Remote Interpreting (VRI) has its place in certain telehealth or quick consultations, in-person interpreting is often the standard for conferences and complex medical screenings like those at a mobile clinic. In-person services allow for better visual clarity, cultural nuance, and the ability to navigate physical environments effectively."
+    },
+    {
+      "question": "3. What should our organization provide to the interpreter before the conference starts?",
+      "answer": "Preparation is key to accuracy. Providing the interpreter with schedules, presentation materials, or specific terminology lists allows them to prepare the linguistic equivalent in ASL. This ensures a higher level of clarity for the Deaf consumer."
+    }
+  ],
+  "asl-access-workplace-employer-accommodations": [
+    {
+      "question": "1. Which workplace situations should employers plan to make accessible?",
+      "answer": "Consider interviews, onboarding, team meetings, training, performance discussions, safety briefings, and other work-related communication. Ask the Deaf employee or applicant about communication preferences and plan for recurring needs as well as one-time events."
+    },
+    {
+      "question": "2. What information should an employer share before requesting interpreting?",
+      "answer": "Share the purpose, date, time, location or platform, expected duration, participant roles, agenda, presentation materials, specialized terms, and any known access or room-layout needs. Early details help the provider assess fit and prepare."
+    },
+    {
+      "question": "3. How should coworkers speak with a Deaf employee when an interpreter is present?",
+      "answer": "Speak directly to the Deaf employee and use the first person, as you would in any conversation. Allow time for interpretation, avoid talking over one another, and include the employee in the discussion rather than directing comments to the interpreter."
+    }
+  ],
+  "celebrating-black-deaf-excellence-juneteenth-2026-florida": [
+    {
+      "question": "1. How do I know if an interpreter is qualified for a cultural event?",
+      "answer": "A qualified interpreter should have a documented track record of experience in various settings and a commitment to professional codes of conduct. At Miqueas Language Solutions, our founder has an EIPA 3.9 and 7+ years of interpreting experience, ensuring a high standard of service for every assignment."
+    },
+    {
+      "question": "2. Is it necessary to provide an ASL interpreter for a public Juneteenth event?",
+      "answer": "Yes. Under the Americans with Disabilities Act (ADA), public events must provide effective communication access. Beyond legal requirements, providing a professional ASL interpreter is an ethical responsibility that ensures the Black Deaf community can participate fully in their own cultural heritage."
+    },
+    {
+      "question": "3. What information does Miqueas Language Solutions need before an event?",
+      "answer": "To ensure readiness, we ask for the event schedule, any specific terminology or names that will be used, and the layout of the venue. This allows us to determine the best positioning for visibility and to prepare for the specific linguistic demands of the occasion."
+    }
+  ],
+  "cost-communication-breakdown-cheap-interpreting": [
+    {
+      "question": "1. What should an organization compare when reviewing interpreting quotes?",
+      "answer": "Compare the same scope of service: setting, modality, assignment length, interpreter count, preparation needs, travel, minimums, and cancellation terms. A lower hourly rate may not represent the lower total cost if the quote leaves out requirements the assignment needs."
+    },
+    {
+      "question": "2. Does a higher interpreting rate guarantee a better fit?",
+      "answer": "No. Price alone does not establish quality or assignment fit. Review relevant experience, qualifications for the setting, preparation practices, communication with the provider, and the plan for handling changes or access barriers."
+    },
+    {
+      "question": "3. What details should an organization provide to receive a useful quote?",
+      "answer": "Provide the date, time, location or platform, purpose, expected duration, participant roles, communication preferences, agenda or terminology, and any known technical, safety, or access considerations. Complete details help the provider review the assignment accurately."
+    }
+  ],
+  "deaf-fest-2026-community-connection-accessibility": [
+    {
+      "question": "1. What can organizations learn from community-led Deaf events?",
+      "answer": "They can see how direct community connection, visible communication access, and useful local services work together. Organizers can also learn from Deaf attendees about what made participation easier and what should change for future events."
+    },
+    {
+      "question": "2. When should an event organizer arrange interpreting?",
+      "answer": "Start planning as soon as the event is being designed. Share the date, schedule, location, program format, speakers, materials, and expected audience so the provider can assess the assignment and prepare. Late changes should be communicated promptly."
+    },
+    {
+      "question": "3. What helps an interpreter support access at a public event?",
+      "answer": "Provide a clear view of the stage and speakers, adequate lighting, the schedule and presentation materials in advance, and a contact person for access questions. Build access into registration, announcements, and plans for schedule changes."
+    }
+  ],
+  "deafblind-asl-interpreting-effective-access": [
+    {
+      "question": "What is the difference between an ASL Interpreter and a Support Service Provider (SSP)?",
+      "answer": "An ASL interpreter facilitates communication between parties by accurately conveying language and managing turn-taking within the interaction. A Support Service Provider (SSP) serves a different function. SSPs assist Deaf-Blind individuals with environmental navigation and access to practical information during daily activities, such as shopping, travel, or locating items in a space. These roles may work alongside each other, but they are not interchangeable."
+    },
+    {
+      "question": "How do interpreters handle group settings involving multiple Deaf-Blind individuals?",
+      "answer": "Group settings often require more than one interpreter because communication access must be managed across several participants, speakers, and turn changes at the same time. In some cases, relay communication is used, where one interpreter receives the original message and another delivers it in the access mode that best fits the Deaf-Blind participant. This structure supports clearer message flow, better pacing, and more consistent access across the group."
+    },
+    {
+      "question": "Are there specific signs or techniques used for providing visual descriptions of non-linguistic content like art or architecture?",
+      "answer": "There is not a single fixed set of signs used only for visual description. Instead, interpreters integrate descriptive language into the sign flow by organizing information clearly, prioritizing relevant details, and conveying form, scale, texture, spatial relationships, and emotional tone when appropriate. For content such as artwork, maps, or architecture, the interpreter makes careful judgment calls about what details are essential so the Deaf-Blind consumer receives fuller access to the experience, not just the spoken commentary."
+    }
+  ],
+  "how-to-hire-qualified-asl-interpreter-florida": [
+    {
+      "question": "1. How should an organization evaluate an interpreter’s qualifications?",
+      "answer": "Start with the assignment’s setting, communication demands, and any applicable requirements. Review relevant experience and preparation practices, and consider performance information such as EIPA 3.9 when it applies to the work. For Micah Stubbs, the stated background is an EIPA 3.9 and 7+ years of experience."
+    },
+    {
+      "question": "2. Does interpreter availability alone establish that an assignment is a good fit?",
+      "answer": "No. Availability is only one part of planning. The provider should review the purpose, modality, pace, subject matter, participants, and preparation needs before confirming whether the interpreter is an appropriate fit."
+    },
+    {
+      "question": "3. What should an organization share when requesting an interpreter?",
+      "answer": "Share the date, time, location or platform, expected duration, assignment purpose, participant roles, communication preferences, materials, specialized terminology, and any known access or safety considerations. These details support an informed review and preparation."
+    }
+  ],
+  "summer-school-accessibility-professional-asl-support": [
+    {
+      "question": "1. What is the difference between a community signer and a qualified interpreter?",
+      "answer": "A community signer may have conversational skills, while a qualified interpreter has demonstrated the language skills, judgment, and ethical practice needed for interpreting. Qualifications should be reviewed in relation to the setting and communication needs."
+    },
+    {
+      "question": "2. Why should organizations plan for ASL support before summer programs begin?",
+      "answer": "Advance planning gives organizations time to review their access process, identify likely assignments, share materials, and discuss fit with a provider before programs become busy."
+    },
+    {
+      "question": "3. Does an EIPA score matter for non-school settings?",
+      "answer": "The EIPA is designed for educational interpreting. For non-school work, organizations should assess qualifications, relevant experience, preparation, modality, and assignment fit for that specific setting rather than treating one score as a universal measure."
+    }
+  ],
+  "why-vri-is-not-always-the-best-fit": [
+    {
+      "question": "1. When is on-site interpreting a better choice than VRI?",
+      "answer": "On-site interpreting is often the better choice when the interaction is highly interactive, emotionally sensitive, or dependent on shared visual context. This includes meetings, conversations, and events with multiple speakers or frequent audience participation. It is also the better fit when the Deaf consumer prefers in-person access or when the environment cannot reliably support clear video communication."
+    },
+    {
+      "question": "2. What are the absolute minimum technical requirements for VRI to work?",
+      "answer": "At minimum, VRI requires a stable internet connection, clear audio, adequate lighting, proper camera placement, and a screen large enough for the Deaf consumer to comfortably see the interpreter. The connection should support consistent video without freezing or lag, and the room should allow one person to speak at a time so the interpreter can accurately process the message."
+    },
+    {
+      "question": "3. How does MLS help us decide which service modality is right for our event?",
+      "answer": "MLS uses a practical review process that centers the Deaf consumer, the communication goals of the event, and the readiness of the environment. We look at factors such as participant preference, complexity of the content, turn-taking demands, visual access needs, and technical setup. The goal is not to push one service over another. The goal is to recommend the modality that gives people the best chance at accurate, respectful, and fully accessible communication."
+    }
+  ],
+  "vri-vs-in-person-asl-interpreting-healthcare": [
+    {
+      "question": "1. When may VRI be an appropriate option in a healthcare setting?",
+      "answer": "VRI may fit an encounter when the patient can comfortably see the interpreter, the audio and video are reliable, the room supports clear turn-taking, and the communication task is appropriate for remote service. The patient’s communication preference and the actual encounter should be part of the decision."
+    },
+    {
+      "question": "2. When should a facility consider in-person interpreting?",
+      "answer": "In-person interpreting may be a better fit when the discussion is complex or emotionally sensitive, several people are communicating, visual or environmental information matters, the patient has difficulty using a screen, or remote technology is not providing effective access."
+    },
+    {
+      "question": "3. What should a facility do if VRI is not working for the patient?",
+      "answer": "Pause and address the barrier with the patient and interpreter. If adjustments to the equipment, audio, lighting, or positioning do not restore effective communication, reassess the modality and arrange a better-fitting option."
+    }
   ]
 };

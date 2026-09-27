@@ -25,7 +25,7 @@ export const blogPosts = [
 <li><strong>Operational Suitability:</strong> Best for rural clinics, after-hours consultations, and routine appointments with limited physical movement and a stable technical environment.</li>
 </ol>
 <h3>In-Person ASL Interpreting</h3>
-<p>In-person interpreting places a <a href="https://miqueaslanguagesolutions.com/interpreters">certified sign language interpreter</a> in the clinical setting.</p>
+<p>In-person interpreting places a <a href="https://miqueaslanguagesolutions.com/interpreters">qualified ASL interpreter</a> in the clinical setting.</p>
 <ol>
 <li><strong>Primary Advantage:</strong> Full access to communication dynamics. On-site interpreters can monitor visual cues, environmental shifts, speaker changes, and emotionally complex exchanges in real time.</li>
 <li><strong>Operational Suitability:</strong> Best for high-stakes diagnoses, mental health assessments, surgical consent, family meetings, and pediatric care.</li>
@@ -55,7 +55,7 @@ export const blogPosts = [
 <li><strong>Managing Multi-Party Communication:</strong> In family meetings, rounds, or consultations with multiple providers, an on-site interpreter can track speaker shifts and overlapping dialogue more effectively.</li>
 <li><strong>Responding to Physical Limitations:</strong> If a patient is immobilized, in pain, visually fatigued, or unable to maintain line of sight with a device, VRI may not be an appropriate fit.</li>
 <li><strong>Supporting Psychological Safety:</strong> In mental health, trauma-informed care, and emotionally charged encounters, physical presence often supports stronger rapport, clearer turn-taking, and more respectful communication access.</li>
-<li><strong>Applying Qualified Judgment:</strong> At Miqueas Language Solutions, our interpreters bring 7+ years of real-world experience and professional credentials (RID and EIPA 3.9). That background supports accurate handling of medical terminology, cultural responsiveness, and setting-specific judgment.</li>
+<li><strong>Applying Qualified Judgment:</strong> Micah Stubbs brings 7+ years of real-world experience and an EIPA 3.9. His work follows the RID Code of Professional Conduct and supports accurate handling of medical terminology, cultural responsiveness, and setting-specific judgment.</li>
 </ol>
 <hr>
 <h2>4. The Legal Landscape: ADA Compliance in Healthcare</h2>
@@ -91,7 +91,14 @@ export const blogPosts = [
 <li><strong>Review our services:</strong> <a href="https://miqueaslanguagesolutions.com/interpreters">ASL-English Interpreting</a></li>
 <li><strong>Inquire about fit:</strong> <a href="https://miqueaslanguagesolutions.com/clients">Contact Miqueas Language Solutions</a></li>
 <li><strong>No commitment required</strong> for an initial consultation about your facility's communication needs.</li>
-</ol>`
+</ol>
+<h2>FAQ</h2>
+<h3>1. When may VRI be an appropriate option in a healthcare setting?</h3>
+<p>VRI may fit an encounter when the patient can comfortably see the interpreter, the audio and video are reliable, the room supports clear turn-taking, and the communication task is appropriate for remote service. The patient’s communication preference and the actual encounter should be part of the decision.</p>
+<h3>2. When should a facility consider in-person interpreting?</h3>
+<p>In-person interpreting may be a better fit when the discussion is complex or emotionally sensitive, several people are communicating, visual or environmental information matters, the patient has difficulty using a screen, or remote technology is not providing effective access.</p>
+<h3>3. What should a facility do if VRI is not working for the patient?</h3>
+<p>Pause and address the barrier with the patient and interpreter. If adjustments to the equipment, audio, lighting, or positioning do not restore effective communication, reassess the modality and arrange a better-fitting option.</p>`
   },
   {
     slug: "asl-access-florida-hurricane-prep-guide",
