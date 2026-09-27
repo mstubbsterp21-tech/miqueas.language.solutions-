@@ -1,4 +1,18 @@
 export const blogFaqs = {
+  "mental-health-interpreting-crisis-counseling-behavioral-health": [
+    {
+      "question": "Should behavioral health providers document the interpreter’s involvement in the clinical record?",
+      "answer": "Documentation practices vary by organization. In general, the record should identify that communication access was provided, the modality used, and any significant communication barrier that affected the encounter. Providers should avoid placing interpreted dialogue or unnecessary interpreter-related detail in the record unless it is clinically or operationally required. Follow the facility’s privacy, documentation, and risk-management policies."
+    },
+    {
+      "question": "What should a provider do if the consumer and interpreter appear to use different meanings for the same mental health concept?",
+      "answer": "Pause the clinical discussion and address the communication issue directly. Ask the consumer how the concept is understood, allow the interpreter to explain the language concern, and use examples or visual supports when appropriate. Do not resolve the difference by choosing the interpretation that seems most clinically convenient. The objective is shared understanding before assessment or treatment decisions continue."
+    },
+    {
+      "question": "How should a crisis center prepare for an interpreter request outside regular business hours?",
+      "answer": "A crisis center should establish an internal access protocol before an emergency occurs. The protocol should identify who requests services, what safety information is shared, how the interpreter is brought into the facility, who confirms the consumer’s preferred communication mode, and how staff document the request. The plan should also specify what the center does when the preferred service is not immediately available while continuing to work toward effective communication access."
+    }
+  ],
   "no-access-without-sign-language-year-round-commitment": [
     {
       "question": "1. How can an organization distinguish a true access commitment from a general diversity statement?",

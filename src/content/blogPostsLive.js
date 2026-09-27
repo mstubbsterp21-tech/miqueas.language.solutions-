@@ -1,4 +1,5 @@
 import yearRoundAccessHtml from "./blog/no-access-without-sign-language-year-round-commitment.html?raw";
+import mentalHealthHtml from "./blog/mental-health-interpreting-crisis-counseling-behavioral-health.html?raw";
 import deafAwarenessHtml from "./blog/deaf-awareness-month-florida-community-events-access-wins.html?raw";
 import teamInterpretingHtml from "./blog/team-interpreting-deaf-interpreters-when-two-professionals-are-needed.html?raw";
 import ongoingPartnerHtml from "./blog/ongoing-interpreting-partner-beyond-one-off-bookings.html?raw";
@@ -17,7 +18,18 @@ import hiringQualifiedInterpreterHtml from "./blog/how-to-hire-qualified-asl-int
 import workplaceAccessHtml from "./blog/asl-access-workplace-employer-accommodations.html?raw";
 import communicationBreakdownCostHtml from "./blog/cost-communication-breakdown-cheap-interpreting.html?raw";
 
-export const FEATURED_BLOG_SLUG = "no-access-without-sign-language-year-round-commitment";
+export const FEATURED_BLOG_SLUG = "mental-health-interpreting-crisis-counseling-behavioral-health";
+
+const mentalHealthPost = {
+  slug: "mental-health-interpreting-crisis-counseling-behavioral-health",
+  title: "Mental Health Interpreting: Preparing for Crisis, Counseling, and Behavioral Health Settings",
+  excerpt: "A practical planning guide for behavioral health providers arranging ASL communication access for crisis intervention, psychiatric evaluation, counseling, and inpatient care.",
+  publishDate: "2026-09-28",
+  category: "Healthcare Access",
+  readTime: "9 min read",
+  featured: false,
+  html: mentalHealthHtml,
+};
 
 const yearRoundAccessPost = {
   slug: "no-access-without-sign-language-year-round-commitment",
@@ -178,6 +190,7 @@ const postOverrides = new Map([[updatedVriPost.slug, updatedVriPost]]);
 const removedPostSlugs = new Set(["how-to-prepare-for-an-interpreted-meeting"]);
 
 const allBlogPosts = [
+  mentalHealthPost,
   yearRoundAccessPost,
   deafAwarenessPost,
   teamInterpretingPost,
