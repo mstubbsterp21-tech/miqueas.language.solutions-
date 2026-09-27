@@ -1,3 +1,4 @@
+import teamInterpretingHtml from "./blog/team-interpreting-deaf-interpreters-when-two-professionals-are-needed.html?raw";
 import ongoingPartnerHtml from "./blog/ongoing-interpreting-partner-beyond-one-off-bookings.html?raw";
 import englishAslVideoHtml from "./blog/english-to-asl-video-translation-digital-accessibility.html?raw";
 import deafFestHtml from "./blog/deaf-fest-2026-community-connection-accessibility.html?raw";
@@ -14,7 +15,18 @@ import hiringQualifiedInterpreterHtml from "./blog/how-to-hire-qualified-asl-int
 import workplaceAccessHtml from "./blog/asl-access-workplace-employer-accommodations.html?raw";
 import communicationBreakdownCostHtml from "./blog/cost-communication-breakdown-cheap-interpreting.html?raw";
 
-export const FEATURED_BLOG_SLUG = "ongoing-interpreting-partner-beyond-one-off-bookings";
+export const FEATURED_BLOG_SLUG = "team-interpreting-deaf-interpreters-when-two-professionals-are-needed";
+
+const teamInterpretingPost = {
+  slug: "team-interpreting-deaf-interpreters-when-two-professionals-are-needed",
+  title: "Team Interpreting and Deaf Interpreters: Why Some Assignments Need More Than One Professional",
+  excerpt: "How team interpreting, planned rotations, support roles, and Deaf interpreters can meet the demands of complex assignments.",
+  publishDate: "2026-09-07",
+  category: "Access Planning",
+  readTime: "9 min read",
+  featured: false,
+  html: teamInterpretingHtml,
+};
 
 const ongoingPartnerPost = {
   slug: "ongoing-interpreting-partner-beyond-one-off-bookings",
@@ -142,6 +154,7 @@ const postOverrides = new Map([[updatedVriPost.slug, updatedVriPost]]);
 const removedPostSlugs = new Set(["how-to-prepare-for-an-interpreted-meeting"]);
 
 const allBlogPosts = [
+  teamInterpretingPost,
   ongoingPartnerPost,
   englishAslVideoPost,
   deafFestPost,

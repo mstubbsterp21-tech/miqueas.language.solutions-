@@ -1,4 +1,18 @@
 export const blogFaqs = {
+  "team-interpreting-deaf-interpreters-when-two-professionals-are-needed": [
+    {
+      "question": "1. Can an organization request a Deaf interpreter without knowing the consumer’s exact language background?",
+      "answer": "Yes. The organization should share what it knows without trying to diagnose the communication need. The Deaf consumer’s preferences should guide the final plan. A provider can ask focused questions about language use, prior access experiences, and the setting to determine whether a Deaf interpreter or another support is appropriate."
+    },
+    {
+      "question": "2. Does using two interpreters mean both professionals interpret continuously?",
+      "answer": "No. Team members may alternate active interpreting, provide monitoring support, manage visual information, or assist with terminology and transitions. Their roles are coordinated around the communication goal. Continuous simultaneous interpreting by both professionals is not automatically necessary."
+    },
+    {
+      "question": "3. What should an organization do if the Deaf consumer and the interpreting provider recommend different team configurations?",
+      "answer": "The organization should pause and clarify the reasons for the difference. Ask what communication risks each recommendation addresses, what modality is expected, and how the consumer’s preferences will be incorporated. The final plan should be based on effective communication access, professional judgment, and the actual demands of the assignment, not on a staffing assumption made before the details were reviewed."
+    }
+  ],
   "english-to-asl-video-translation-digital-accessibility": [
     {
       "question": "1. What should an organization do if the English source content changes after the ASL video has already been produced?",
