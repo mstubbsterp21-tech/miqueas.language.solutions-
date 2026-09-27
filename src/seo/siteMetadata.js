@@ -114,6 +114,7 @@ export const siteMetadata = {
 };
 
 const blogArticles = [
+  ["deaf-awareness-month-florida-community-events-access-wins", "Deaf Awareness Month in Florida: A Calendar of Community Events and Access Wins", "A Florida-focused September calendar and practical communication access improvements for healthcare, education, business, and community organizations.", "2026-09-14"],
   ["team-interpreting-deaf-interpreters-when-two-professionals-are-needed", "Team Interpreting and Deaf Interpreters: Why Some Assignments Need More Than One Professional", "How team interpreting, planned rotations, support roles, and Deaf interpreters can meet the demands of complex assignments.", "2026-09-07"],
   ["ongoing-interpreting-partner-beyond-one-off-bookings", "Moving Beyond One-Off Bookings: Why Your Organization Needs an Ongoing Interpreting Partner", "How an ongoing interpreting partnership supports preparation, scheduling continuity, professional standards, and consistent communication access.", "2026-08-17"],
   ["english-to-asl-video-translation-digital-accessibility", "English-to-ASL Video Translation: Making Your Digital Content Accessible", "A practical guide to English-to-ASL video translation, from script preparation and linguistic quality to accessible video integration and content updates.", "2026-08-10"],

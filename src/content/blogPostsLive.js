@@ -1,3 +1,4 @@
+import deafAwarenessHtml from "./blog/deaf-awareness-month-florida-community-events-access-wins.html?raw";
 import teamInterpretingHtml from "./blog/team-interpreting-deaf-interpreters-when-two-professionals-are-needed.html?raw";
 import ongoingPartnerHtml from "./blog/ongoing-interpreting-partner-beyond-one-off-bookings.html?raw";
 import englishAslVideoHtml from "./blog/english-to-asl-video-translation-digital-accessibility.html?raw";
@@ -15,7 +16,18 @@ import hiringQualifiedInterpreterHtml from "./blog/how-to-hire-qualified-asl-int
 import workplaceAccessHtml from "./blog/asl-access-workplace-employer-accommodations.html?raw";
 import communicationBreakdownCostHtml from "./blog/cost-communication-breakdown-cheap-interpreting.html?raw";
 
-export const FEATURED_BLOG_SLUG = "team-interpreting-deaf-interpreters-when-two-professionals-are-needed";
+export const FEATURED_BLOG_SLUG = "deaf-awareness-month-florida-community-events-access-wins";
+
+const deafAwarenessPost = {
+  slug: "deaf-awareness-month-florida-community-events-access-wins",
+  title: "Deaf Awareness Month in Florida: A Calendar of Community Events and Access Wins",
+  excerpt: "A Florida-focused September calendar and practical communication access improvements for healthcare, education, business, and community organizations.",
+  publishDate: "2026-09-14",
+  category: "Community Access",
+  readTime: "10 min read",
+  featured: false,
+  html: deafAwarenessHtml,
+};
 
 const teamInterpretingPost = {
   slug: "team-interpreting-deaf-interpreters-when-two-professionals-are-needed",
@@ -154,6 +166,7 @@ const postOverrides = new Map([[updatedVriPost.slug, updatedVriPost]]);
 const removedPostSlugs = new Set(["how-to-prepare-for-an-interpreted-meeting"]);
 
 const allBlogPosts = [
+  deafAwarenessPost,
   teamInterpretingPost,
   ongoingPartnerPost,
   englishAslVideoPost,

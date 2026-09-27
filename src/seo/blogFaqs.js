@@ -1,4 +1,18 @@
 export const blogFaqs = {
+  "deaf-awareness-month-florida-community-events-access-wins": [
+    {
+      "question": "How should an organization handle an event where the Deaf audience uses more than one sign language or communication system?",
+      "answer": "Begin by asking the intended participants or community partners what language and communication preferences should guide the event. ASL should not be assumed to meet every attendee’s needs. The access plan may require consultation with Deaf-led organizations, multiple language resources, or a different communication strategy."
+    },
+    {
+      "question": "What should a Florida organization do if its event is announced before access services are confirmed?",
+      "answer": "Update the public notice with a clear access statement rather than implying that access is guaranteed. Assign one contact person to collect requests, document the current status, and communicate changes promptly. Avoid advertising “interpreters provided” until the service arrangement is confirmed."
+    },
+    {
+      "question": "How can an organization measure whether a Deaf Awareness Month initiative had a meaningful result?",
+      "answer": "Use evidence beyond attendance numbers. Review whether Deaf participants could obtain information, follow the program, participate in discussions, and provide feedback. Track the operational changes that remain after September, such as revised registration language, staff procedures, accessible materials, and a documented process for future ASL interpreter services."
+    }
+  ],
   "team-interpreting-deaf-interpreters-when-two-professionals-are-needed": [
     {
       "question": "1. Can an organization request a Deaf interpreter without knowing the consumer’s exact language background?",
