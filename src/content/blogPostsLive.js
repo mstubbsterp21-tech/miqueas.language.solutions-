@@ -3,6 +3,7 @@ import mentalHealthHtml from "./blog/mental-health-interpreting-crisis-counselin
 import ndeamWorkplaceHtml from "./blog/ndeam-2026-communication-access-deaf-employees.html?raw";
 import beyondWhiteCaneHtml from "./blog/beyond-white-cane-deafblind-communication-access-ssp.html?raw";
 import emergencyAccessHtml from "./blog/emergency-communication-access-deaf-floridians-storm-planning.html?raw";
+import frontDeskAccessHtml from "./blog/front-desk-communication-access-deaf-consumers.html?raw";
 import deafAwarenessHtml from "./blog/deaf-awareness-month-florida-community-events-access-wins.html?raw";
 import teamInterpretingHtml from "./blog/team-interpreting-deaf-interpreters-when-two-professionals-are-needed.html?raw";
 import ongoingPartnerHtml from "./blog/ongoing-interpreting-partner-beyond-one-off-bookings.html?raw";
@@ -21,7 +22,18 @@ import hiringQualifiedInterpreterHtml from "./blog/how-to-hire-qualified-asl-int
 import workplaceAccessHtml from "./blog/asl-access-workplace-employer-accommodations.html?raw";
 import communicationBreakdownCostHtml from "./blog/cost-communication-breakdown-cheap-interpreting.html?raw";
 
-export const FEATURED_BLOG_SLUG = "emergency-communication-access-deaf-floridians-storm-planning";
+export const FEATURED_BLOG_SLUG = "front-desk-communication-access-deaf-consumers";
+
+const frontDeskAccessPost = {
+  slug: "front-desk-communication-access-deaf-consumers",
+  title: "The Front Desk Is Where Access Breaks: Customer Service for Deaf Consumers",
+  excerpt: "How front desks can provide communication access at check-in, in waiting rooms, at kiosks and payment windows, and during unplanned requests.",
+  publishDate: "2026-10-26",
+  category: "Client Guidance",
+  readTime: "8 min read",
+  featured: false,
+  html: frontDeskAccessHtml,
+};
 
 const emergencyAccessPost = {
   slug: "emergency-communication-access-deaf-floridians-storm-planning",
@@ -226,6 +238,7 @@ const postOverrides = new Map([[updatedVriPost.slug, updatedVriPost]]);
 const removedPostSlugs = new Set(["how-to-prepare-for-an-interpreted-meeting"]);
 
 const allBlogPosts = [
+  frontDeskAccessPost,
   emergencyAccessPost,
   beyondWhiteCanePost,
   ndeamWorkplacePost,

@@ -114,6 +114,7 @@ export const siteMetadata = {
 };
 
 const blogArticles = [
+  ["front-desk-communication-access-deaf-consumers", "The Front Desk Is Where Access Breaks: Customer Service for Deaf Consumers", "How front desks can provide communication access at check-in, in waiting rooms, at kiosks and payment windows, and during unplanned requests.", "2026-10-26"],
   ["emergency-communication-access-deaf-floridians-storm-planning", "Emergency Communication Access for Deaf Floridians: Planning Before the Next Storm", "A practical emergency access plan for Deaf Floridians covering alerts, evacuation and shelter information, 911 and dispatch, hospital intake, public briefings, and connectivity failures.", "2026-10-19"],
   ["beyond-white-cane-deafblind-communication-access-ssp", "Beyond the White Cane: DeafBlind Communication Access and Support Service Providers", "How organizations can plan DeafBlind communication access through tactile or close-vision interpreting, Protactile approaches, Support Service Providers, and the right environment.", "2026-10-12"],
   ["ndeam-2026-communication-access-deaf-employees", "National Disability Employment Awareness Month: Building Real Communication Access for Deaf Employees", "A practical guide to reliable workplace communication access for Deaf employees during recurring meetings, urgent conversations, internal training, and sensitive HR discussions.", "2026-10-05"],

@@ -1,4 +1,18 @@
 export const blogFaqs = {
+  "front-desk-communication-access-deaf-consumers": [
+    {
+      "question": "How should an organization handle access when a Deaf consumer’s communication preference changes during a visit?",
+      "answer": "Treat the change as new information about effective communication, not as an inconvenience or inconsistency. Staff should pause, confirm the preferred modality, update the appropriate record, and reassess whether the current interaction remains effective. A consumer may prefer writing for check-in but request an interpreter for a complaint or financial discussion."
+    },
+    {
+      "question": "What should be documented after an unexpected front-desk access failure?",
+      "answer": "Document the operational facts: what communication was needed, where the workflow failed, what interim method was used, whether the consumer received the necessary information, and what corrective action is assigned. Avoid subjective judgments about the consumer’s behavior or communication style. The purpose of the record is process improvement and accountability."
+    },
+    {
+      "question": "How can a multi-location organization evaluate front-desk access consistently?",
+      "answer": "Use the same access pathway at every location, then test it against the differences in each site’s physical layout, technology, staffing, and service mix. Review the results with people who understand Deaf consumers’ communication needs. A policy is only reliable when staff can apply it under ordinary conditions, including during busy periods and unexpected requests."
+    }
+  ],
   "emergency-communication-access-deaf-floridians-storm-planning": [
     {
       "question": "1. How should an organization document a Deaf person’s preferred communication modality if the person arrives without identification?",
