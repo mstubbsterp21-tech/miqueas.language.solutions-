@@ -114,6 +114,7 @@ export const siteMetadata = {
 };
 
 const blogArticles = [
+  ["beyond-white-cane-deafblind-communication-access-ssp", "Beyond the White Cane: DeafBlind Communication Access and Support Service Providers", "How organizations can plan DeafBlind communication access through tactile or close-vision interpreting, Protactile approaches, Support Service Providers, and the right environment.", "2026-10-12"],
   ["ndeam-2026-communication-access-deaf-employees", "National Disability Employment Awareness Month: Building Real Communication Access for Deaf Employees", "A practical guide to reliable workplace communication access for Deaf employees during recurring meetings, urgent conversations, internal training, and sensitive HR discussions.", "2026-10-05"],
   ["mental-health-interpreting-crisis-counseling-behavioral-health", "Mental Health Interpreting: Preparing for Crisis, Counseling, and Behavioral Health Settings", "A practical planning guide for behavioral health providers arranging ASL communication access for crisis intervention, psychiatric evaluation, counseling, and inpatient care.", "2026-09-28"],
   ["no-access-without-sign-language-year-round-commitment", "No Access Without Sign Language: Turning International Week of Deaf People Into Year-Round Commitment", "A practical framework for Florida organizations to turn Deaf awareness into year-round communication access through ownership, budgeting, provider partnerships, accessible procedures, and measurable targets.", "2026-09-21"],

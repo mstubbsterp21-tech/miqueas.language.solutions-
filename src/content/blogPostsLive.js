@@ -1,6 +1,7 @@
 import yearRoundAccessHtml from "./blog/no-access-without-sign-language-year-round-commitment.html?raw";
 import mentalHealthHtml from "./blog/mental-health-interpreting-crisis-counseling-behavioral-health.html?raw";
 import ndeamWorkplaceHtml from "./blog/ndeam-2026-communication-access-deaf-employees.html?raw";
+import beyondWhiteCaneHtml from "./blog/beyond-white-cane-deafblind-communication-access-ssp.html?raw";
 import deafAwarenessHtml from "./blog/deaf-awareness-month-florida-community-events-access-wins.html?raw";
 import teamInterpretingHtml from "./blog/team-interpreting-deaf-interpreters-when-two-professionals-are-needed.html?raw";
 import ongoingPartnerHtml from "./blog/ongoing-interpreting-partner-beyond-one-off-bookings.html?raw";
@@ -19,7 +20,18 @@ import hiringQualifiedInterpreterHtml from "./blog/how-to-hire-qualified-asl-int
 import workplaceAccessHtml from "./blog/asl-access-workplace-employer-accommodations.html?raw";
 import communicationBreakdownCostHtml from "./blog/cost-communication-breakdown-cheap-interpreting.html?raw";
 
-export const FEATURED_BLOG_SLUG = "ndeam-2026-communication-access-deaf-employees";
+export const FEATURED_BLOG_SLUG = "beyond-white-cane-deafblind-communication-access-ssp";
+
+const beyondWhiteCanePost = {
+  slug: "beyond-white-cane-deafblind-communication-access-ssp",
+  title: "Beyond the White Cane: DeafBlind Communication Access and Support Service Providers",
+  excerpt: "How organizations can plan DeafBlind communication access through tactile or close-vision interpreting, Protactile approaches, Support Service Providers, and the right environment.",
+  publishDate: "2026-10-12",
+  category: "DeafBlind Access",
+  readTime: "9 min read",
+  featured: false,
+  html: beyondWhiteCaneHtml,
+};
 
 const ndeamWorkplacePost = {
   slug: "ndeam-2026-communication-access-deaf-employees",
@@ -202,6 +214,7 @@ const postOverrides = new Map([[updatedVriPost.slug, updatedVriPost]]);
 const removedPostSlugs = new Set(["how-to-prepare-for-an-interpreted-meeting"]);
 
 const allBlogPosts = [
+  beyondWhiteCanePost,
   ndeamWorkplacePost,
   mentalHealthPost,
   yearRoundAccessPost,

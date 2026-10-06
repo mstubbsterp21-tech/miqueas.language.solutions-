@@ -1,4 +1,18 @@
 export const blogFaqs = {
+  "beyond-white-cane-deafblind-communication-access-ssp": [
+    {
+      "question": "How should an organization document a DeafBlind consumer’s changing access needs over time?",
+      "answer": "Maintain an access profile that records the consumer’s stated preferences without treating it as permanent. Confirm the profile before significant assignments, especially when the location, participants, schedule, health conditions, or communication demands change. The consumer should be able to update or correct the information directly."
+    },
+    {
+      "question": "What should a provider do when a DeafBlind consumer uses different methods with different communication partners?",
+      "answer": "Document the method preferred for the specific assignment rather than selecting one general method for every situation. Share only the information necessary for the professionals involved, and confirm whether the consumer wants the interpreter, SSP, or both to switch methods during the encounter."
+    },
+    {
+      "question": "How can an organization include DeafBlind access in emergency and evacuation planning?",
+      "answer": "Ask the consumer and appropriate support professionals how alerts, directions, evacuation routes, changing hazards, and regrouping information should be communicated. Build those procedures into the venue plan before an emergency occurs, and avoid assuming that visual alarms or general announcements provide usable access."
+    }
+  ],
   "ndeam-2026-communication-access-deaf-employees": [
     {
       "question": "1. How can an organization evaluate communication access without placing the burden of testing the system on one Deaf employee?",
