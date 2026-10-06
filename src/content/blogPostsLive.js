@@ -1,5 +1,6 @@
 import yearRoundAccessHtml from "./blog/no-access-without-sign-language-year-round-commitment.html?raw";
 import mentalHealthHtml from "./blog/mental-health-interpreting-crisis-counseling-behavioral-health.html?raw";
+import ndeamWorkplaceHtml from "./blog/ndeam-2026-communication-access-deaf-employees.html?raw";
 import deafAwarenessHtml from "./blog/deaf-awareness-month-florida-community-events-access-wins.html?raw";
 import teamInterpretingHtml from "./blog/team-interpreting-deaf-interpreters-when-two-professionals-are-needed.html?raw";
 import ongoingPartnerHtml from "./blog/ongoing-interpreting-partner-beyond-one-off-bookings.html?raw";
@@ -18,7 +19,18 @@ import hiringQualifiedInterpreterHtml from "./blog/how-to-hire-qualified-asl-int
 import workplaceAccessHtml from "./blog/asl-access-workplace-employer-accommodations.html?raw";
 import communicationBreakdownCostHtml from "./blog/cost-communication-breakdown-cheap-interpreting.html?raw";
 
-export const FEATURED_BLOG_SLUG = "mental-health-interpreting-crisis-counseling-behavioral-health";
+export const FEATURED_BLOG_SLUG = "ndeam-2026-communication-access-deaf-employees";
+
+const ndeamWorkplacePost = {
+  slug: "ndeam-2026-communication-access-deaf-employees",
+  title: "National Disability Employment Awareness Month: Building Real Communication Access for Deaf Employees",
+  excerpt: "A practical guide to reliable workplace communication access for Deaf employees during recurring meetings, urgent conversations, internal training, and sensitive HR discussions.",
+  publishDate: "2026-10-05",
+  category: "Workplace Access",
+  readTime: "9 min read",
+  featured: false,
+  html: ndeamWorkplaceHtml,
+};
 
 const mentalHealthPost = {
   slug: "mental-health-interpreting-crisis-counseling-behavioral-health",
@@ -190,6 +202,7 @@ const postOverrides = new Map([[updatedVriPost.slug, updatedVriPost]]);
 const removedPostSlugs = new Set(["how-to-prepare-for-an-interpreted-meeting"]);
 
 const allBlogPosts = [
+  ndeamWorkplacePost,
   mentalHealthPost,
   yearRoundAccessPost,
   deafAwarenessPost,

@@ -1,4 +1,18 @@
 export const blogFaqs = {
+  "ndeam-2026-communication-access-deaf-employees": [
+    {
+      "question": "1. How can an organization evaluate communication access without placing the burden of testing the system on one Deaf employee?",
+      "answer": "Use a structured review of common work scenarios and invite input through a confidential, voluntary process. Examine response times, request ownership, modality fit, platform performance, and whether managers understand the escalation pathway. The review should assess the system rather than require the employee to repeatedly prove that access is needed."
+    },
+    {
+      "question": "2. When should a workplace revisit an employee’s communication modality?",
+      "answer": "Revisit the plan when the employee’s role, team structure, work location, technology, or communication demands change. A modality that works for a quiet one-on-one meeting may not work for a fast-moving production meeting or a technical training. The review should be collaborative and based on the communication task."
+    },
+    {
+      "question": "3. What should an organization retain after an interpreted HR conversation?",
+      "answer": "Retain the same employment records the organization would normally create for a comparable conversation. Access details, provider information, and confidential notes should be stored only through approved channels and shared with authorized personnel. Interpreting arrangements should not create a separate informal record of the employee’s communication or personal information."
+    }
+  ],
   "mental-health-interpreting-crisis-counseling-behavioral-health": [
     {
       "question": "Should behavioral health providers document the interpreter’s involvement in the clinical record?",

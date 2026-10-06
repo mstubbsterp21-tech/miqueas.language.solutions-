@@ -114,6 +114,7 @@ export const siteMetadata = {
 };
 
 const blogArticles = [
+  ["ndeam-2026-communication-access-deaf-employees", "National Disability Employment Awareness Month: Building Real Communication Access for Deaf Employees", "A practical guide to reliable workplace communication access for Deaf employees during recurring meetings, urgent conversations, internal training, and sensitive HR discussions.", "2026-10-05"],
   ["mental-health-interpreting-crisis-counseling-behavioral-health", "Mental Health Interpreting: Preparing for Crisis, Counseling, and Behavioral Health Settings", "A practical planning guide for behavioral health providers arranging ASL communication access for crisis intervention, psychiatric evaluation, counseling, and inpatient care.", "2026-09-28"],
   ["no-access-without-sign-language-year-round-commitment", "No Access Without Sign Language: Turning International Week of Deaf People Into Year-Round Commitment", "A practical framework for Florida organizations to turn Deaf awareness into year-round communication access through ownership, budgeting, provider partnerships, accessible procedures, and measurable targets.", "2026-09-21"],
   ["deaf-awareness-month-florida-community-events-access-wins", "Deaf Awareness Month in Florida: A Calendar of Community Events and Access Wins", "A Florida-focused September calendar and practical communication access improvements for healthcare, education, business, and community organizations.", "2026-09-14"],
