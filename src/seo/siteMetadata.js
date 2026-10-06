@@ -114,6 +114,7 @@ export const siteMetadata = {
 };
 
 const blogArticles = [
+  ["emergency-communication-access-deaf-floridians-storm-planning", "Emergency Communication Access for Deaf Floridians: Planning Before the Next Storm", "A practical emergency access plan for Deaf Floridians covering alerts, evacuation and shelter information, 911 and dispatch, hospital intake, public briefings, and connectivity failures.", "2026-10-19"],
   ["beyond-white-cane-deafblind-communication-access-ssp", "Beyond the White Cane: DeafBlind Communication Access and Support Service Providers", "How organizations can plan DeafBlind communication access through tactile or close-vision interpreting, Protactile approaches, Support Service Providers, and the right environment.", "2026-10-12"],
   ["ndeam-2026-communication-access-deaf-employees", "National Disability Employment Awareness Month: Building Real Communication Access for Deaf Employees", "A practical guide to reliable workplace communication access for Deaf employees during recurring meetings, urgent conversations, internal training, and sensitive HR discussions.", "2026-10-05"],
   ["mental-health-interpreting-crisis-counseling-behavioral-health", "Mental Health Interpreting: Preparing for Crisis, Counseling, and Behavioral Health Settings", "A practical planning guide for behavioral health providers arranging ASL communication access for crisis intervention, psychiatric evaluation, counseling, and inpatient care.", "2026-09-28"],

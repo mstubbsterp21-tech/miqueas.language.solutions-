@@ -2,6 +2,7 @@ import yearRoundAccessHtml from "./blog/no-access-without-sign-language-year-rou
 import mentalHealthHtml from "./blog/mental-health-interpreting-crisis-counseling-behavioral-health.html?raw";
 import ndeamWorkplaceHtml from "./blog/ndeam-2026-communication-access-deaf-employees.html?raw";
 import beyondWhiteCaneHtml from "./blog/beyond-white-cane-deafblind-communication-access-ssp.html?raw";
+import emergencyAccessHtml from "./blog/emergency-communication-access-deaf-floridians-storm-planning.html?raw";
 import deafAwarenessHtml from "./blog/deaf-awareness-month-florida-community-events-access-wins.html?raw";
 import teamInterpretingHtml from "./blog/team-interpreting-deaf-interpreters-when-two-professionals-are-needed.html?raw";
 import ongoingPartnerHtml from "./blog/ongoing-interpreting-partner-beyond-one-off-bookings.html?raw";
@@ -20,7 +21,18 @@ import hiringQualifiedInterpreterHtml from "./blog/how-to-hire-qualified-asl-int
 import workplaceAccessHtml from "./blog/asl-access-workplace-employer-accommodations.html?raw";
 import communicationBreakdownCostHtml from "./blog/cost-communication-breakdown-cheap-interpreting.html?raw";
 
-export const FEATURED_BLOG_SLUG = "beyond-white-cane-deafblind-communication-access-ssp";
+export const FEATURED_BLOG_SLUG = "emergency-communication-access-deaf-floridians-storm-planning";
+
+const emergencyAccessPost = {
+  slug: "emergency-communication-access-deaf-floridians-storm-planning",
+  title: "Emergency Communication Access for Deaf Floridians: Planning Before the Next Storm",
+  excerpt: "A practical emergency access plan for Deaf Floridians covering alerts, evacuation and shelter information, 911 and dispatch, hospital intake, public briefings, and connectivity failures.",
+  publishDate: "2026-10-19",
+  category: "Emergency Access",
+  readTime: "9 min read",
+  featured: false,
+  html: emergencyAccessHtml,
+};
 
 const beyondWhiteCanePost = {
   slug: "beyond-white-cane-deafblind-communication-access-ssp",
@@ -214,6 +226,7 @@ const postOverrides = new Map([[updatedVriPost.slug, updatedVriPost]]);
 const removedPostSlugs = new Set(["how-to-prepare-for-an-interpreted-meeting"]);
 
 const allBlogPosts = [
+  emergencyAccessPost,
   beyondWhiteCanePost,
   ndeamWorkplacePost,
   mentalHealthPost,

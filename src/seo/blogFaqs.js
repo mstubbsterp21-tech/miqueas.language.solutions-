@@ -1,4 +1,18 @@
 export const blogFaqs = {
+  "emergency-communication-access-deaf-floridians-storm-planning": [
+    {
+      "question": "1. How should an organization document a Deaf person’s preferred communication modality if the person arrives without identification?",
+      "answer": "Staff should ask the person directly through an accessible method and avoid assuming that every Deaf person uses ASL. Offer writing, typing, visual communication, captioning, or interpreter support while confirming the person’s preference. Record the preference in a way that can follow the person through intake, transfer, and discharge."
+    },
+    {
+      "question": "2. Should emergency communication plans include both a primary and backup interpreting provider?",
+      "answer": "Yes. A backup pathway is important when several organizations request services at the same time, travel becomes unsafe, or a provider cannot reach the affected location. The plan should identify who activates the backup, what information must be shared, and how the organization confirms the requested modality and assignment details."
+    },
+    {
+      "question": "3. What should happen after an emergency access plan is used?",
+      "answer": "The organization should conduct an after-action review with the people who delivered and relied on the communication support. Review response time, message accuracy, technology failures, staff decisions, unmet needs, and any points where a Deaf person had to repeat or advocate for access. Update the plan before the next activation."
+    }
+  ],
   "beyond-white-cane-deafblind-communication-access-ssp": [
     {
       "question": "How should an organization document a DeafBlind consumer’s changing access needs over time?",
