@@ -1,7 +1,8 @@
 import { Building2, CircleDollarSign, ClipboardCheck, ShieldCheck, Users } from "lucide-react";
 import GmailIntegrationCard from "../GmailIntegrationCard";
 import { Card, Hero, Metric, SectionHeader } from "../ui";
-import { ActionButton, AssignmentRow, WorkflowList } from "./shared";
+import { ActionButton, AssignmentRow, WorkflowList, usePortalNow } from "./shared";
+import { isWithinDays } from "../datePredicates";
 
 export default function AdminHomeV2({ workspace, app, v2, actions }) {
   const clients = workspace.admin?.clients || [];
@@ -9,7 +10,7 @@ export default function AdminHomeV2({ workspace, app, v2, actions }) {
   const assignments = app?.assignments || workspace.admin?.assignments || [];
   const invoices = v2?.invoices || [];
   const credentials = v2?.credentials || [];
-  const expiryWindow = Date.now() + 60 * 864e5;
+  const now = usePortalNow();
   const active = assignments.filter((item) => !["closed", "paid", "cancelled"].includes(item.lifecycle_status));
   const pendingTimes = (v2?.timeEntries || []).filter((item) => item.status === "submitted");
   const pendingExpenses = (v2?.expenses || []).filter((item) => item.status === "submitted");
@@ -20,7 +21,7 @@ export default function AdminHomeV2({ workspace, app, v2, actions }) {
     { icon: Users, name: "Interpreters", value: interpreters.length, color: "#dd7d00" },
     { icon: Building2, name: "Clients", value: clients.length, color: "#4338ca" },
     { icon: CircleDollarSign, name: "Receivables", value: invoices.filter((item) => !["paid", "void", "refunded"].includes(item.status)).length, color: "#c2410c" },
-    { icon: ShieldCheck, name: "Expiring soon", value: credentials.filter((item) => item.expires_on && new Date(item.expires_on).getTime() <= expiryWindow).length, color: "#7c3aed" },
+    { icon: ShieldCheck, name: "Expiring soon", value: credentials.filter((item) => item.expires_on && isWithinDays(item.expires_on, now, 60)).length, color: "#7c3aed" },
   ];
 
   return (
