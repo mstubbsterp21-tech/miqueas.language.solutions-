@@ -8,6 +8,8 @@ import AssignmentDocumentCenter from "../AssignmentDocumentCenter";
 import { createPortalSupabaseClient } from "../../lib/supabaseClient";
 import { createMLSApi } from "../api";
 import { InterpreterWorkCard, recordsForAssignment } from "../agencyWorkflowExperience";
+import { isAtOrAfterNow, isWithinDays } from "../datePredicates";
+import { usePortalNow } from "./shared";
 
 const emptyTime = { assignmentId: "", actualStartAt: "", actualEndAt: "", breakMinutes: 0, notes: "" };
 const emptyExpense = { assignmentId: "", expenseType: "mileage", amount: "", mileage: "", description: "", receipt: null };
@@ -21,8 +23,6 @@ const BLOCKS = [
   { key: "afternoon", label: "Afternoon", helper: "12 PM–6 PM", start: [12, 0], end: [18, 0] },
   { key: "evening", label: "Evening", helper: "6 PM–12 AM", start: [18, 0], end: [23, 59] },
 ];
-
-const INTERPRETER_DASHBOARD_NOW = Date.now();
 
 function weeklyRule(item) {
   return String(item?.recurrence_rule || "").includes("X-MLS-BLOCK=");
@@ -75,18 +75,19 @@ function occurrence(weekday, block, timeZone) {
 }
 
 function Home({ workspace, operations, app, v2, actions }) {
+  const now = usePortalNow();
   const profile = workspace.interpreter?.profile || {};
   const assignments = app?.assignments || [];
   const payments = v2?.payments || [];
   const credentials = v2?.credentials || [];
-  const upcoming = assignments.filter((item) => new Date(item.start_at).getTime() >= INTERPRETER_DASHBOARD_NOW && !["cancelled", "closed"].includes(item.lifecycle_status));
+  const upcoming = assignments.filter((item) => isAtOrAfterNow(item.start_at, now) && !["cancelled", "closed"].includes(item.lifecycle_status));
   const unpaid = payments.filter((item) => !["paid", "void"].includes(item.contractor_payment_status));
-  const expiring = credentials.filter((item) => item.expires_on && new Date(item.expires_on).getTime() <= INTERPRETER_DASHBOARD_NOW + 60 * 864e5);
+  const expiring = credentials.filter((item) => item.expires_on && isWithinDays(item.expires_on, now, 60));
   return (
     <div className="space-y-6">
       <Hero title={`${profile.first_name || "Interpreter"}, keep your MLS work assignment-ready.`} actions={<ActionButton tone="gold" onClick={() => actions.go("work")}>Open work</ActionButton>} />
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4"><Metric icon={CalendarDays} name="Upcoming" value={upcoming.length} note="Scheduled assignments" /><Metric icon={ClipboardCheck} name="Opportunities" value={(operations?.opportunities || []).length} note="Open for bidding" color="#dd7d00" /><Metric icon={CircleDollarSign} name="Payments" value={unpaid.length} note="Ready, scheduled, or processing" color="#15803d" /><Metric icon={ShieldCheck} name="Expiring" value={expiring.length} note="Credentials within 60 days" color="#c2410c" /></div>
-      <Card><SectionHeader title="Upcoming assignments" /><div className="mt-5 grid gap-4 xl:grid-cols-2">{upcoming.slice(0, 6).map((item) => <InterpreterWorkCard key={item.id} assignment={item} records={recordsForAssignment(v2, item.id)} onOpen={actions.openAssignment} onTimePay={() => actions.go("payments")} />)}{!upcoming.length && <EmptyState icon={CalendarDays} title="No upcoming assignments" />}</div></Card>
+      <Card><SectionHeader title="Upcoming assignments" /><div className="mt-5 grid gap-4 xl:grid-cols-2">{upcoming.slice(0, 6).map((item) => <InterpreterWorkCard key={item.id} assignment={item} records={recordsForAssignment(v2, item.id)} now={now} onOpen={actions.openAssignment} onTimePay={() => actions.go("payments")} />)}{!upcoming.length && <EmptyState icon={CalendarDays} title="No upcoming assignments" />}</div></Card>
     </div>
   );
 }
@@ -102,6 +103,7 @@ function AssignmentCalendar({ assignments, onOpen }) {
 }
 
 function Work({ operations, app, v2, actions }) {
+  const now = usePortalNow();
   const assignments = app?.assignments || [];
   const opportunities = operations?.opportunities || [];
   const [view, setView] = useState("list");
@@ -117,12 +119,13 @@ function Work({ operations, app, v2, actions }) {
     <div className="space-y-6">
       <Hero title="Work" actions={<ActionButton tone="soft" onClick={() => actions.go("schedule")}>Availability</ActionButton>} />
       <Card><SectionHeader title="Opportunities" action={viewToggle(opportunityView, setOpportunityView)} /><div className="mt-5">{opportunityView === "list" ? <div className="grid gap-4 lg:grid-cols-2">{opportunities.map((opportunity) => { const item = opportunity.assignments || {}; return <button type="button" key={opportunity.id} onClick={() => actions.submitBid(opportunity)} className="group min-w-0 overflow-hidden rounded-[1.5rem] border border-slate-200 bg-white text-left shadow-sm transition hover:-translate-y-0.5 hover:border-[#dd7d00]/50 hover:shadow-lg"><div className="bg-gradient-to-br from-[#721100] to-[#24130e] p-4 text-white"><div className="flex min-w-0 items-start justify-between gap-3"><div className="min-w-0"><p className="mt-1 break-words text-lg font-black">{item.service_type || "Interpreter opportunity"}</p><p className="mt-2 break-words text-xs leading-5 text-white/70">{formatDate(item.start_at)} · {item.delivery_mode || "Delivery pending"}</p></div><Badge value={opportunity.status} className="border-white/20 bg-white/10 text-white" /></div></div><div className="grid gap-2 p-4 text-xs text-slate-600 sm:grid-cols-2"><p><b>Area:</b> {item.delivery_mode === "VRI" ? "Remote" : [item.city, item.state].filter(Boolean).join(", ") || "Shared after assignment"}</p><p><b>Setting:</b> {item.specialty || item.setting || "General"}</p><p><b>Participants:</b> {item.deaf_participants || 0} Deaf · {item.hearing_participants || 0} hearing</p><p><b>Team:</b> {item.team_requested ? "Team requested" : "Solo assignment"}{item.cdi_requested ? " · CDI" : ""}</p><p className="sm:col-span-2"><b>Language/access:</b> {item.language_preferences || item.communication_preferences || "Not specified"}</p><p className="inline-flex items-center gap-1 font-black text-[#721100] sm:col-span-2">Express interest <ClipboardCheck size={13} /></p></div></button>; })}{!opportunities.length && <EmptyState icon={ClipboardCheck} title="No opportunities" />}</div> : <AssignmentCalendar assignments={opportunityAssignments} onOpen={(item) => actions.submitBid(item.opportunity)} />}</div></Card>
-      <Card><SectionHeader title="Assigned services" action={viewToggle(view, setView)} /><div className="mt-5">{view === "list" ? <div className="grid gap-4 xl:grid-cols-2">{assignments.map((item) => <InterpreterWorkCard key={item.id} assignment={item} records={recordsForAssignment(v2, item.id)} onOpen={actions.openAssignment} onTimePay={() => actions.go("payments")} />)}{!assignments.length && <EmptyState icon={CalendarDays} title="No assigned work" />}</div> : <AssignmentCalendar assignments={assignments} onOpen={actions.openAssignment} />}</div></Card>
+      <Card><SectionHeader title="Assigned services" action={viewToggle(view, setView)} /><div className="mt-5">{view === "list" ? <div className="grid gap-4 xl:grid-cols-2">{assignments.map((item) => <InterpreterWorkCard key={item.id} assignment={item} records={recordsForAssignment(v2, item.id)} now={now} onOpen={actions.openAssignment} onTimePay={() => actions.go("payments")} />)}{!assignments.length && <EmptyState icon={CalendarDays} title="No assigned work" />}</div> : <AssignmentCalendar assignments={assignments} onOpen={actions.openAssignment} />}</div></Card>
     </div>
   );
 }
 
 function Payments({ app, v2, actions, saving }) {
+  const now = usePortalNow();
   const { session } = useSession();
   const api = useMemo(() => createMLSApi(session), [session]);
   const storage = useMemo(() => createPortalSupabaseClient(null), []);
@@ -139,7 +142,7 @@ function Payments({ app, v2, actions, saving }) {
   const expenses = v2?.expenses || [];
   const payments = v2?.payments || [];
   const contractorInvoices = v2?.contractorInvoices || [];
-  const completedNeedingTime = assignments.filter((assignment) => assignment.end_at && new Date(assignment.end_at).getTime() < INTERPRETER_DASHBOARD_NOW && !timeEntries.some((entry) => (entry.assignment_id || entry.assignments?.id) === assignment.id));
+  const completedNeedingTime = assignments.filter((assignment) => assignment.end_at && new Date(assignment.end_at).getTime() < now && !timeEntries.some((entry) => (entry.assignment_id || entry.assignments?.id) === assignment.id));
   const awaitingReview = timeEntries.filter((item) => ["submitted", "under_review"].includes(item.status)).length + expenses.filter((item) => ["submitted", "under_review"].includes(item.status)).length;
   const scheduledPayments = payments.filter((item) => ["ready", "scheduled", "processing"].includes(item.contractor_payment_status));
   const paidTotal = payments.filter((item) => item.contractor_payment_status === "paid").reduce((sum, item) => sum + Number(item.contractor_payment_amount || 0), 0);

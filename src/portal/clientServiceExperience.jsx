@@ -17,8 +17,6 @@ import {
 } from "lucide-react";
 import { Badge, Card, SectionHeader, cx, formatDate, pretty } from "./ui";
 
-const CLIENT_EXPERIENCE_NOW = Date.now();
-
 const STAGES = [
   { key: "request", label: "Request", description: "Submitted to MLS" },
   { key: "approval", label: "Approval", description: "Scope and terms" },
@@ -79,9 +77,9 @@ export function assignmentLocation(assignment = {}) {
   return assignment.location_name || [assignment.address_line_1, assignment.address_line_2, assignment.city, assignment.state, assignment.postal_code].filter(Boolean).join(", ") || "Location pending";
 }
 
-export function assignmentIsUpcoming(assignment = {}) {
+export function assignmentIsUpcoming(assignment = {}, now = Date.now()) {
   const start = new Date(assignment.start_at).getTime();
-  return Number.isFinite(start) && start >= CLIENT_EXPERIENCE_NOW && !["cancelled", "closed", "paid"].includes(statusKey(assignment));
+  return Number.isFinite(start) && start >= now && !["cancelled", "closed", "paid"].includes(statusKey(assignment));
 }
 
 export function ClientServiceTracker({ assignment, compact = false }) {

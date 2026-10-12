@@ -1,13 +1,14 @@
 import { useEffect, useMemo, useState } from "react";
 import { FileText, GraduationCap, ShieldCheck, UserCheck, XCircle } from "lucide-react";
 import { Badge, Card, EmptyState, Field, Hero, INPUT, SectionHeader, formatDate } from "../ui";
-import { ActionButton, SelectField } from "./shared";
+import { ActionButton, SelectField, usePortalNow } from "./shared";
 
 const emptyCredential = { interpreterId: "", credentialType: "certification", credentialName: "", credentialNumber: "", issuer: "", issuedOn: "", expiresOn: "", verificationStatus: "pending", notes: "" };
 const emptyOnboarding = { interpreterId: "", stage: "application", status: "active", assignedReviewer: "", dueDate: "", score: "", recommendation: "", notes: "" };
 const cancellableRequestStatuses = new Set(["requested", "viewed", "overdue"]);
 
 export default function AdminComplianceV2({ workspace, operations, v2, actions, saving }) {
+  const now = usePortalNow();
   const clients = workspace.admin?.clients || [];
   const interpreters = (workspace.admin?.interpreters || []).filter((item) => item.roster_status !== "removed");
   const [credential, setCredential] = useState(emptyCredential);
@@ -16,7 +17,6 @@ export default function AdminComplianceV2({ workspace, operations, v2, actions, 
   const interpreterOptions = useMemo(() => interpreters.map((item) => ({ value: item.id, label: `${item.first_name || ""} ${item.last_name || ""}`.trim() || item.email })), [interpreters]);
   const credentials = v2?.credentials || [];
   const pipelines = v2?.onboarding || [];
-  const now = Date.now();
   const expiring = credentials.filter((item) => item.expires_on && new Date(item.expires_on).getTime() <= now + 90 * 864e5);
   const courses = operations?.admin?.courses || [];
 

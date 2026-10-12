@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { isBlockedInterpreterRosterStatus } from "../../api/_shared/portal-access-policy.js";
+import { isAtOrAfterNow, isDueDatePast, isWithinDays } from "../../src/portal/datePredicates.js";
 import {
   newestRecordsByDocumentType,
   normalizeWorkspaceDocumentRecords,
@@ -41,4 +42,14 @@ test("cancelled document requests are excluded from the portal workspace", () =>
     workspace.interpreter.documentRequests.map((item) => item.id),
     ["active-new", "active-old"],
   );
+});
+
+test("portal date summaries use the supplied live clock and handle boundary cases", () => {
+  const now = new Date("2026-10-12T16:00:00.000Z").getTime();
+  assert.equal(isAtOrAfterNow("2026-10-12T16:00:00.000Z", now), true);
+  assert.equal(isAtOrAfterNow("2026-10-12T15:59:59.999Z", now), false);
+  assert.equal(isDueDatePast("2026-10-11", now), true);
+  assert.equal(isDueDatePast("2026-10-12", now), false);
+  assert.equal(isWithinDays("2026-12-11T16:00:00.000Z", now, 60), true);
+  assert.equal(isWithinDays("2026-12-11T16:00:00.001Z", now, 60), false);
 });

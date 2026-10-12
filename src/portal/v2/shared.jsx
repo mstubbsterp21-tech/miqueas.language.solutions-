@@ -1,5 +1,17 @@
+import { useEffect, useState } from "react";
 import { ArrowRight, CalendarDays, ExternalLink, Loader2 } from "lucide-react";
 import { Badge, Card, EmptyState, INPUT, SectionHeader, cx, formatDate, formatMoney, pretty } from "../ui";
+
+const PORTAL_CLOCK_INTERVAL_MS = 60_000;
+
+export function usePortalNow() {
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const interval = setInterval(() => setNow(Date.now()), PORTAL_CLOCK_INTERVAL_MS);
+    return () => clearInterval(interval);
+  }, []);
+  return now;
+}
 
 export function ActionButton({ children, onClick, type = "button", tone = "primary", disabled = false, icon: Icon }) {
   const styles = {

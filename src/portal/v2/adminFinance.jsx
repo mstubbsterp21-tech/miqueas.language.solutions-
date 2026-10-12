@@ -4,7 +4,8 @@ import {
   Badge, Card, EmptyState, Field, Hero, INPUT, Metric, SectionHeader,
   formatDate, formatMoney,
 } from "../ui";
-import { ActionButton, ExternalRecordLink, SelectField } from "./shared";
+import { ActionButton, ExternalRecordLink, SelectField, usePortalNow } from "./shared";
+import { isDueDatePast } from "../datePredicates";
 import {
   getPortalTimeZone,
   timeZoneAbbreviation,
@@ -55,8 +56,6 @@ const emptyPayment = {
   foundPaymentUrl: "",
 };
 
-const FINANCE_DASHBOARD_NOW = Date.now();
-
 function FilePicker({ label, file, onChange, existing, onOpen }) {
   return (
     <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-4">
@@ -94,6 +93,7 @@ function FilePicker({ label, file, onChange, existing, onOpen }) {
 export default function AdminFinanceV2({ workspace, app, v2, actions, saving }) {
   const timeZone = getPortalTimeZone(workspace.preferences?.timeZone);
   const zone = timeZoneAbbreviation(timeZone);
+  const now = usePortalNow();
   const assignments = useMemo(() => app?.assignments || workspace.admin?.assignments || [], [app?.assignments, workspace.admin?.assignments]);
   const clients = workspace.admin?.clients || [];
   const agreements = v2?.agreements || [];
@@ -132,7 +132,7 @@ export default function AdminFinanceV2({ workspace, app, v2, actions, saving }) 
     .reduce((sum, item) => sum + Number(item.contractor_payment_amount || 0), 0);
   const submittedTime = (v2?.timeEntries || []).filter((item) => item.status === "submitted");
   const submittedExpenses = (v2?.expenses || []).filter((item) => item.status === "submitted");
-  const overdueInvoices = invoices.filter((item) => item.status === "overdue" || (item.due_date && !["paid", "void", "refunded"].includes(item.status) && new Date(`${item.due_date}T23:59:59`).getTime() < FINANCE_DASHBOARD_NOW));
+  const overdueInvoices = invoices.filter((item) => item.status === "overdue" || (item.due_date && !["paid", "void", "refunded"].includes(item.status) && isDueDatePast(item.due_date, now)));
   const unpaidContractors = staffing.filter((item) => !["paid", "void"].includes(item.contractor_payment_status) && Number(item.contractor_payment_amount || 0) > 0);
   const payableInvoices = contractorInvoices.filter((item) => !["paid", "void", "rejected"].includes(item.status));
 
