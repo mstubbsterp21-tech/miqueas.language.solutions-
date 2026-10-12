@@ -23,17 +23,62 @@ function LoadingShell() {
   );
 }
 
+class AppRenderBoundary extends React.Component {
+  state = { hasError: false };
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error) {
+    console.error('MLS app render failed', error);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <main className="flex min-h-[100dvh] items-center justify-center bg-[#f7f3ef] p-5">
+          <section className="w-full max-w-xl rounded-3xl border border-[#d1c6bc] bg-white p-8 text-center shadow-xl" role="alert">
+            <p className="text-xs font-black uppercase tracking-[.16em] text-[#dd7d00]">MLS secure portal</p>
+            <h1 className="mt-3 text-2xl font-black text-[#464747]">We couldn’t open this workspace</h1>
+            <p className="mt-3 text-sm leading-6 text-slate-600">
+              Your account and saved data are safe. Reload the page to reconnect to MLS Portal.
+            </p>
+            <div className="mt-6 flex flex-wrap justify-center gap-3">
+              <button
+                type="button"
+                onClick={() => window.location.reload()}
+                className="min-h-11 rounded-full bg-[#721100] px-6 py-3 text-sm font-black text-white"
+              >
+                Reload workspace
+              </button>
+              <a href="/login" className="inline-flex min-h-11 items-center rounded-full border border-[#d1c6bc] px-6 py-3 text-sm font-bold text-[#464747]">
+                Return to login
+              </a>
+            </div>
+          </section>
+        </main>
+      );
+    }
+    return this.props.children;
+  }
+}
+
 function RootRouter() {
   const { pathname } = useLocation();
   const isPortalPath = pathname.startsWith('/portal') || pathname.startsWith('/login') || pathname.startsWith('/admin/interpreters');
 
-  if (isPortalPath) return <PortalAppRouterHub />;
-
   return (
-    <>
-      <AccessibilityTools />
-      <App />
-    </>
+    <AppRenderBoundary key={pathname}>
+      {isPortalPath ? (
+        <PortalAppRouterHub />
+      ) : (
+        <>
+          <AccessibilityTools />
+          <App />
+        </>
+      )}
+    </AppRenderBoundary>
   );
 }
 

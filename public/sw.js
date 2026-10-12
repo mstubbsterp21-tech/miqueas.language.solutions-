@@ -1,4 +1,4 @@
-const CACHE_NAME = "mls-app-v3";
+const CACHE_NAME = "mls-app-v4";
 const APP_SHELL = ["/portal", "/login", "/manifest.webmanifest", "/mls-app-icon.svg"];
 
 self.addEventListener("install", (event) => {
@@ -31,7 +31,15 @@ self.addEventListener("fetch", (event) => {
         }
         return response;
       })
-      .catch(() => caches.match(request).then((cached) => cached || caches.match("/portal")))
+      .catch(async () => {
+        const cached = await caches.match(request);
+        if (cached) return cached;
+        if (request.mode === "navigate") {
+          const appShell = await caches.match("/portal");
+          if (appShell) return appShell;
+        }
+        return Response.error();
+      })
   );
 });
 
