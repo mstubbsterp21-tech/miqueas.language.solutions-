@@ -3,7 +3,8 @@ import { AlertCircle, CalendarDays, CheckCircle2, Filter, Search, Users } from "
 import { NewAssignmentControl } from "../AssignmentAdminControls";
 import { AdminOperationsCard, adminAssignmentMeta, recordsForAssignment } from "../agencyWorkflowExperience";
 import { Card, EmptyState, Hero, Metric, SectionHeader, cx } from "../ui";
-import { ActionButton } from "./shared";
+import { ActionButton, usePortalNow } from "./shared";
+import { isAtOrAfterNow } from "../datePredicates";
 
 const FILTERS = [
   ["action", "Needs action"],
@@ -14,8 +15,6 @@ const FILTERS = [
   ["archive", "Archive"],
   ["all", "All"],
 ];
-
-const ADMIN_ASSIGNMENTS_NOW = Date.now();
 
 function filterStage(meta, value) {
   if (value === "all") return true;
@@ -31,6 +30,7 @@ function filterStage(meta, value) {
 export default function AdminAssignmentsV2({ workspace, app, v2, actions }) {
   const assignments = useMemo(() => app?.assignments || workspace.admin?.assignments || [], [app?.assignments, workspace.admin?.assignments]);
   const clients = workspace.admin?.clients || [];
+  const now = usePortalNow();
   const [view, setView] = useState("action");
   const [query, setQuery] = useState("");
   const prepared = useMemo(() => assignments.map((assignment) => {
@@ -48,7 +48,7 @@ export default function AdminAssignmentsV2({ workspace, app, v2, actions }) {
   const needsAction = prepared.filter(({ meta }) => filterStage(meta, "action")).length;
   const unstaffed = prepared.filter(({ meta }) => meta.stage === 2).length;
   const closeout = prepared.filter(({ meta }) => meta.stage >= 4 && meta.title !== "Archived").length;
-  const upcoming = assignments.filter((item) => new Date(item.start_at).getTime() >= ADMIN_ASSIGNMENTS_NOW && !["cancelled", "closed"].includes(item.lifecycle_status)).length;
+  const upcoming = assignments.filter((item) => isAtOrAfterNow(item.start_at, now) && !["cancelled", "closed"].includes(item.lifecycle_status)).length;
 
   return <div className="space-y-6">
     <Hero title="Operations" actions={<div className="flex flex-wrap gap-3"><NewAssignmentControl clients={clients} actions={actions} /><ActionButton tone="soft" onClick={actions.openOpportunity}>Publish opportunity</ActionButton></div>} />
