@@ -48,6 +48,8 @@ const allowedAssignmentFields = [
 
 function sendJson(res, status, payload) {
   res.status(status).setHeader("content-type", "application/json");
+  res.setHeader("cache-control", "private, no-store, max-age=0");
+  res.setHeader("pragma", "no-cache");
   res.end(JSON.stringify(payload));
 }
 
@@ -630,6 +632,6 @@ export default async function handler(req, res) {
     return sendJson(res, 400, { error: "Unsupported portal action." });
   } catch (error) {
     console.error("Portal API error", error);
-    return sendJson(res, 500, { error: error.message || "Portal request failed." });
+    return sendJson(res, 500, { error: "Portal request failed. Please try again or contact MLS support." });
   }
 }
