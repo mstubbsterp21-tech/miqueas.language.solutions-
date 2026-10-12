@@ -35,8 +35,8 @@ export default function AdminAssignmentsV2({ workspace, app, v2, actions }) {
   const [query, setQuery] = useState("");
   const prepared = useMemo(() => assignments.map((assignment) => {
     const records = recordsForAssignment(v2, assignment.id);
-    return { assignment, records, meta: adminAssignmentMeta(assignment, records) };
-  }), [assignments, v2]);
+    return { assignment, records, meta: adminAssignmentMeta(assignment, records, now) };
+  }), [assignments, v2, now]);
   const visible = useMemo(() => prepared.filter(({ assignment, meta }) => {
     const haystack = [assignment.service_type, assignment.clients?.organization_name, assignment.clients?.primary_contact_name, assignment.delivery_mode, assignment.city, assignment.state, assignment.lifecycle_status, meta.title].filter(Boolean).join(" ").toLowerCase();
     return haystack.includes(query.trim().toLowerCase()) && filterStage(meta, view);
