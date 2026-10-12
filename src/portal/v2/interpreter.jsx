@@ -8,6 +8,8 @@ import AssignmentDocumentCenter from "../AssignmentDocumentCenter";
 import { createPortalSupabaseClient } from "../../lib/supabaseClient";
 import { createMLSApi } from "../api";
 import { InterpreterWorkCard, recordsForAssignment } from "../agencyWorkflowExperience";
+import { isAtOrAfterNow, isWithinDays } from "../datePredicates";
+import { usePortalNow } from "./shared";
 
 const emptyTime = { assignmentId: "", actualStartAt: "", actualEndAt: "", breakMinutes: 0, notes: "" };
 const emptyExpense = { assignmentId: "", expenseType: "mileage", amount: "", mileage: "", description: "", receipt: null };
@@ -21,8 +23,6 @@ const BLOCKS = [
   { key: "afternoon", label: "Afternoon", helper: "12 PM–6 PM", start: [12, 0], end: [18, 0] },
   { key: "evening", label: "Evening", helper: "6 PM–12 AM", start: [18, 0], end: [23, 59] },
 ];
-
-const INTERPRETER_DASHBOARD_NOW = Date.now();
 
 function weeklyRule(item) {
   return String(item?.recurrence_rule || "").includes("X-MLS-BLOCK=");
@@ -75,13 +75,14 @@ function occurrence(weekday, block, timeZone) {
 }
 
 function Home({ workspace, operations, app, v2, actions }) {
+  const now = usePortalNow();
   const profile = workspace.interpreter?.profile || {};
   const assignments = app?.assignments || [];
   const payments = v2?.payments || [];
   const credentials = v2?.credentials || [];
-  const upcoming = assignments.filter((item) => new Date(item.start_at).getTime() >= INTERPRETER_DASHBOARD_NOW && !["cancelled", "closed"].includes(item.lifecycle_status));
+  const upcoming = assignments.filter((item) => isAtOrAfterNow(item.start_at, now) && !["cancelled", "closed"].includes(item.lifecycle_status));
   const unpaid = payments.filter((item) => !["paid", "void"].includes(item.contractor_payment_status));
-  const expiring = credentials.filter((item) => item.expires_on && new Date(item.expires_on).getTime() <= INTERPRETER_DASHBOARD_NOW + 60 * 864e5);
+  const expiring = credentials.filter((item) => item.expires_on && isWithinDays(item.expires_on, now, 60));
   return (
     <div className="space-y-6">
       <Hero title={`${profile.first_name || "Interpreter"}, keep your MLS work assignment-ready.`} actions={<ActionButton tone="gold" onClick={() => actions.go("work")}>Open work</ActionButton>} />
@@ -139,7 +140,7 @@ function Payments({ app, v2, actions, saving }) {
   const expenses = v2?.expenses || [];
   const payments = v2?.payments || [];
   const contractorInvoices = v2?.contractorInvoices || [];
-  const completedNeedingTime = assignments.filter((assignment) => assignment.end_at && new Date(assignment.end_at).getTime() < INTERPRETER_DASHBOARD_NOW && !timeEntries.some((entry) => (entry.assignment_id || entry.assignments?.id) === assignment.id));
+  const completedNeedingTime = assignments.filter((assignment) => assignment.end_at && new Date(assignment.end_at).getTime() < now && !timeEntries.some((entry) => (entry.assignment_id || entry.assignments?.id) === assignment.id));
   const awaitingReview = timeEntries.filter((item) => ["submitted", "under_review"].includes(item.status)).length + expenses.filter((item) => ["submitted", "under_review"].includes(item.status)).length;
   const scheduledPayments = payments.filter((item) => ["ready", "scheduled", "processing"].includes(item.contractor_payment_status));
   const paidTotal = payments.filter((item) => item.contractor_payment_status === "paid").reduce((sum, item) => sum + Number(item.contractor_payment_amount || 0), 0);
