@@ -130,6 +130,7 @@ test('protected production APIs reject signed-out requests without leaking data'
     const response = await fetch(`${baseURL}${endpoint}`, { redirect: 'manual' });
     const body = await response.text();
     assert.equal(response.status, 401, `${endpoint} returned ${response.status}`);
+    assert.match(response.headers.get("cache-control") || "", /private.*no-store/i, `${endpoint} must not cache authenticated portal data`);
     assert.match(body, /Sign in is required/i, `${endpoint} returned an unexpected signed-out response`);
     assert.ok(body.length < 500, `${endpoint} returned an unexpectedly large response`);
   }
