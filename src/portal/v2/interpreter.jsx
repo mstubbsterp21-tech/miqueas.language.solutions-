@@ -125,6 +125,7 @@ function Work({ operations, app, v2, actions }) {
 }
 
 function Payments({ app, v2, actions, saving }) {
+  const now = usePortalNow();
   const { session } = useSession();
   const api = useMemo(() => createMLSApi(session), [session]);
   const storage = useMemo(() => createPortalSupabaseClient(null), []);
