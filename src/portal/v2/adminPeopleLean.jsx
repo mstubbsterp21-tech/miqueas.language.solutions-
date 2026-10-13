@@ -148,13 +148,18 @@ function uniqueSorted(values) {
 function optionsWithSaved(preferred, savedValues) {
   const ordered = [];
   const seen = new Set();
-  [...preferred, ...savedValues].map(safeText).filter(Boolean).forEach((value) => {
-    const key = normalize(value);
-    if (!seen.has(key)) {
-      seen.add(key);
-      ordered.push(value);
-    }
-  });
+  const add = (values) => {
+    if (!Array.isArray(values)) return;
+    values.map(safeText).filter(Boolean).forEach((value) => {
+      const key = normalize(value);
+      if (!seen.has(key)) {
+        seen.add(key);
+        ordered.push(value);
+      }
+    });
+  };
+  add(preferred);
+  add(savedValues);
   return ordered;
 }
 
