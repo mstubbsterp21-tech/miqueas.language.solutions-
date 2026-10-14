@@ -2,6 +2,7 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { cwd } from "node:process";
 import { DEFAULT_IMAGE, SITE_URL, schemaForRoute, siteMetadata } from "../src/seo/siteMetadata.js";
+import { publicSiteEntries } from "../src/seo/publishing.js";
 
 const escapeAttribute = (value) => String(value).replaceAll("&", "&amp;").replaceAll('"', "&quot;").replaceAll("<", "&lt;");
 
@@ -28,9 +29,9 @@ export default function seoStaticPages() {
     async closeBundle() {
       const dist = join(cwd(), "dist");
       const template = await readFile(join(dist, "index.html"), "utf8");
-      const today = new Date().toISOString().slice(0, 10);
+      const published = publicSiteEntries(siteMetadata);
 
-      for (const [path, meta] of Object.entries(siteMetadata)) {
+      for (const [path, meta] of published) {
         if (path === "/") {
           await writeFile(join(dist, "index.html"), replaceHead(template, path, meta));
           continue;
@@ -40,16 +41,8 @@ export default function seoStaticPages() {
         await writeFile(output, replaceHead(template, path, meta));
       }
 
-      const urls = Object.entries(siteMetadata).map(([path, meta]) => [
-        "  <url>",
-        `    <loc>${SITE_URL}${path === "/" ? "/" : path}</loc>`,
-        `    <lastmod>${today}</lastmod>`,
-        `    <changefreq>${path === "/" || path === "/blog" ? "weekly" : "monthly"}</changefreq>`,
-        `    <priority>${meta.priority || "0.6"}</priority>`,
-        "  </url>",
-      ].join("\n"));
-      const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.join("\n")}\n</urlset>\n`;
-      await writeFile(join(dist, "sitemap.xml"), sitemap);
+      // Sitemap is generated at request time by /api/sitemap so scheduled
+      // articles appear at New York midnight without deploying new code.
     },
   };
 }
