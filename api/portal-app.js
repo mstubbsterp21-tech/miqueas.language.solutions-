@@ -633,6 +633,8 @@ async function notifyDocumentRequest(db, user, payload) {
 
 export default async function handler(req, res) {
   try {
+    // Public SEO endpoint handled by this existing function to respect Hobby limits.
+    if (req.query?.action === "publicSitemap") return publicSitemap(req, res);
     const user = await signedInUser(req);
     if (!user) return send(res, 401, { error: "Sign in is required." });
     const db = database();
