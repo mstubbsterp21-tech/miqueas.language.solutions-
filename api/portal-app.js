@@ -1,5 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import { signedInUser } from "./_shared/ops-v2-core.js";
+import { CLIENT_ASSIGNMENT_SELECT, INTERPRETER_ASSIGNMENT_SELECT, CLIENT_ASSIGNMENT_MESSAGES_SELECT, INTERPRETER_OWN_STAFFING_FIELDS, canWriteAsRole } from "./_shared/portal-boundary-policy.js";
 import { deliverPortalFeedback } from "./_shared/portal-feedback-email.js";
 import { sendPushNotification, vapidPublicKey } from "./_shared/web-push.js";
 
@@ -147,6 +148,7 @@ async function clientFor(db, userId) {
 
 async function portalRoleFor(db, user) {
   if (user.isAdmin) return "admin";
+  if (user.metadataRole === "client" || user.metadataRole === "interpreter") return user.metadataRole;
   return (await clientFor(db, user.id)) ? "client" : "interpreter";
 }
 
@@ -212,10 +214,10 @@ async function assignmentAccess(db, user, assignmentId) {
   if (!assignment) return { allowed: false, assignment: null, role: "" };
   if (user.isAdmin) return { allowed: true, assignment, role: "admin" };
 
-  const client = await clientFor(db, user.id);
+  const client = user.metadataRole === "interpreter" ? null : await clientFor(db, user.id);
   if (client?.id === assignment.client_id) return { allowed: true, assignment, role: "client" };
 
-  const interpreter = await interpreterFor(db, user.id);
+  const interpreter = user.metadataRole === "client" ? null : await interpreterFor(db, user.id);
   if (interpreter) {
     const link = await db
       .from("assignment_interpreters")
@@ -231,31 +233,31 @@ async function assignmentAccess(db, user, assignmentId) {
 }
 
 async function loadAssignments(db, user) {
-  const select = "*, clients(id,clerk_user_id,organization_name,primary_contact_name,email), assignment_interpreters(*, interpreters(id,clerk_user_id,first_name,last_name,email,credentials,modalities,current_location,city,state))";
+  const adminSelect = "*, clients(id,clerk_user_id,organization_name,primary_contact_name,email), assignment_interpreters(*, interpreters(id,clerk_user_id,first_name,last_name,email,credentials,modalities,current_location,city,state))";
   if (user.isAdmin) {
-    const result = await db.from("assignments").select(select).order("start_at", { ascending: false });
+    const result = await db.from("assignments").select(adminSelect).order("start_at", { ascending: false });
     if (result.error) throw result.error;
     return result.data || [];
   }
 
-  const client = await clientFor(db, user.id);
-  if (client) {
-    const result = await db.from("assignments").select(select).eq("client_id", client.id).order("start_at", { ascending: false });
+  const client = user.metadataRole === "interpreter" ? null : await clientFor(db, user.id);
+  if (client && canWriteAsRole(user, "client", client)) {
+    const result = await db.from("assignments").select(CLIENT_ASSIGNMENT_SELECT).eq("client_id", client.id).order("start_at", { ascending: false });
     if (result.error) throw result.error;
     return result.data || [];
   }
 
-  const interpreter = await interpreterFor(db, user.id);
-  if (!interpreter) return [];
+  const interpreter = user.metadataRole === "client" ? null : await interpreterFor(db, user.id);
+  if (!interpreter || !canWriteAsRole(user, "interpreter", interpreter)) return [];
   const links = await db
     .from("assignment_interpreters")
-    .select("*, assignments(*, clients(id,clerk_user_id,organization_name,primary_contact_name,email))")
+    .select(`${INTERPRETER_OWN_STAFFING_FIELDS.join(",")},assignments(${INTERPRETER_ASSIGNMENT_SELECT})`)
     .eq("interpreter_id", interpreter.id)
     .order("assigned_at", { ascending: false });
   if (links.error) throw links.error;
   return (links.data || []).map((link) => ({
     ...(link.assignments || {}),
-    assignment_interpreters: [{ ...link, interpreters: interpreter }],
+    assignment_interpreters: [{ ...Object.fromEntries(INTERPRETER_OWN_STAFFING_FIELDS.map((field) => [field, link[field]])), interpreters: { id: interpreter.id, first_name: interpreter.first_name, last_name: interpreter.last_name, email: interpreter.email, credentials: interpreter.credentials, modalities: interpreter.modalities, current_location: interpreter.current_location, city: interpreter.city, state: interpreter.state } }],
   }));
 }
 
@@ -267,7 +269,7 @@ export async function loadApp(db, user) {
   const [notificationResult, messageResult, layoutResult] = await Promise.all([
     db.from("notifications").select("*").eq("recipient_clerk_user_id", user.id).order("created_at", { ascending: false }).limit(50),
     assignmentIds.length
-      ? db.from("assignment_messages").select("*").in("assignment_id", assignmentIds).order("created_at", { ascending: true }).limit(500)
+      ? db.from("assignment_messages").select(user.isAdmin ? "*" : CLIENT_ASSIGNMENT_MESSAGES_SELECT).in("assignment_id", assignmentIds).order("created_at", { ascending: true }).limit(500)
       : Promise.resolve({ data: [], error: null }),
     db.from("portal_layout_preferences").select("nav_order,home_order,hidden_home_sections,widget_order,enabled_widgets,tab_card_preferences").eq("clerk_user_id", user.id).eq("role", role).maybeSingle(),
   ]);
