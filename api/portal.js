@@ -35,7 +35,7 @@ const allowedClientProfileFields = [
   "organization_name", "primary_contact_name", "phone", "preferred_contact_method", "billing_email",
   "billing_phone", "address_line_1", "address_line_2", "city", "state", "postal_code", "country",
   "industry", "default_service_type", "default_delivery_mode", "communication_preferences",
-  "request_defaults",
+  "request_defaults", "billing_notes", "account_status",
 ];
 
 const allowedAssignmentFields = [
@@ -184,10 +184,10 @@ export async function loadWorkspace(db, user) {
 
   let clientWorkspace = null;
   let interpreterWorkspace = null;
-  if (user.isAdmin || (role === "client" && canWriteAsRole(user, "client", client))) {
+  if ((client || role === "client") && (user.isAdmin || (role === "client" && canWriteAsRole(user, "client", client)))) {
     clientWorkspace = await loadClientWorkspace(db, user, client || undefined);
   }
-  if (user.isAdmin || (role === "interpreter" && canWriteAsRole(user, "interpreter", interpreter))) {
+  if ((interpreter || role === "interpreter") && (user.isAdmin || (role === "interpreter" && canWriteAsRole(user, "interpreter", interpreter)))) {
     interpreterWorkspace = await loadInterpreterWorkspace(db, user, interpreter || undefined);
   }
 
