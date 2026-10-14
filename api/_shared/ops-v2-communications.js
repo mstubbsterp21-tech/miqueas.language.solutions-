@@ -425,15 +425,15 @@ export async function sendPortalDirectMessage(db, user, payload) {
   await Promise.all(recipients.map((recipient) => notify(db, recipient.clerk_user_id, {
     category: "message",
     title: conversation.conversation_type === "group" ? `New message in ${conversation.title || "group chat"}` : `New message from ${identity.name}`,
-    body: text || `${attachments.length} attachment${attachments.length === 1 ? "" : "s"}`,
+    body: "Sign in to MLS Portal to view the content securely.",
     section: "communications",
     relatedType: "direct_message",
     relatedId: conversation.id,
   })));
 
-  const files = await emailAttachments(db, attachments);
+  const files = user.isAdmin && process.env.MLS_EMAIL_ATTACHMENTS_ENABLED === "true" ? await emailAttachments(db, attachments) : [];
   const heading = conversation.conversation_type === "group" ? `${identity.name} in ${conversation.title || "MLS group chat"}` : `New message from ${identity.name}`;
-  const copy = brandedPortalEmail({ heading, intro: "A new message was sent through MLS Portal.", bodyText: text || "An attachment was added to the conversation.", buttonLabel: "Reply in MLS Portal", buttonUrl: portalUrl({ conversation: conversation.id }) });
+  const copy = brandedPortalEmail({ heading, intro: "A new message was sent through MLS Portal.", bodyText: "The message and attachments are available in your secure MLS Portal.", buttonLabel: "Reply in MLS Portal", buttonUrl: portalUrl({ conversation: conversation.id }) });
   const deliveries = [];
   for (let index = 0; index < recipients.length; index += 5) {
     const batch = recipients.slice(index, index + 5);
@@ -480,14 +480,14 @@ export async function publishPortalAnnouncement(db, user, payload) {
     if (attachmentResult.error) throw attachmentResult.error;
   }
   const recipients = await announcementRecipients(db, audiences);
-  const notificationRows = recipients.filter((item) => item.clerkUserId !== user.id).map((item) => ({ recipient_clerk_user_id: item.clerkUserId, category: "announcement", title, body: text.slice(0, 240), section: "communications", related_type: "announcement", related_id: inserted.data.id }));
+  const notificationRows = recipients.filter((item) => item.clerkUserId !== user.id).map((item) => ({ recipient_clerk_user_id: item.clerkUserId, category: "announcement", title, body: "Sign in to MLS Portal to view this announcement securely.", section: "communications", related_type: "announcement", related_id: inserted.data.id }));
   if (notificationRows.length) {
     const notificationResult = await db.from("notifications").insert(notificationRows).select();
     if (notificationResult.error) throw notificationResult.error;
     await sendPushNotifications(db, notificationResult.data || []).catch((error) => console.warn("MLS announcement push delivery failed", error));
   }
-  const copy = brandedPortalEmail({ heading: title, intro: "Miqueas Language Solutions posted a new portal announcement.", bodyText: text, buttonLabel: "Open announcement", buttonUrl: portalUrl({ announcement: inserted.data.id }) });
-  const files = await emailAttachments(db, attachments);
+  const copy = brandedPortalEmail({ heading: title, intro: "Miqueas Language Solutions posted a new portal announcement.", bodyText: "Sign in to MLS Portal to read the announcement.", buttonLabel: "Open announcement", buttonUrl: portalUrl({ announcement: inserted.data.id }) });
+  const files = user.isAdmin && process.env.MLS_EMAIL_ATTACHMENTS_ENABLED === "true" ? await emailAttachments(db, attachments) : [];
   const deliveries = [];
   for (let index = 0; index < recipients.length; index += 5) {
     const batch = recipients.slice(index, index + 5);
