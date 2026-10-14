@@ -1,5 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import { signedInUser } from "./_shared/ops-v2-core.js";
+import publicSitemap from "./_shared/portal-sitemap.js";
 import { CLIENT_ASSIGNMENT_SELECT, INTERPRETER_ASSIGNMENT_SELECT, CLIENT_ASSIGNMENT_MESSAGES_SELECT, INTERPRETER_OWN_STAFFING_FIELDS, canWriteAsRole } from "./_shared/portal-boundary-policy.js";
 import { deliverPortalFeedback } from "./_shared/portal-feedback-email.js";
 import { sendPushNotification, vapidPublicKey } from "./_shared/web-push.js";
