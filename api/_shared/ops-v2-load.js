@@ -95,7 +95,7 @@ export async function loadOperationsV2(db, user) {
     return { ...data, announcements: await homeAnnouncements(db, user, "admin") };
   }
   const client = await clientFor(db, user.id);
-  if (client) {
+  if (client && user.metadataRole !== "interpreter") {
     const data = await loadClient(db, user);
     return { ...data, announcements: await homeAnnouncements(db, user, "client") };
   }
