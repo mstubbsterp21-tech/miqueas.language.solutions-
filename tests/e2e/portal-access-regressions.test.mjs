@@ -1,4 +1,21 @@
 import assert from "node:assert/strict";
+import { publicSiteEntries, todayInNewYork } from "../../src/seo/publishing.js";
+
+test("scheduled blog pages stay unpublished until midnight in New York", () => {
+  assert.equal(todayInNewYork(new Date("2026-10-19T03:59:59Z")), "2026-10-18");
+  assert.equal(todayInNewYork(new Date("2026-10-19T04:00:00Z")), "2026-10-19");
+  assert.equal(todayInNewYork(new Date("2026-12-21T04:59:59Z")), "2026-12-20");
+  assert.equal(todayInNewYork(new Date("2026-12-21T05:00:00Z")), "2026-12-21");
+  const sample = {
+    "/": { priority: "1.0" },
+    "/blog/older": { publishDate: "2026-10-12" },
+    "/blog/future": { publishDate: "2026-10-26" },
+  };
+  assert.deepEqual(publicSiteEntries(sample, "2026-10-14").map(([path]) => path), ["/", "/blog/older"]);
+  assert.deepEqual(publicSiteEntries(sample, "2026-10-26").map(([path]) => path), ["/", "/blog/older", "/blog/future"]);
+});
+
+
 import test from "node:test";
 import { isBlockedInterpreterRosterStatus } from "../../api/_shared/portal-access-policy.js";
 import { isAtOrAfterNow, isDueDatePast, isWithinDays } from "../../src/portal/datePredicates.js";
