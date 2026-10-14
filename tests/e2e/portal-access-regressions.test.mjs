@@ -7,6 +7,67 @@ import {
   normalizeWorkspaceDocumentRecords,
 } from "../../src/portal/documentRecords.js";
 
+import {
+  canWriteAsRole,
+  safeProfileWrite,
+  publicProfile,
+  CLIENT_ASSIGNMENT_FIELDS,
+  CLIENT_ASSIGNMENT_SELECT,
+  INTERPRETER_ASSIGNMENT_FIELDS,
+  INTERPRETER_ASSIGNMENT_SELECT,
+  CLIENT_TIME_ENTRY_SELECT,
+  STAFFING_PUBLIC_FIELDS,
+} from "../../api/_shared/portal-boundary-policy.js";
+
+test("only admins or the account's declared role may update its profile", () => {
+  const client = { id: "user-client", metadataRole: "client", isAdmin: false };
+  const interpreter = { id: "user-interpreter", metadataRole: "interpreter", isAdmin: false };
+  assert.equal(canWriteAsRole(client, "client"), true);
+  assert.equal(canWriteAsRole(client, "interpreter", { id: "old-interpreter-record" }), false);
+  assert.equal(canWriteAsRole(interpreter, "interpreter"), true);
+  assert.equal(canWriteAsRole(interpreter, "client", { id: "old-client-record" }), false);
+  assert.equal(canWriteAsRole({ id: "legacy", isAdmin: false }, "interpreter"), false);
+  assert.equal(canWriteAsRole({ id: "legacy", isAdmin: false }, "interpreter", { id: "existing" }), true);
+  assert.equal(canWriteAsRole({ id: "admin", isAdmin: true }, "client"), true);
+});
+
+test("non-admin profile writes cannot change account administration fields", () => {
+  const interpreterInput = {
+    first_name: "Alex", roster_status: "active", admin_notes: "override",
+    onsite_rate: "500", vri_rate: "500", screening_status: "approved", w9_status: "approved",
+  };
+  const safeInterpreter = safeProfileWrite(interpreterInput, "interpreter");
+  assert.equal(safeInterpreter.first_name, "Alex");
+  for (const key of ["roster_status", "admin_notes", "onsite_rate", "vri_rate", "screening_status", "w9_status"]) {
+    assert.equal(Object.hasOwn(safeInterpreter, key), false, key);
+  }
+  const clientInput = { organization_name: "Sample LLC", account_status: "active", billing_notes: "internal" };
+  const safeClient = safeProfileWrite(clientInput, "client");
+  assert.equal(safeClient.organization_name, "Sample LLC");
+  assert.equal(Object.hasOwn(safeClient, "account_status"), false);
+  assert.equal(Object.hasOwn(safeClient, "billing_notes"), false);
+  assert.equal(safeProfileWrite(clientInput, "client", true).account_status, "active");
+  assert.equal(publicProfile(clientInput, "client").billing_notes, undefined);
+  assert.equal(publicProfile(interpreterInput, "interpreter").admin_notes, undefined);
+});
+
+test("client and interpreter response projections omit other parties' internal data", () => {
+  const forbiddenAssignment = ["admin_notes", "calendar_last_error", "drive_last_error", "confirmation_email_last_error"];
+  for (const key of forbiddenAssignment) {
+    assert.equal(CLIENT_ASSIGNMENT_FIELDS.includes(key), false, `client assignment leaked ${key}`);
+    assert.equal(INTERPRETER_ASSIGNMENT_FIELDS.includes(key), false, `interpreter assignment leaked ${key}`);
+  }
+  for (const key of ["agreed_rate", "contractor_payment_amount", "contractor_payment_status", "found_payment_url", "notes"]) {
+    assert.equal(STAFFING_PUBLIC_FIELDS.includes(key), false, `client staffing leaked ${key}`);
+  }
+  for (const key of ["invoice_amount", "deposit_amount", "payment_status", "purchase_order_number"]) {
+    assert.equal(INTERPRETER_ASSIGNMENT_FIELDS.includes(key), false, `interpreter assignment leaked ${key}`);
+  }
+  assert.doesNotMatch(CLIENT_ASSIGNMENT_SELECT, /assignment_interpreters\(\*/);
+  assert.doesNotMatch(INTERPRETER_ASSIGNMENT_SELECT, /assignments\(\*/);
+  assert.doesNotMatch(CLIENT_TIME_ENTRY_SELECT, /admin_notes|interpreter_notes|reviewed_by/);
+});
+
 test("removed and disabled interpreter roster statuses are blocked", () => {
   for (const status of ["removed", "inactive", "suspended", "disabled", " Removed "]) {
     assert.equal(isBlockedInterpreterRosterStatus(status), true);
