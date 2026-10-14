@@ -140,6 +140,6 @@ export default async function handler(req, res) {
     return send(res, result.status, result.payload);
   } catch (error) {
     console.error("MLS operations v2 API error", error);
-    return send(res, 500, { error: error.message || "MLS operations request failed." });
+    return send(res, 500, { error: "MLS operations are temporarily unavailable. Please try again or contact support." });
   }
 }
