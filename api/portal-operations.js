@@ -315,6 +315,6 @@ export default async function handler(req, res) {
     return send(res, result.status, result.payload);
   } catch (error) {
     console.error("Portal operations error", error);
-    return send(res, 500, { error: error.message || "Portal operation failed." });
+    return send(res, 500, { error: "Portal operation failed. Please try again or contact support." });
   }
 }
