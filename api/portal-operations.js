@@ -25,12 +25,14 @@ function db() {
 }
 
 async function interpreterFor(database, user) {
+  if (!user.isAdmin && user.metadataRole && user.metadataRole !== "interpreter") return null;
   const result = await database.from("interpreters").select("*").eq("clerk_user_id", user.id).maybeSingle();
   if (result.error) throw result.error;
   return result.data;
 }
 
 async function clientFor(database, user) {
+  if (!user.isAdmin && user.metadataRole && user.metadataRole !== "client") return null;
   const result = await database.from("clients").select("*").eq("clerk_user_id", user.id).maybeSingle();
   if (result.error) throw result.error;
   return result.data;
@@ -131,7 +133,7 @@ export async function loadOperations(database, user) {
     const [courses, opportunities, bids, documents] = await Promise.all([
       database.from("training_courses").select("*, training_progress(*)").eq("is_published", true).order("sort_order"),
       database.from("assignment_opportunities").select("id,assignment_id,status,opens_at,closes_at,notes,assignments(id,service_type,specialty,start_at,end_at,timezone,delivery_mode,city,state,deaf_participants,hearing_participants,language_preferences,team_requested,cdi_requested,required_interpreter_count,assignment_interpreters(id,status))").eq("status", "open").order("opens_at", { ascending: false }),
-      database.from("assignment_bids").select("*, assignment_opportunities(*, assignments(*))").eq("interpreter_id", interpreter.id).order("created_at", { ascending: false }),
+      database.from("assignment_bids").select("id,opportunity_id,interpreter_id,status,bid_rate,message,created_at,updated_at,assignment_opportunities(id,assignment_id,status,opens_at,closes_at,notes,assignments(id,service_type,specialty,start_at,end_at,timezone,delivery_mode,city,state,deaf_participants,hearing_participants,language_preferences,team_requested,cdi_requested,required_interpreter_count)))").eq("interpreter_id", interpreter.id).order("created_at", { ascending: false }),
       database.from("interpreter_documents").select("document_type,status").eq("interpreter_id", interpreter.id),
     ]);
     for (const result of [courses, opportunities, bids, documents]) if (result.error) throw result.error;
