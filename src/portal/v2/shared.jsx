@@ -16,7 +16,7 @@ export function usePortalNow() {
 export function ActionButton({ children, onClick, type = "button", tone = "primary", disabled = false, icon: Icon }) {
   const styles = {
     primary: "bg-[#721100] text-white hover:bg-[#5a0d00]",
-    gold: "bg-[#dd7d00] text-white hover:bg-[#c46f00]",
+    gold: "bg-[#dd7d00] text-[#111827] hover:bg-[#f09b26]",
     soft: "border border-slate-200 bg-white text-[#721100] hover:border-[#dd7d00]/40 hover:bg-[#fffaf2]",
     dark: "bg-[#24130e] text-white hover:bg-black",
     danger: "bg-rose-50 text-rose-700 hover:bg-rose-100",
