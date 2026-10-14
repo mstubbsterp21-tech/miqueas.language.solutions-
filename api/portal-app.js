@@ -672,6 +672,6 @@ export default async function handler(req, res) {
     return send(res, result.status, result.payload);
   } catch (error) {
     console.error("MLS app API error", error);
-    return send(res, 500, { error: error.message || "MLS app request failed." });
+    return send(res, 500, { error: "MLS app request failed. Please try again or contact support." });
   }
 }
