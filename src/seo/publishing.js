@@ -1,8 +1,10 @@
 // Publication timestamps are compared in the same time zone as the MLS blog.
 export function todayInNewYork(now = new Date()) {
-  return new Intl.DateTimeFormat("en-CA", {
+  const parts = new Intl.DateTimeFormat("en-US", {
     timeZone: "America/New_York", year: "numeric", month: "2-digit", day: "2-digit",
-  }).format(now);
+  }).formatToParts(now);
+  const fields = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+  return `${fields.year}-${fields.month}-${fields.day}`;
 }
 
 export function isPubliclyPublished(meta, today = todayInNewYork()) {
