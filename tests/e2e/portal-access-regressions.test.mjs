@@ -1,4 +1,8 @@
 import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
+import { Script } from "node:vm";
+import sitemapHandler from "../../api/sitemap.js";
+import { siteMetadata } from "../../src/seo/siteMetadata.js";
 import { publicSiteEntries, todayInNewYork } from "../../src/seo/publishing.js";
 
 test("scheduled blog pages stay unpublished until midnight in New York", () => {
@@ -83,6 +87,36 @@ test("client and interpreter response projections omit other parties' internal d
   assert.doesNotMatch(CLIENT_ASSIGNMENT_SELECT, /assignment_interpreters\(\*/);
   assert.doesNotMatch(INTERPRETER_ASSIGNMENT_SELECT, /assignments\(\*/);
   assert.doesNotMatch(CLIENT_TIME_ENTRY_SELECT, /admin_notes|interpreter_notes|reviewed_by/);
+});
+
+
+test("public sitemap serves XML and does not list articles before their publish date", () => {
+  const headers = {};
+  let statusCode = 0;
+  let responseBody = "";
+  const res = {
+    setHeader(key, value) { headers[key.toLowerCase()] = value; return this; },
+    status(value) { statusCode = value; return this; },
+    end(value) { responseBody = value || ""; return this; },
+  };
+  sitemapHandler({ method: "GET" }, res);
+  assert.equal(statusCode, 200);
+  assert.match(headers["content-type"], /application\/xml/);
+  assert.match(responseBody, /<urlset/);
+  const today = todayInNewYork();
+  for (const [path, meta] of Object.entries(siteMetadata)) {
+    if (meta.publishDate && meta.publishDate > today) {
+      assert.equal(responseBody.includes(`<loc>https:\/\/miqueaslanguagesolutions.com${path}<\/loc>`), false, `Early sitemap entry: ${path}`);
+    }
+  }
+});
+
+test("offline worker is syntactically valid and does not cache private API requests", async () => {
+  const source = await readFile(new URL("../../public/sw.js", import.meta.url), "utf8");
+  assert.doesNotThrow(() => new Script(source, { filename: "sw.js" }));
+  assert.match(source, /url\.pathname\.startsWith\("\/api\/"\)/);
+  assert.doesNotMatch(source, /APP_SHELL = \[[^\]]*"\/portal"/);
+  assert.match(source, /no-store/);
 });
 
 test("removed and disabled interpreter roster statuses are blocked", () => {
