@@ -1,5 +1,6 @@
 import { clientFor, interpreterFor } from "./ops-v2-core.js";
 import { loadProfileCustomizationCollection, loadProfileCustomizationForRecord } from "./ops-v2-profiles.js";
+import { CLIENT_TIME_ENTRY_SELECT } from "./portal-boundary-policy.js";
 
 async function realtimeTopic(db, user, role) {
   const result = await db.from("portal_realtime_channels").upsert({
@@ -61,10 +62,10 @@ async function loadClient(db, user) {
   if (assignmentIdsResult.error) throw assignmentIdsResult.error;
   const assignmentIds = (assignmentIdsResult.data || []).map((item) => item.id);
   const [quotes, invoices, agreements, times, profileCustomization] = await Promise.all([
-    db.from("quotes").select("*, quote_items(*), assignments(id,service_type,start_at,lifecycle_status)").eq("client_id", client.id).order("created_at", { ascending: false }),
-    db.from("invoices").select("*, invoice_items(*), payments(*), assignments(id,service_type,start_at,lifecycle_status)").eq("client_id", client.id).order("created_at", { ascending: false }),
-    db.from("assignment_agreements").select("*, assignments(id,service_type,start_at,lifecycle_status)").eq("client_id", client.id).order("created_at", { ascending: false }),
-    assignmentIds.length ? db.from("time_entries").select("*, interpreters(id,first_name,last_name,email), assignments(id,service_type,start_at)").in("assignment_id", assignmentIds).order("created_at", { ascending: false }) : Promise.resolve({ data: [], error: null }),
+    db.from("quotes").select("id,assignment_id,client_id,quote_number,status,currency,subtotal,discount_amount,tax_amount,deposit_amount,total_amount,expires_at,terms,client_note,sent_at,responded_at,approved_at,rejected_at,created_at,updated_at,quote_items(id,quote_id,item_type,description,quantity,unit_rate,amount,sort_order,created_at),assignments(id,service_type,start_at,lifecycle_status)").eq("client_id", client.id).order("created_at", { ascending: false }),
+    db.from("invoices").select("id,assignment_id,client_id,quote_id,invoice_number,status,currency,issue_date,due_date,subtotal,discount_amount,tax_amount,credit_amount,total_amount,amount_paid,balance_due,payment_link,memo,sent_at,paid_at,voided_at,created_at,updated_at,found_invoice_url,found_status,invoice_items(id,invoice_id,item_type,description,quantity,unit_rate,amount,sort_order,created_at),payments(id,invoice_id,amount,currency,payment_type,method,provider,status,paid_at,created_at),assignments(id,service_type,start_at,lifecycle_status)").eq("client_id", client.id).order("created_at", { ascending: false }),
+    db.from("assignment_agreements").select("id,assignment_id,client_id,template_name,terms_version,status,document_url,signer_name,signer_email,signature_acknowledgement,sent_at,signed_at,declined_at,expires_at,created_at,updated_at,provider,boldsign_signing_url,boldsign_status,manual_workflow,completed_document_id,audit_trail_document_id,assignments(id,service_type,start_at,lifecycle_status)").eq("client_id", client.id).order("created_at", { ascending: false }),
+    assignmentIds.length ? db.from("time_entries").select(CLIENT_TIME_ENTRY_SELECT).in("assignment_id", assignmentIds).order("created_at", { ascending: false }) : Promise.resolve({ data: [], error: null }),
     loadProfileCustomizationForRecord(db, "client", client),
   ]);
   for (const result of [quotes, invoices, agreements, times]) if (result.error) throw result.error;
@@ -81,7 +82,7 @@ async function loadInterpreter(db, user) {
     db.from("interpreter_availability").select("*").eq("interpreter_id", interpreter.id).order("start_at", { ascending: true }),
     db.from("interpreter_onboarding").select("*").eq("interpreter_id", interpreter.id),
     db.from("assignment_interpreters").select("*, assignments(id,service_type,start_at)").eq("interpreter_id", interpreter.id).order("assigned_at", { ascending: false }),
-    db.from("contractor_invoices").select("id,assignment_id,invoice_number,invoice_date,amount,currency,status,file_name,interpreter_notes,admin_notes,submitted_at,scheduled_at,paid_at,payment_reference,created_at,assignments(id,service_type,start_at)").eq("interpreter_id", interpreter.id).order("created_at", { ascending: false }),
+    db.from("contractor_invoices").select("id,assignment_id,invoice_number,invoice_date,amount,currency,status,file_name,interpreter_notes,submitted_at,scheduled_at,paid_at,payment_reference,created_at,assignments(id,service_type,start_at)").eq("interpreter_id", interpreter.id).order("created_at", { ascending: false }),
     loadProfileCustomizationForRecord(db, "interpreter", interpreter),
   ]);
   for (const result of [times, expenses, credentials, availability, onboardingRows, payments, contractorInvoices]) if (result.error) throw result.error;
