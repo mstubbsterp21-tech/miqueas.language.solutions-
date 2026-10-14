@@ -1,6 +1,6 @@
 const CACHE_NAME = "mls-static-v5";
 const APP_SHELL = ["/manifest.webmanifest", "/mls-app-icon.svg"];
-const STATIC_ASSET = /^\\/assets\\/.*\\.(?:js|css|png|jpe?g|webp|svg|woff2?)$/i;
+const STATIC_ASSET = /^\/assets\/.*\.(?:js|css|png|jpe?g|webp|svg|woff2?)$/i;
 
 // Never cache authenticated pages, personal records, or arbitrary same-origin GETs.
 self.addEventListener("install", (event) => {
@@ -40,7 +40,7 @@ self.addEventListener("fetch", (event) => {
     fetch(request)
       .then((response) => {
         const contentType = response.headers.get("content-type") || "";
-        if (response.ok && response.type !== "opaque" && !/text\\/html/i.test(contentType) && !/no-store|private/i.test(response.headers.get("cache-control") || "")) {
+        if (response.ok && response.type !== "opaque" && !/text\/html/i.test(contentType) && !/no-store|private/i.test(response.headers.get("cache-control") || "")) {
           event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.put(request, response.clone())).catch(() => undefined));
         }
         return response;
