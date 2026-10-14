@@ -30,7 +30,7 @@ async function homeAnnouncements(db, user, role) {
 
 async function loadAdmin(db, user) {
   const personalInterpreter = await interpreterFor(db, user.id);
-  const [quotes, invoices, contractorInvoices, agreements, times, expenses, credentials, availability, onboarding, auditEvents, integrations, profileCustomizations, personalProfileCustomization] = await Promise.all([
+  const [quotes, invoices, contractorInvoices, agreements, times, expenses, credentials, availability, onboarding, auditEvents, integrations, workspaceIntegration, profileCustomizations, personalProfileCustomization] = await Promise.all([
     db.from("quotes").select("*, quote_items(*), clients(id,organization_name,email), assignments(id,service_type,start_at,lifecycle_status)").order("created_at", { ascending: false }),
     db.from("invoices").select("*, invoice_items(*), payments(*), clients(id,organization_name,email), assignments(id,service_type,start_at,lifecycle_status), quotes(id,quote_number)").order("created_at", { ascending: false }),
     db.from("contractor_invoices").select("*, interpreters(id,first_name,last_name,email), assignments(id,service_type,start_at), assignment_interpreters(id,agreed_rate,contractor_payment_status)").order("created_at", { ascending: false }),
@@ -42,16 +42,28 @@ async function loadAdmin(db, user) {
     db.from("interpreter_onboarding").select("*, interpreters(id,first_name,last_name,email,roster_status,screening_status,w9_status,insurance_status)").order("updated_at", { ascending: false }),
     db.from("audit_events").select("*").order("created_at", { ascending: false }).limit(250),
     db.from("integration_settings").select("*").order("integration_key"),
+    db.from("gmail_integrations").select("status,calendar_id,drive_root_folder_id,workspace_last_verified_at").eq("id", "primary").maybeSingle(),
     loadProfileCustomizationCollection(db),
     loadProfileCustomizationForRecord(db, "interpreter", personalInterpreter),
   ]);
-  const databaseResults = [quotes, invoices, contractorInvoices, agreements, times, expenses, credentials, availability, onboarding, auditEvents, integrations];
+  const databaseResults = [quotes, invoices, contractorInvoices, agreements, times, expenses, credentials, availability, onboarding, auditEvents, integrations, workspaceIntegration];
   for (const result of databaseResults) if (result.error) throw result.error;
   return {
     role: "admin",
     realtimeTopic: await realtimeTopic(db, user, "admin"),
     quotes: quotes.data || [], invoices: invoices.data || [], contractorInvoices: contractorInvoices.data || [], agreements: agreements.data || [], timeEntries: times.data || [], expenses: expenses.data || [], credentials: credentials.data || [], availability: availability.data || [], onboarding: onboarding.data || [], auditEvents: auditEvents.data || [], integrations: integrations.data || [], profileCustomizations, personalProfileCustomization, personalInterpreter,
-    integrationCapabilities: { found: { mode: "reference_and_manual_sync", apiAvailable: false }, boldsign: { mode: "manual", apiRequired: false, enabled: true }, googleDrive: { configured: false } },
+    integrationCapabilities: {
+      found: { mode: "reference_and_manual_sync", apiAvailable: false },
+      boldsign: { mode: "manual", apiRequired: false, enabled: true },
+      googleDrive: {
+        configured: workspaceIntegration.data?.status === "connected" && Boolean(workspaceIntegration.data?.drive_root_folder_id && workspaceIntegration.data?.workspace_last_verified_at),
+        lastVerifiedAt: workspaceIntegration.data?.workspace_last_verified_at || null,
+      },
+      googleCalendar: {
+        configured: workspaceIntegration.data?.status === "connected" && Boolean(workspaceIntegration.data?.calendar_id && workspaceIntegration.data?.workspace_last_verified_at),
+        lastVerifiedAt: workspaceIntegration.data?.workspace_last_verified_at || null,
+      },
+    },
   };
 }
 
