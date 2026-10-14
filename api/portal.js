@@ -3,6 +3,7 @@ import { randomUUID } from "node:crypto";
 import { database as getDb, signedInUser as getSignedInUser } from "./_shared/ops-v2-core.js";
 import { loadOperationsV2 } from "./_shared/ops-v2-load.js";
 import { loadApp } from "./portal-app.js";
+import { canWriteAsRole, publicProfile, safeProfileWrite, CLIENT_ASSIGNMENT_FIELDS } from "./_shared/portal-boundary-policy.js";
 import { loadOperations } from "./portal-operations.js";
 
 const clerkKey = process.env["CLERK_" + "SECRET_KEY"];
@@ -24,7 +25,7 @@ const allowedInterpreterProfileFields = [
   "preferred_contact_method", "credentials", "state_license", "state_license_details",
   "years_experience", "modalities", "areas_of_experience", "assignment_type_preference",
   "willing_to_travel", "technical_readiness_confirmed", "professional_liability_insurance",
-  "onsite_rate", "vri_rate", "travel_radius", "roster_status", "admin_notes",
+  "travel_radius",
   "availability_sunday", "availability_monday", "availability_tuesday", "availability_wednesday",
   "availability_thursday", "availability_friday", "availability_saturday", "availability_morning",
   "availability_afternoon", "availability_evening", "availability_overnight",
@@ -34,7 +35,7 @@ const allowedClientProfileFields = [
   "organization_name", "primary_contact_name", "phone", "preferred_contact_method", "billing_email",
   "billing_phone", "address_line_1", "address_line_2", "city", "state", "postal_code", "country",
   "industry", "default_service_type", "default_delivery_mode", "communication_preferences",
-  "request_defaults", "billing_notes", "account_status",
+  "request_defaults",
 ];
 
 const allowedAssignmentFields = [
@@ -130,21 +131,21 @@ async function loadInterpreterWorkspace(db, user, profile = null) {
   ]);
   if (documentError) throw documentError;
   if (requestError) throw requestError;
-  return { profile: interpreter, documents: documents || [], documentRequests: requests || [] };
+  return { profile: publicProfile(interpreter, "interpreter", user.isAdmin), documents: documents || [], documentRequests: requests || [] };
 }
 
 async function loadClientWorkspace(db, user, profile = null) {
   const client = profile || (await ensureClient(db, user));
   const [documentResult, assignmentResult, requestResult] = await Promise.all([
     db.from("client_documents").select("*").eq("client_id", client.id).order("uploaded_at", { ascending: false }),
-    db.from("assignments").select("*").eq("client_id", client.id).order("start_at", { ascending: false }),
+    db.from("assignments").select(CLIENT_ASSIGNMENT_FIELDS.join(",")).eq("client_id", client.id).order("start_at", { ascending: false }),
     db.from("document_requests").select("*").eq("client_id", client.id).order("created_at", { ascending: false }),
   ]);
   if (documentResult.error) throw documentResult.error;
   if (assignmentResult.error) throw assignmentResult.error;
   if (requestResult.error) throw requestResult.error;
   return {
-    profile: client,
+    profile: publicProfile(client, "client", user.isAdmin),
     documents: documentResult.data || [],
     assignments: assignmentResult.data || [],
     documentRequests: requestResult.data || [],
@@ -183,8 +184,12 @@ export async function loadWorkspace(db, user) {
 
   let clientWorkspace = null;
   let interpreterWorkspace = null;
-  if (client || role === "client") clientWorkspace = await loadClientWorkspace(db, user, client || undefined);
-  if (interpreter || role === "interpreter") interpreterWorkspace = await loadInterpreterWorkspace(db, user, interpreter || undefined);
+  if (user.isAdmin || (role === "client" && canWriteAsRole(user, "client", client))) {
+    clientWorkspace = await loadClientWorkspace(db, user, client || undefined);
+  }
+  if (user.isAdmin || (role === "interpreter" && canWriteAsRole(user, "interpreter", interpreter))) {
+    interpreterWorkspace = await loadInterpreterWorkspace(db, user, interpreter || undefined);
+  }
 
   const availablePortals = user.isAdmin
     ? ["admin", "client", "interpreter"]
@@ -209,7 +214,10 @@ export async function loadWorkspace(db, user) {
 
 async function saveInterpreterProfile(db, user, body) {
   const currentProfile = await getInterpreter(db, user.id);
-  const safeProfile = cleanInput(body?.profile || {}, allowedInterpreterProfileFields);
+  if (!canWriteAsRole(user, "interpreter", currentProfile)) {
+    return { status: 403, payload: { error: "Interpreter profile access required." } };
+  }
+  const safeProfile = cleanInput(safeProfileWrite(body?.profile, "interpreter", user.isAdmin), allowedInterpreterProfileFields);
   const payload = {
     ...safeProfile,
     clerk_user_id: user.id,
@@ -222,21 +230,25 @@ async function saveInterpreterProfile(db, user, body) {
 
   const { data, error } = await db.from("interpreters").upsert(payload, { onConflict: "clerk_user_id" }).select().single();
   if (error) throw error;
-  return { profile: data };
+  return { status: 200, payload: { profile: publicProfile(data, "interpreter", user.isAdmin) } };
 }
 
 async function saveClientProfile(db, user, body) {
+  const ownClient = user.isAdmin ? null : await getClient(db, user.id);
+  if (!canWriteAsRole(user, "client", ownClient)) {
+    return { status: 403, payload: { error: "Client profile access required." } };
+  }
   let client;
   if (user.isAdmin && body?.clientId) {
     const result = await db.from("clients").select("*").eq("id", body.clientId).maybeSingle();
     if (result.error) throw result.error;
     client = result.data;
   } else {
-    client = await ensureClient(db, user);
+    client = ownClient || await ensureClient(db, user);
   }
   if (!client) return { status: 404, payload: { error: "Client profile not found." } };
 
-  const safeProfile = cleanInput(body?.profile || {}, allowedClientProfileFields);
+  const safeProfile = cleanInput(safeProfileWrite(body?.profile, "client", user.isAdmin), allowedClientProfileFields);
   const merged = { ...client, ...safeProfile };
   const onboardingComplete = Boolean(
     merged.organization_name && merged.primary_contact_name && merged.email && merged.phone && merged.billing_email
@@ -248,10 +260,13 @@ async function saveClientProfile(db, user, body) {
     .select()
     .single();
   if (error) throw error;
-  return { status: 200, payload: { profile: data } };
+  return { status: 200, payload: { profile: publicProfile(data, "client", user.isAdmin) } };
 }
 
 async function createAssignment(db, user, body) {
+  if (!user.isAdmin && user.metadataRole && user.metadataRole !== "client") {
+    return { status: 403, payload: { error: "Client access required." } };
+  }
   let client;
   if (user.isAdmin && body?.clientId) {
     const result = await db.from("clients").select("*").eq("id", body.clientId).maybeSingle();
@@ -282,6 +297,7 @@ async function createAssignment(db, user, body) {
 }
 
 async function resolveOwner(db, user, audienceType, ownerId) {
+  if (!user.isAdmin && user.metadataRole && user.metadataRole !== audienceType) return null;
   if (audienceType === "client") {
     if (user.isAdmin && ownerId) {
       const result = await db.from("clients").select("*").eq("id", ownerId).maybeSingle();
@@ -312,7 +328,8 @@ function sanitizeFileName(fileName) {
 function validateUpload(fileName, fileSize) {
   const extension = sanitizeFileName(fileName).split(".").pop()?.toLowerCase();
   if (!extension || !allowedFileExtensions.has(extension)) return "Upload a PDF, DOC, DOCX, PNG, or JPG file.";
-  if (Number(fileSize || 0) > maxUploadBytes) return "Files must be 15 MB or smaller.";
+  const bytes = Number(fileSize);
+  if (!Number.isFinite(bytes) || bytes <= 0 || bytes > maxUploadBytes) return "Files must be larger than zero and 15 MB or smaller.";
   return "";
 }
 
@@ -338,6 +355,21 @@ async function recordUpload(db, user, body) {
   if (!body?.storagePath || !body?.fileName || !body?.documentType) {
     return { status: 400, payload: { error: "Incomplete upload details." } };
   }
+  const safeType = String(body.documentType).replace(/[^a-z0-9_-]/gi, "-").toLowerCase();
+  const expectedPrefix = `${audienceType}s/${owner.id}/${safeType}/`;
+  const storagePath = String(body.storagePath);
+  const objectName = storagePath.slice(expectedPrefix.length);
+  if (!storagePath.startsWith(expectedPrefix) || objectName.includes("/") || !objectName.endsWith(`-${sanitizeFileName(body.fileName)}`)) {
+    return { status: 403, payload: { error: "The uploaded document path is not authorized for this profile." } };
+  }
+  const bucketForValidation = audienceType === "client" ? clientDocumentBucket : interpreterDocumentBucket;
+  const objects = await db.storage.from(bucketForValidation).list(expectedPrefix.slice(0, -1), { limit: 100, search: objectName });
+  if (objects.error) throw objects.error;
+  const stored = (objects.data || []).find((item) => item.name === objectName);
+  const storedBytes = Number(stored?.metadata?.size);
+  if (!stored || !Number.isFinite(storedBytes) || storedBytes <= 0 || storedBytes > maxUploadBytes) {
+    return { status: 400, payload: { error: "The uploaded file is missing or exceeds the permitted size." } };
+  }
 
   const table = audienceType === "client" ? "client_documents" : "interpreter_documents";
   const ownerColumn = audienceType === "client" ? "client_id" : "interpreter_id";
@@ -347,6 +379,7 @@ async function recordUpload(db, user, body) {
     const result = await db.from(table).select("*").eq("id", body.replaceDocumentId).eq(ownerColumn, owner.id).maybeSingle();
     if (result.error) throw result.error;
     existing = result.data;
+    if (!existing) return { status: 404, payload: { error: "The document being replaced was not found." } };
   } else if (audienceType === "client") {
     const result = await db.from(table).select("*").eq(ownerColumn, owner.id).eq("document_type", body.documentType).maybeSingle();
     if (result.error) throw result.error;
@@ -375,7 +408,8 @@ async function recordUpload(db, user, body) {
     if (result.error) throw result.error;
     document = result.data;
     if (existing.storage_path && existing.storage_path !== body.storagePath) {
-      await db.storage.from(bucket).remove([existing.storage_path]);
+      const removal = await db.storage.from(bucket).remove([existing.storage_path]);
+      if (removal.error) console.warn("MLS document cleanup needs retry", { documentId: document.id });
     }
   } else {
     const result = await db
@@ -574,8 +608,15 @@ export default async function handler(req, res) {
       return sendJson(res, 200, { workspace, operations, app, operationsV2 });
     }
     if (req.method === "GET" && action === "loadWorkspace") return sendJson(res, 200, await loadWorkspace(db, user));
-    if (req.method === "GET" && action === "load") return sendJson(res, 200, await loadInterpreterWorkspace(db, user));
-    if (req.method === "POST" && action === "saveProfile") return sendJson(res, 200, await saveInterpreterProfile(db, user, body));
+    if (req.method === "GET" && action === "load") {
+      const profile = await getInterpreter(db, user.id);
+      if (!canWriteAsRole(user, "interpreter", profile)) return sendJson(res, 403, { error: "Interpreter access required." });
+      return sendJson(res, 200, await loadInterpreterWorkspace(db, user, profile));
+    }
+    if (req.method === "POST" && action === "saveProfile") {
+      const result = await saveInterpreterProfile(db, user, body);
+      return sendJson(res, result.status, result.payload);
+    }
     if (req.method === "POST" && action === "saveClientProfile") {
       const result = await saveClientProfile(db, user, body);
       return sendJson(res, result.status, result.payload);
