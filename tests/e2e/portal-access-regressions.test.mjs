@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { Script } from "node:vm";
-import sitemapHandler from "../../api/sitemap.js";
+import sitemapHandler from "../../api/_shared/portal-sitemap.js";
 import { siteMetadata } from "../../src/seo/siteMetadata.js";
 import { publicSiteEntries, todayInNewYork } from "../../src/seo/publishing.js";
 
