@@ -1,4 +1,5 @@
 import { audit } from "./ops-v2-core.js";
+import { canWriteAsRole, publicProfile } from "./portal-boundary-policy.js";
 
 const editableFields = [
   "first_name", "last_name", "phone", "address_line_1", "address_line_2", "city", "state", "postal_code", "country", "current_location",
@@ -29,9 +30,9 @@ function availabilityFlags(profile) {
 }
 
 export async function saveInterpreterProfileDetails(db, user, payload) {
-  if (user.metadataRole === "client" && !user.isAdmin) return { status: 403, payload: { error: "Interpreter access required." } };
   const existing = await db.from("interpreters").select("*").eq("clerk_user_id", user.id).maybeSingle();
   if (existing.error) throw existing.error;
+  if (!canWriteAsRole(user, "interpreter", existing.data)) return { status: 403, payload: { error: "Interpreter access required." } };
   const safe = clean(payload.profile, editableFields);
   const merged = { ...(existing.data || {}), ...safe };
   const values = {
@@ -58,7 +59,7 @@ export async function saveInterpreterProfileDetails(db, user, payload) {
     before: existing.data || null,
     after: result.data,
   });
-  return { status: 200, payload: { profile: result.data } };
+  return { status: 200, payload: { profile: publicProfile(result.data, "interpreter", user.isAdmin) } };
 }
 
 export async function adminUpdateInterpreterProfileDetails(db, user, payload) {

@@ -439,9 +439,9 @@ export default function FirstLoginSetupWizard({ role, profile, user, onComplete 
   const steps = role === "client" ? CLIENT_STEPS : INTERPRETER_STEPS;
   const defaults = role === "client" ? EMPTY_CLIENT : EMPTY_INTERPRETER;
   const storageKey = `mls:first-login:${user?.id || user?.email || "user"}:${role}`;
-  const savedDraft = (() => {
-    try { return JSON.parse(localStorage.getItem(storageKey) || "null") || {}; } catch { return {}; }
-  })();
+  // Each completed setup step is saved by the authenticated server endpoint.
+  // Do not persist contact, address, or credential drafts to shared browser storage.
+  const savedDraft = {};
   const seedDraft = {
     ...defaults,
     ...(profile || {}),
@@ -465,8 +465,9 @@ export default function FirstLoginSetupWizard({ role, profile, user, onComplete 
   const completion = Math.round((step / steps.length) * 100);
 
   useEffect(() => {
-    localStorage.setItem(storageKey, JSON.stringify(draft));
-  }, [draft, storageKey]);
+    // Remove previously saved sensitive drafts from older MLS Portal versions.
+    localStorage.removeItem(storageKey);
+  }, [storageKey]);
 
   async function saveProgress(nextStep, complete = false) {
     const missing = role === "client" ? clientStepErrors(step, draft) : interpreterStepErrors(step, draft);
@@ -511,7 +512,7 @@ export default function FirstLoginSetupWizard({ role, profile, user, onComplete 
         <div className="mb-5 flex flex-col gap-4 rounded-[1.75rem] border border-white/70 bg-white/90 p-5 shadow-xl backdrop-blur-xl md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-4">
             <img src={logo} alt="Miqueas Language Solutions" className="h-14 w-auto" />
-            <div><p className="text-xs font-black uppercase tracking-[.16em] text-[#dd7d00]">Secure MLS setup</p><p className="mt-1 text-sm font-bold text-slate-500">Your progress saves after each step.</p></div>
+            <div><p className="text-xs font-black uppercase tracking-[.16em] text-[#721100]">Secure MLS setup</p><p className="mt-1 text-sm font-bold text-slate-500">Your progress saves after each step.</p></div>
           </div>
           <div className="w-full max-w-xs">
             <div className="flex items-center justify-between text-xs font-black text-slate-500"><span>Setup progress</span><span>{completion}%</span></div>
@@ -531,7 +532,7 @@ export default function FirstLoginSetupWizard({ role, profile, user, onComplete 
             <AnimatePresence mode="wait">
               <motion.div key={`${role}-${step}`} initial={{ opacity: 0, x: 18 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -18 }} transition={{ duration: 0.2 }}>
                 <div className="mb-7">
-                  <p className="text-xs font-black uppercase tracking-[.14em] text-[#dd7d00]">Step {step + 1} of {steps.length}</p>
+                  <p className="text-xs font-black uppercase tracking-[.14em] text-[#721100]">Step {step + 1} of {steps.length}</p>
                   <h2 className="mt-2 text-2xl font-black text-slate-950 md:text-3xl">{steps[step].title}</h2>
                   <p className="mt-2 text-sm leading-6 text-slate-500">{steps[step].helper}</p>
                 </div>
@@ -547,7 +548,7 @@ export default function FirstLoginSetupWizard({ role, profile, user, onComplete 
                 {step < steps.length - 1 ? (
                   <button type="button" onClick={() => saveProgress(step + 1)} disabled={saving} className="inline-flex items-center justify-center gap-2 rounded-2xl bg-[#721100] px-6 py-3 text-sm font-black text-white shadow-lg transition hover:-translate-y-0.5 disabled:opacity-60">{saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />} Save & continue <ChevronRight size={16} /></button>
                 ) : (
-                  <button type="button" onClick={() => saveProgress(steps.length, true)} disabled={saving} className="inline-flex items-center justify-center gap-2 rounded-2xl bg-[#dd7d00] px-6 py-3 text-sm font-black text-white shadow-lg transition hover:-translate-y-0.5 disabled:opacity-60">{saving ? <Loader2 size={16} className="animate-spin" /> : <CheckCircle2 size={16} />} Finish setup</button>
+                  <button type="button" onClick={() => saveProgress(steps.length, true)} disabled={saving} className="inline-flex items-center justify-center gap-2 rounded-2xl bg-[#dd7d00] px-6 py-3 text-sm font-black text-[#111827] shadow-lg transition hover:-translate-y-0.5 disabled:opacity-60">{saving ? <Loader2 size={16} className="animate-spin" /> : <CheckCircle2 size={16} />} Finish setup</button>
                 )}
               </div>
             </div>

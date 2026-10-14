@@ -81,6 +81,10 @@
   ],
   "rewrites": [
     {
+      "source": "/sitemap.xml",
+      "destination": "/api/portal-app?action=publicSitemap"
+    },
+    {
       "source": "/api/communications",
       "destination": "/api/operations-v2"
     },

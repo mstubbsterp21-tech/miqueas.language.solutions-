@@ -331,14 +331,14 @@ export async function sendPortalMessageWithMentions(db, user, payload = {}) {
       : conversation.conversation_type === "group" || conversation.title
         ? `New message in ${label}`
         : `New message from ${identity.name}`,
-    body: text || `${attachments.length} attachment${attachments.length === 1 ? "" : "s"}`,
+    body: "Sign in to MLS Portal to view the content securely.",
     section: "communications",
     relatedType: mentionedIds.has(recipient.clerk_user_id) ? "message_mention" : "direct_message",
     relatedId: conversation.id,
     key: `message:${inserted.data.id}:${recipient.clerk_user_id}`,
   })));
 
-  const files = await emailAttachments(db, attachments);
+  const files = user.isAdmin && process.env.MLS_EMAIL_ATTACHMENTS_ENABLED === "true" ? await emailAttachments(db, attachments) : [];
   const deliveries = [];
   for (let index = 0; index < recipients.length; index += 5) {
     const batch = recipients.slice(index, index + 5);
@@ -353,7 +353,7 @@ export async function sendPortalMessageWithMentions(db, user, payload = {}) {
       const copy = brandedPortalEmail({
         heading,
         intro: wasMentioned ? "You were mentioned in an MLS Portal message." : "A new message was sent through MLS Portal.",
-        bodyText: text || "An attachment was added to the conversation.",
+        bodyText: "The message and attachments are available in your secure MLS Portal.",
         buttonLabel: "Reply in MLS Portal",
         buttonUrl: portalUrl({ conversation: conversation.id }),
       });
