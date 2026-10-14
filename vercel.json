@@ -82,7 +82,7 @@
   "rewrites": [
     {
       "source": "/sitemap.xml",
-      "destination": "/api/sitemap"
+      "destination": "/api/portal-app?action=publicSitemap"
     },
     {
       "source": "/api/communications",
