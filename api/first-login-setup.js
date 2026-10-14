@@ -499,6 +499,6 @@ export default async function handler(req, res) {
     return send(res, result.status, result.payload);
   } catch (error) {
     console.error("MLS first-login setup error", error);
-    return send(res, 500, { error: error.message || "Setup could not be saved." });
+    return send(res, 500, { error: "Setup could not be saved. Please try again or contact support." });
   }
 }
