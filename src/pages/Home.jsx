@@ -57,6 +57,11 @@ export default function Home({ palette }) {
   const testimonials = [
     {
       quote:
+        "I’m sorry for the late response, but here’s my review: I had the pleasure of working with this interpreter during my web development courses. His clarity and professionalism were unmatched. Unlike many interpreters I’ve encountered, he ensured I fully understood everything and clarified when needed. I even told my agency I want him every time! If you need an interpreter who is clear, reliable, and respectful, he is the one.",
+      role: "Deaf Consumer – Web Development Education",
+    },
+    {
+      quote:
         "Micah is very involved in the interpreting field and Deaf community. He consistently makes every effort to adapt to the needs of his Deaf consumers, appropriately anticipates my needs, and follows through.",
       role: "Deaf Consumer",
     },
