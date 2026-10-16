@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { formatBlogDate, getBlogPostImage, getFeaturedBlogPost } from "../content/blogPostsLive";
+import MlsSitePhoto from "../components/MlsSitePhoto";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 18 },
@@ -31,10 +32,10 @@ const fadeUp = {
 };
 
 const serviceCards = [
-  { icon: Users, title: "In-Person Interpreting", path: "/services/in-person-interpreting", copy: "On-site access for appointments, meetings, events, and live settings." },
-  { icon: Video, title: "Video Remote Interpreting", path: "/services/video-remote-interpreting", copy: "Real-time ASL access for virtual meetings, telehealth, and remote support." },
-  { icon: FileVideo, title: "English → ASL Translation", path: "/services/english-asl-translation", copy: "Recorded ASL video translation for public-facing or internal information." },
-  { icon: Globe, title: "ASL → English Translation", path: "/services/asl-english-translation", copy: "Transcripts, captions, summaries, and English-ready documentation." },
+  { icon: Users, title: "In-Person Interpreting", path: "/services/in-person-interpreting", image: "in-person-interpreting", copy: "On-site access for appointments, meetings, events, and live settings." },
+  { icon: Video, title: "Video Remote Interpreting", path: "/services/video-remote-interpreting", image: "video-remote-interpreting", copy: "Real-time ASL access for virtual meetings, telehealth, and remote support." },
+  { icon: FileVideo, title: "English → ASL Translation", path: "/services/english-asl-translation", image: "english-asl-translation", copy: "Recorded ASL video translation for public-facing or internal information." },
+  { icon: Globe, title: "ASL → English Translation", path: "/services/asl-english-translation", image: "asl-english-translation", copy: "Transcripts, captions, summaries, and English-ready documentation." },
 ];
 
 export default function Home({ palette }) {
@@ -136,6 +137,7 @@ export default function Home({ palette }) {
               <div className="absolute -right-6 -top-6 h-28 w-28 rounded-full opacity-20" style={{ backgroundColor: palette.burgundy }} />
               <div className="absolute -bottom-6 -left-6 h-24 w-24 rounded-full opacity-80" style={{ backgroundColor: palette.gold }} />
               <div className="relative rounded-[2.2rem] border bg-white p-4 shadow-2xl md:p-5" style={{ borderColor: palette.border }}>
+                <MlsSitePhoto name="home-hero" alt="Illustrative ASL interpreting in a diverse professional meeting" priority className="mb-4 aspect-[4/3] object-cover" />
                 <div className="rounded-[1.8rem] bg-[#202020] p-6 text-white md:p-7">
                   <div className="flex items-start justify-between gap-4 border-b border-white/10 pb-5">
                     <div>
@@ -173,8 +175,9 @@ export default function Home({ palette }) {
             <h2 className="mt-3 text-3xl font-black tracking-tight md:text-5xl" style={{ color: palette.charcoal }}>Choose the service path that fits the communication need.</h2>
           </motion.div>
           <div className="grid auto-rows-fr gap-4 md:grid-cols-2 xl:grid-cols-4">
-            {serviceCards.map(({ icon: Icon, title, path, copy }, index) => (
+            {serviceCards.map(({ icon: Icon, title, path, copy, image }, index) => (
               <motion.div key={title} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.25 }} variants={fadeUp} transition={{ duration: 0.45, delay: index * 0.04 }} className="group h-full rounded-[1.6rem] border bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-lg" style={cardStyle}>
+                <MlsSitePhoto name={image} alt={`Illustrative ${title.toLowerCase()} service scene`} className="mb-4 aspect-[4/3]" />
                 <div className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-2xl" style={{ backgroundColor: "rgba(221,125,0,0.12)", color: palette.gold }}><Icon size={22} /></div>
                 <h3 className="text-lg font-black" style={{ color: palette.charcoal }}>{title}</h3>
                 <p className="mt-3 text-sm leading-7 text-[#666]">{copy}</p>
