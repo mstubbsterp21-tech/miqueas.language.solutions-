@@ -264,6 +264,27 @@ const allBlogPosts = [
     })),
 ];
 
+// Use the article's own image for every featured/article-card display.
+// Editors may provide an explicit image, otherwise the first image in the article HTML is used.
+export const getBlogPostImage = (post) => {
+  if (!post) return null;
+
+  const explicitImage = post.image || post.coverImage;
+  if (typeof explicitImage === "string" && explicitImage.trim()) {
+    return { src: explicitImage.trim(), alt: post.imageAlt || `${post.title} article image` };
+  }
+  if (explicitImage?.src) {
+    return { src: explicitImage.src, alt: explicitImage.alt || `${post.title} article image` };
+  }
+
+  const imageTag = (post.html || "").match(/<img\\b[^>]*>/i)?.[0];
+  if (!imageTag) return null;
+
+  const src = imageTag.match(/\\bsrc\\s*=\\s*["']([^"']+)["']/i)?.[1];
+  const alt = imageTag.match(/\\balt\\s*=\\s*["']([^"']*)["']/i)?.[1];
+  return src ? { src, alt: alt || `${post.title} article image` } : null;
+};
+
 // Single source of truth used by both the homepage and blog page.
 export const blogPosts = allBlogPosts.map((post) => ({
   ...post,
