@@ -168,11 +168,11 @@ function AppShellContent({ role, section, setSection, user, personalization, acc
   const sidebar = (
     <>
       <div className="border-b border-white/10 p-4 sm:p-5">
-        <div className="flex items-center gap-3 rounded-2xl bg-white p-3 shadow-sm">
-          <img src={logo} alt="Miqueas Language Solutions" className="h-12 w-auto shrink-0" />
-          <div className="min-w-0">
-            <p className="truncate text-sm font-black text-[#464747]">Miqueas Language Solutions</p>
-            <p className="mt-0.5 text-[10px] font-bold leading-4" style={{ color: theme.primaryInk }}>Bridging Perspectives. Delivering Understanding.</p>
+        <div className="flex min-w-0 items-center gap-3 rounded-2xl bg-white p-3 shadow-sm">
+          <img src={logo} alt="Miqueas Language Solutions logo" className="h-12 w-auto max-w-[72px] shrink-0 object-contain" />
+          <div className="min-w-0 flex-1">
+            <p className="whitespace-normal break-words text-sm font-black leading-snug text-[#464747]">Miqueas Language Solutions</p>
+            <p className="mt-1 whitespace-normal break-words text-[10px] font-bold leading-4" style={{ color: theme.primaryInk }}>Bridging Perspectives. Delivering Understanding.</p>
           </div>
         </div>
         <div className="mt-5 flex items-center gap-3">
