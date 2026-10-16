@@ -1,4 +1,5 @@
 import { useParams, Link } from "react-router-dom";
+import MlsSitePhoto from "../components/MlsSitePhoto";
 import { motion } from "framer-motion";
 import {
   ArrowLeft,
@@ -194,6 +195,7 @@ export default function ServiceDetail({ palette }) {
   };
 
   const service = services[serviceId];
+  const servicePhoto = ["in-person-interpreting", "video-remote-interpreting", "english-asl-translation", "asl-english-translation"].includes(serviceId) ? serviceId : null;
   const goldButton = { backgroundColor: palette.gold, color: palette.white };
 
   if (!service) {
@@ -232,6 +234,7 @@ export default function ServiceDetail({ palette }) {
               <div className="absolute -right-6 -top-6 h-28 w-28 rounded-full opacity-20" style={{ backgroundColor: palette.burgundy }} />
               <div className="absolute -bottom-6 -left-6 h-24 w-24 rounded-full opacity-80" style={{ backgroundColor: palette.gold }} />
               <div className="relative rounded-[2.2rem] border bg-white p-4 shadow-2xl md:p-5" style={{ borderColor: palette.border }}>
+                <MlsSitePhoto name={servicePhoto} alt={`Illustrative ${service.title.toLowerCase()} service scene`} priority className="mb-4 aspect-[4/3]" />
                 <div className="rounded-[1.8rem] bg-[#202020] p-6 text-white md:p-7">
                   <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.gold }}>Quick view</p>
                   <div className="mt-5 space-y-4 text-sm leading-7 text-white/82">
