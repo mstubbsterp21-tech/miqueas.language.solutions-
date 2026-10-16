@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
+import MlsSitePhoto from "../components/MlsSitePhoto";
 import {
   ArrowRight,
   BriefcaseBusiness,
@@ -25,6 +26,7 @@ const fadeUp = {
 const serviceCards = [
   {
     id: "in-person-interpreting",
+    image: "in-person-interpreting",
     icon: Users,
     title: "In-Person Interpreting",
     text: "On-site communication access for appointments, meetings, events, and live environments where presence, visibility, and nuance matter.",
@@ -32,6 +34,7 @@ const serviceCards = [
   },
   {
     id: "video-remote-interpreting",
+    image: "video-remote-interpreting",
     icon: Video,
     title: "Video Remote Interpreting",
     text: "Real-time ASL access for telehealth, virtual meetings, short-notice requests, and remote communication across locations.",
@@ -39,6 +42,7 @@ const serviceCards = [
   },
   {
     id: "english-asl-translation",
+    image: "english-asl-translation",
     icon: FileVideo,
     title: "English → ASL Translation",
     text: "Recorded ASL video translation for information that needs to be clearly and naturally communicated to Deaf viewers.",
@@ -46,6 +50,7 @@ const serviceCards = [
   },
   {
     id: "asl-english-translation",
+    image: "asl-english-translation",
     icon: Globe,
     title: "ASL → English Translation",
     text: "English transcripts, captions, summaries, or documentation-ready outputs created from ASL source content.",
@@ -198,6 +203,7 @@ export default function Services({ palette }) {
               return (
                 <motion.div key={card.title} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.25 }} variants={fadeUp} transition={{ duration: 0.45, delay: index * 0.04 }} className="group relative overflow-hidden rounded-[1.75rem] border bg-white p-6 shadow-sm transition-all duration-500 hover:-translate-y-1.5 hover:shadow-xl" style={cardStyle}>
                   <div className="pointer-events-none absolute inset-x-0 top-0 h-1 origin-left scale-x-0 transition-transform duration-500 group-hover:scale-x-100" style={{ backgroundColor: palette.gold }} />
+                  <MlsSitePhoto name={card.image} alt={`Illustrative ${card.title.toLowerCase()} service scene`} className="mb-5 aspect-[4/3]" />
                   <div className="flex h-12 w-12 items-center justify-center rounded-2xl" style={{ backgroundColor: "rgba(221,125,0,0.12)", color: palette.gold }}>
                     <Icon size={23} />
                   </div>
