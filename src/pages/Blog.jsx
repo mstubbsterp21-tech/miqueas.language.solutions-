@@ -11,7 +11,7 @@ import {
   Search,
   X,
 } from "lucide-react";
-import { formatBlogDate, getPublishedBlogPosts } from "../content/blogPostsLive";
+import { formatBlogDate, getBlogPostImage, getPublishedBlogPosts } from "../content/blogPostsLive";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 16 },
@@ -26,18 +26,6 @@ const staggerGroup = {
     },
   },
 };
-
-function getPostImage(post) {
-  const html = post?.html || "";
-  const imgTag = html.match(/<img\b[^>]*>/i)?.[0];
-
-  if (!imgTag) return null;
-
-  const src = imgTag.match(/src=["']([^"']+)["']/i)?.[1];
-  const alt = imgTag.match(/alt=["']([^"']*)["']/i)?.[1] || `${post.title} visual`;
-
-  return src ? { src, alt } : null;
-}
 
 function getThemeStyles(palette) {
   const isDark = palette.white !== "#ffffff";
@@ -108,7 +96,7 @@ function PostMeta({ post, palette, light = false }) {
 }
 
 function FeaturedArticle({ post, palette, accentText }) {
-  const postImage = getPostImage(post);
+  const postImage = getBlogPostImage(post);
 
   return (
     <motion.article
@@ -179,7 +167,7 @@ function FeaturedArticle({ post, palette, accentText }) {
 }
 
 function CardArticle({ post, palette, accentText }) {
-  const postImage = getPostImage(post);
+  const postImage = getBlogPostImage(post);
 
   return (
     <motion.article
@@ -245,7 +233,7 @@ function CardArticle({ post, palette, accentText }) {
 }
 
 function ListArticle({ post, palette, accentText }) {
-  const postImage = getPostImage(post);
+  const postImage = getBlogPostImage(post);
 
   return (
     <motion.article
