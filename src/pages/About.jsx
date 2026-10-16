@@ -224,36 +224,12 @@ export default function About({ palette }) {
                 <div className="absolute -left-24 top-10 h-48 w-48 rounded-full blur-3xl" style={{ backgroundColor: "rgba(221,125,0,0.22)" }} />
                 <div className="absolute -right-20 bottom-6 h-56 w-56 rounded-full blur-3xl" style={{ backgroundColor: "rgba(114,17,0,0.16)" }} />
 
-                <div className="relative z-10 flex min-h-[280px] flex-col justify-between p-5 md:min-h-[340px] md:p-6">
-                  <div className="flex flex-wrap items-center justify-between gap-3">
-                    <div className="rounded-full bg-white/85 px-4 py-2 text-xs font-bold uppercase tracking-[0.16em] shadow-sm backdrop-blur" style={{ color: palette.burgundy }}>
-                      Access in motion
-                    </div>
-                    <div className="rounded-full border border-white/70 bg-white/70 px-4 py-2 text-xs font-bold uppercase tracking-[0.16em] shadow-sm backdrop-blur" style={{ color: palette.charcoal }}>
-                      MLS
-                    </div>
-                  </div>
-
-                  <div className="relative mt-6 flex flex-1 items-end justify-center">
-                    <div className="absolute bottom-0 left-1/2 h-24 w-[82%] -translate-x-1/2 rounded-[100%] bg-black/10 blur-2xl" />
-                    <img
-                      src={bridgeImageUrl}
-                      alt="Stylized burgundy bridge representing communication access"
-                      className="relative z-10 w-[118%] max-w-none object-contain drop-shadow-2xl md:w-[112%]"
-                    />
-                  </div>
-
-                  <div className="relative z-20 mt-5 grid gap-3 sm:grid-cols-3">
-                    {[
-                      "Connection",
-                      "Clarity",
-                      "Understanding",
-                    ].map((item) => (
-                      <div key={item} className="rounded-2xl border border-white/70 bg-white/75 px-3 py-3 text-center text-xs font-bold uppercase tracking-[0.12em] shadow-sm backdrop-blur" style={{ color: palette.burgundy }}>
-                        {item}
-                      </div>
-                    ))}
-                  </div>
+                <div className="relative z-10 flex items-center justify-center p-4 sm:p-6 md:p-8">
+                  <img
+                    src={bridgeImageUrl}
+                    alt="Stylized burgundy bridge representing communication access"
+                    className="block h-auto w-full max-w-full object-contain drop-shadow-2xl"
+                  />
                 </div>
               </div>
             </motion.div>
