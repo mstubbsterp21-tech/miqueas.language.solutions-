@@ -120,13 +120,13 @@ function AccessibilityOverlay({ theme, onToggle, palette }) {
 
 function BrandLockup({ palette, compact = false }) {
   return (
-    <div className="flex min-w-0 items-center gap-3">
+    <div className="flex min-w-0 items-center gap-2.5 sm:gap-3">
       <img src={logo} alt="Miqueas Language Solutions logo" className={compact ? "h-11 w-auto shrink-0 object-contain sm:h-12" : "h-16 w-auto shrink-0 object-contain"} />
-      <div className="min-w-0 text-left">
-        <div className={compact ? "max-w-[190px] truncate text-sm font-bold leading-tight sm:max-w-none" : "text-lg font-bold tracking-tight"} style={{ color: palette.charcoal }}>
+      <div className="min-w-0 flex-1 text-left">
+        <div className={compact ? "max-w-[190px] whitespace-normal break-words text-sm font-bold leading-tight sm:max-w-none" : "whitespace-normal break-words text-lg font-bold leading-tight tracking-tight"} style={{ color: palette.charcoal }}>
           Miqueas Language Solutions
         </div>
-        <div className={compact ? "mt-0.5 max-w-[190px] truncate text-[11px] leading-tight sm:max-w-none" : "text-sm"} style={{ color: palette.burgundy }}>
+        <div className={compact ? "mt-0.5 max-w-[190px] whitespace-normal break-words text-[11px] leading-snug sm:max-w-none" : "whitespace-normal break-words text-sm leading-snug"} style={{ color: palette.burgundy }}>
           Bridging Perspectives. Delivering Understanding.
         </div>
       </div>
@@ -314,11 +314,11 @@ export default function App() {
         <div className="mx-auto max-w-6xl">
           <div className="grid gap-10 text-center md:text-left lg:grid-cols-[1.25fr_0.8fr_0.9fr_1.15fr]">
             <div className="space-y-5">
-              <Link to="/" className="mx-auto inline-flex max-w-full items-center gap-3 rounded-2xl bg-white px-4 py-3 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md md:mx-0">
+              <Link to="/" className="mx-auto flex w-full min-w-0 max-w-full items-center gap-3 rounded-2xl bg-white px-4 py-3 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md md:mx-0">
                 <img src={logo} alt="Miqueas Language Solutions logo" className="h-12 w-auto shrink-0 object-contain sm:h-14" />
-                <div className="min-w-0 text-left">
-                  <div className="max-w-[210px] truncate text-sm font-bold leading-tight text-[#464747] sm:max-w-none sm:text-base">Miqueas Language Solutions</div>
-                  <div className="mt-1 max-w-[210px] truncate text-xs font-semibold text-[#721100] sm:max-w-none">Bridging Perspectives. Delivering Understanding.</div>
+                <div className="min-w-0 flex-1 text-left">
+                  <div className="whitespace-normal break-words text-sm font-bold leading-tight text-[#464747] sm:text-base">Miqueas Language Solutions</div>
+                  <div className="mt-1 whitespace-normal break-words text-xs font-semibold leading-snug text-[#721100]">Bridging Perspectives. Delivering Understanding.</div>
                 </div>
               </Link>
               <p className="mx-auto max-w-md text-sm leading-7 text-white/75 md:mx-0">
