@@ -277,11 +277,11 @@ export const getBlogPostImage = (post) => {
     return { src: explicitImage.src, alt: explicitImage.alt || `${post.title} article image` };
   }
 
-  const imageTag = (post.html || "").match(/<img\\b[^>]*>/i)?.[0];
+  const imageTag = (post.html || "").match(/<img\b[^>]*>/i)?.[0];
   if (!imageTag) return null;
 
-  const src = imageTag.match(/\\bsrc\\s*=\\s*["']([^"']+)["']/i)?.[1];
-  const alt = imageTag.match(/\\balt\\s*=\\s*["']([^"']*)["']/i)?.[1];
+  const src = imageTag.match(/\bsrc\s*=\s*["']([^"']+)["']/i)?.[1];
+  const alt = imageTag.match(/\balt\s*=\s*["']([^"']*)["']/i)?.[1];
   return src ? { src, alt: alt || `${post.title} article image` } : null;
 };
 
