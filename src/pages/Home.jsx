@@ -23,7 +23,7 @@ import {
   Video,
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { formatBlogDate, getFeaturedBlogPost } from "../content/blogPostsLive";
+import { formatBlogDate, getBlogPostImage, getFeaturedBlogPost } from "../content/blogPostsLive";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 18 },
@@ -40,6 +40,7 @@ const serviceCards = [
 export default function Home({ palette }) {
   const [activeTestimonial, setActiveTestimonial] = useState(0);
   const featuredArticle = getFeaturedBlogPost();
+  const featuredImage = getBlogPostImage(featuredArticle);
 
   const stats = [
     ["7+ Years", "Professional interpreting experience across diverse real-world settings"],
@@ -192,17 +193,38 @@ export default function Home({ palette }) {
           <div className="mx-auto max-w-6xl">
             <motion.article initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} variants={fadeUp} transition={{ duration: 0.45 }} className="overflow-hidden rounded-[2.2rem] border bg-white shadow-xl" style={{ borderColor: palette.border }}>
               <div className="grid gap-0 lg:grid-cols-[0.8fr_1.2fr]">
-                <div className="flex min-h-[300px] flex-col justify-between bg-[#202020] p-7 text-white md:p-9">
-                  <div>
-                    <div className="mb-5 inline-flex h-12 w-12 items-center justify-center rounded-2xl" style={{ backgroundColor: palette.gold }}>
-                      <FileText size={22} color="#ffffff" />
-                    </div>
-                    <p className="text-xs font-bold uppercase tracking-[0.2em]" style={{ color: palette.gold }}>Featured Article</p>
-                    <h2 className="mt-5 text-3xl font-black leading-tight md:text-4xl">Helpful insight before you book.</h2>
-                  </div>
-                  <div className="mt-8 flex flex-wrap gap-3 text-sm text-white/70">
-                    <span className="inline-flex items-center gap-2"><CalendarDays size={16} style={{ color: palette.gold }} />{formatBlogDate(featuredArticle.publishDate)}</span>
-                    <span className="inline-flex items-center gap-2"><Clock size={16} style={{ color: palette.gold }} />{featuredArticle.readTime}</span>
+                <div className="flex min-h-[320px] flex-col bg-[#202020] text-white">
+                  <Link
+                    to={`/blog/${featuredArticle.slug}`}
+                    aria-label={`Read featured article: ${featuredArticle.title}`}
+                    className="group relative block min-h-[250px] flex-1 overflow-hidden bg-[#211714] focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-[-4px] focus-visible:outline-[#dd7d00] lg:min-h-[340px]"
+                  >
+                    {featuredImage ? (
+                      <>
+                        <img
+                          src={featuredImage.src}
+                          alt=""
+                          aria-hidden="true"
+                          className="absolute inset-0 h-full w-full scale-110 object-cover opacity-25 blur-2xl"
+                        />
+                        <img
+                          src={featuredImage.src}
+                          alt={featuredImage.alt}
+                          decoding="async"
+                          className="absolute inset-0 h-full w-full object-contain transition-transform duration-500 group-hover:scale-[1.02]"
+                        />
+                      </>
+                    ) : (
+                      <div className="flex h-full min-h-[250px] flex-col items-center justify-center gap-3 p-8 text-center">
+                        <FileText size={40} style={{ color: palette.gold }} />
+                        <span className="text-sm font-bold">Featured article image unavailable</span>
+                      </div>
+                    )}
+                  </Link>
+                  <div className="flex flex-wrap items-center gap-x-4 gap-y-2 px-6 py-5 text-xs text-white/80 md:px-8">
+                    <span className="font-bold uppercase tracking-[0.15em]" style={{ color: palette.gold }}>Featured Article</span>
+                    <span className="inline-flex items-center gap-1.5"><CalendarDays size={15} style={{ color: palette.gold }} />{formatBlogDate(featuredArticle.publishDate)}</span>
+                    <span className="inline-flex items-center gap-1.5"><Clock size={15} style={{ color: palette.gold }} />{featuredArticle.readTime}</span>
                   </div>
                 </div>
                 <div className="flex flex-col justify-center p-7 md:p-9">
