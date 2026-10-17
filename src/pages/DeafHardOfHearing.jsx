@@ -66,34 +66,20 @@ export default function DeafHardOfHearing({ palette }) {
               </div>
             </div>
 
-            <div className="relative">
-              <div className="absolute -right-7 -top-7 h-32 w-32 rounded-full opacity-20" style={{ backgroundColor: palette.burgundy }} />
-              <div className="absolute -bottom-7 -left-7 h-28 w-28 rounded-full opacity-80" style={{ backgroundColor: palette.gold }} />
+            <div className="relative mx-auto w-full max-w-[520px]">
+              <div className="pointer-events-none absolute -right-4 -top-6 h-36 w-36 rounded-full bg-[#dd7d00]/20 blur-2xl" />
               <MlsEditorialImage
                 name="inclusive_asl_conversation_in_modern_lounge"
-                alt="Diverse adults sharing a signed conversation in a bright community lounge"
-                aspect="aspect-[5/4]"
-                className="mb-6 lg:-ml-5 lg:mr-5"
+                alt="A group of diverse adults sharing a signed conversation in a community lounge"
+                aspect="aspect-[4/3]"
+                className="relative w-full"
                 tilt="right"
                 priority
               />
-              <div className="relative rounded-[2.2rem] border bg-white p-5 shadow-2xl" style={{ borderColor: palette.border }}>
-                <div className="rounded-[1.8rem] bg-[#202020] p-6 text-white">
-                  <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.gold }}>Self-advocacy toolkit</p>
-                  <h2 className="mt-3 text-2xl font-black leading-tight">Clear phrases can make access requests easier.</h2>
-                  <div className="mt-6 space-y-3">
-                    {advocacyPhrases.slice(0, 3).map((phrase) => (
-                      <div key={phrase} className="rounded-2xl border border-white/10 bg-white/[0.06] p-4 text-sm font-semibold leading-6 text-white/85">
-                        “{phrase}”
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                <div className="mt-4 rounded-[1.5rem] border bg-[#f7f3ef] p-5" style={{ borderColor: palette.border }}>
-                  <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.gold }}>Access reminder</p>
-                  <p className="mt-2 text-xl font-black leading-tight" style={{ color: palette.charcoal }}>Being present is not the same as being able to participate.</p>
-                </div>
-              </div>
+              <motion.div initial={{ opacity: 0, y: 22 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.25 }} className="relative z-10 -mt-6 ml-auto w-[91%] rounded-[1.3rem] bg-[#202020] p-5 text-white shadow-xl sm:w-[83%] sm:p-6">
+                <p className="text-xs font-black uppercase tracking-[0.17em]" style={{ color: palette.gold }}>Your communication matters</p>
+                <p className="mt-2 text-lg font-bold leading-snug">Being present isn't the same as being able to participate.</p>
+              </motion.div>
             </div>
           </motion.div>
         </div>
