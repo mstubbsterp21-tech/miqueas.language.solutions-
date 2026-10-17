@@ -196,6 +196,10 @@ export default function Home({ palette }) {
           <motion.div initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} variants={fadeUp} transition={{ duration: 0.45 }} className="mb-8 max-w-3xl">
             <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.gold }}>Services</p>
             <h2 className="mt-3 text-3xl font-black tracking-tight md:text-5xl" style={{ color: palette.charcoal }}>Choose the service path that fits the communication need.</h2>
+            <p className="mt-4 max-w-2xl text-base leading-7 text-[#626262]">Not sure whether you need an on-site interpreter, VRI, or ASL translation? Get a personalized starting point in a few clicks.</p>
+            <Link to="/services#service-finder" className="mt-5 inline-flex min-h-12 items-center gap-2 rounded-full bg-[#721100] px-6 py-3 text-sm font-black text-white transition hover:bg-[#560c00] focus-visible:outline focus-visible:outline-4 focus-visible:outline-[#dd7d00]">
+              Find the right service <ArrowRight size={17} aria-hidden="true" />
+            </Link>
           </motion.div>
           <div className="grid auto-rows-fr gap-5 md:grid-cols-2 lg:grid-cols-12">
             {serviceCards.map(({ icon: Icon, title, path, copy, image }, index) => (
