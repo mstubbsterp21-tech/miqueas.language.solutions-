@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import MlsEditorialImage from "../components/MlsEditorialImage";
 import { Link } from "react-router-dom";
 import { ArrowRight, BadgeCheck, BookOpenCheck, BriefcaseBusiness, ClipboardCheck, FileSearch, Handshake, ShieldCheck, Star } from "lucide-react";
 
@@ -67,6 +68,14 @@ export default function ResourcesInterpreters({ palette }) {
               </div>
             ))}
           </motion.div>
+          <MlsEditorialImage
+            name="diverse_team_collaboration_around_conference_table"
+            alt="A racially diverse group of professionals discussing work around a conference table"
+            aspect="aspect-[16/9]"
+            className="mx-auto mt-11 w-full max-w-[860px] lg:mr-0"
+            caption="Professional connection, preparation, and collaboration."
+            tilt="right"
+          />
         </div>
       </section>
 
@@ -172,6 +181,22 @@ export default function ResourcesInterpreters({ palette }) {
                 <p className="mt-3 text-sm leading-7 text-[#666]">{resource.copy}</p>
               </motion.a>
             ))}
+          </div>
+          <div className="mt-12 grid items-center gap-7 lg:grid-cols-[0.7fr_1.3fr]">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.gold }}>For remote interpreters</p>
+              <h3 className="mt-3 text-2xl font-black leading-tight md:text-3xl" style={{ color: palette.charcoal }}>Your VRI environment matters.</h3>
+              <p className="mt-4 text-sm leading-7 text-[#5f6368]">Review framing, lighting, reliable connectivity, audio quality, signing space, and privacy before accepting remote work. Open the guide for a closer look.</p>
+            </div>
+            <MlsEditorialImage
+              name="interpreter_vri_technical_requirements"
+              alt="MLS interpreter VRI technical requirements infographic covering lighting, camera positioning, audio, connectivity, and privacy"
+              fit="contain"
+              aspect="aspect-[4/3]"
+              className="w-full"
+              expand
+              tilt="left"
+            />
           </div>
           <motion.div initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.25 }} variants={fadeUp} transition={{ duration: 0.45 }} className="mt-10 overflow-hidden rounded-[2rem] border shadow-lg" style={{ borderColor: palette.border }}>
             <div className="grid gap-0 lg:grid-cols-[1fr_auto]">
