@@ -100,7 +100,7 @@ export default function About({ palette }) {
   };
 
   return (
-    <div className="overflow-hidden bg-white">
+    <div className="mls-public-site overflow-hidden bg-white">
       <section className="relative px-5 py-14 md:px-8 md:py-20">
         <div
           className="absolute inset-0 -z-10"
@@ -140,7 +140,7 @@ export default function About({ palette }) {
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <Link
                   to="/contact"
-                  className="inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-bold shadow-md transition hover:-translate-y-0.5 hover:shadow-lg"
+                  className="mls-cta-motion inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-bold shadow-md transition hover:-translate-y-0.5 hover:shadow-lg"
                   style={goldBackground}
                 >
                   Request an Interpreter
@@ -148,7 +148,7 @@ export default function About({ palette }) {
                 </Link>
                 <Link
                   to="/services"
-                  className="inline-flex items-center justify-center rounded-full border bg-white px-6 py-3 text-sm font-bold shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+                  className="mls-cta-motion inline-flex items-center justify-center rounded-full border bg-white px-6 py-3 text-sm font-bold shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
                   style={{ borderColor: palette.border, color: palette.charcoal }}
                 >
                   Explore Services
@@ -423,7 +423,7 @@ export default function About({ palette }) {
                 </p>
                 <Link
                   to="/contact"
-                  className="inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-bold shadow-md transition hover:-translate-y-0.5 hover:shadow-lg"
+                  className="mls-cta-motion inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-bold shadow-md transition hover:-translate-y-0.5 hover:shadow-lg"
                   style={goldBackground}
                 >
                   Request an Interpreter
