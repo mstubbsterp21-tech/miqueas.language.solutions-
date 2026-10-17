@@ -231,25 +231,19 @@ export default function ServiceDetail({ palette }) {
               </div>
             </div>
 
-            <div className="relative mx-auto w-full max-w-[420px] lg:mx-0">
-              <div className="absolute -right-6 -top-6 h-28 w-28 rounded-full opacity-20" style={{ backgroundColor: palette.burgundy }} />
-              <div className="absolute -bottom-6 -left-6 h-24 w-24 rounded-full opacity-80" style={{ backgroundColor: palette.gold }} />
-              <div className="relative rounded-[2.2rem] border bg-white p-4 shadow-2xl md:p-5" style={{ borderColor: palette.border }}>
-                <MlsSitePhoto name={servicePhoto} alt={`Illustrative ${service.title.toLowerCase()} service scene`} priority className="mb-4 aspect-[4/3]" />
-                <div className="rounded-[1.8rem] bg-[#202020] p-6 text-white md:p-7">
-                  <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.gold }}>Quick view</p>
-                  <div className="mt-5 space-y-4 text-sm leading-7 text-white/82">
-                    <div><span className="font-bold text-white">Best for:</span> assignments that need clarity, planning, and the right service fit.</div>
-                    <div><span className="font-bold text-white">Booking style:</span> review first, confirm details, then schedule or deliver.</div>
-                    <div><span className="font-bold text-white">Next step:</span> submit your request with as much detail as possible.</div>
-                  </div>
-                </div>
-                <div className="mt-4 flex flex-wrap gap-2">
-                  {service.settings.slice(0, 6).map((item) => (
-                    <span key={item} className="rounded-full border bg-[#f7f3ef] px-3 py-2 text-xs font-bold" style={{ borderColor: palette.border, color: palette.burgundy }}>{item}</span>
+            <div className="relative mx-auto w-full max-w-[520px] lg:mx-0">
+              <motion.div initial={{ opacity: 0, x: 22 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.7, delay: 0.1 }} className="relative overflow-hidden rounded-[2rem] border-4 border-white bg-[#f7f3ef] shadow-[0_26px_72px_-28px_rgba(65,24,10,0.37)]">
+                <MlsSitePhoto name={servicePhoto} alt={`Illustrative ${service.title.toLowerCase()} service scene`} priority className="!rounded-none aspect-[4/3] object-cover" />
+              </motion.div>
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.58, delay: 0.3 }} className="relative z-10 -mt-7 ml-auto w-[94%] rounded-[1.35rem] border border-[#721100]/10 bg-white p-5 shadow-xl sm:w-[89%] md:p-6">
+                <p className="text-[11px] font-black uppercase tracking-[0.16em]" style={{ color: palette.burgundy }}>Plan with confidence</p>
+                <p className="mt-2 text-sm font-semibold leading-6" style={{ color: palette.charcoal }}>We'll review the setting, preparation, and service fit before confirming details.</p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {service.settings.slice(0, 3).map((item) => (
+                    <span key={item} className="rounded-full border border-[#721100]/10 bg-[#f7f3ef] px-3 py-1.5 text-[11px] font-bold" style={{ color: palette.burgundy }}>{item}</span>
                   ))}
                 </div>
-              </div>
+              </motion.div>
             </div>
           </motion.div>
         </div>
@@ -277,7 +271,7 @@ export default function ServiceDetail({ palette }) {
 
       {serviceId === "video-remote-interpreting" && (
         <section className="px-5 py-12 md:px-8 md:py-16" aria-labelledby="client-vri-access-heading">
-          <div className="mx-auto grid max-w-6xl items-center gap-8 lg:grid-cols-[0.72fr_1.28fr]">
+          <div className="mx-auto grid max-w-6xl items-center gap-8 rounded-[2rem] border border-[#721100]/10 bg-[#f8f3ed] p-6 md:gap-10 md:p-10 lg:grid-cols-[0.67fr_1.33fr]">
             <div>
               <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.gold }}>Before your VRI appointment</p>
               <h2 id="client-vri-access-heading" className="mt-3 text-3xl font-black leading-tight md:text-4xl" style={{ color: palette.charcoal }}>Set up for communication access.</h2>
@@ -293,8 +287,8 @@ export default function ServiceDetail({ palette }) {
               alt="MLS client VRI setup and accessibility guide with camera, screen, internet, audio, and environment considerations"
               fit="contain"
               aspect="aspect-[4/3]"
-              className="w-full"
-              caption="Select to open this visual guide at full size."
+              className="w-full bg-white"
+              caption="Select to open the full-size accessibility guide."
               expand
               tilt="right"
             />
