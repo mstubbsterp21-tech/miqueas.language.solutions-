@@ -209,7 +209,7 @@ export default function Home({ palette }) {
                 className={`group flex h-full min-w-0 flex-col overflow-hidden rounded-[1.7rem] border border-[#721100]/10 bg-white shadow-sm transition-all duration-500 hover:-translate-y-1 hover:shadow-xl ${index === 0 || index === 3 ? "lg:col-span-7" : "lg:col-span-5"}`}
               >
                 <Link to={path} className="block overflow-hidden bg-[#f7f3ef] focus-visible:outline focus-visible:outline-4 focus-visible:outline-[#dd7d00]" aria-label={`Explore ${title}`}>
-                  <MlsSitePhoto name={image} alt={`Illustration of ${title.toLowerCase()} in a professional setting`} className="!rounded-none aspect-[16/10] object-cover transition-transform duration-700 group-hover:scale-[1.035] motion-reduce:transition-none motion-reduce:transform-none" />
+                  <MlsSitePhoto name={image} alt={`Illustration of ${title.toLowerCase()} in a professional setting`} className="!rounded-none aspect-[16/11] object-cover transition-transform duration-700 group-hover:scale-[1.035] motion-reduce:transition-none motion-reduce:transform-none" />
                 </Link>
                 <div className="flex flex-1 flex-col px-6 pb-7 pt-6 md:px-8">
                   <div className="mb-3 flex items-center gap-3">
