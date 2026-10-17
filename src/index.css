@@ -385,3 +385,53 @@ body:has(.theme-dark) {
 .theme-dark .blog-html h3,
 .theme-dark .blog-html a { color: #ffb199 !important; }
 .theme-dark .blog-html blockquote { background: rgba(221, 125, 0, 0.08) !important; }
+
+/* MLS editorial motion: scoped to the public marketing pages, never the portals. */
+@keyframes mls-orb-drift {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(12px, -15px, 0); }
+}
+.mls-public-site .mls-ambient-orb {
+  pointer-events: none;
+  animation: mls-orb-drift 8s ease-in-out infinite;
+  will-change: transform;
+}
+.mls-public-site .mls-ambient-orb:nth-child(even) {
+  animation-delay: -3.5s;
+}
+.mls-public-site a.mls-cta-motion {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  transition: transform 250ms ease, box-shadow 250ms ease, background-color 250ms ease;
+}
+.mls-public-site a.mls-cta-motion::after {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background: linear-gradient(100deg, transparent 30%, rgba(255,255,255,0.21) 48%, transparent 67%);
+  transform: translateX(-140%);
+  transition: transform 650ms ease;
+}
+.mls-public-site a.mls-cta-motion:hover::after,
+.mls-public-site a.mls-cta-motion:focus-visible::after {
+  transform: translateX(140%);
+}
+.mls-public-site a.mls-cta-motion:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 22px -12px rgba(70,24,10,0.48);
+}
+.mls-public-site a.mls-cta-motion:focus-visible {
+  outline: 3px solid #dd7d00;
+  outline-offset: 3px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .mls-public-site .mls-ambient-orb { animation: none !important; will-change: auto; }
+  .mls-public-site a.mls-cta-motion,
+  .mls-public-site a.mls-cta-motion::after {
+    transition: none !important;
+    transform: none !important;
+  }
+}
