@@ -213,7 +213,7 @@ export default function ServiceDetail({ palette }) {
   }
 
   return (
-    <div className="overflow-hidden bg-white">
+    <div className="mls-public-site overflow-hidden bg-white">
       <section className="relative px-5 py-14 md:px-8 md:py-20">
         <div className="absolute inset-0 -z-10" style={{ background: "radial-gradient(circle at 12% 15%, rgba(221,125,0,0.18), transparent 28%), radial-gradient(circle at 92% 8%, rgba(114,17,0,0.14), transparent 32%), linear-gradient(180deg, #ffffff 0%, #f7f3ef 100%)" }} />
         <div className="mx-auto max-w-6xl">
@@ -226,8 +226,8 @@ export default function ServiceDetail({ palette }) {
               <h1 className="mt-4 text-4xl font-black leading-[1.03] tracking-tight md:text-6xl" style={{ color: palette.charcoal }}>{service.title}</h1>
               <p className="mt-6 max-w-2xl text-lg leading-8 text-[#555] md:text-xl">{service.subtitle}</p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-                <Link to="/contact" className="inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-bold shadow-md transition hover:-translate-y-0.5 hover:shadow-lg" style={goldButton}>Request a Quote <ArrowRight size={17} /></Link>
-                <Link to="/services" className="inline-flex items-center justify-center rounded-full border bg-white px-6 py-3 text-sm font-bold shadow-sm transition hover:-translate-y-0.5 hover:shadow-md" style={{ borderColor: palette.border, color: palette.charcoal }}>Compare Services</Link>
+                <Link to="/contact" className="mls-cta-motion inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-bold shadow-md transition hover:-translate-y-0.5 hover:shadow-lg" style={goldButton}>Request a Quote <ArrowRight size={17} /></Link>
+                <Link to="/services" className="mls-cta-motion inline-flex items-center justify-center rounded-full border bg-white px-6 py-3 text-sm font-bold shadow-sm transition hover:-translate-y-0.5 hover:shadow-md" style={{ borderColor: palette.border, color: palette.charcoal }}>Compare Services</Link>
               </div>
             </div>
 
@@ -311,8 +311,8 @@ export default function ServiceDetail({ palette }) {
             </div>
             <div className="flex flex-col justify-center gap-4 bg-white p-7 md:min-w-[340px] md:p-9">
               <p className="text-sm leading-6 text-[#5f6368]">Ready to move forward?</p>
-              <Link to="/contact" className="inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-bold shadow-md transition hover:-translate-y-0.5 hover:shadow-lg" style={goldButton}>Request a Quote <ArrowRight size={17} /></Link>
-              <Link to="/services" className="inline-flex items-center justify-center gap-2 rounded-full border bg-white px-6 py-3 text-sm font-bold shadow-sm transition hover:-translate-y-0.5 hover:shadow-md" style={{ borderColor: palette.border, color: palette.charcoal }}>Compare Services</Link>
+              <Link to="/contact" className="mls-cta-motion inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-bold shadow-md transition hover:-translate-y-0.5 hover:shadow-lg" style={goldButton}>Request a Quote <ArrowRight size={17} /></Link>
+              <Link to="/services" className="mls-cta-motion inline-flex items-center justify-center gap-2 rounded-full border bg-white px-6 py-3 text-sm font-bold shadow-sm transition hover:-translate-y-0.5 hover:shadow-md" style={{ borderColor: palette.border, color: palette.charcoal }}>Compare Services</Link>
             </div>
           </div>
         </div>
