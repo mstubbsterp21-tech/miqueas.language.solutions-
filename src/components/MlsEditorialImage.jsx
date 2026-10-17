@@ -38,7 +38,7 @@ export default function MlsEditorialImage({
       fetchPriority={priority ? "high" : undefined}
       decoding="async"
       onError={() => setMissing(true)}
-      className={`h-full w-full transition-transform duration-700 ease-out group-hover:scale-[1.035] motion-reduce:transform-none motion-reduce:transition-none ${fit === "contain" ? "object-contain" : "object-cover"} ${imageClassName}`}
+      className={`h-full w-full transition-transform duration-700 ease-out motion-reduce:transform-none motion-reduce:transition-none ${fit === "contain" ? "object-contain" : "object-cover group-hover:scale-[1.035]"} ${imageClassName}`}
     />
   );
 
