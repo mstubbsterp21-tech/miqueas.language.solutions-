@@ -67,40 +67,40 @@ export default function ResourcesClients({ palette }) {
                   View Services
                 </Link>
               </div>
-              <MlsEditorialImage
-                name="collaborative_meeting_with_sign_language"
-                alt="An interpreter and participants discussing plans together at a table"
-                aspect="aspect-[16/8]"
-                className="mt-7 max-w-[475px] lg:-ml-4"
-                tilt="left"
-              />
             </div>
 
-            <div className="relative mx-auto w-full max-w-[520px] lg:mx-0">
-              <div className="absolute -right-6 -top-6 h-28 w-28 rounded-full opacity-20" style={{ backgroundColor: palette.burgundy }} />
-              <div className="absolute -bottom-6 -left-6 h-24 w-24 rounded-full opacity-80" style={{ backgroundColor: palette.gold }} />
-              <div className="relative rounded-[2.2rem] border bg-white p-4 shadow-2xl md:p-5" style={{ borderColor: palette.border }}>
-                <div className="rounded-[1.8rem] bg-[#202020] p-6 text-white md:p-7">
-                  <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.gold }}>Planning checklist</p>
-                  <h2 className="mt-3 max-w-md text-2xl font-black leading-tight">What helps MLS coordinate the right interpreter?</h2>
-                  <div className="mt-6 grid gap-3 sm:grid-cols-2">
-                    {planningItems.map(({ icon: Icon, label, detail }) => (
-                      <div key={label} className="min-h-[132px] rounded-2xl border border-white/10 bg-white/[0.06] p-4">
-                        <Icon size={21} style={{ color: palette.gold }} />
-                        <h3 className="mt-3 text-sm font-black">{label}</h3>
-                        <p className="mt-2 text-xs leading-5 text-white/65">{detail}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                <div className="mt-4 grid gap-3 sm:grid-cols-3">
-                  {["On-site", "Remote", "Hybrid"].map((item) => (
-                    <div key={item} className="rounded-2xl border bg-[#f7f3ef] px-4 py-4 text-center text-sm font-black" style={{ borderColor: palette.border, color: palette.burgundy }}>{item}</div>
-                  ))}
-                </div>
-              </div>
+            <div className="relative mx-auto w-full max-w-[530px]">
+              <MlsEditorialImage
+                name="collaborative_meeting_with_sign_language"
+                alt="An interpreter and participants discussing access planning in a professional consultation"
+                aspect="aspect-[4/3]"
+                priority
+                tilt="right"
+              />
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.2 }} className="relative z-10 -mt-7 ml-auto w-[92%] rounded-[1.25rem] border border-[#721100]/10 bg-white p-5 shadow-xl sm:w-[83%] md:p-6">
+                <p className="text-xs font-black uppercase tracking-[0.16em]" style={{ color: palette.burgundy }}>Prepared from the start</p>
+                <p className="mt-2 text-lg font-bold leading-snug" style={{ color: palette.charcoal }}>Share the details you know. We'll help identify the next steps.</p>
+              </motion.div>
             </div>
           </motion.div>
+        </div>
+      </section>
+
+      <section className="px-5 py-12 md:px-8 md:py-14" aria-labelledby="client-planning-checklist">
+        <div className="mx-auto max-w-6xl rounded-[2rem] bg-[#202020] p-6 text-white md:p-9">
+          <motion.div initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} variants={fadeUp} transition={{ duration: 0.45 }} className="mb-7 max-w-2xl">
+            <p className="text-xs font-black uppercase tracking-[0.18em]" style={{ color: palette.gold }}>Planning checklist</p>
+            <h2 id="client-planning-checklist" className="mt-2 text-2xl font-black md:text-3xl">Four details that help us prepare.</h2>
+          </motion.div>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {planningItems.map(({ icon: Icon, label, detail }, index) => (
+              <motion.div key={label} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} variants={fadeUp} transition={{ duration: 0.45, delay: index * 0.07 }} className="rounded-[1.2rem] border border-white/15 bg-white/[0.06] p-5 transition-colors duration-300 hover:bg-white/[0.1]">
+                <Icon size={22} style={{ color: palette.gold }} />
+                <h3 className="mt-4 text-sm font-black">{label}</h3>
+                <p className="mt-2 text-xs leading-6 text-white/70">{detail}</p>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -130,26 +130,25 @@ export default function ResourcesClients({ palette }) {
               <h2 className="mt-3 text-3xl font-black leading-tight md:text-4xl" style={{ color: palette.charcoal }}>A smoother request starts with the right details.</h2>
               <p className="mt-4 text-base leading-8 text-[#5f6368]">You do not need to know every answer before reaching out. Share what you have, and MLS will help identify what else may be needed.</p>
             </motion.div>
-            <div className="space-y-4">
-              {processSteps.map((step, index) => (
-                <motion.div key={step} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.25 }} variants={fadeUp} transition={{ duration: 0.45, delay: index * 0.04 }} className="flex gap-4 rounded-[1.5rem] border bg-white p-5 shadow-sm" style={cardStyle}>
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-lg font-black text-white" style={{ backgroundColor: palette.burgundy }}>{index + 1}</div>
-                  <p className="self-center text-sm font-bold leading-7" style={{ color: palette.charcoal }}>{step}</p>
-                </motion.div>
-              ))}
-            </div>
+            <MlsEditorialImage
+              name="three_step_language_solutions_workflow"
+              alt="MLS three-step booking overview: request, review, and confirm"
+              fit="contain"
+              aspect="aspect-[4/3]"
+              className="w-full bg-white"
+              caption="Open the full-size booking overview."
+              expand
+              tilt="right"
+            />
           </div>
-          <MlsEditorialImage
-            name="three_step_language_solutions_workflow"
-            alt="MLS three-step booking overview: request, review, and confirm"
-            fit="contain"
-            aspect="aspect-[4/3]"
-            className="mx-auto mt-9 w-full max-w-[760px]"
-            caption="Visual overview of the request, review, and confirmation process. Select to view full size."
-            expand
-            tilt="right"
-          />
-        </div>
+          <div className="mt-7 grid gap-3 md:grid-cols-3">
+            {processSteps.map((step, index) => (
+              <motion.div key={step} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.15 }} variants={fadeUp} transition={{ duration: 0.45, delay: index * 0.08 }} className="flex items-start gap-3 rounded-[1.15rem] bg-white p-5 shadow-sm">
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-black text-white" style={{ backgroundColor: palette.burgundy }}>{index + 1}</span>
+                <p className="text-sm font-semibold leading-6" style={{ color: palette.charcoal }}>{step}</p>
+              </motion.div>
+            ))}
+          </div>        </div>
       </section>
 
       <section className={sectionClass}>
