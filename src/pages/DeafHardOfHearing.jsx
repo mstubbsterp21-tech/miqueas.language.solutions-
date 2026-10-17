@@ -39,7 +39,7 @@ export default function DeafHardOfHearing({ palette }) {
   const goldButton = { backgroundColor: palette.gold, color: palette.white };
 
   return (
-    <div className="overflow-hidden bg-white">
+    <div className="mls-public-site overflow-hidden bg-white">
       <section className="relative px-5 py-14 md:px-8 md:py-20">
         <div className="absolute inset-0 -z-10" style={{ background: "radial-gradient(circle at 12% 16%, rgba(221,125,0,0.18), transparent 28%), radial-gradient(circle at 92% 12%, rgba(114,17,0,0.14), transparent 32%), linear-gradient(180deg, #ffffff 0%, #f7f3ef 100%)" }} />
         <div className="mx-auto max-w-6xl">
@@ -56,18 +56,18 @@ export default function DeafHardOfHearing({ palette }) {
                 This page is built as an advocacy hub for Deaf, DeafBlind, hard-of-hearing, late-deafened, and hearing community members who want clearer communication access and practical tools for requesting support.
               </p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-                <Link to="/contact" className="inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-bold shadow-md transition hover:-translate-y-0.5 hover:shadow-lg" style={goldButton}>
+                <Link to="/contact" className="mls-cta-motion inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-bold shadow-md transition hover:-translate-y-0.5 hover:shadow-lg" style={goldButton}>
                   Request Support
                   <ArrowRight size={17} />
                 </Link>
-                <Link to="/clients" className="inline-flex items-center justify-center rounded-full border bg-white px-6 py-3 text-sm font-bold shadow-sm transition hover:-translate-y-0.5 hover:shadow-md" style={{ borderColor: palette.border, color: palette.charcoal }}>
+                <Link to="/clients" className="mls-cta-motion inline-flex items-center justify-center rounded-full border bg-white px-6 py-3 text-sm font-bold shadow-sm transition hover:-translate-y-0.5 hover:shadow-md" style={{ borderColor: palette.border, color: palette.charcoal }}>
                   Client Access Information
                 </Link>
               </div>
             </div>
 
             <div className="relative mx-auto w-full max-w-[520px]">
-              <div className="pointer-events-none absolute -right-4 -top-6 h-36 w-36 rounded-full bg-[#dd7d00]/20 blur-2xl" />
+              <div className="mls-ambient-orb pointer-events-none absolute -right-4 -top-6 h-36 w-36 rounded-full bg-[#dd7d00]/20 blur-2xl" />
               <MlsEditorialImage
                 name="inclusive_asl_conversation_in_modern_lounge"
                 alt="A group of diverse adults sharing a signed conversation in a community lounge"
@@ -216,7 +216,7 @@ export default function DeafHardOfHearing({ palette }) {
               </div>
               <div className="flex flex-col justify-center gap-4 bg-white p-7 md:min-w-[320px] md:p-9">
                 <p className="text-sm leading-6 text-[#5f6368]">Need help requesting or coordinating ASL interpreting services?</p>
-                <Link to="/contact" className="inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-bold shadow-md transition hover:-translate-y-0.5 hover:shadow-lg" style={goldButton}>Request Support <ArrowRight size={17} /></Link>
+                <Link to="/contact" className="mls-cta-motion inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-bold shadow-md transition hover:-translate-y-0.5 hover:shadow-lg" style={goldButton}>Request Support <ArrowRight size={17} /></Link>
                 <p className="text-xs font-medium text-[#777]">MLS can help clarify next steps</p>
               </div>
             </div>
