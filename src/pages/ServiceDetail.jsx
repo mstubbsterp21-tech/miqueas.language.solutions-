@@ -1,5 +1,6 @@
 import { useParams, Link } from "react-router-dom";
 import MlsSitePhoto from "../components/MlsSitePhoto";
+import MlsEditorialImage from "../components/MlsEditorialImage";
 import { motion } from "framer-motion";
 import {
   ArrowLeft,
@@ -273,6 +274,33 @@ export default function ServiceDetail({ palette }) {
       </section>
 
       <WorkflowTimeline steps={service.workflow} palette={palette} />
+
+      {serviceId === "video-remote-interpreting" && (
+        <section className="px-5 py-12 md:px-8 md:py-16" aria-labelledby="client-vri-access-heading">
+          <div className="mx-auto grid max-w-6xl items-center gap-8 lg:grid-cols-[0.72fr_1.28fr]">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.gold }}>Before your VRI appointment</p>
+              <h2 id="client-vri-access-heading" className="mt-3 text-3xl font-black leading-tight md:text-4xl" style={{ color: palette.charcoal }}>Set up for communication access.</h2>
+              <p className="mt-4 text-base leading-8 text-[#5f6368]">
+                Check the viewing environment, connection, audio, camera, screen visibility, and placement before the session. Use the illustrated guide to discuss your setup with MLS.
+              </p>
+              <p className="mt-3 text-sm leading-7 text-[#5f6368]">
+                A remote option should support effective participation. Discuss another modality when the setting or technology cannot support communication access.
+              </p>
+            </div>
+            <MlsEditorialImage
+              name="client_vri_accessibility_guide"
+              alt="MLS client VRI setup and accessibility guide with camera, screen, internet, audio, and environment considerations"
+              fit="contain"
+              aspect="aspect-[4/3]"
+              className="w-full"
+              caption="Select to open this visual guide at full size."
+              expand
+              tilt="right"
+            />
+          </div>
+        </section>
+      )}
 
       <section className="px-5 py-12 md:px-8 md:py-16">
         <div className="mx-auto grid max-w-6xl auto-rows-fr gap-6 lg:grid-cols-2">
