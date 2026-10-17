@@ -61,7 +61,7 @@ export default function ResourcesInterpreters({ palette }) {
           <MlsEditorialImage
             name="diverse_team_collaboration_around_conference_table"
             alt="A diverse group of professionals collaborating around a conference table"
-            aspect="aspect-[16/8]"
+            aspect="aspect-[16/11]"
             className="mx-auto mt-11 w-full max-w-[940px]"
             tilt="right"
           />
