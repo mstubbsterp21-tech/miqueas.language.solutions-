@@ -58,7 +58,16 @@ export default function ResourcesInterpreters({ palette }) {
             </div>
           </motion.div>
 
-          <motion.div initial="hidden" animate="show" variants={fadeUp} transition={{ duration: 0.55, delay: 0.08 }} className="mt-12 grid gap-4 md:grid-cols-4">
+          <MlsEditorialImage
+            name="diverse_team_collaboration_around_conference_table"
+            alt="A diverse group of professionals collaborating around a conference table"
+            aspect="aspect-[16/8]"
+            className="mx-auto mt-11 w-full max-w-[940px]"
+            tilt="right"
+          />
+          <p className="mx-auto mt-4 max-w-[940px] text-right text-xs font-semibold text-[#777]">Illustrative professional collaboration scene</p>
+
+          <motion.div initial="hidden" animate="show" variants={fadeUp} transition={{ duration: 0.55, delay: 0.08 }} className="mt-8 grid gap-3 sm:grid-cols-2 md:grid-cols-4">
             {["Credential review", "Screening", "Roster fit", "Assignment matching"].map((item, index) => (
               <div key={item} className="rounded-[1.5rem] border bg-white/85 p-5 text-center shadow-sm backdrop-blur" style={{ borderColor: palette.border }}>
                 <div className="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-full text-sm font-black text-white" style={{ backgroundColor: index % 2 === 0 ? palette.gold : palette.burgundy }}>
@@ -68,14 +77,6 @@ export default function ResourcesInterpreters({ palette }) {
               </div>
             ))}
           </motion.div>
-          <MlsEditorialImage
-            name="diverse_team_collaboration_around_conference_table"
-            alt="A racially diverse group of professionals discussing work around a conference table"
-            aspect="aspect-[16/9]"
-            className="mx-auto mt-11 w-full max-w-[860px] lg:mr-0"
-            caption="Professional connection, preparation, and collaboration."
-            tilt="right"
-          />
         </div>
       </section>
 
@@ -182,7 +183,7 @@ export default function ResourcesInterpreters({ palette }) {
               </motion.a>
             ))}
           </div>
-          <div className="mt-12 grid items-center gap-7 lg:grid-cols-[0.7fr_1.3fr]">
+          <div className="mt-12 grid items-center gap-8 rounded-[2rem] border border-[#721100]/10 bg-[#f8f3ed] p-6 md:p-10 lg:grid-cols-[0.65fr_1.35fr]">
             <div>
               <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.gold }}>For remote interpreters</p>
               <h3 className="mt-3 text-2xl font-black leading-tight md:text-3xl" style={{ color: palette.charcoal }}>Your VRI environment matters.</h3>
@@ -193,7 +194,8 @@ export default function ResourcesInterpreters({ palette }) {
               alt="MLS interpreter VRI technical requirements infographic covering lighting, camera positioning, audio, connectivity, and privacy"
               fit="contain"
               aspect="aspect-[4/3]"
-              className="w-full"
+              className="w-full bg-white"
+              caption="Open the full-size VRI technical guide."
               expand
               tilt="left"
             />
