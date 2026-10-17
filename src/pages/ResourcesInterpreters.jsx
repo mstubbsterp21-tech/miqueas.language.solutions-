@@ -32,7 +32,7 @@ export default function ResourcesInterpreters({ palette }) {
   const goldButton = { backgroundColor: palette.gold, color: palette.white };
 
   return (
-    <div className="overflow-hidden bg-white">
+    <div className="mls-public-site overflow-hidden bg-white">
       <section className="relative px-5 py-14 md:px-8 md:py-20">
         <div className="absolute inset-0 -z-10" style={{ background: "radial-gradient(circle at 12% 18%, rgba(114,17,0,0.14), transparent 30%), radial-gradient(circle at 88% 12%, rgba(221,125,0,0.17), transparent 28%), linear-gradient(180deg, #ffffff 0%, #f7f3ef 100%)" }} />
         <div className="mx-auto max-w-6xl">
@@ -48,11 +48,11 @@ export default function ResourcesInterpreters({ palette }) {
               MLS connects with interpreters who take communication access seriously and understand that good interpreting requires more than availability. It requires preparation, judgment, cultural responsiveness, and professional humility.
             </p>
             <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-              <Link to="/join-our-team" className="inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-bold shadow-md transition hover:-translate-y-0.5 hover:shadow-lg" style={goldButton}>
+              <Link to="/join-our-team" className="mls-cta-motion inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-bold shadow-md transition hover:-translate-y-0.5 hover:shadow-lg" style={goldButton}>
                 Join Our Team
                 <ArrowRight size={17} />
               </Link>
-              <Link to="/services" className="inline-flex items-center justify-center rounded-full border bg-white px-6 py-3 text-sm font-bold shadow-sm transition hover:-translate-y-0.5 hover:shadow-md" style={{ borderColor: palette.border, color: palette.charcoal }}>
+              <Link to="/services" className="mls-cta-motion inline-flex items-center justify-center rounded-full border bg-white px-6 py-3 text-sm font-bold shadow-sm transition hover:-translate-y-0.5 hover:shadow-md" style={{ borderColor: palette.border, color: palette.charcoal }}>
                 View MLS Services
               </Link>
             </div>
@@ -93,11 +93,11 @@ export default function ResourcesInterpreters({ palette }) {
                   Already connected with MLS or finishing onboarding? Use the interpreter portal to review your profile, track document needs, and keep your availability and rate details current.
                 </p>
                 <div className="mt-7 flex flex-col gap-3 sm:flex-row">
-                  <Link to="/login" className="inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-bold shadow-md transition hover:-translate-y-0.5 hover:shadow-lg" style={goldButton}>
+                  <Link to="/login" className="mls-cta-motion inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-bold shadow-md transition hover:-translate-y-0.5 hover:shadow-lg" style={goldButton}>
                     Interpreter Login
                     <ArrowRight size={17} />
                   </Link>
-                  <Link to="/join-our-team" className="inline-flex items-center justify-center rounded-full border border-white/20 bg-white/10 px-6 py-3 text-sm font-bold text-white transition hover:-translate-y-0.5 hover:bg-white/15">
+                  <Link to="/join-our-team" className="mls-cta-motion inline-flex items-center justify-center rounded-full border border-white/20 bg-white/10 px-6 py-3 text-sm font-bold text-white transition hover:-translate-y-0.5 hover:bg-white/15">
                     New to MLS? Apply here
                   </Link>
                 </div>
@@ -210,7 +210,7 @@ export default function ResourcesInterpreters({ palette }) {
               </div>
               <div className="flex flex-col justify-center gap-4 bg-white p-7 md:min-w-[320px] md:p-9">
                 <p className="text-sm leading-6 text-[#5f6368]">Interested in being considered for MLS assignments?</p>
-                <Link to="/join-our-team" className="inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-bold shadow-md transition hover:-translate-y-0.5 hover:shadow-lg" style={goldButton}>Join Our Team <ArrowRight size={17} /></Link>
+                <Link to="/join-our-team" className="mls-cta-motion inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-bold shadow-md transition hover:-translate-y-0.5 hover:shadow-lg" style={goldButton}>Join Our Team <ArrowRight size={17} /></Link>
                 <p className="text-xs font-medium text-[#777]">Application form only available through Join Our Team</p>
               </div>
             </div>
