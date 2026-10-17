@@ -98,7 +98,7 @@ export default function Home({ palette }) {
   const cardStyle = { borderColor: palette.border, backgroundColor: palette.white };
 
   return (
-    <div className="overflow-hidden bg-white">
+    <div className="mls-public-site overflow-hidden bg-white">
       <section className="relative px-5 py-14 md:px-8 md:py-20">
         <div className="absolute inset-0 -z-10" style={{ background: "radial-gradient(circle at 12% 15%, rgba(221,125,0,0.18), transparent 28%), radial-gradient(circle at 92% 8%, rgba(114,17,0,0.14), transparent 32%), linear-gradient(180deg, #ffffff 0%, #f7f3ef 100%)" }} />
         <div className="mx-auto max-w-6xl">
@@ -115,11 +115,11 @@ export default function Home({ palette }) {
                 Miqueas Language Solutions provides interpreting and ASL video translation services with a focus on clarity, preparation, access, and genuine human connection.
               </p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-                <Link to="/contact" className="inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-bold shadow-md transition hover:-translate-y-0.5 hover:shadow-lg" style={goldButton}>
+                <Link to="/contact" className="mls-cta-motion inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-bold shadow-md transition hover:-translate-y-0.5 hover:shadow-lg" style={goldButton}>
                   Request an Interpreter
                   <ArrowRight size={17} />
                 </Link>
-                <Link to="/join-our-team" className="inline-flex items-center justify-center rounded-full border bg-white px-6 py-3 text-sm font-bold shadow-sm transition hover:-translate-y-0.5 hover:shadow-md" style={{ borderColor: palette.border, color: palette.charcoal }}>
+                <Link to="/join-our-team" className="mls-cta-motion inline-flex items-center justify-center rounded-full border bg-white px-6 py-3 text-sm font-bold shadow-sm transition hover:-translate-y-0.5 hover:shadow-md" style={{ borderColor: palette.border, color: palette.charcoal }}>
                   Join Our Team
                 </Link>
               </div>
@@ -134,7 +134,7 @@ export default function Home({ palette }) {
             </div>
 
             <div className="relative mx-auto w-full max-w-[560px] lg:mx-0">
-              <div className="pointer-events-none absolute -right-4 -top-5 h-32 w-32 rounded-full bg-[#dd7d00]/20 blur-2xl" />
+              <div className="mls-ambient-orb pointer-events-none absolute -right-4 -top-5 h-32 w-32 rounded-full bg-[#dd7d00]/20 blur-2xl" />
               <motion.div
                 initial={{ opacity: 0, x: 25 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -268,11 +268,11 @@ export default function Home({ palette }) {
                   <h2 className="mt-4 text-3xl font-black leading-tight md:text-4xl" style={{ color: palette.charcoal }}>{featuredArticle.title}</h2>
                   <p className="mt-4 text-lg leading-8 text-[#555]">{featuredArticle.excerpt}</p>
                   <div className="mt-7 flex flex-col gap-3 sm:flex-row">
-                    <Link to={`/blog/${featuredArticle.slug}`} className="inline-flex w-fit items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-bold text-white shadow-md transition hover:-translate-y-0.5 hover:shadow-lg" style={{ backgroundColor: palette.burgundy }}>
+                    <Link to={`/blog/${featuredArticle.slug}`} className="mls-cta-motion inline-flex w-fit items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-bold text-white shadow-md transition hover:-translate-y-0.5 hover:shadow-lg" style={{ backgroundColor: palette.burgundy }}>
                       Read Featured Article
                       <ArrowRight size={17} />
                     </Link>
-                    <Link to="/blog" className="inline-flex w-fit items-center justify-center rounded-full border bg-white px-6 py-3 text-sm font-bold shadow-sm transition hover:-translate-y-0.5 hover:shadow-md" style={{ borderColor: palette.border, color: palette.charcoal }}>
+                    <Link to="/blog" className="mls-cta-motion inline-flex w-fit items-center justify-center rounded-full border bg-white px-6 py-3 text-sm font-bold shadow-sm transition hover:-translate-y-0.5 hover:shadow-md" style={{ borderColor: palette.border, color: palette.charcoal }}>
                       View All Articles
                     </Link>
                   </div>
@@ -371,8 +371,8 @@ export default function Home({ palette }) {
             </div>
             <div className="flex flex-col justify-center gap-4 bg-white p-7 md:min-w-[340px] md:p-9">
               <p className="text-sm leading-6 text-[#5f6368]">Ready to start a request?</p>
-              <Link to="/contact" className="inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-bold shadow-md transition hover:-translate-y-0.5 hover:shadow-lg" style={goldButton}>Request Services <ArrowRight size={17} /></Link>
-              <Link to="/services" className="inline-flex items-center justify-center gap-2 rounded-full border bg-white px-6 py-3 text-sm font-bold shadow-sm transition hover:-translate-y-0.5 hover:shadow-md" style={{ borderColor: palette.border, color: palette.charcoal }}>View Services</Link>
+              <Link to="/contact" className="mls-cta-motion inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-bold shadow-md transition hover:-translate-y-0.5 hover:shadow-lg" style={goldButton}>Request Services <ArrowRight size={17} /></Link>
+              <Link to="/services" className="mls-cta-motion inline-flex items-center justify-center gap-2 rounded-full border bg-white px-6 py-3 text-sm font-bold shadow-sm transition hover:-translate-y-0.5 hover:shadow-md" style={{ borderColor: palette.border, color: palette.charcoal }}>View Services</Link>
             </div>
           </div>
         </div>
