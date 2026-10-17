@@ -133,38 +133,59 @@ export default function Home({ palette }) {
               </div>
             </div>
 
-            <div className="relative mx-auto w-full max-w-[430px] lg:mx-0">
-              <div className="absolute -right-6 -top-6 h-28 w-28 rounded-full opacity-20" style={{ backgroundColor: palette.burgundy }} />
-              <div className="absolute -bottom-6 -left-6 h-24 w-24 rounded-full opacity-80" style={{ backgroundColor: palette.gold }} />
-              <div className="relative rounded-[2.2rem] border bg-white p-4 shadow-2xl md:p-5" style={{ borderColor: palette.border }}>
-                <MlsSitePhoto name="home-hero" alt="Illustrative ASL interpreting in a diverse professional meeting" priority className="mb-4 aspect-[4/3] object-cover" />
-                <div className="rounded-[1.8rem] bg-[#202020] p-6 text-white md:p-7">
-                  <div className="flex items-start justify-between gap-4 border-b border-white/10 pb-5">
-                    <div>
-                      <p className="text-xs font-bold uppercase tracking-[0.18em] text-white/50">MLS approach</p>
-                      <h2 className="mt-3 text-2xl font-black leading-tight">Clear communication. Professional presence. Reliable access.</h2>
-                    </div>
-                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl" style={{ backgroundColor: palette.gold }}>
-                      <MonitorSmartphone size={22} color="#ffffff" />
-                    </div>
-                  </div>
-                  <div className="mt-6 grid gap-3 sm:grid-cols-2">
-                    {sectors.map(({ icon: Icon, label, description }) => (
-                      <div key={label} className="min-h-[145px] rounded-2xl border border-white/10 bg-white/[0.06] p-4">
-                        <Icon size={20} style={{ color: palette.gold }} />
-                        <h3 className="mt-3 text-sm font-black text-white">{label}</h3>
-                        <p className="mt-2 text-xs leading-5 text-white/65">{description}</p>
-                      </div>
-                    ))}
-                  </div>
+            <div className="relative mx-auto w-full max-w-[560px] lg:mx-0">
+              <div className="pointer-events-none absolute -right-4 -top-5 h-32 w-32 rounded-full bg-[#dd7d00]/20 blur-2xl" />
+              <motion.div
+                initial={{ opacity: 0, x: 25 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.7, delay: 0.12 }}
+                className="relative overflow-hidden rounded-[2rem] border-4 border-white bg-[#f7f3ef] shadow-[0_28px_70px_-28px_rgba(70,24,10,0.4)]"
+              >
+                <MlsSitePhoto
+                  name="home-hero"
+                  alt="Diverse participants communicating with ASL interpretation in a professional meeting"
+                  priority
+                  className="!rounded-none aspect-[4/3] object-cover"
+                />
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, y: 25 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.55, delay: 0.3 }}
+                className="relative z-10 -mt-7 ml-auto w-[92%] rounded-[1.35rem] border border-white/10 bg-[#202020] px-5 py-5 text-white shadow-2xl sm:w-[80%] sm:px-7"
+              >
+                <p className="text-[11px] font-bold uppercase tracking-[0.2em]" style={{ color: palette.gold }}>People first. Access always.</p>
+                <p className="mt-2 text-xl font-black leading-snug">Communication access that puts the conversation—not the process—first.</p>
+                <div className="mt-4 flex flex-wrap gap-2 text-[11px] font-semibold text-white/75">
+                  <span className="rounded-full border border-white/20 px-3 py-1">In person</span>
+                  <span className="rounded-full border border-white/20 px-3 py-1">Remote</span>
+                  <span className="rounded-full border border-white/20 px-3 py-1">ASL translation</span>
                 </div>
-                <div className="mt-4 rounded-[1.5rem] border bg-[#f7f3ef] p-5" style={{ borderColor: palette.border }}>
-                  <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.gold }}>Why MLS</p>
-                  <p className="mt-2 text-xl font-black leading-tight" style={{ color: palette.charcoal }}>A personable experience that helps clients feel supported, not processed.</p>
-                </div>
-              </div>
+              </motion.div>
             </div>
           </motion.div>
+        </div>
+      </section>
+
+
+      <section className="border-y border-[#721100]/10 bg-[#faf7f3] px-5 py-9 md:px-8 md:py-12" aria-labelledby="mls-sectors-heading">
+        <div className="mx-auto max-w-6xl">
+          <motion.div initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} variants={fadeUp} transition={{ duration: 0.45 }} className="mb-6 flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <p className="text-xs font-black uppercase tracking-[0.18em]" style={{ color: palette.burgundy }}>Who we support</p>
+              <h2 id="mls-sectors-heading" className="mt-2 text-2xl font-black md:text-3xl" style={{ color: palette.charcoal }}>Communication matters in every setting.</h2>
+            </div>
+            <Link to="/services" className="inline-flex items-center gap-2 text-sm font-bold" style={{ color: palette.burgundy }}>Explore services <ArrowRight size={16} /></Link>
+          </motion.div>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {sectors.map(({ icon: Icon, label, description }, index) => (
+              <motion.div key={label} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} variants={fadeUp} transition={{ duration: 0.4, delay: index * 0.08 }} className="rounded-[1.3rem] border border-[#721100]/10 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+                <Icon size={24} style={{ color: palette.gold }} />
+                <h3 className="mt-3 text-base font-black" style={{ color: palette.charcoal }}>{label}</h3>
+                <p className="mt-2 text-sm leading-6 text-[#656565]">{description}</p>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -174,18 +195,30 @@ export default function Home({ palette }) {
             <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.gold }}>Services</p>
             <h2 className="mt-3 text-3xl font-black tracking-tight md:text-5xl" style={{ color: palette.charcoal }}>Choose the service path that fits the communication need.</h2>
           </motion.div>
-          <div className="grid auto-rows-fr gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <div className="grid auto-rows-fr gap-5 md:grid-cols-2 lg:grid-cols-12">
             {serviceCards.map(({ icon: Icon, title, path, copy, image }, index) => (
-              <motion.div key={title} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.25 }} variants={fadeUp} transition={{ duration: 0.45, delay: index * 0.04 }} className="group h-full rounded-[1.6rem] border bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-lg" style={cardStyle}>
-                <MlsSitePhoto name={image} alt={`Illustrative ${title.toLowerCase()} service scene`} className="mb-4 aspect-[4/3]" />
-                <div className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-2xl" style={{ backgroundColor: "rgba(221,125,0,0.12)", color: palette.gold }}><Icon size={22} /></div>
-                <h3 className="text-lg font-black" style={{ color: palette.charcoal }}>{title}</h3>
-                <p className="mt-3 text-sm leading-7 text-[#666]">{copy}</p>
-                <Link to={path} className="mt-6 inline-flex items-center gap-2 text-sm font-bold transition group-hover:gap-3" style={{ color: palette.gold }}>
-                  Explore service
-                  <ArrowRight size={16} />
+              <motion.article
+                key={title}
+                initial="hidden"
+                whileInView="show"
+                viewport={{ once: true, amount: 0.15 }}
+                variants={fadeUp}
+                transition={{ duration: 0.55, delay: index * 0.08 }}
+                className={`group flex h-full min-w-0 flex-col overflow-hidden rounded-[1.7rem] border border-[#721100]/10 bg-white shadow-sm transition-all duration-500 hover:-translate-y-1 hover:shadow-xl ${index === 0 || index === 3 ? "lg:col-span-7" : "lg:col-span-5"}`}
+              >
+                <Link to={path} className="block overflow-hidden bg-[#f7f3ef] focus-visible:outline focus-visible:outline-4 focus-visible:outline-[#dd7d00]" aria-label={`Explore ${title}`}>
+                  <MlsSitePhoto name={image} alt={`Illustration of ${title.toLowerCase()} in a professional setting`} className="!rounded-none aspect-[16/10] object-cover transition-transform duration-700 group-hover:scale-[1.035] motion-reduce:transition-none motion-reduce:transform-none" />
                 </Link>
-              </motion.div>
+                <div className="flex flex-1 flex-col px-6 pb-7 pt-6 md:px-8">
+                  <div className="mb-3 flex items-center gap-3">
+                    <Icon size={22} style={{ color: palette.gold }} />
+                    <span className="text-[11px] font-bold uppercase tracking-[0.18em]" style={{ color: palette.burgundy }}>MLS Services</span>
+                  </div>
+                  <h3 className="text-2xl font-black leading-tight" style={{ color: palette.charcoal }}>{title}</h3>
+                  <p className="mt-3 max-w-xl text-sm leading-7 text-[#626262]">{copy}</p>
+                  <Link to={path} className="mt-auto inline-flex w-fit items-center gap-2 pt-6 text-sm font-bold group-hover:gap-3 transition-all" style={{ color: palette.burgundy }}>Explore service <ArrowRight size={16} /></Link>
+                </div>
+              </motion.article>
             ))}
           </div>
         </div>
