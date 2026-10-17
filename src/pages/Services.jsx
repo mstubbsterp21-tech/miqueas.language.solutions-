@@ -148,27 +148,14 @@ export default function Services({ palette }) {
               </div>
             </div>
 
-            <div className="relative">
-              <div className="absolute -right-7 -top-7 h-32 w-32 rounded-full opacity-20" style={{ backgroundColor: palette.burgundy }} />
-              <div className="absolute -bottom-7 -left-7 h-28 w-28 rounded-full opacity-80" style={{ backgroundColor: palette.gold }} />
-              <div className="relative rounded-[2.2rem] border bg-white p-5 shadow-2xl" style={{ borderColor: palette.border }}>
-                <div className="rounded-[1.8rem] bg-[#202020] p-6 text-white">
-                  <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.gold }}>Service catalog</p>
-                  <h2 className="mt-3 text-2xl font-black leading-tight">Live access and recorded language solutions.</h2>
-                  <div className="mt-6 grid gap-3">
-                    {serviceCards.map(({ icon: Icon, title }) => (
-                      <div key={title} className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.06] p-4">
-                        <Icon size={21} style={{ color: palette.gold }} />
-                        <span className="text-sm font-bold">{title}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                <div className="mt-4 rounded-[1.5rem] border bg-[#f7f3ef] p-5" style={{ borderColor: palette.border }}>
-                  <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.gold }}>One intake standard</p>
-                  <p className="mt-2 text-xl font-black leading-tight" style={{ color: palette.charcoal }}>Every service starts with the details needed to quote responsibly.</p>
-                </div>
-              </div>
+            <div className="relative mx-auto w-full max-w-[540px]">
+              <motion.div initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.65, delay: 0.1 }} className="relative overflow-hidden rounded-[2rem] border-4 border-white bg-[#f7f3ef] shadow-[0_28px_70px_-30px_rgba(70,24,10,0.4)]">
+                <MlsSitePhoto name="in-person-interpreting" alt="A professional ASL interpreter assisting communication in a healthcare setting" className="!rounded-none aspect-[4/3] object-cover" priority />
+              </motion.div>
+              <motion.div initial={{ opacity: 0, y: 22 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.25 }} className="relative z-10 -mt-7 ml-auto max-w-[88%] rounded-[1.3rem] bg-[#202020] p-5 text-white shadow-xl md:p-6">
+                <p className="text-xs font-black uppercase tracking-[0.15em]" style={{ color: palette.gold }}>Focused on your needs</p>
+                <p className="mt-2 text-lg font-bold leading-snug">Live interpreting and recorded ASL translation, coordinated with care.</p>
+              </motion.div>
             </div>
           </motion.div>
         </div>
@@ -197,24 +184,33 @@ export default function Services({ palette }) {
             <h2 className="mt-3 text-3xl font-black tracking-tight md:text-5xl" style={{ color: palette.charcoal }}>Different needs call for different workflows.</h2>
           </motion.div>
 
-          <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+          <div className="space-y-8 md:space-y-10">
             {serviceCards.map((card, index) => {
               const Icon = card.icon;
               return (
-                <motion.div key={card.title} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.25 }} variants={fadeUp} transition={{ duration: 0.45, delay: index * 0.04 }} className="group relative overflow-hidden rounded-[1.75rem] border bg-white p-6 shadow-sm transition-all duration-500 hover:-translate-y-1.5 hover:shadow-xl" style={cardStyle}>
-                  <div className="pointer-events-none absolute inset-x-0 top-0 h-1 origin-left scale-x-0 transition-transform duration-500 group-hover:scale-x-100" style={{ backgroundColor: palette.gold }} />
-                  <MlsSitePhoto name={card.image} alt={`Illustrative ${card.title.toLowerCase()} service scene`} className="mb-5 aspect-[4/3]" />
-                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl" style={{ backgroundColor: "rgba(221,125,0,0.12)", color: palette.gold }}>
-                    <Icon size={23} />
-                  </div>
-                  <h3 className="mt-5 text-xl font-black" style={{ color: palette.charcoal }}>{card.title}</h3>
-                  <p className="mt-3 text-sm leading-7 text-[#666]">{card.text}</p>
-                  <p className="mt-4 text-xs font-bold uppercase tracking-[0.12em]" style={{ color: palette.burgundy }}>{card.label}</p>
-                  <Link to={`/services/${card.id}`} className="mt-7 inline-flex items-center gap-2 text-sm font-bold transition group-hover:gap-3" style={{ color: palette.gold }}>
-                    Explore this service
-                    <ArrowRight size={16} />
+                <motion.article
+                  key={card.title}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.15 }}
+                  transition={{ duration: 0.58, delay: 0.06 }}
+                  className="group grid min-w-0 items-center gap-0 overflow-hidden rounded-[2rem] border border-[#721100]/10 bg-white shadow-sm transition-shadow duration-500 hover:shadow-xl lg:grid-cols-2"
+                >
+                  <Link to={`/services/${card.id}`} aria-label={`Learn more about ${card.title}`} className={`block overflow-hidden bg-[#f7f3ef] focus-visible:outline focus-visible:outline-4 focus-visible:outline-[#dd7d00] ${index % 2 ? "lg:order-2" : ""}`}>
+                    <MlsSitePhoto name={card.image} alt={`Illustration of ${card.title.toLowerCase()} in practice`} className="!rounded-none aspect-[4/3] w-full object-cover transition-transform duration-700 group-hover:scale-[1.035] motion-reduce:transform-none motion-reduce:transition-none" />
                   </Link>
-                </motion.div>
+                  <div className="flex flex-col justify-center p-7 md:p-10 lg:p-12">
+                    <div className="mb-5 flex items-center gap-3">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-2xl" style={{ backgroundColor: "rgba(221,125,0,0.12)", color: palette.gold }}><Icon size={23} /></div>
+                      <p className="text-xs font-black uppercase tracking-[0.15em]" style={{ color: palette.burgundy }}>{card.label}</p>
+                    </div>
+                    <h3 className="text-3xl font-black leading-tight" style={{ color: palette.charcoal }}>{card.title}</h3>
+                    <p className="mt-5 max-w-md text-base leading-8 text-[#626262]">{card.text}</p>
+                    <Link to={`/services/${card.id}`} className="mt-7 inline-flex w-fit items-center gap-2 rounded-full border px-5 py-3 text-sm font-bold transition-all duration-300 group-hover:gap-3 group-hover:shadow-md" style={{ borderColor: palette.border, color: palette.burgundy }}>
+                      Explore this service <ArrowRight size={17} />
+                    </Link>
+                  </div>
+                </motion.article>
               );
             })}
           </div>
