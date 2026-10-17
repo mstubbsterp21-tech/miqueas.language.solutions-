@@ -1,6 +1,7 @@
 import { motion, useReducedMotion } from "framer-motion";
 import { Link } from "react-router-dom";
 import MlsSitePhoto from "../components/MlsSitePhoto";
+import ServiceFinder from "../components/ServiceFinder";
 import {
   ArrowRight,
   BriefcaseBusiness,
@@ -159,6 +160,12 @@ export default function Services({ palette }) {
               </motion.div>
             </div>
           </motion.div>
+        </div>
+      </section>
+
+      <section id="service-finder" aria-labelledby="service-finder-title" className="scroll-mt-44 px-5 py-12 md:px-8 md:py-16">
+        <div className="mx-auto max-w-6xl">
+          <ServiceFinder />
         </div>
       </section>
 

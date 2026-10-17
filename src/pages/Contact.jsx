@@ -1,4 +1,6 @@
 import InterpreterRequestForm from "../components/InterpreterRequestForm";
+import { useSearchParams } from "react-router-dom";
+import { INTERPRETER_REQUEST_SERVICE_OPTIONS, INTERPRETER_REQUEST_SETTING_OPTIONS } from "../requestFormConfig";
 import { motion } from "framer-motion";
 import { CalendarCheck2, ClipboardList, Mail, MessageSquareText, Phone, Send, Sparkles } from "lucide-react";
 
@@ -41,6 +43,13 @@ const contactMethods = [
 ];
 
 export default function Contact({ palette }) {
+  const [searchParams] = useSearchParams();
+  const requestedService = searchParams.get("service") || "";
+  const requestedSetting = searchParams.get("setting") || "";
+  const initialValues = {
+    serviceNeeded: INTERPRETER_REQUEST_SERVICE_OPTIONS.includes(requestedService) ? requestedService : "",
+    setting: INTERPRETER_REQUEST_SETTING_OPTIONS.includes(requestedSetting) ? requestedSetting : "",
+  };
   const cardStyle = { borderColor: palette.border, backgroundColor: palette.white };
   const goldButton = { backgroundColor: palette.gold, color: palette.white };
 
@@ -136,7 +145,7 @@ export default function Contact({ palette }) {
         </div>
       </section>
 
-      <section id="request-form" className="px-5 py-12 md:px-8 md:py-16">
+      <section id="request-form" className="scroll-mt-44 px-5 py-12 md:px-8 md:py-16">
         <div className="mx-auto max-w-6xl">
           <motion.div initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} variants={fadeUp} transition={{ duration: 0.45 }} className="mb-8 max-w-3xl">
             <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.gold }}>Request form</p>
@@ -145,7 +154,7 @@ export default function Contact({ palette }) {
               Fill out the form with as much information as you have. The more complete the request, the easier it is to review fit, availability, and next steps.
             </p>
           </motion.div>
-          <InterpreterRequestForm palette={palette} />
+          <InterpreterRequestForm palette={palette} initialValues={initialValues} />
         </div>
       </section>
 

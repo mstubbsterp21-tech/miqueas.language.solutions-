@@ -9,7 +9,7 @@ const defaultPalette = {
   border: "#e5e5e5",
 };
 
-export default function InterpreterRequestForm({ palette = defaultPalette }) {
+export default function InterpreterRequestForm({ palette = defaultPalette, initialValues = {} }) {
   const scriptUrl =
     import.meta.env.VITE_GOOGLE_SCRIPT_URL ||
     "https://script.google.com/macros/s/AKfycbwVCk2VeLlWlMFDY5r_SIR3nSgv4vQ7mOVZ2jmF5vacH3AP50BixZh-IdVqryu0LJ0/exec";
@@ -32,6 +32,7 @@ export default function InterpreterRequestForm({ palette = defaultPalette }) {
   return (
     <InterpreterRequestFormShared
       palette={{ ...defaultPalette, ...palette }}
+      initialValues={initialValues}
       onSubmitRequest={submitToWebsiteRequestSheet}
       successTitle="Request Submitted Successfully"
       successMessage="Your interpreter request was submitted successfully. MLS will review the details and follow up with you about availability and next steps. Submitting a request does not confirm interpreter coverage."
