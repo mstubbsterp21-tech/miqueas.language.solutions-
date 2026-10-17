@@ -145,7 +145,7 @@ export default function Contact({ palette }) {
         </div>
       </section>
 
-      <section id="request-form" className="px-5 py-12 md:px-8 md:py-16">
+      <section id="request-form" className="scroll-mt-44 px-5 py-12 md:px-8 md:py-16">
         <div className="mx-auto max-w-6xl">
           <motion.div initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} variants={fadeUp} transition={{ duration: 0.45 }} className="mb-8 max-w-3xl">
             <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.gold }}>Request form</p>
