@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { Link } from "react-router-dom";
 import MlsSitePhoto from "../components/MlsSitePhoto";
 import {
@@ -109,6 +109,7 @@ const useCases = [
 ];
 
 export default function Services({ palette }) {
+  const reduceMotion = useReducedMotion();
   const cardStyle = { borderColor: palette.border, backgroundColor: palette.white };
   const goldButton = { backgroundColor: palette.gold, color: palette.white };
 
@@ -149,10 +150,10 @@ export default function Services({ palette }) {
             </div>
 
             <div className="relative mx-auto w-full max-w-[540px]">
-              <motion.div initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.65, delay: 0.1 }} className="relative overflow-hidden rounded-[2rem] border-4 border-white bg-[#f7f3ef] shadow-[0_28px_70px_-30px_rgba(70,24,10,0.4)]">
+              <motion.div initial={reduceMotion ? false : { opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.65, delay: 0.1 }} className="relative overflow-hidden rounded-[2rem] border-4 border-white bg-[#f7f3ef] shadow-[0_28px_70px_-30px_rgba(70,24,10,0.4)]">
                 <MlsSitePhoto name="in-person-interpreting" alt="A professional ASL interpreter assisting communication in a healthcare setting" className="!rounded-none aspect-[4/3] object-cover" priority />
               </motion.div>
-              <motion.div initial={{ opacity: 0, y: 22 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.25 }} className="relative z-10 -mt-7 ml-auto max-w-[88%] rounded-[1.3rem] bg-[#202020] p-5 text-white shadow-xl md:p-6">
+              <motion.div initial={reduceMotion ? false : { opacity: 0, y: 22 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.25 }} className="relative z-10 -mt-7 ml-auto max-w-[88%] rounded-[1.3rem] bg-[#202020] p-5 text-white shadow-xl md:p-6">
                 <p className="text-xs font-black uppercase tracking-[0.15em]" style={{ color: palette.gold }}>Focused on your needs</p>
                 <p className="mt-2 text-lg font-bold leading-snug">Live interpreting and recorded ASL translation, coordinated with care.</p>
               </motion.div>
@@ -190,7 +191,7 @@ export default function Services({ palette }) {
               return (
                 <motion.article
                   key={card.title}
-                  initial={{ opacity: 0, y: 30 }}
+                  initial={reduceMotion ? false : { opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, amount: 0.15 }}
                   transition={{ duration: 0.58, delay: 0.06 }}
