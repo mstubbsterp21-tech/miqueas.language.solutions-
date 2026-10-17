@@ -45,7 +45,7 @@ export default function Contact({ palette }) {
   const goldButton = { backgroundColor: palette.gold, color: palette.white };
 
   return (
-    <div className="overflow-hidden bg-white">
+    <div className="mls-public-site overflow-hidden bg-white">
       <section className="relative px-5 py-14 md:px-8 md:py-20">
         <div
           className="absolute inset-0 -z-10"
@@ -77,11 +77,11 @@ export default function Contact({ palette }) {
                 Whether you are ready to submit details, need help thinking through the request, or have something urgent, this page helps you choose the best way to connect.
               </p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-                <a href="#request-form" className="inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-bold shadow-md transition hover:-translate-y-0.5 hover:shadow-lg" style={goldButton}>
+                <a href="#request-form" className="mls-cta-motion inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-bold shadow-md transition hover:-translate-y-0.5 hover:shadow-lg" style={goldButton}>
                   Submit Request
                   <Send size={17} />
                 </a>
-                <a href="#info-session" className="inline-flex items-center justify-center rounded-full border bg-white px-6 py-3 text-sm font-bold shadow-sm transition hover:-translate-y-0.5 hover:shadow-md" style={{ borderColor: palette.border, color: palette.charcoal }}>
+                <a href="#info-session" className="mls-cta-motion inline-flex items-center justify-center rounded-full border bg-white px-6 py-3 text-sm font-bold shadow-sm transition hover:-translate-y-0.5 hover:shadow-md" style={{ borderColor: palette.border, color: palette.charcoal }}>
                   Book Info Session
                 </a>
               </div>
@@ -190,8 +190,8 @@ export default function Contact({ palette }) {
             </div>
             <div className="flex flex-col justify-center gap-4 bg-white p-7 md:min-w-[360px] md:p-9">
               <p className="text-sm leading-6 text-[#5f6368]">Have an urgent request?</p>
-              <a href="tel:+13213798010" className="inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-bold shadow-md transition hover:-translate-y-0.5 hover:shadow-lg" style={goldButton}>Call Now <Phone size={17} /></a>
-              <a href="mailto:m.stubbs@miqueaslanguagesolutions.com?subject=Urgent%20Interpreting%20Request&body=Hi%20Micah%2C%0A%0AThis%20is%20an%20urgent%20request.%20Here%20are%20my%20details%3A%0A%0AService%20needed%3A%0ADate%3A%0ATime%3A%0ALocation%20or%20platform%3A%0AOrganization%3A%0AAdditional%20details%3A%0A%0AThank%20you." className="inline-flex items-center justify-center gap-2 rounded-full border bg-white px-6 py-3 text-sm font-bold shadow-sm transition hover:-translate-y-0.5 hover:shadow-md" style={{ borderColor: palette.border, color: palette.charcoal }}>Email Us <Mail size={17} /></a>
+              <a href="tel:+13213798010" className="mls-cta-motion inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-bold shadow-md transition hover:-translate-y-0.5 hover:shadow-lg" style={goldButton}>Call Now <Phone size={17} /></a>
+              <a href="mailto:m.stubbs@miqueaslanguagesolutions.com?subject=Urgent%20Interpreting%20Request&body=Hi%20Micah%2C%0A%0AThis%20is%20an%20urgent%20request.%20Here%20are%20my%20details%3A%0A%0AService%20needed%3A%0ADate%3A%0ATime%3A%0ALocation%20or%20platform%3A%0AOrganization%3A%0AAdditional%20details%3A%0A%0AThank%20you." className="mls-cta-motion inline-flex items-center justify-center gap-2 rounded-full border bg-white px-6 py-3 text-sm font-bold shadow-sm transition hover:-translate-y-0.5 hover:shadow-md" style={{ borderColor: palette.border, color: palette.charcoal }}>Email Us <Mail size={17} /></a>
             </div>
           </div>
         </div>
