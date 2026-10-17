@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import MlsEditorialImage from "../components/MlsEditorialImage";
 import { Link } from "react-router-dom";
 import { ArrowRight, Building2, CalendarCheck2, ClipboardList, FileText, HeartHandshake, MapPin, MessageSquareText, ShieldCheck, Users } from "lucide-react";
@@ -38,6 +38,7 @@ const resourceLinks = [
 ];
 
 export default function ResourcesClients({ palette }) {
+  const reduceMotion = useReducedMotion();
   const cardStyle = { borderColor: palette.border, backgroundColor: palette.white };
   const goldButton = { backgroundColor: palette.gold, color: palette.white };
 
@@ -77,7 +78,7 @@ export default function ResourcesClients({ palette }) {
                 priority
                 tilt="right"
               />
-              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.2 }} className="relative z-10 -mt-7 ml-auto w-[92%] rounded-[1.25rem] border border-[#721100]/10 bg-white p-5 shadow-xl sm:w-[83%] md:p-6">
+              <motion.div initial={reduceMotion ? false : { opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.2 }} className="relative z-10 -mt-7 ml-auto w-[92%] rounded-[1.25rem] border border-[#721100]/10 bg-white p-5 shadow-xl sm:w-[83%] md:p-6">
                 <p className="text-xs font-black uppercase tracking-[0.16em]" style={{ color: palette.burgundy }}>Prepared from the start</p>
                 <p className="mt-2 text-lg font-bold leading-snug" style={{ color: palette.charcoal }}>Share the details you know. We'll help identify the next steps.</p>
               </motion.div>
