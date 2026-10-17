@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import MlsEditorialImage from "../components/MlsEditorialImage";
 import { Link } from "react-router-dom";
 import { ArrowRight, Building2, CalendarCheck2, ClipboardList, FileText, HeartHandshake, MapPin, MessageSquareText, ShieldCheck, Users } from "lucide-react";
 
@@ -66,6 +67,13 @@ export default function ResourcesClients({ palette }) {
                   View Services
                 </Link>
               </div>
+              <MlsEditorialImage
+                name="collaborative_meeting_with_sign_language"
+                alt="An interpreter and participants discussing plans together at a table"
+                aspect="aspect-[16/8]"
+                className="mt-7 max-w-[475px] lg:-ml-4"
+                tilt="left"
+              />
             </div>
 
             <div className="relative mx-auto w-full max-w-[520px] lg:mx-0">
@@ -131,6 +139,16 @@ export default function ResourcesClients({ palette }) {
               ))}
             </div>
           </div>
+          <MlsEditorialImage
+            name="three_step_language_solutions_workflow"
+            alt="MLS three-step booking overview: request, review, and confirm"
+            fit="contain"
+            aspect="aspect-[4/3]"
+            className="mx-auto mt-9 w-full max-w-[760px]"
+            caption="Visual overview of the request, review, and confirmation process. Select to view full size."
+            expand
+            tilt="right"
+          />
         </div>
       </section>
 
