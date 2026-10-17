@@ -103,7 +103,6 @@ const settingToRequest = {
   medical: "Medical",
   mental: "Mental Health",
   legal: "Legal",
-  education: "Edu. K-12",
   business: "Business",
   event: "Platform / Conference",
   community: "General / Community",
