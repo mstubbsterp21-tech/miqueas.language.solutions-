@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import MlsEditorialImage from "../components/MlsEditorialImage";
 import { Link } from "react-router-dom";
 import { ArrowRight, BookOpenCheck, BriefcaseBusiness, Building2, CheckCircle2, Ear, FileText, GraduationCap, HandHeart, HeartHandshake, MessageCircle, ShieldCheck, Stethoscope, Users } from "lucide-react";
 
@@ -68,6 +69,14 @@ export default function DeafHardOfHearing({ palette }) {
             <div className="relative">
               <div className="absolute -right-7 -top-7 h-32 w-32 rounded-full opacity-20" style={{ backgroundColor: palette.burgundy }} />
               <div className="absolute -bottom-7 -left-7 h-28 w-28 rounded-full opacity-80" style={{ backgroundColor: palette.gold }} />
+              <MlsEditorialImage
+                name="inclusive_asl_conversation_in_modern_lounge"
+                alt="Diverse adults sharing a signed conversation in a bright community lounge"
+                aspect="aspect-[5/4]"
+                className="mb-6 lg:-ml-5 lg:mr-5"
+                tilt="right"
+                priority
+              />
               <div className="relative rounded-[2.2rem] border bg-white p-5 shadow-2xl" style={{ borderColor: palette.border }}>
                 <div className="rounded-[1.8rem] bg-[#202020] p-6 text-white">
                   <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.gold }}>Self-advocacy toolkit</p>
