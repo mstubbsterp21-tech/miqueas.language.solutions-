@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import MlsEditorialImage from "../components/MlsEditorialImage";
 import { Link } from "react-router-dom";
 import { ArrowRight, BookOpenCheck, BriefcaseBusiness, Building2, CheckCircle2, Ear, FileText, GraduationCap, HandHeart, HeartHandshake, MessageCircle, ShieldCheck, Stethoscope, Users } from "lucide-react";
@@ -35,6 +35,7 @@ const resources = [
 ];
 
 export default function DeafHardOfHearing({ palette }) {
+  const reduceMotion = useReducedMotion();
   const cardStyle = { borderColor: palette.border, backgroundColor: palette.white };
   const goldButton = { backgroundColor: palette.gold, color: palette.white };
 
@@ -76,7 +77,7 @@ export default function DeafHardOfHearing({ palette }) {
                 tilt="right"
                 priority
               />
-              <motion.div initial={{ opacity: 0, y: 22 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.25 }} className="relative z-10 -mt-6 ml-auto w-[91%] rounded-[1.3rem] bg-[#202020] p-5 text-white shadow-xl sm:w-[83%] sm:p-6">
+              <motion.div initial={reduceMotion ? false : { opacity: 0, y: 22 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.25 }} className="relative z-10 -mt-6 ml-auto w-[91%] rounded-[1.3rem] bg-[#202020] p-5 text-white shadow-xl sm:w-[83%] sm:p-6">
                 <p className="text-xs font-black uppercase tracking-[0.17em]" style={{ color: palette.gold }}>Your communication matters</p>
                 <p className="mt-2 text-lg font-bold leading-snug">Being present isn't the same as being able to participate.</p>
               </motion.div>
