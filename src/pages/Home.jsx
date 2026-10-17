@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import {
   ArrowRight,
   BadgeCheck,
@@ -39,6 +39,7 @@ const serviceCards = [
 ];
 
 export default function Home({ palette }) {
+  const reduceMotion = useReducedMotion();
   const [activeTestimonial, setActiveTestimonial] = useState(0);
   const featuredArticle = getFeaturedBlogPost();
   const featuredImage = getBlogPostImage(featuredArticle);
@@ -80,11 +81,12 @@ export default function Home({ palette }) {
   ];
 
   useEffect(() => {
+    if (reduceMotion) return undefined;
     const interval = window.setInterval(() => {
       setActiveTestimonial((current) => (current + 1) % testimonials.length);
     }, 6000);
     return () => window.clearInterval(interval);
-  }, [testimonials.length]);
+  }, [testimonials.length, reduceMotion]);
 
   const goToPreviousTestimonial = () => {
     setActiveTestimonial((current) => (current === 0 ? testimonials.length - 1 : current - 1));
@@ -136,7 +138,7 @@ export default function Home({ palette }) {
             <div className="relative mx-auto w-full max-w-[560px] lg:mx-0">
               <div className="mls-ambient-orb pointer-events-none absolute -right-4 -top-5 h-32 w-32 rounded-full bg-[#dd7d00]/20 blur-2xl" />
               <motion.div
-                initial={{ opacity: 0, x: 25 }}
+                initial={reduceMotion ? false : { opacity: 0, x: 25 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.7, delay: 0.12 }}
                 className="relative overflow-hidden rounded-[2rem] border-4 border-white bg-[#f7f3ef] shadow-[0_28px_70px_-28px_rgba(70,24,10,0.4)]"
@@ -149,7 +151,7 @@ export default function Home({ palette }) {
                 />
               </motion.div>
               <motion.div
-                initial={{ opacity: 0, y: 25 }}
+                initial={reduceMotion ? false : { opacity: 0, y: 25 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.55, delay: 0.3 }}
                 className="relative z-10 -mt-7 ml-auto w-[92%] rounded-[1.35rem] border border-white/10 bg-[#202020] px-5 py-5 text-white shadow-2xl sm:w-[80%] sm:px-7"
