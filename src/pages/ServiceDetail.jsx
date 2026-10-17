@@ -1,7 +1,7 @@
 import { useParams, Link } from "react-router-dom";
 import MlsSitePhoto from "../components/MlsSitePhoto";
 import MlsEditorialImage from "../components/MlsEditorialImage";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import {
   ArrowLeft,
   ArrowRight,
@@ -106,6 +106,7 @@ function InfoList({ title, items, palette, dark = false }) {
 }
 
 export default function ServiceDetail({ palette }) {
+  const reduceMotion = useReducedMotion();
   const { serviceId } = useParams();
 
   const services = {
@@ -232,10 +233,10 @@ export default function ServiceDetail({ palette }) {
             </div>
 
             <div className="relative mx-auto w-full max-w-[520px] lg:mx-0">
-              <motion.div initial={{ opacity: 0, x: 22 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.7, delay: 0.1 }} className="relative overflow-hidden rounded-[2rem] border-4 border-white bg-[#f7f3ef] shadow-[0_26px_72px_-28px_rgba(65,24,10,0.37)]">
+              <motion.div initial={reduceMotion ? false : { opacity: 0, x: 22 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.7, delay: 0.1 }} className="relative overflow-hidden rounded-[2rem] border-4 border-white bg-[#f7f3ef] shadow-[0_26px_72px_-28px_rgba(65,24,10,0.37)]">
                 <MlsSitePhoto name={servicePhoto} alt={`Illustrative ${service.title.toLowerCase()} service scene`} priority className="!rounded-none aspect-[4/3] object-cover" />
               </motion.div>
-              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.58, delay: 0.3 }} className="relative z-10 -mt-7 ml-auto w-[94%] rounded-[1.35rem] border border-[#721100]/10 bg-white p-5 shadow-xl sm:w-[89%] md:p-6">
+              <motion.div initial={reduceMotion ? false : { opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.58, delay: 0.3 }} className="relative z-10 -mt-7 ml-auto w-[94%] rounded-[1.35rem] border border-[#721100]/10 bg-white p-5 shadow-xl sm:w-[89%] md:p-6">
                 <p className="text-[11px] font-black uppercase tracking-[0.16em]" style={{ color: palette.burgundy }}>Plan with confidence</p>
                 <p className="mt-2 text-sm font-semibold leading-6" style={{ color: palette.charcoal }}>We'll review the setting, preparation, and service fit before confirming details.</p>
                 <div className="mt-3 flex flex-wrap gap-2">
