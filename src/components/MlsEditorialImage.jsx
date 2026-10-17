@@ -24,11 +24,11 @@ export default function MlsEditorialImage({
 
   const src = `/${name}.webp`;
   const appearance = reducedMotion ? {} : {
-    initial: { opacity: 0, y: 26, rotate: tilt === "left" ? -1 : 1 },
-    whileInView: { opacity: 1, y: 0, rotate: 0 },
+    initial: { opacity: 0, y: 18, x: tilt === "left" ? -24 : 24, rotate: tilt === "left" ? -0.7 : 0.7 },
+    whileInView: { opacity: 1, y: 0, x: 0, rotate: 0 },
     viewport: { once: true, amount: 0.16 },
-    transition: { duration: 0.65, ease: "easeOut" },
-    whileHover: { y: -5, rotate: tilt === "left" ? -0.45 : 0.45 },
+    transition: { duration: 0.75, ease: [0.2, 0.7, 0.2, 1] },
+    whileHover: { y: -4, rotate: tilt === "left" ? -0.35 : 0.35 },
   };
   const image = (
     <img
@@ -53,6 +53,7 @@ export default function MlsEditorialImage({
             {image}
           </a>
         ) : image}
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-[#721100]/5 opacity-0 transition-opacity duration-500 group-hover:opacity-100 motion-reduce:transition-none" />
       </div>
       {caption && <figcaption className="px-5 py-3 text-xs font-semibold leading-5 text-[#555]">{caption}</figcaption>}
     </motion.figure>
