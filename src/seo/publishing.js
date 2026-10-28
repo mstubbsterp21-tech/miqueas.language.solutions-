@@ -1,3 +1,5 @@
+import { isBlogReviewApprovedInMetadata } from "./blogReviewGate.js";
+
 // Publication timestamps are compared in the same time zone as the MLS blog.
 export function todayInNewYork(now = new Date()) {
   const parts = new Intl.DateTimeFormat("en-US", {
@@ -7,10 +9,11 @@ export function todayInNewYork(now = new Date()) {
   return `${fields.year}-${fields.month}-${fields.day}`;
 }
 
-export function isPubliclyPublished(meta, today = todayInNewYork()) {
-  return !meta?.publishDate || meta.publishDate <= today;
+export function isPubliclyPublished(meta, today = todayInNewYork(), path = "") {
+  return (!meta?.publishDate || meta.publishDate <= today)
+    && isBlogReviewApprovedInMetadata(path, meta);
 }
 
 export function publicSiteEntries(siteMetadata, today = todayInNewYork()) {
-  return Object.entries(siteMetadata).filter(([, meta]) => isPubliclyPublished(meta, today));
+  return Object.entries(siteMetadata).filter(([path, meta]) => isPubliclyPublished(meta, today, path));
 }
