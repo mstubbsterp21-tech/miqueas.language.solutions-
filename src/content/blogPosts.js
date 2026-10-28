@@ -48,7 +48,7 @@ export const blogPosts = [
 <p>Failure to meet these benchmarks means the facility is not providing effective communication access.</p>
 <hr>
 <h2>3. The Value of Physical Presence: In-Person Interpreting</h2>
-<p>Some clinical encounters require physical presence because the communication demands exceed what remote delivery can support. In-person interpreting remains the standard for complex, high-stakes care.</p>
+<p>Some clinical encounters are a poor fit for remote interpreting because of physical positioning, environment, technology limitations, or communication needs. An on-site interpreter may be necessary when VRI cannot provide effective communication.</p>
 <p><img src="https://cdn.marblism.com/-a_Nt0ckLYc.webp" alt="Minimalist flat vector illustration showing a doctor, patient, and ASL interpreter in a collaborative triangle formation using a brick red, dark charcoal, tan/beige, and pure white palette. Crisp geometric shapes, minimalist detail, and no orange."></p>
 <h3>Why Physical Presence Matters</h3>
 <ol>
@@ -60,7 +60,7 @@ export const blogPosts = [
 <hr>
 <h2>4. The Legal Landscape: ADA Compliance in Healthcare</h2>
 <p>The Americans with Disabilities Act (ADA) requires hospitals, clinics, and private practices to provide effective communication. For administrators, the relevant standard is not whether a service was offered. The standard is whether the patient can understand and participate in care as fully as a hearing patient would.</p>
-<p>According to the <a href="https://www.ada.gov/resources/effective-communication/">Department of Justice (DOJ)</a>, if VRI technology fails or the patient reports that the remote interpreter is not understandable, the facility is <strong>not</strong> in compliance. In those cases, the facility must move to a modality that meets the communication need, which may require an in-person interpreter.</p>
+<p>Under <a href="https://www.ada.gov/resources/effective-communication/">DOJ effective communication guidance</a>, VRI must meet performance standards and work for the actual encounter. If a patient cannot understand a remote interpreter, promptly assess the problem and provide an effective alternative if the setup cannot be made effective; on-site interpreting may be needed. RID's VRI SPP also recommends arranging on-site interpreting when remote interpreting is ineffective.</p>
 <blockquote>
 <p><strong>Professional Boundary</strong><br>Communication access is a high-stakes responsibility. Lip-reading, note writing, or improvised accommodation methods are generally inadequate for anything beyond simple administrative exchanges.</p>
 </blockquote>
@@ -79,7 +79,7 @@ export const blogPosts = [
 <li><strong>Dynamic Environment:</strong> Active ER, bedside equipment, limited mobility, or more than three participants. In-person interpreting is often the better fit.</li>
 </ol>
 <h3>Step 3: Consult the Patient</h3>
-<p>The ADA requires that substantial weight be given to the patient's preferred method of communication. If a patient requests an on-site interpreter, that preference should be evaluated as part of the communication access determination, not treated as a convenience issue.</p>
+<p>For public entities under ADA Title II, the individual's requested aid receives primary consideration, subject to applicable exceptions. For private businesses covered by Title III, staff should consult the person whenever possible and provide a method that results in effective communication. The patient's actual access needs and preferences are central to the decision.</p>
 <h3>Step 4: Verify Preparation</h3>
 <p>Effective interpreting requires preparation. For planned procedures or specialized encounters, share relevant background information within appropriate privacy standards so the interpreter can prepare terminology, setting expectations, and modality-specific considerations.</p>
 <hr>
@@ -102,8 +102,8 @@ export const blogPosts = [
   },
   {
     slug: "asl-access-florida-hurricane-prep-guide",
-    title: "ASL Access in the Eye of the Storm: A 2026 Florida Hurricane Prep Guide",
-    excerpt: "A practical emergency-readiness guide for organizations planning ASL access during Florida hurricane season.",
+    title: "ASL Access in the Eye of the Storm: A Florida Hurricane Preparedness Guide",
+    excerpt: "Year-round emergency communication readiness for Florida organizations serving Deaf and hard-of-hearing residents.",
     publishDate: "2026-06-02",
     category: "Emergency Preparedness",
     readTime: "7 min read",
