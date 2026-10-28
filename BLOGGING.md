@@ -1,5 +1,19 @@
 # MLS Blog Publishing Guide
 
+## Mandatory RID / CPC / legal pre-publication review
+
+**New articles with publication dates after October 28, 2026 are held by default.** The date alone no longer makes a newly scheduled article public. The review-approval registry in `src/seo/blogReviewGate.js` must contain a record for the article slug, scheduled publication date, and a fingerprint matching the complete current title, excerpt, category, read time, and HTML/content. An edit after approval invalidates the fingerprint and automatically holds the article again.
+
+The `MLS Pre-Publication Audit` runs Sunday evening in America/New_York, before the next Monday 12:00 AM Eastern publication time. It must check the full article (not just the summary), including all consequential legal, medical, privacy, credential, technical, and professional-practice claims, with current primary-source references. For each applicable issue, use the current RID Standard Practice Paper or Professional Practice Paper, NAD-RID Code of Professional Conduct, official DOJ ADA guidance, HHS/Section 1557/HIPAA guidance when applicable, state regulations where relevant, and W3C/WCAG for web accessibility. Distinguish law, professional recommendation, and MLS policy; do not describe a recommendation as a legal mandate.
+
+**Publish only on a documented PASS:** Correct the article and its metadata first, verify references and claims, run checks and inspect the result, calculate the fingerprint with `blogContentFingerprint(post)` from `src/seo/blogReviewGate.js`, and add the matching record to `approvedBlogRevisions` in that file. The record format is `"article-slug": { publishDate: "YYYY-MM-DD", fingerprint: "8hexchars" }`. If the article changes again, recompute its fingerprint after another review. If uncertain or there are unresolved issues, do not add approval; report the blocker. The article will stay off the blog page and out of the dynamic sitemap until approved.
+
+This safeguard affects only newer posts. All existing articles published through October 28, 2026 retain their current visibility. Do not use the older base `getPublishedBlogPosts` helper in public site features; use the guarded `blogPostsLive` helper. The Sunday task notification does **not** itself constitute approval—an explicit matching repository record is required.
+
+Official starting points: https://rid.org/resources/ ; https://rid.org/programs/ethics/code-of-professional-conduct/ ; https://www.ada.gov/resources/effective-communication/ ; https://www.hhs.gov/civil-rights/for-individuals/section-1557/ ; https://www.w3.org/WAI/WCAG22/ .
+
+
+
 ## Current HTML publishing workflow
 
 1. Save the article body in `src/content/blog/<slug>.html`. The page template renders the title and publication date, so omit duplicate title/date elements from the body.
