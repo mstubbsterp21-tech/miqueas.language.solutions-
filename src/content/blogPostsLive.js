@@ -59,7 +59,7 @@ const beyondWhiteCanePost = {
 
 const ndeamWorkplacePost = {
   slug: "ndeam-2026-communication-access-deaf-employees",
-  title: "National Disability Employment Awareness Month: Building Real Communication Access for Deaf Employees",
+  title: "Beyond Onboarding: Everyday Communication Access for Deaf Employees",
   excerpt: "A practical guide to reliable workplace communication access for Deaf employees during recurring meetings, urgent conversations, internal training, and sensitive HR discussions.",
   publishDate: "2026-10-05",
   category: "Workplace Access",
@@ -81,7 +81,7 @@ const mentalHealthPost = {
 
 const yearRoundAccessPost = {
   slug: "no-access-without-sign-language-year-round-commitment",
-  title: "No Access Without Sign Language: Turning International Week of Deaf People Into Year-Round Commitment",
+  title: "No Access Without Sign Language: Building a Year-Round Communication Access Plan",
   excerpt: "A practical framework for Florida organizations to turn Deaf awareness into year-round communication access through ownership, budgeting, provider partnerships, accessible procedures, and measurable targets.",
   publishDate: "2026-09-21",
   category: "Accessibility Planning",
