@@ -10,6 +10,7 @@ import ongoingPartnerHtml from "./blog/ongoing-interpreting-partner-beyond-one-o
 import englishAslVideoHtml from "./blog/english-to-asl-video-translation-digital-accessibility.html?raw";
 import deafFestHtml from "./blog/deaf-fest-2026-community-connection-accessibility.html?raw";
 import { blogPosts as baseBlogPosts, formatBlogDate } from "./blogPosts";
+import { isBlogReviewApproved } from "../seo/blogReviewGate.js";
 import whyVriBestFitHtml from "./blog/why-vri-is-not-always-the-best-fit.html?raw";
 import whyVriBestFitPart2Html from "./blog/why-vri-is-not-always-the-best-fit-part2.html?raw";
 import whyVriBestFitPart3Html from "./blog/why-vri-is-not-always-the-best-fit-part3.html?raw";
@@ -299,7 +300,7 @@ const todayInNewYork = () =>
 export const getPublishedBlogPosts = () => {
   const today = todayInNewYork();
   return blogPosts
-    .filter((post) => post.publishDate <= today)
+    .filter((post) => post.publishDate <= today && isBlogReviewApproved(post))
     .sort((a, b) => {
       const dateSort = b.publishDate.localeCompare(a.publishDate);
       if (dateSort !== 0) return dateSort;
