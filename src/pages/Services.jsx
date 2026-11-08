@@ -142,10 +142,11 @@ export default function Services({ palette }) {
               </div>
               <div className="mt-8 flex flex-wrap gap-3">
                 {specialtyCards.map(({ icon: Icon, title }) => (
-                  <div key={title} className="flex items-center gap-3 rounded-full border bg-white/80 px-4 py-2 text-sm font-bold shadow-sm backdrop-blur" style={{ borderColor: palette.border, color: palette.charcoal }}>
-                    <Icon size={16} style={{ color: palette.gold }} />
+                  <Link key={title} to={"/settings/" + title.toLowerCase()} aria-label={"Explore " + title.toLowerCase() + " settings"} className="group flex items-center gap-3 rounded-full border bg-white/80 px-4 py-2 text-sm font-bold shadow-sm backdrop-blur transition hover:-translate-y-0.5 hover:shadow-md focus-visible:outline focus-visible:outline-4 focus-visible:outline-[#dd7d00]" style={{ borderColor: palette.border, color: palette.charcoal }}>
+                    <Icon size={16} style={{ color: palette.gold }} aria-hidden="true" />
                     {title}
-                  </div>
+                    <ArrowRight size={14} className="transition group-hover:translate-x-1" style={{ color: palette.gold }} aria-hidden="true" />
+                  </Link>
                 ))}
               </div>
             </div>
