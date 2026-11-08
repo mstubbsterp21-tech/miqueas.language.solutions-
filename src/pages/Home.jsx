@@ -191,7 +191,8 @@ export default function Home({ palette }) {
                   </span>
                 </Link>
               </motion.div>
-            ))}         </div>
+            ))}
+          </div>
         </div>
       </section>
 
