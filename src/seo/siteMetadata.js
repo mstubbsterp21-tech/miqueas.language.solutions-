@@ -48,6 +48,30 @@ export const siteMetadata = {
     schemaType: "Service",
     priority: "0.8",
   },
+  "/settings/medical": {
+    title: "Medical ASL Interpreting & Healthcare Access | MLS",
+    description: "Learn how MLS supports ASL-English interpreting for medical appointments, specialist visits, telehealth, and patient communication with thoughtful coordination.",
+    schemaType: "Service",
+    priority: "0.8",
+  },
+  "/settings/educational": {
+    title: "Educational ASL Interpreting & School Access | MLS",
+    description: "Explore MLS support for classrooms, parent-teacher conferences, IEP meetings, training, and educational interpreting coordination.",
+    schemaType: "Service",
+    priority: "0.8",
+  },
+  "/settings/business": {
+    title: "Workplace & Business ASL Interpreting | MLS",
+    description: "See how MLS coordinates ASL-English communication access for interviews, HR conversations, team meetings, trainings, conferences, and hybrid workplaces.",
+    schemaType: "Service",
+    priority: "0.8",
+  },
+  "/settings/community": {
+    title: "Community ASL Interpreting & Public Access | MLS",
+    description: "Discover MLS interpreting support for public programs, nonprofits, social services, community meetings, local events, and everyday participation.",
+    schemaType: "Service",
+    priority: "0.8",
+  },
   "/locations/orlando": {
     title: "ASL Interpreting Services in Orlando, FL | MLS",
     description: "Professional in-person ASL-English interpreting in Orlando for healthcare, business, education, conferences, appointments, and community events.",

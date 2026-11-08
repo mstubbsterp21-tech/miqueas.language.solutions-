@@ -51,10 +51,10 @@ export default function Home({ palette }) {
   ];
 
   const sectors = [
-    { icon: Stethoscope, label: "Medical", description: "Appointments, consultations, and healthcare interactions where clarity matters." },
-    { icon: Building2, label: "Educational", description: "School meetings, classroom settings, trainings, and access planning." },
-    { icon: BriefcaseBusiness, label: "Business", description: "Workplace meetings, interviews, trainings, and organizational communication." },
-    { icon: Users, label: "Community", description: "Public services, events, social services, and everyday community access." },
+    { id: "medical", icon: Stethoscope, label: "Medical", description: "Appointments, consultations, and healthcare interactions where clarity matters." },
+    { id: "educational", icon: Building2, label: "Educational", description: "School meetings, classroom settings, trainings, and access planning." },
+    { id: "business", icon: BriefcaseBusiness, label: "Business", description: "Workplace meetings, interviews, trainings, and organizational communication." },
+    { id: "community", icon: Users, label: "Community", description: "Public services, events, social services, and everyday community access." },
   ];
 
   const testimonials = [
@@ -180,11 +180,16 @@ export default function Home({ palette }) {
             <Link to="/services" className="inline-flex items-center gap-2 text-sm font-bold" style={{ color: palette.burgundy }}>Explore services <ArrowRight size={16} /></Link>
           </motion.div>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            {sectors.map(({ icon: Icon, label, description }, index) => (
-              <motion.div key={label} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} variants={fadeUp} transition={{ duration: 0.4, delay: index * 0.08 }} className="rounded-[1.3rem] border border-[#721100]/10 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
-                <Icon size={24} style={{ color: palette.gold }} />
-                <h3 className="mt-3 text-base font-black" style={{ color: palette.charcoal }}>{label}</h3>
-                <p className="mt-2 text-sm leading-6 text-[#656565]">{description}</p>
+            {sectors.map(({ id, icon: Icon, label, description }, index) => (
+              <motion.div key={id} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} variants={fadeUp} transition={{ duration: 0.4, delay: index * 0.08 }} className="group overflow-hidden rounded-[1.3rem] border border-[#721100]/10 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg focus-within:-translate-y-1 focus-within:shadow-lg">
+                <Link to={"/settings/" + id} aria-label={"Explore " + label.toLowerCase() + " interpreting support"} className="flex h-full flex-col p-5 focus-visible:rounded-[1.3rem] focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-[-4px] focus-visible:outline-[#dd7d00]">
+                  <Icon size={24} style={{ color: palette.gold }} aria-hidden="true" />
+                  <h3 className="mt-3 text-base font-black" style={{ color: palette.charcoal }}>{label}</h3>
+                  <p className="mt-2 flex-1 text-sm leading-6 text-[#656565]">{description}</p>
+                  <span className="mt-4 inline-flex items-center gap-2 text-xs font-black transition-all group-hover:gap-3" style={{ color: palette.burgundy }}>
+                    Explore {label.toLowerCase()} <ArrowRight size={15} aria-hidden="true" />
+                  </span>
+                </Link>
               </motion.div>
             ))}
           </div>
