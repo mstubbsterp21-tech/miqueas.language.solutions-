@@ -3,6 +3,7 @@ import { Routes, Route, Link, Navigate } from "react-router-dom";
 import Home from "./pages/Home";
 import Services from "./pages/Services";
 import ServiceDetail from "./pages/ServiceDetail";
+import SettingDetail from "./pages/SettingDetail";
 import About from "./pages/About";
 import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
@@ -291,6 +292,7 @@ export default function App() {
           <Route path="/portal" element={isClerkConfigured ? <RequirePortalAuth><InterpreterPortal palette={palette} /></RequirePortalAuth> : <PortalSetupNotice palette={palette} />} />
           <Route path="/admin/interpreters" element={isClerkConfigured ? <RequirePortalAuth><AdminInterpreters palette={palette} /></RequirePortalAuth> : <PortalSetupNotice palette={palette} />} />
           <Route path="/admin/interpreters/:interpreterId" element={isClerkConfigured ? <RequirePortalAuth><AdminInterpreterProfile palette={palette} /></RequirePortalAuth> : <PortalSetupNotice palette={palette} />} />
+          <Route path="/settings/:settingId" element={<SettingDetail palette={palette} />} />
           <Route path="/services" element={<Services palette={palette} />} />
           <Route path="/services/:serviceId" element={<ServiceDetail palette={palette} />} />
           <Route path="/services/video-remote-interpreting-nationwide" element={<NationwideVri palette={palette} />} />
