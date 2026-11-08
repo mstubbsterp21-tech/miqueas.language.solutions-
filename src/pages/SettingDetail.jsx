@@ -1,10 +1,10 @@
 import { Link, Navigate, useParams } from "react-router-dom";
 import { motion, useReducedMotion } from "framer-motion";
 import {
-  ArrowLeft, ArrowRight, BookOpen, BriefcaseBusiness, Building2, CalendarDays,
+  ArrowLeft, ArrowRight, BookOpen, BriefcaseBusiness, CalendarDays,
   CheckCircle2, ChevronDown, ClipboardList, FileText, GraduationCap, HeartHandshake,
   Landmark, MapPin, MessageSquareText, MonitorPlay, Presentation, ShieldCheck,
-  Stethoscope, Users, Video
+  Stethoscope, Users
 } from "lucide-react";
 import { settingOrder, settingPages } from "../content/settingPages";
 
