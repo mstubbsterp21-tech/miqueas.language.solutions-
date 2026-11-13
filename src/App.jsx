@@ -182,6 +182,15 @@ export default function App() {
                     {item.label}
                   </Link>
                 ))}
+                <details className="group relative">
+                  <summary className="flex cursor-pointer list-none items-center gap-1 whitespace-nowrap text-[13px] font-semibold leading-tight xl:text-sm [&::-webkit-details-marker]:hidden" style={{ color: palette.charcoal }}>
+                    Mentorship <span aria-hidden="true" className="text-xs">▾</span>
+                  </summary>
+                  <div className="absolute right-0 top-full z-[60] mt-3 min-w-[210px] rounded-xl border bg-white p-2 shadow-xl" style={{ borderColor: palette.border }}>
+                    <a href="/mentor-profile/" className="block rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-black/5" style={{ color: lightPalette.charcoal }}>Meet Your Mentor</a>
+                    <Link to="/mentee-interest" className="block rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-black/5" style={{ color: lightPalette.charcoal }}>Apply for Mentorship</Link>
+                  </div>
+                </details>
               </div>
             </nav>
 
@@ -236,6 +245,13 @@ export default function App() {
                   {item.label}
                 </Link>
               ))}
+              <details className="rounded-xl">
+                <summary className="cursor-pointer rounded-xl px-3 py-3 text-sm font-semibold hover:bg-black/5" style={{ color: palette.charcoal }}>Mentorship ▾</summary>
+                <div className="ml-3 flex flex-col border-l-2 pl-3" style={{ borderColor: palette.gold }}>
+                  <a href="/mentor-profile/" className="rounded-xl px-3 py-3 text-sm hover:bg-black/5" style={{ color: palette.charcoal }}>Meet Your Mentor</a>
+                  <Link to="/mentee-interest" className="rounded-xl px-3 py-3 text-sm hover:bg-black/5" style={{ color: palette.charcoal }} onClick={() => setMobileOpen(false)}>Apply for Mentorship</Link>
+                </div>
+              </details>
 
               <div className="mt-3 border-t border-black/10 pt-4 text-center">
                 <div className="mb-3 text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.burgundy }}>
