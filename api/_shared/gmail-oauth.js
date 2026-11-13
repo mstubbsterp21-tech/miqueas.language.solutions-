@@ -10,8 +10,9 @@ export const gmailScope = "https://www.googleapis.com/auth/gmail.send";
 export const gmailModifyScope = "https://www.googleapis.com/auth/gmail.modify";
 export const calendarScope = "https://www.googleapis.com/auth/calendar";
 export const driveScope = "https://www.googleapis.com/auth/drive.file";
+export const sheetsScope = "https://www.googleapis.com/auth/spreadsheets";
 const identityScopes = ["openid", "email"];
-const workspaceScopes = [gmailScope, gmailModifyScope, calendarScope, driveScope];
+const workspaceScopes = [gmailScope, gmailModifyScope, calendarScope, driveScope, sheetsScope];
 
 function encodeHeader(value) {
   const text = String(value || "");
