@@ -145,20 +145,21 @@
 
     .photo-wrap {
       width: 215px;
+      aspect-ratio: 4 / 5;
       justify-self: end;
-      padding: 8px;
-      background: var(--white);
+      overflow: hidden;
+      border-radius: 14px;
       border: 3px solid var(--gold);
+      background: #f8f6f3;
       box-shadow: 0 14px 28px rgba(0,0,0,.18);
     }
 
     .photo-wrap img {
       display: block;
       width: 100%;
-      aspect-ratio: 4 / 5;
-      object-fit: contain;
-      object-position: center bottom;
-      background: #f8f6f3;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 35%;
     }
 
     /* CONTENT */
