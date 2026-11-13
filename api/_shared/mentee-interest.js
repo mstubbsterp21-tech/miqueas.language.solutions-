@@ -1,6 +1,6 @@
 import crypto from "node:crypto";
-import { database, readBody, send } from "./_shared/ops-v2-core.js";
-import { getGoogleWorkspaceAccessToken } from "./_shared/gmail-oauth.js";
+import { database, readBody, send } from "./ops-v2-core.js";
+import { getGoogleWorkspaceAccessToken } from "./gmail-oauth.js";
 
 const spreadsheetId = process.env.MENTEE_INTEREST_SHEET_ID || "1o4IxQOK3WLlzCU1OWr6f1VCjHsMgF-VPVI0KqnPuCzg";
 const sheetsWriteScope = "https://www.googleapis.com/auth/spreadsheets";
