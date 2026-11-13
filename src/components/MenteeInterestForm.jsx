@@ -170,10 +170,9 @@ export default function MenteeInterestForm({ palette = defaultPalette }) {
   return <section className="mx-auto max-w-4xl px-5 py-6 md:px-8">
     <form onSubmit={submit} className="space-y-6" noValidate>
       <header className="rounded-[2rem] border bg-white p-6 text-center shadow-sm md:p-8" style={{ borderColor: p.border }}>
-        <img src={logo} alt="Miqueas Language Solutions" className="mx-auto mb-5 h-20 object-contain" />
-        <h1 className="text-3xl font-bold md:text-4xl" style={{ color: p.charcoal }}>Mentee Interest Form</h1>
-        <p className="mt-2 text-xs font-medium" style={{ color: p.gold }}>Bridging Perspectives. Delivering Understanding.</p>
-        <p className="mt-3 text-sm">Free · Live · Virtual · Approximately 5–7 minutes</p>
+        <img src={logo} alt="Miqueas Language Solutions" className="mx-auto h-20 max-w-full object-contain" />
+        <p className="mx-auto mt-3 max-w-full px-1 text-center text-xs font-medium leading-relaxed whitespace-normal break-words" style={{ color: p.gold }}>Bridging Perspectives. Delivering Understanding.</p>
+        <h1 className="mx-auto mt-6 max-w-full text-center text-2xl font-bold leading-tight whitespace-normal break-words sm:text-3xl md:text-4xl" style={{ color: p.charcoal }}>Mentorship Interest Form</h1>
         <div className="mt-6 flex items-center justify-between gap-4 text-left text-xs font-bold" style={{ color: p.charcoal }}>
           <span>Step {page} of 2</span><span>{page === 1 ? "Mentee Application" : "Recording & Consent"}</span>
         </div>
