@@ -346,6 +346,27 @@
       font-weight: 900;
     }
 
+    /* MENTORSHIP APPLICATION */
+    .apply-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      max-width: 100%;
+      margin-top: 8px;
+      padding: 14px 22px;
+      background: var(--burgundy);
+      color: #fff;
+      text-decoration: none;
+      text-align: center;
+      font-size: .96rem;
+      font-weight: 800;
+      line-height: 1.4;
+      overflow-wrap: anywhere;
+      transition: background .2s ease;
+    }
+    .apply-button:hover, .apply-button:focus-visible { background: #501000; }
+    .application-note { margin-top: 12px !important; font-size: .85rem; }
+
     /* CONNECT */
 
     .connect {
@@ -629,27 +650,27 @@
       </div>
     </section>
 
-    <section class="section connect">
-      <div class="section-header">
-        <h2>How to Connect</h2>
+    <section class="section">
+      <div class="section-header"><h2>Who Can Apply</h2></div>
+      <div class="section-body">
+        <p>This mentorship opportunity is open to interpreting students, recent ITP/IPP graduates, working interpreters, and those returning to the profession. We'll focus on the skills and professional goals you want to strengthen.</p>
+        <p>All sessions are live and virtual. Participation is subject to availability and fit with the practicum.</p>
       </div>
+    </section>
+
+    <!-- Hide this section after practicum recruitment closes; the mentor profile remains available. -->
+    <section class="section connect" id="mentorship-application">
+      <div class="section-header"><h2>Interested in Mentorship?</h2></div>
       <div class="section-body">
         <div class="connect-copy">
-          <p>
-            Send me a short introduction with your current interpreting experience, what you want to work on,
-            and what you hope to gain from mentorship.
-          </p>
-          <p>
-            From there, we can have an initial conversation and decide whether my mentoring approach is a good
-            fit for what you need.
-          </p>
+          <p>I'm currently accepting interest from aspiring and working ASL/English interpreters who want to strengthen their skills and grow professionally.</p>
+          <p>As part of my <em>So You Want to Be an Interpreter Mentor</em> practicum, I'm offering free, live virtual mentorship sessions. Space is limited, and sessions must be recorded and shared with fellow practicum participants for observation and feedback on my mentoring skills.</p>
+          <a class="apply-button" href="/mentee-interest">Apply for Mentorship →</a>
+          <p class="application-note">Free mentorship · Virtual sessions · Application required</p>
+          <p>You'll find the full recording and consent information in the application. Submitting an interest form does not guarantee placement.</p>
         </div>
-
         <div class="business-card">
-          <img
-            src="/Business%20Card%20.png"
-            alt="Miqueas Language Solutions business card for Micah Stubbs"
-          />
+          <img src="/Business%20Card%20.png" alt="Miqueas Language Solutions business card for Micah Stubbs" />
         </div>
       </div>
     </section>
