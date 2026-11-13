@@ -1,4 +1,5 @@
 import { database, readBody, send, signedInUser } from "./_shared/ops-v2-core.js";
+import submitMenteeInterest from "./_shared/mentee-interest.js";
 import { loadOperationsV2 } from "./_shared/ops-v2-load.js";
 import { adminCreateQuote, adminSendQuote, clientRespondQuote } from "./_shared/ops-v2-quotes.js";
 import { adminLinkFoundInvoice } from "./_shared/ops-v2-found-invoices.js";
@@ -112,6 +113,8 @@ const actions = {
 export default async function handler(req, res) {
   try {
     const action = String(req.query?.action || "loadOperationsV2");
+    // Public application route. Validate and persist within its own handler.
+    if (action === "submitMenteeInterest") return submitMenteeInterest(req, res);
     const deviceAccessAction = deviceAccessActions.has(action);
     const user = await signedInUser(req, {
       allowUntrustedDevice: deviceAccessAction,

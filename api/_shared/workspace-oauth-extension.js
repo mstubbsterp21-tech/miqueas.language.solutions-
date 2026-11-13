@@ -14,6 +14,7 @@ const expandedScopes = [
   "https://www.googleapis.com/auth/calendar",
   "https://www.googleapis.com/auth/drive.file",
   sheetsReadonlyScope,
+  "https://www.googleapis.com/auth/spreadsheets",
 ];
 
 export async function createExpandedWorkspaceAuthorization(db, user) {

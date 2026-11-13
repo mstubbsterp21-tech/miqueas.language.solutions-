@@ -21,6 +21,7 @@ import Accessibility from "./pages/Accessibility";
 import InterpreterCommunity from "./pages/InterpreterCommunity";
 import LocationService, { NationwideVri } from "./pages/LocationService";
 import InterpreterNetworkForm from "./components/InterpreterNetworkFormOptional";
+import MenteeInterestForm from "./components/MenteeInterestForm";
 import Login from "./pages/Login";
 import InterpreterPortal from "./pages/InterpreterPortal";
 import AdminInterpreters from "./pages/AdminInterpreters";
@@ -287,6 +288,7 @@ export default function App() {
           <Route path="/resources/clients" element={<Navigate to="/clients" replace />} />
           <Route path="/resources/interpreters" element={<Navigate to="/interpreters" replace />} />
           <Route path="/join-our-team" element={<InterpreterNetworkForm palette={palette} />} />
+          <Route path="/mentee-interest" element={<MenteeInterestForm palette={palette} />} />
           <Route path="/login/*" element={<Login palette={palette} />} />
           <Route path="/login.html" element={<Navigate to="/login" replace />} />
           <Route path="/portal" element={isClerkConfigured ? <RequirePortalAuth><InterpreterPortal palette={palette} /></RequirePortalAuth> : <PortalSetupNotice palette={palette} />} />
