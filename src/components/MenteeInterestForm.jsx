@@ -188,7 +188,7 @@ export default function MenteeInterestForm({ palette = defaultPalette }) {
           <p className="text-sm leading-7">I'm currently completing the <em>So You Want to Be an Interpreter Mentor</em> course. As part of the practicum, I'm offering <strong>free, live virtual mentorship sessions</strong> to individuals interested in developing their interpreting skills and growing professionally.</p>
           <p className="text-sm leading-7">Sessions offer opportunities for discussion, constructive feedback, skill development, and professional reflection. They take place live through video conferencing; in-person sessions are not available.</p>
           <aside className="rounded-2xl p-5 text-sm leading-7" style={{ backgroundColor: p.softGray }}>
-            <strong>Important recording information:</strong> The practicum requires me to record four live mentorship sessions. Fellow practicum participants will watch the recordings and provide feedback on my development as a mentor. You'll review the complete recording and consent policy on the next page before submitting.
+            <strong>Important recording information:</strong> The practicum requires me to record six live mentorship sessions. Fellow practicum participants will watch the recordings and provide feedback on my development as a mentor. You'll review the complete recording and consent policy on the next page before submitting.
           </aside>
         </Panel>
         <Panel number="02" title="Personal Information" palette={p}>
@@ -286,7 +286,7 @@ export default function MenteeInterestForm({ palette = defaultPalette }) {
         <Panel number="06" title="Practicum Recording & Observation Consent" palette={p}>
           <div className="space-y-3 text-sm leading-7">
             <h3 className="text-lg font-bold">Why Sessions Are Recorded</h3>
-            <p>As part of my participation in the <em>So You Want to Be an Interpreter Mentor</em> course, I'm completing a practicum that requires recordings of four live mentorship sessions.</p>
+            <p>As part of my participation in the <em>So You Want to Be an Interpreter Mentor</em> course, I'm completing a practicum that requires recordings of six live mentorship sessions.</p>
             <p>Fellow practicum participants will review the recordings and provide feedback on my mentoring techniques, communication, and approach to supporting mentees.</p>
             <p><strong>The main purpose of these observations is to provide feedback on my development as a mentor, not to formally evaluate your interpreting performance.</strong></p>
             <h3 className="pt-3 text-lg font-bold">How Recordings Will Be Shared</h3>
