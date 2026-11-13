@@ -75,6 +75,13 @@ const navItems = [
   { path: "/deaf-and-hard-of-hearing", label: "Deaf & Hard of Hearing" },
 ];
 
+const serviceNavItems = [
+  { path: "/services/in-person-interpreting", label: "In-Person Interpreting" },
+  { path: "/services/video-remote-interpreting", label: "Video Remote Interpreting" },
+  { path: "/services/english-asl-translation", label: "English → ASL Translation" },
+  { path: "/services/asl-english-translation", label: "ASL → English Translation" },
+];
+
 const socialItems = [
   { href: "https://www.instagram.com/miqueas.language.solutions/", label: "Instagram", Icon: FaInstagram },
   { href: "https://www.facebook.com/profile.php?id=61573286078153", label: "Facebook", Icon: FaFacebookF },
@@ -177,7 +184,17 @@ export default function App() {
 
             <nav className="hidden min-w-0 items-center justify-center md:flex">
               <div className="flex min-w-0 flex-wrap items-center justify-center gap-x-7 gap-y-2">
-                {navItems.map((item) => (
+                {navItems.map((item) => item.path === "/services" ? (
+                  <details key={item.path} className="group relative">
+                    <summary className="flex cursor-pointer list-none items-center gap-1 whitespace-nowrap text-[13px] font-semibold leading-tight xl:text-sm [&::-webkit-details-marker]:hidden" style={{ color: palette.charcoal }}>
+                      Services <span aria-hidden="true" className="text-xs">▾</span>
+                    </summary>
+                    <div className="absolute left-0 top-full z-[60] mt-3 min-w-[250px] rounded-xl border bg-white p-2 shadow-xl" style={{ borderColor: palette.border }}>
+                      <Link to="/services" className="block rounded-lg px-3 py-2.5 text-sm font-semibold hover:bg-black/5" style={{ color: lightPalette.charcoal }}>All Services</Link>
+                      {serviceNavItems.map((service) => <Link key={service.path} to={service.path} className="block rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-black/5" style={{ color: lightPalette.charcoal }}>{service.label}</Link>)}
+                    </div>
+                  </details>
+                ) : (
                   <Link key={item.path} to={item.path} className="whitespace-nowrap text-[13px] font-semibold leading-tight transition hover:opacity-70 xl:text-sm" style={{ color: palette.charcoal }}>
                     {item.label}
                   </Link>
@@ -240,7 +257,15 @@ export default function App() {
         {mobileOpen && (
           <div className="max-h-[calc(100vh-76px)] overflow-y-auto border-b border-black/5 bg-white md:hidden">
             <div className="mx-auto flex max-w-6xl flex-col gap-1 px-4 py-4">
-              {navItems.map((item) => (
+              {navItems.map((item) => item.path === "/services" ? (
+                <details key={item.path} className="rounded-xl">
+                  <summary className="cursor-pointer rounded-xl px-3 py-3 text-sm font-semibold hover:bg-black/5" style={{ color: palette.charcoal }}>Services ▾</summary>
+                  <div className="ml-3 flex flex-col border-l-2 pl-3" style={{ borderColor: palette.gold }}>
+                    <Link to="/services" className="rounded-xl px-3 py-3 text-sm font-semibold hover:bg-black/5" style={{ color: palette.charcoal }} onClick={() => setMobileOpen(false)}>All Services</Link>
+                    {serviceNavItems.map((service) => <Link key={service.path} to={service.path} className="rounded-xl px-3 py-3 text-sm hover:bg-black/5" style={{ color: palette.charcoal }} onClick={() => setMobileOpen(false)}>{service.label}</Link>)}
+                  </div>
+                </details>
+              ) : (
                 <Link key={item.path} to={item.path} className="rounded-xl px-3 py-3 text-sm font-medium hover:bg-black/5" style={{ color: palette.charcoal }} onClick={() => setMobileOpen(false)}>
                   {item.label}
                 </Link>
