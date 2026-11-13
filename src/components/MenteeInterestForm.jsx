@@ -43,10 +43,10 @@ function Field({ label, id, error, children }) {
   </div>;
 }
 function Panel({ number, title, children, palette }) {
-  return <section className="rounded-[2rem] border bg-white p-6 shadow-sm md:p-8" style={{ borderColor: palette.border }}>
+  return <section className="min-w-0 max-w-full rounded-[2rem] border bg-white p-4 shadow-sm sm:p-6 md:p-8" style={{ borderColor: palette.border }}>
     <span className="text-xs font-bold uppercase tracking-[0.16em]" style={{ color: palette.gold }}>Section {number}</span>
     <h2 className="mt-2 mb-6 text-2xl font-bold" style={{ color: palette.charcoal }}>{title}</h2>
-    <div className="space-y-6">{children}</div>
+    <div className="min-w-0 space-y-6 break-words">{children}</div>
   </section>;
 }
 function consentError(values, errors) {
@@ -168,7 +168,7 @@ export default function MenteeInterestForm({ palette = defaultPalette }) {
     </section>;
   }
   return <section className="mx-auto max-w-4xl px-5 py-6 md:px-8">
-    <form onSubmit={submit} className="space-y-6" noValidate>
+    <form onSubmit={submit} className="min-w-0 max-w-full space-y-6" noValidate>
       <header className="rounded-[2rem] border bg-white p-6 text-center shadow-sm md:p-8" style={{ borderColor: p.border }}>
         <img src={logo} alt="Miqueas Language Solutions" className="mx-auto h-20 max-w-full object-contain" />
         <p className="mx-auto mt-3 max-w-full px-1 text-center text-xs font-medium leading-relaxed whitespace-normal break-words" style={{ color: p.gold }}>Bridging Perspectives. Delivering Understanding.</p>
@@ -252,7 +252,18 @@ export default function MenteeInterestForm({ palette = defaultPalette }) {
           <fieldset>
             <legend className="mb-2 text-sm font-semibold">10. What days and times are you generally available for live virtual mentorship sessions? *</legend>
             <p className="mb-3 text-xs form-note">Choose all that apply, using your local time zone from question 4.</p>
-            <div className="max-w-full overflow-x-auto rounded-xl border" style={{ borderColor: p.border }}>
+            <div className="grid gap-3 md:hidden">
+              {days.map((day) => <fieldset key={day} className="min-w-0 rounded-xl border p-3" style={{ borderColor: p.border }}>
+                <legend className="px-1 text-sm font-bold">{day}</legend>
+                <div className="grid grid-cols-3 gap-2">
+                  {periods.map((period) => <label key={period} className="flex min-w-0 flex-col items-center gap-2 rounded-lg px-1 py-3 text-center text-xs" style={{ backgroundColor: p.softGray }}>
+                    <span className="break-words">{period}</span>
+                    <input type="checkbox" aria-label={day + " " + period} checked={!!values.availability[day + ":" + period]} onChange={() => toggleAvailability(day, period)} className={boxClass} style={{ accentColor: p.burgundy }} />
+                  </label>)}
+                </div>
+              </fieldset>)}
+            </div>
+            <div className="hidden max-w-full overflow-x-auto rounded-xl border md:block" style={{ borderColor: p.border }}>
               <table className="w-full min-w-[650px] border-collapse text-center text-xs">
                 <thead><tr style={{ backgroundColor: p.softGray }}><th className="p-3 text-left">Time</th>{days.map((day) => <th className="p-3" key={day}>{day.slice(0, 3)}</th>)}</tr></thead>
                 <tbody>{periods.map((period) => <tr key={period} className="border-t" style={{ borderColor: p.border }}>
@@ -270,7 +281,7 @@ export default function MenteeInterestForm({ palette = defaultPalette }) {
             <textarea id="schedulingNotes" maxLength={1000} rows={2} className={inputClass} value={values.schedulingNotes} onChange={(e) => update("schedulingNotes", e.target.value)} placeholder="Any scheduling preferences or limitations..." />
           </Field>
         </Panel>
-        <div className="flex justify-end"><button type="button" className="btn btn-primary" onClick={goNext}>Next: Recording &amp; Consent</button></div>
+        <div className="flex min-w-0 justify-stretch sm:justify-end"><button type="button" className="btn btn-primary w-full max-w-full whitespace-normal break-words text-center sm:w-auto" onClick={goNext}>Next: Recording &amp; Consent</button></div>
       </> : <>
         <Panel number="06" title="Practicum Recording & Observation Consent" palette={p}>
           <div className="space-y-3 text-sm leading-7">
