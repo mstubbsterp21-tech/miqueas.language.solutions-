@@ -139,7 +139,7 @@ export default function MenteeInterestForm({ palette = defaultPalette }) {
     setSubmitting(true);
     setSubmitError("");
     try {
-      const response = await fetch("/api/mentee-interest", {
+      const response = await fetch("/api/operations-v2?action=submitMenteeInterest", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...values, consentVersion }),
