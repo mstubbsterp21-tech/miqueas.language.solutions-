@@ -247,7 +247,7 @@ export default function App() {
                     </div>
                   </NavigationDropdown>
                 ) : (
-                  <Link key={item.path} to={item.path} className="whitespace-nowrap text-[13px] font-semibold leading-tight transition hover:opacity-70 xl:text-sm" style={{ color: palette.charcoal }}>
+                  <Link key={item.path} to={item.path} className="whitespace-nowrap text-[13px] font-semibold leading-tight transition hover:underline hover:underline-offset-4 xl:text-sm" style={{ color: palette.charcoal }}>
                     {item.label}
                   </Link>
                 ))}

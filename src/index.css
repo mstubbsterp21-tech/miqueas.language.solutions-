@@ -445,6 +445,7 @@ body:has(.theme-dark) {
 :is(.theme-light, .theme-dark) :is([class~="bg-[#202020]"], .brand-band, .mls-dark-panel) {
   --mls-brand-ink: #ffb199;
   --mls-accent-ink: #ffb23f;
+  --mls-focus: #ffb23f;
 }
 :is(.theme-light, .theme-dark) footer {
   --mls-accent-ink: #ffb23f;
@@ -494,3 +495,5 @@ body:has(.theme-dark) {
 :is(.theme-light, .theme-dark) .mls-dark-panel { --mls-focus: #ffb23f; }
 :is(.theme-light, .theme-dark) footer [class~="text-white/50"] { color: #bdb6b1; }
 :is(.theme-light, .theme-dark) [class~="text-[#777]"] { color: var(--mls-muted-text) !important; }
+
+.brand-band { background-color: #202020; }

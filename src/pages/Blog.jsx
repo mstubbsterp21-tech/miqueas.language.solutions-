@@ -29,7 +29,7 @@ const staggerGroup = {
 
 function getThemeStyles(palette) {
   const isDark = palette.white !== "#ffffff";
-  const accentText = isDark ? palette.actionGold : palette.burgundy;
+  const accentText = palette.goldText;
   const heroGradient = isDark
     ? "radial-gradient(circle at 12% 12%, rgba(221,125,0,0.12), transparent 30%), linear-gradient(180deg, #15100e 0%, #211714 100%)"
     : "radial-gradient(circle at 12% 12%, rgba(221,125,0,0.10), transparent 30%), linear-gradient(180deg, var(--mls-page) 0%, #f8f5f2 100%)";

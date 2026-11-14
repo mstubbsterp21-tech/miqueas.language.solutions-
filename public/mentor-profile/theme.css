@@ -15,14 +15,15 @@
     --gold: #ffb23f;
     --focus: #ffb23f;
   }
+  :root[data-theme="dark"] .brand img { background: #fff; border-radius: 6px; padding: 3px; }
   :root[data-theme="dark"] body { background: #0f0b0a; }
-  :root[data-theme="dark"] :is(.profile, .section, .credential, .detail-card,
+  :root[data-theme="dark"] :is(.profile, .brand-header, .section, .credential, .detail-card,
     .structure-item, .community-box, .workflow-step, .role-response, .agreement-box) {
     background: #18110f;
   }
   :root[data-theme="dark"] :is(.section-header h2, .credential strong, .detail-card strong,
     .structure-item h3, .community-box strong, .workflow-step strong, .agreement-box h2,
-    .section-heading, .eyebrow) { color: #ffb199; }
+    .section-heading, .eyebrow, .document-title) { color: #ffb199; }
   :root[data-theme="dark"] :is(.mentor-section, .mentee-section, .joint-section) .section-heading {
     background: #30221c; color: #ffb199;
   }

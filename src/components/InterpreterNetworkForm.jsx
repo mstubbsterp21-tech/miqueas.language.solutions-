@@ -120,7 +120,7 @@ function SectionCard({ title, subtitle, children, step, totalSteps, borderColor,
       <div className="mb-6">
         <div
           className="inline-flex rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em]"
-          style={{ backgroundColor: defaultPalette.softGray, color: defaultPalette.gold }}
+          style={{ backgroundColor: "var(--mls-muted-surface)", color: "var(--mls-accent-ink)" }}
         >
           Section {step} of {totalSteps}
         </div>

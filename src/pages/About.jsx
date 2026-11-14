@@ -204,7 +204,7 @@ export default function About({ palette }) {
               viewport={{ once: true, amount: 0.25 }}
               variants={fadeUp}
               transition={{ duration: 0.45 }}
-              className="overflow-hidden rounded-[2rem] border shadow-sm"
+              className="mls-dark-panel overflow-hidden rounded-[2rem] border shadow-sm"
               style={{ borderColor: palette.border, backgroundColor: "#202020" }}
             >
               <div className="p-7 pb-5 md:p-8 md:pb-5">
