@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Routes, Route, Link, Navigate } from "react-router-dom";
 import Home from "./pages/Home";
 import Services from "./pages/Services";
@@ -104,6 +104,50 @@ const footerServiceItems = [
   { path: "/services/asl-english-translation", label: "ASL → English Translation" },
 ];
 
+function NavigationDropdown({ children }) {
+  const ref = useRef(null);
+
+  useEffect(() => {
+    const closeOutside = (event) => {
+      if (!ref.current?.contains(event.target)) ref.current?.removeAttribute("open");
+    };
+    document.addEventListener("pointerdown", closeOutside);
+    return () => document.removeEventListener("pointerdown", closeOutside);
+  }, []);
+
+  return (
+    <details
+      ref={ref}
+      className="group relative"
+      onPointerEnter={(event) => {
+        if (event.pointerType === "mouse") {
+          event.currentTarget.parentElement.querySelectorAll("details[open]").forEach((menu) => {
+            if (menu !== event.currentTarget) menu.removeAttribute("open");
+          });
+          event.currentTarget.setAttribute("open", "");
+        }
+      }}
+      onPointerLeave={(event) => {
+        if (event.pointerType === "mouse") event.currentTarget.removeAttribute("open");
+      }}
+      onBlur={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget)) event.currentTarget.removeAttribute("open");
+      }}
+      onKeyDown={(event) => {
+        if (event.key === "Escape") {
+          event.currentTarget.removeAttribute("open");
+          event.currentTarget.querySelector("summary").focus();
+        }
+      }}
+      onClick={(event) => {
+        if (event.target.closest("a")) event.currentTarget.removeAttribute("open");
+      }}
+    >
+      {children}
+    </details>
+  );
+}
+
 function AccessibilityOverlay({ theme, onToggle, palette }) {
   const isDark = theme === "dark";
   const ModeIcon = isDark ? Sun : Moon;
@@ -185,29 +229,33 @@ export default function App() {
             <nav className="hidden min-w-0 items-center justify-center md:flex">
               <div className="flex min-w-0 flex-wrap items-center justify-center gap-x-7 gap-y-2">
                 {navItems.map((item) => item.path === "/services" ? (
-                  <details key={item.path} className="group relative">
+                  <NavigationDropdown key={item.path}>
                     <summary className="flex cursor-pointer list-none items-center gap-1 whitespace-nowrap text-[13px] font-semibold leading-tight xl:text-sm [&::-webkit-details-marker]:hidden" style={{ color: palette.charcoal }}>
                       Services <span aria-hidden="true" className="text-xs">▾</span>
                     </summary>
-                    <div className="absolute left-0 top-full z-[60] mt-3 min-w-[250px] rounded-xl border bg-white p-2 shadow-xl" style={{ borderColor: palette.border }}>
+                    <div className="absolute left-0 top-full z-[60] min-w-[250px] pt-3" >
+                      <div className="rounded-xl border bg-white p-2 shadow-xl" style={{ borderColor: palette.border }}>
                       <Link to="/services" className="block rounded-lg px-3 py-2.5 text-sm font-semibold hover:bg-black/5" style={{ color: lightPalette.charcoal }}>All Services</Link>
                       {serviceNavItems.map((service) => <Link key={service.path} to={service.path} className="block rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-black/5" style={{ color: lightPalette.charcoal }}>{service.label}</Link>)}
+                      </div>
                     </div>
-                  </details>
+                  </NavigationDropdown>
                 ) : (
                   <Link key={item.path} to={item.path} className="whitespace-nowrap text-[13px] font-semibold leading-tight transition hover:opacity-70 xl:text-sm" style={{ color: palette.charcoal }}>
                     {item.label}
                   </Link>
                 ))}
-                <details className="group relative">
+                <NavigationDropdown>
                   <summary className="flex cursor-pointer list-none items-center gap-1 whitespace-nowrap text-[13px] font-semibold leading-tight xl:text-sm [&::-webkit-details-marker]:hidden" style={{ color: palette.charcoal }}>
                     Mentorship <span aria-hidden="true" className="text-xs">▾</span>
                   </summary>
-                  <div className="absolute right-0 top-full z-[60] mt-3 min-w-[210px] rounded-xl border bg-white p-2 shadow-xl" style={{ borderColor: palette.border }}>
+                  <div className="absolute right-0 top-full z-[60] min-w-[210px] pt-3" >
+                    <div className="rounded-xl border bg-white p-2 shadow-xl" style={{ borderColor: palette.border }}>
                     <a href="/mentor-profile/" className="block rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-black/5" style={{ color: lightPalette.charcoal }}>Meet Your Mentor</a>
                     <Link to="/mentee-interest" className="block rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-black/5" style={{ color: lightPalette.charcoal }}>Apply for Mentorship</Link>
+                    </div>
                   </div>
-                </details>
+                </NavigationDropdown>
               </div>
             </nav>
 
