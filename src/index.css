@@ -105,7 +105,10 @@ textarea {
   --mls-white: #ffffff;
   --mls-soft-gray: #f5f5f5;
   --mls-border: #d1c6bc;
-  --mls-form-border: #b9aca1;
+  --mls-form-border: #827165;
+  --mls-brand-ink: #721100;
+  --mls-accent-ink: #995000;
+  --mls-focus: #995000;
   --mls-body: #444444;
   --mls-page: #ffffff;
   --mls-card: #ffffff;
@@ -122,7 +125,10 @@ textarea {
   --mls-white: #15100e;
   --mls-soft-gray: #211714;
   --mls-border: rgba(221, 125, 0, 0.24);
-  --mls-form-border: rgba(221, 125, 0, 0.34);
+  --mls-form-border: #a48b79;
+  --mls-brand-ink: #ffb199;
+  --mls-accent-ink: #ffb23f;
+  --mls-focus: #ffb23f;
   --mls-body: #efe7df;
   --mls-page: #0f0b0a;
   --mls-card: #18110f;
@@ -268,9 +274,7 @@ body:has(.theme-dark) {
   box-shadow: 0 18px 45px rgba(0, 0, 0, 0.34) !important;
 }
 
-.theme-dark a:hover {
-  color: #ffb23f;
-}
+
 
 .section-shell {
   border: 1px solid var(--mls-border);
@@ -435,3 +439,58 @@ body:has(.theme-dark) {
     transform: none !important;
   }
 }
+
+/* Text inks are independent of brand fills: gold/white buttons and burgundy
+   labels require different pairings. Dark promotional panels keep their own ink. */
+:is(.theme-light, .theme-dark) :is([class~="bg-[#202020]"], .brand-band, .mls-dark-panel) {
+  --mls-brand-ink: #ffb199;
+  --mls-accent-ink: #ffb23f;
+}
+:is(.theme-light, .theme-dark) footer {
+  --mls-accent-ink: #ffb23f;
+}
+:is(.theme-light, .theme-dark) [class~="text-[#dd7d00]"] {
+  color: var(--mls-accent-ink) !important;
+}
+:is(.theme-light, .theme-dark) [class~="bg-[#dd7d00]"] {
+  background-color: #a65300 !important;
+  color: #ffffff !important;
+}
+.theme-dark :is([class~="bg-[#ece5df]"], [class~="bg-[#f7f0ea]"],
+  [class~="bg-[#f8f3ed]"], [class~="bg-[#f8f4ef]"], [class~="bg-[#f9f5f1]"],
+  [class~="bg-[#faf7f3]"], [class~="bg-[#fffdfb]"]) {
+  background-color: var(--mls-muted-surface) !important;
+}
+.theme-dark :is([class~="text-[#292929]"], [class~="text-[#302b29]"],
+  [class~="text-[#383838]"], [class~="text-[#404040]"], [class~="text-[#474747]"],
+  [class~="text-[#575757]"], [class~="text-[#595959]"], [class~="text-[#5b5b5b]"],
+  [class~="text-[#5c5550]"], [class~="text-[#626262]"], [class~="text-[#656565]"],
+  [class~="text-slate-500"]) {
+  color: var(--mls-muted-text) !important;
+}
+:is(.theme-light, .theme-dark) :is(input:not([type="checkbox"]):not([type="radio"]), select, textarea) {
+  border-color: var(--mls-form-border) !important;
+  color: var(--mls-body);
+  background-color: var(--mls-card);
+}
+:is(.theme-light, .theme-dark) :is(input, textarea)::placeholder {
+  color: var(--mls-muted-text);
+  opacity: 1;
+}
+:is(.theme-light, .theme-dark) :is(a, button, summary, input, select, textarea):focus-visible {
+  outline: 3px solid var(--mls-focus);
+  outline-offset: 3px;
+}
+.theme-dark :is([class~="hover:bg-black/5"], [class~="hover:bg-[#f7f0ea]"]):hover {
+  background-color: #3a2922 !important;
+}
+/* A bright link hover must not replace white text on a burgundy CTA. */
+.theme-dark a[class~="text-white"]:hover { color: #ffffff !important; }
+.theme-dark .blog-html :is(li, td, th, caption) { color: var(--mls-body) !important; }
+.theme-dark .blog-html table { background-color: var(--mls-card) !important; }
+.theme-dark .blog-html :is(thead, th) { background-color: var(--mls-muted-surface) !important; }
+
+.mls-dark-panel { background-color: #202020; }
+:is(.theme-light, .theme-dark) .mls-dark-panel { --mls-focus: #ffb23f; }
+:is(.theme-light, .theme-dark) footer [class~="text-white/50"] { color: #bdb6b1; }
+:is(.theme-light, .theme-dark) [class~="text-[#777]"] { color: var(--mls-muted-text) !important; }

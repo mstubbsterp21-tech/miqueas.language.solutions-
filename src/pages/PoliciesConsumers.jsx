@@ -207,12 +207,12 @@ export default function PoliciesConsumers({ palette }) {
         </p>
       </PolicySection>
 
-      <section className="rounded-[2rem] p-6 text-white md:p-8" style={{ background: `linear-gradient(135deg, ${palette.burgundy}, ${palette.charcoal})` }}>
+      <section className="rounded-[2rem] p-6 text-white md:p-8 mls-dark-panel" style={{ background: `linear-gradient(135deg, ${palette.burgundy}, #464747)` }}>
         <h3 className="text-2xl font-bold">Need to share an access concern?</h3>
         <p className="mt-3 max-w-3xl text-sm leading-7 text-white/80 md:text-base">
           Contact MLS directly if communication access is not working, if you want to share a preference, or if you need to submit feedback about an assignment.
         </p>
-        <Link to="/contact" className="mt-5 inline-flex rounded-2xl px-5 py-3 text-sm font-bold text-white transition hover:-translate-y-0.5" style={{ backgroundColor: palette.gold }}>
+        <Link to="/contact" className="mt-5 inline-flex rounded-2xl px-5 py-3 text-sm font-bold text-white transition hover:-translate-y-0.5" style={{ backgroundColor: palette.actionGold }}>
           Contact MLS
         </Link>
       </section>

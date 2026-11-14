@@ -37,6 +37,9 @@ import { Accessibility as AccessibilityIcon, Mail, Moon, Phone, Sun } from "luci
 const lightPalette = {
   burgundy: "#721100",
   gold: "#dd7d00",
+  actionGold: "#a65300",
+  brandText: "var(--mls-brand-ink)",
+  goldText: "var(--mls-accent-ink)",
   charcoal: "#464747",
   white: "#ffffff",
   softGray: "#f5f5f5",
@@ -47,6 +50,9 @@ const lightPalette = {
 const darkPalette = {
   burgundy: "#721100",
   gold: "#dd7d00",
+  actionGold: "#a65300",
+  brandText: "var(--mls-brand-ink)",
+  goldText: "var(--mls-accent-ink)",
   charcoal: "#f7f3ef",
   white: "#15100e",
   softGray: "#211714",
@@ -166,7 +172,7 @@ function AccessibilityOverlay({ theme, onToggle, palette }) {
         <span className="block">Accessibility</span>
         <span className="block text-[11px] font-bold opacity-75">{isDark ? "Light mode" : "Dark mode"}</span>
       </span>
-      <ModeIcon size={17} style={{ color: palette.gold }} />
+      <ModeIcon size={17} style={{ color: palette.goldText }} />
     </button>
   );
 }
@@ -174,12 +180,12 @@ function AccessibilityOverlay({ theme, onToggle, palette }) {
 function BrandLockup({ palette, compact = false }) {
   return (
     <div className="flex min-w-0 items-center gap-2.5 sm:gap-3">
-      <img src={logo} alt="Miqueas Language Solutions logo" className={compact ? "h-11 w-auto shrink-0 object-contain sm:h-12" : "h-16 w-auto shrink-0 object-contain"} />
+      <img src={logo} alt="Miqueas Language Solutions logo" className={compact ? "rounded-lg bg-white p-1 h-11 w-auto shrink-0 object-contain sm:h-12" : "rounded-lg bg-white p-1 h-16 w-auto shrink-0 object-contain"} />
       <div className="min-w-0 flex-1 text-left">
         <div className={compact ? "max-w-[190px] whitespace-normal break-words text-sm font-bold leading-tight sm:max-w-none" : "whitespace-normal break-words text-lg font-bold leading-tight tracking-tight"} style={{ color: palette.charcoal }}>
           Miqueas Language Solutions
         </div>
-        <div className={compact ? "mt-0.5 max-w-[190px] whitespace-normal break-words text-[11px] leading-snug sm:max-w-none" : "whitespace-normal break-words text-sm leading-snug"} style={{ color: palette.burgundy }}>
+        <div className={compact ? "mt-0.5 max-w-[190px] whitespace-normal break-words text-[11px] leading-snug sm:max-w-none" : "whitespace-normal break-words text-sm leading-snug"} style={{ color: palette.brandText }}>
           Bridging Perspectives. Delivering Understanding.
         </div>
       </div>
@@ -235,8 +241,8 @@ export default function App() {
                     </summary>
                     <div className="absolute left-0 top-full z-[60] min-w-[250px] pt-3" >
                       <div className="rounded-xl border bg-white p-2 shadow-xl" style={{ borderColor: palette.border }}>
-                      <Link to="/services" className="block rounded-lg px-3 py-2.5 text-sm font-semibold hover:bg-black/5" style={{ color: lightPalette.charcoal }}>All Services</Link>
-                      {serviceNavItems.map((service) => <Link key={service.path} to={service.path} className="block rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-black/5" style={{ color: lightPalette.charcoal }}>{service.label}</Link>)}
+                      <Link to="/services" className="block rounded-lg px-3 py-2.5 text-sm font-semibold hover:bg-black/5" style={{ color: palette.charcoal }}>All Services</Link>
+                      {serviceNavItems.map((service) => <Link key={service.path} to={service.path} className="block rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-black/5" style={{ color: palette.charcoal }}>{service.label}</Link>)}
                       </div>
                     </div>
                   </NavigationDropdown>
@@ -251,8 +257,8 @@ export default function App() {
                   </summary>
                   <div className="absolute right-0 top-full z-[60] min-w-[210px] pt-3" >
                     <div className="rounded-xl border bg-white p-2 shadow-xl" style={{ borderColor: palette.border }}>
-                    <a href="/mentor-profile/" className="block rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-black/5" style={{ color: lightPalette.charcoal }}>Meet Your Mentor</a>
-                    <Link to="/mentee-interest" className="block rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-black/5" style={{ color: lightPalette.charcoal }}>Apply for Mentorship</Link>
+                    <a href="/mentor-profile/" className="block rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-black/5" style={{ color: palette.charcoal }}>Meet Your Mentor</a>
+                    <Link to="/mentee-interest" className="block rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-black/5" style={{ color: palette.charcoal }}>Apply for Mentorship</Link>
                     </div>
                   </div>
                 </NavigationDropdown>
@@ -279,11 +285,11 @@ export default function App() {
 
         <div className="hidden border-b border-black/5 bg-[rgba(245,245,245,0.85)] sm:block">
           <div className="mx-auto flex max-w-[96rem] flex-wrap items-center justify-center gap-x-5 gap-y-2 px-4 py-2.5 text-sm md:px-8 xl:px-10">
-            <div className="inline-flex items-center gap-3 font-semibold" style={{ color: palette.burgundy }}>
+            <div className="inline-flex items-center gap-3 font-semibold" style={{ color: palette.brandText }}>
               <span>Connect With Us</span>
               <div className="flex items-center gap-2">
                 {socialItems.map(({ href, label, Icon }) => (
-                  <a key={label} href={href} target="_blank" rel="noreferrer" aria-label={label} className="inline-flex h-8 w-8 items-center justify-center rounded-full text-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md" style={{ backgroundColor: lightPalette.gold }}>
+                  <a key={label} href={href} target="_blank" rel="noreferrer" aria-label={label} className="inline-flex h-8 w-8 items-center justify-center rounded-full text-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md" style={{ backgroundColor: lightPalette.actionGold }}>
                     <Icon size={14} />
                   </a>
                 ))}
@@ -291,12 +297,12 @@ export default function App() {
             </div>
             <div className="hidden h-4 w-px bg-black/10 sm:block" />
             <a href="tel:+13213798010" className="inline-flex items-center gap-2 font-medium transition hover:opacity-75" style={{ color: palette.charcoal }}>
-              <Phone size={14} style={{ color: palette.gold }} />
+              <Phone size={14} style={{ color: palette.goldText }} />
               <span>(321) 379-8010</span>
             </a>
             <div className="hidden h-4 w-px bg-black/10 sm:block" />
             <a href="mailto:m.stubbs@miqueaslanguagesolutions.com" className="inline-flex items-center gap-2 font-medium transition hover:opacity-75" style={{ color: palette.charcoal }}>
-              <Mail size={14} style={{ color: palette.gold }} />
+              <Mail size={14} style={{ color: palette.goldText }} />
               <span className="break-all sm:break-normal">m.stubbs@miqueaslanguagesolutions.com</span>
             </a>
           </div>
@@ -327,23 +333,23 @@ export default function App() {
               </details>
 
               <div className="mt-3 border-t border-black/10 pt-4 text-center">
-                <div className="mb-3 text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.burgundy }}>
+                <div className="mb-3 text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.brandText }}>
                   Connect With Us
                 </div>
                 <div className="flex flex-wrap justify-center gap-3">
                   {socialItems.map(({ href, label, Icon }) => (
-                    <a key={label} href={href} target="_blank" rel="noreferrer" aria-label={label} className="inline-flex h-10 w-10 items-center justify-center rounded-full text-white shadow-sm" style={{ backgroundColor: lightPalette.gold }} onClick={() => setMobileOpen(false)}>
+                    <a key={label} href={href} target="_blank" rel="noreferrer" aria-label={label} className="inline-flex h-10 w-10 items-center justify-center rounded-full text-white shadow-sm" style={{ backgroundColor: lightPalette.actionGold }} onClick={() => setMobileOpen(false)}>
                       <Icon size={17} />
                     </a>
                   ))}
                 </div>
                 <div className="mt-4 space-y-2">
                   <a href="tel:+13213798010" className="flex items-center justify-center gap-2 rounded-xl bg-black/[0.03] px-3 py-3 text-sm font-semibold" style={{ color: palette.charcoal }}>
-                    <Phone size={15} style={{ color: palette.gold }} />
+                    <Phone size={15} style={{ color: palette.goldText }} />
                     (321) 379-8010
                   </a>
                   <a href="mailto:m.stubbs@miqueaslanguagesolutions.com" className="flex items-center justify-center gap-2 rounded-xl bg-black/[0.03] px-3 py-3 text-sm font-semibold" style={{ color: palette.charcoal }}>
-                    <Mail size={15} style={{ color: palette.gold }} />
+                    <Mail size={15} style={{ color: palette.goldText }} />
                     <span className="break-all">m.stubbs@miqueaslanguagesolutions.com</span>
                   </a>
                 </div>
@@ -417,7 +423,7 @@ export default function App() {
               <p className="mx-auto max-w-md text-sm leading-7 text-white/75 md:mx-0">
                 Professional ASL/English interpreting and ASL video translation services built around clarity, access, and genuine human connection.
               </p>
-              <Link to="/contact" className="inline-flex rounded-2xl px-5 py-3 text-sm font-bold text-white transition hover:-translate-y-0.5" style={{ backgroundColor: lightPalette.gold }}>
+              <Link to="/contact" className="inline-flex rounded-2xl px-5 py-3 text-sm font-bold text-white transition hover:-translate-y-0.5" style={{ backgroundColor: lightPalette.actionGold }}>
                 Request Services
               </Link>
             </div>

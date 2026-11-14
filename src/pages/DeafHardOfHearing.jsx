@@ -37,17 +37,17 @@ const resources = [
 export default function DeafHardOfHearing({ palette }) {
   const reduceMotion = useReducedMotion();
   const cardStyle = { borderColor: palette.border, backgroundColor: palette.white };
-  const goldButton = { backgroundColor: palette.gold, color: palette.white };
+  const goldButton = { backgroundColor: palette.actionGold, color: "#ffffff" };
 
   return (
     <div className="mls-public-site overflow-hidden bg-white">
       <section className="relative px-5 py-14 md:px-8 md:py-20">
-        <div className="absolute inset-0 -z-10" style={{ background: "radial-gradient(circle at 12% 16%, rgba(221,125,0,0.18), transparent 28%), radial-gradient(circle at 92% 12%, rgba(114,17,0,0.14), transparent 32%), linear-gradient(180deg, #ffffff 0%, #f7f3ef 100%)" }} />
+        <div className="absolute inset-0 -z-10" style={{ background: "radial-gradient(circle at 12% 16%, rgba(221,125,0,0.18), transparent 28%), radial-gradient(circle at 92% 12%, rgba(114,17,0,0.14), transparent 32%), linear-gradient(180deg, var(--mls-page) 0%, var(--mls-muted-surface) 100%)" }} />
         <div className="mx-auto max-w-6xl">
           <motion.div initial="hidden" animate="show" variants={fadeUp} transition={{ duration: 0.55 }} className="grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_430px]">
             <div>
-              <div className="mb-5 inline-flex items-center gap-2 rounded-full border bg-white/80 px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] shadow-sm backdrop-blur" style={{ borderColor: palette.border, color: palette.burgundy }}>
-                <HandHeart size={15} style={{ color: palette.gold }} />
+              <div className="mb-5 inline-flex items-center gap-2 rounded-full border bg-white/80 px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] shadow-sm backdrop-blur" style={{ borderColor: palette.border, color: palette.brandText }}>
+                <HandHeart size={15} style={{ color: palette.goldText }} />
                 Deaf & Hard of Hearing
               </div>
               <h1 className="max-w-4xl text-4xl font-black leading-[1.03] tracking-tight md:text-6xl" style={{ color: palette.charcoal }}>
@@ -78,7 +78,7 @@ export default function DeafHardOfHearing({ palette }) {
                 priority
               />
               <motion.div initial={reduceMotion ? false : { opacity: 0, y: 22 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.25 }} className="relative z-10 -mt-6 ml-auto w-[91%] rounded-[1.3rem] bg-[#202020] p-5 text-white shadow-xl sm:w-[83%] sm:p-6">
-                <p className="text-xs font-black uppercase tracking-[0.17em]" style={{ color: palette.gold }}>Your communication matters</p>
+                <p className="text-xs font-black uppercase tracking-[0.17em]" style={{ color: palette.goldText }}>Your communication matters</p>
                 <p className="mt-2 text-lg font-bold leading-snug">Being present isn't the same as being able to participate.</p>
               </motion.div>
             </div>
@@ -91,7 +91,7 @@ export default function DeafHardOfHearing({ palette }) {
           <motion.div initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.25 }} variants={fadeUp} transition={{ duration: 0.45 }} className="rounded-[2.2rem] border bg-[#202020] p-7 shadow-sm md:p-10" style={{ borderColor: palette.border }}>
             <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
               <div>
-                <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.gold }}>Rights & access</p>
+                <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.goldText }}>Rights & access</p>
                 <h2 className="mt-3 text-3xl font-black leading-tight text-white md:text-5xl">Communication access is not a favor.</h2>
                 <p className="mt-5 text-base leading-8 text-white/75">
                   In many settings, organizations may be responsible for providing effective communication. A qualified interpreter can help make sure you are not just present, but actually able to understand, respond, ask questions, and make informed decisions.
@@ -105,7 +105,7 @@ export default function DeafHardOfHearing({ palette }) {
                   { icon: HeartHandshake, title: "Be respected", copy: "Access should support dignity, privacy, and meaningful involvement." },
                 ].map(({ icon: Icon, title, copy }, index) => (
                   <motion.div key={title} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.25 }} variants={fadeUp} transition={{ duration: 0.45, delay: index * 0.04 }} className="h-full rounded-[1.5rem] border border-white/10 bg-white/[0.06] p-5">
-                    <Icon size={23} style={{ color: palette.gold }} />
+                    <Icon size={23} style={{ color: palette.goldText }} />
                     <h3 className="mt-4 text-lg font-black text-white">{title}</h3>
                     <p className="mt-2 text-sm leading-6 text-white/65">{copy}</p>
                   </motion.div>
@@ -119,13 +119,13 @@ export default function DeafHardOfHearing({ palette }) {
       <section className="px-5 py-12 md:px-8 md:py-16">
         <div className="mx-auto max-w-6xl">
           <motion.div initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} variants={fadeUp} transition={{ duration: 0.45 }} className="mb-8 max-w-3xl">
-            <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.gold }}>Common situations</p>
+            <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.goldText }}>Common situations</p>
             <h2 className="mt-3 text-3xl font-black tracking-tight md:text-5xl" style={{ color: palette.charcoal }}>Access may be needed in more places than people realize.</h2>
           </motion.div>
           <div className="grid auto-rows-fr gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {situations.map(({ icon: Icon, title, copy }, index) => (
               <motion.div key={title} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.25 }} variants={fadeUp} transition={{ duration: 0.45, delay: index * 0.04 }} className="h-full rounded-[1.6rem] border bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-lg" style={cardStyle}>
-                <div className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-2xl" style={{ backgroundColor: "rgba(221,125,0,0.12)", color: palette.gold }}><Icon size={22} /></div>
+                <div className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-2xl" style={{ backgroundColor: "rgba(221,125,0,0.12)", color: palette.goldText }}><Icon size={22} /></div>
                 <h3 className="text-lg font-black" style={{ color: palette.charcoal }}>{title}</h3>
                 <p className="mt-3 text-sm leading-7 text-[#666]">{copy}</p>
               </motion.div>
@@ -138,14 +138,14 @@ export default function DeafHardOfHearing({ palette }) {
         <div className="mx-auto max-w-6xl rounded-[2.2rem] border bg-[#fafafa] p-6 md:p-8" style={{ borderColor: palette.border }}>
           <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
             <motion.div initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.25 }} variants={fadeUp} transition={{ duration: 0.45 }}>
-              <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.gold }}>Self-advocacy phrases</p>
+              <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.goldText }}>Self-advocacy phrases</p>
               <h2 className="mt-3 text-3xl font-black leading-tight md:text-4xl" style={{ color: palette.charcoal }}>Words you can use when requesting access.</h2>
               <p className="mt-4 text-base leading-8 text-[#5f6368]">Sometimes the hardest part is knowing how to ask. These phrases can be adapted for email, phone calls, portals, or in-person conversations.</p>
             </motion.div>
             <div className="space-y-4">
               {advocacyPhrases.map((phrase, index) => (
                 <motion.div key={phrase} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.25 }} variants={fadeUp} transition={{ duration: 0.45, delay: index * 0.04 }} className="rounded-[1.5rem] border bg-white p-5 shadow-sm" style={cardStyle}>
-                  <p className="text-xs font-black uppercase tracking-[0.16em]" style={{ color: palette.gold }}>Phrase {index + 1}</p>
+                  <p className="text-xs font-black uppercase tracking-[0.16em]" style={{ color: palette.goldText }}>Phrase {index + 1}</p>
                   <p className="mt-2 text-base font-bold leading-8" style={{ color: palette.charcoal }}>“{phrase}”</p>
                 </motion.div>
               ))}
@@ -159,13 +159,13 @@ export default function DeafHardOfHearing({ palette }) {
           <div className="grid gap-8 lg:grid-cols-[1fr_0.95fr] lg:items-start">
             <div>
               <motion.div initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} variants={fadeUp} transition={{ duration: 0.45 }} className="mb-8 max-w-3xl">
-                <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.gold }}>Working with interpreters</p>
+                <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.goldText }}>Working with interpreters</p>
                 <h2 className="mt-3 text-3xl font-black tracking-tight md:text-5xl" style={{ color: palette.charcoal }}>The interpreter supports communication. They do not replace your voice.</h2>
               </motion.div>
               <div className="grid auto-rows-fr gap-4 md:grid-cols-3 lg:grid-cols-1">
                 {interpreterTips.map(({ icon: Icon, title, copy }, index) => (
                   <motion.div key={title} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.25 }} variants={fadeUp} transition={{ duration: 0.45, delay: index * 0.04 }} className="h-full rounded-[1.5rem] border bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-lg" style={cardStyle}>
-                    <Icon size={23} style={{ color: palette.gold }} />
+                    <Icon size={23} style={{ color: palette.goldText }} />
                     <h3 className="mt-4 text-lg font-black" style={{ color: palette.charcoal }}>{title}</h3>
                     <p className="mt-3 text-sm leading-7 text-[#666]">{copy}</p>
                   </motion.div>
@@ -174,7 +174,7 @@ export default function DeafHardOfHearing({ palette }) {
             </div>
 
             <motion.div initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.25 }} variants={fadeUp} transition={{ duration: 0.45 }} className="rounded-[2rem] border bg-[#f7f3ef] p-6 md:p-8" style={{ borderColor: palette.border }}>
-              <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.gold }}>For hearing allies</p>
+              <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.goldText }}>For hearing allies</p>
               <h3 className="mt-3 text-3xl font-black leading-tight" style={{ color: palette.charcoal }}>Access works better when hearing people understand their role too.</h3>
               <div className="mt-6 space-y-3">
                 {[
@@ -184,7 +184,7 @@ export default function DeafHardOfHearing({ palette }) {
                   "Share materials ahead of time when possible.",
                 ].map((item) => (
                   <div key={item} className="flex items-start gap-3 rounded-2xl bg-white p-4 shadow-sm">
-                    <CheckCircle2 size={18} style={{ color: palette.gold, marginTop: 2, flexShrink: 0 }} />
+                    <CheckCircle2 size={18} style={{ color: palette.goldText, marginTop: 2, flexShrink: 0 }} />
                     <span className="text-sm leading-6" style={{ color: palette.body }}>{item}</span>
                   </div>
                 ))}
@@ -197,13 +197,13 @@ export default function DeafHardOfHearing({ palette }) {
       <section className="px-5 py-12 md:px-8 md:py-16">
         <div className="mx-auto max-w-6xl">
           <motion.div initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} variants={fadeUp} transition={{ duration: 0.45 }} className="mb-8 max-w-3xl">
-            <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.gold }}>Helpful resources</p>
+            <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.goldText }}>Helpful resources</p>
             <h2 className="mt-3 text-3xl font-black tracking-tight md:text-5xl" style={{ color: palette.charcoal }}>Learn more about communication access and advocacy.</h2>
           </motion.div>
           <div className="grid auto-rows-fr gap-4 md:grid-cols-3">
             {resources.map((resource, index) => (
               <motion.a key={resource.title} href={resource.href} target="_blank" rel="noreferrer" initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.25 }} variants={fadeUp} transition={{ duration: 0.45, delay: index * 0.04 }} className="h-full rounded-[1.5rem] border bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-lg" style={cardStyle}>
-                <BookOpenCheck size={23} style={{ color: palette.gold }} />
+                <BookOpenCheck size={23} style={{ color: palette.goldText }} />
                 <h3 className="mt-4 text-lg font-black" style={{ color: palette.charcoal }}>{resource.title}</h3>
                 <p className="mt-3 text-sm leading-7 text-[#666]">{resource.copy}</p>
               </motion.a>

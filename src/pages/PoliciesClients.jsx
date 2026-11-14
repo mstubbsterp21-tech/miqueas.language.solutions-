@@ -271,12 +271,12 @@ export default function PoliciesClients({ palette }) {
         </p>
       </PolicySection>
 
-      <section className="rounded-[2rem] p-6 text-white md:p-8" style={{ background: `linear-gradient(135deg, ${palette.burgundy}, ${palette.charcoal})` }}>
+      <section className="rounded-[2rem] p-6 text-white md:p-8 mls-dark-panel" style={{ background: `linear-gradient(135deg, ${palette.burgundy}, #464747)` }}>
         <h3 className="text-2xl font-bold">Need to request services?</h3>
         <p className="mt-3 max-w-3xl text-sm leading-7 text-white/80 md:text-base">
           Submit your request with as much detail as possible so MLS can review the assignment and determine appropriate staffing.
         </p>
-        <Link to="/contact" className="mt-5 inline-flex rounded-2xl px-5 py-3 text-sm font-bold text-white transition hover:-translate-y-0.5" style={{ backgroundColor: palette.gold }}>
+        <Link to="/contact" className="mt-5 inline-flex rounded-2xl px-5 py-3 text-sm font-bold text-white transition hover:-translate-y-0.5" style={{ backgroundColor: palette.actionGold }}>
           Request Services
         </Link>
       </section>

@@ -40,17 +40,17 @@ const resourceLinks = [
 export default function ResourcesClients({ palette }) {
   const reduceMotion = useReducedMotion();
   const cardStyle = { borderColor: palette.border, backgroundColor: palette.white };
-  const goldButton = { backgroundColor: palette.gold, color: palette.white };
+  const goldButton = { backgroundColor: palette.actionGold, color: "#ffffff" };
 
   return (
     <div className="mls-public-site overflow-hidden bg-white">
       <section className="relative px-5 py-14 md:px-8 md:py-20">
-        <div className="absolute inset-0 -z-10" style={{ background: "radial-gradient(circle at 15% 15%, rgba(221,125,0,0.18), transparent 28%), radial-gradient(circle at 85% 10%, rgba(114,17,0,0.12), transparent 32%), linear-gradient(180deg, #ffffff 0%, #f7f3ef 100%)" }} />
+        <div className="absolute inset-0 -z-10" style={{ background: "radial-gradient(circle at 15% 15%, rgba(221,125,0,0.18), transparent 28%), radial-gradient(circle at 85% 10%, rgba(114,17,0,0.12), transparent 32%), linear-gradient(180deg, var(--mls-page) 0%, var(--mls-muted-surface) 100%)" }} />
         <div className="mx-auto max-w-6xl">
           <motion.div initial="hidden" animate="show" variants={fadeUp} transition={{ duration: 0.55 }} className="grid items-center gap-12 lg:grid-cols-[minmax(0,0.95fr)_minmax(360px,1.05fr)]">
             <div className="max-w-3xl">
-              <div className="mb-5 inline-flex items-center gap-2 rounded-full border bg-white/80 px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] shadow-sm backdrop-blur" style={{ borderColor: palette.border, color: palette.burgundy }}>
-                <ClipboardList size={15} style={{ color: palette.gold }} />
+              <div className="mb-5 inline-flex items-center gap-2 rounded-full border bg-white/80 px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] shadow-sm backdrop-blur" style={{ borderColor: palette.border, color: palette.brandText }}>
+                <ClipboardList size={15} style={{ color: palette.goldText }} />
                 For Clients
               </div>
               <h1 className="text-4xl font-black leading-[1.03] tracking-tight md:text-6xl" style={{ color: palette.charcoal }}>
@@ -79,7 +79,7 @@ export default function ResourcesClients({ palette }) {
                 tilt="right"
               />
               <motion.div initial={reduceMotion ? false : { opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.2 }} className="relative z-10 -mt-7 ml-auto w-[92%] rounded-[1.25rem] border border-[#721100]/10 bg-white p-5 shadow-xl sm:w-[83%] md:p-6">
-                <p className="text-xs font-black uppercase tracking-[0.16em]" style={{ color: palette.burgundy }}>Prepared from the start</p>
+                <p className="text-xs font-black uppercase tracking-[0.16em]" style={{ color: palette.brandText }}>Prepared from the start</p>
                 <p className="mt-2 text-lg font-bold leading-snug" style={{ color: palette.charcoal }}>Share the details you know. We'll help identify the next steps.</p>
               </motion.div>
             </div>
@@ -90,13 +90,13 @@ export default function ResourcesClients({ palette }) {
       <section className="px-5 py-12 md:px-8 md:py-14" aria-labelledby="client-planning-checklist">
         <div className="mx-auto max-w-6xl rounded-[2rem] bg-[#202020] p-6 text-white md:p-9">
           <motion.div initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} variants={fadeUp} transition={{ duration: 0.45 }} className="mb-7 max-w-2xl">
-            <p className="text-xs font-black uppercase tracking-[0.18em]" style={{ color: palette.gold }}>Planning checklist</p>
+            <p className="text-xs font-black uppercase tracking-[0.18em]" style={{ color: palette.goldText }}>Planning checklist</p>
             <h2 id="client-planning-checklist" className="mt-2 text-2xl font-black md:text-3xl">Four details that help us prepare.</h2>
           </motion.div>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {planningItems.map(({ icon: Icon, label, detail }, index) => (
               <motion.div key={label} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} variants={fadeUp} transition={{ duration: 0.45, delay: index * 0.07 }} className="rounded-[1.2rem] border border-white/15 bg-white/[0.06] p-5 transition-colors duration-300 hover:bg-white/[0.1]">
-                <Icon size={22} style={{ color: palette.gold }} />
+                <Icon size={22} style={{ color: palette.goldText }} />
                 <h3 className="mt-4 text-sm font-black">{label}</h3>
                 <p className="mt-2 text-xs leading-6 text-white/70">{detail}</p>
               </motion.div>
@@ -108,13 +108,13 @@ export default function ResourcesClients({ palette }) {
       <section className={sectionClass}>
         <div className="mx-auto max-w-6xl">
           <motion.div initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} variants={fadeUp} transition={{ duration: 0.45 }} className={sectionHeadingClass}>
-            <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.gold }}>Where MLS can help</p>
+            <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.goldText }}>Where MLS can help</p>
             <h2 className="mt-3 text-3xl font-black tracking-tight md:text-5xl" style={{ color: palette.charcoal }}>Different settings require different access decisions.</h2>
           </motion.div>
           <div className="grid auto-rows-fr gap-4 md:grid-cols-2 lg:grid-cols-4">
             {clientCards.map(({ icon: Icon, title, copy }, index) => (
               <motion.div key={title} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.25 }} variants={fadeUp} transition={{ duration: 0.45, delay: index * 0.04 }} className="rounded-[1.6rem] border bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-lg" style={cardStyle}>
-                <div className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-2xl" style={{ backgroundColor: "rgba(221,125,0,0.12)", color: palette.gold }}><Icon size={22} /></div>
+                <div className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-2xl" style={{ backgroundColor: "rgba(221,125,0,0.12)", color: palette.goldText }}><Icon size={22} /></div>
                 <h3 className="text-lg font-black" style={{ color: palette.charcoal }}>{title}</h3>
                 <p className="mt-3 text-sm leading-7 text-[#666]">{copy}</p>
               </motion.div>
@@ -127,7 +127,7 @@ export default function ResourcesClients({ palette }) {
         <div className="mx-auto max-w-6xl rounded-[2.2rem] border bg-[#fafafa] p-6 md:p-8" style={{ borderColor: palette.border }}>
           <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-center">
             <motion.div initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.25 }} variants={fadeUp} transition={{ duration: 0.45 }}>
-              <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.gold }}>The process</p>
+              <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.goldText }}>The process</p>
               <h2 className="mt-3 text-3xl font-black leading-tight md:text-4xl" style={{ color: palette.charcoal }}>A smoother request starts with the right details.</h2>
               <p className="mt-4 text-base leading-8 text-[#5f6368]">You do not need to know every answer before reaching out. Share what you have, and MLS will help identify what else may be needed.</p>
             </motion.div>
@@ -155,13 +155,13 @@ export default function ResourcesClients({ palette }) {
       <section className={sectionClass}>
         <div className="mx-auto max-w-6xl">
           <motion.div initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} variants={fadeUp} transition={{ duration: 0.45 }} className={sectionHeadingClass}>
-            <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.gold }}>Helpful guidance</p>
+            <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.goldText }}>Helpful guidance</p>
             <h2 className="mt-3 text-3xl font-black tracking-tight md:text-5xl" style={{ color: palette.charcoal }}>Know the basics before the assignment begins.</h2>
           </motion.div>
           <div className="grid auto-rows-fr gap-4 md:grid-cols-3">
             {resourceLinks.map((resource, index) => (
               <motion.a key={resource.title} href={resource.href} target="_blank" rel="noreferrer" initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.25 }} variants={fadeUp} transition={{ duration: 0.45, delay: index * 0.04 }} className="rounded-[1.5rem] border bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-lg" style={cardStyle}>
-                <FileText size={23} style={{ color: palette.gold }} />
+                <FileText size={23} style={{ color: palette.goldText }} />
                 <h3 className="mt-4 text-lg font-black" style={{ color: palette.charcoal }}>{resource.title}</h3>
                 <p className="mt-3 text-sm leading-7 text-[#666]">{resource.copy}</p>
               </motion.a>

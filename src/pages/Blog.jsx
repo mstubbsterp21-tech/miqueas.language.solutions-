@@ -29,10 +29,10 @@ const staggerGroup = {
 
 function getThemeStyles(palette) {
   const isDark = palette.white !== "#ffffff";
-  const accentText = isDark ? palette.gold : palette.burgundy;
+  const accentText = isDark ? palette.actionGold : palette.burgundy;
   const heroGradient = isDark
     ? "radial-gradient(circle at 12% 12%, rgba(221,125,0,0.12), transparent 30%), linear-gradient(180deg, #15100e 0%, #211714 100%)"
-    : "radial-gradient(circle at 12% 12%, rgba(221,125,0,0.10), transparent 30%), linear-gradient(180deg, #ffffff 0%, #f8f5f2 100%)";
+    : "radial-gradient(circle at 12% 12%, rgba(221,125,0,0.10), transparent 30%), linear-gradient(180deg, var(--mls-page) 0%, #f8f5f2 100%)";
 
   return { accentText, heroGradient };
 }
@@ -84,11 +84,11 @@ function PostMeta({ post, palette, light = false }) {
       style={{ color: light ? "rgba(255,255,255,0.82)" : palette.body }}
     >
       <span className="inline-flex items-center gap-2">
-        <CalendarDays size={15} style={{ color: palette.gold }} />
+        <CalendarDays size={15} style={{ color: palette.goldText }} />
         {formatBlogDate(post.publishDate)}
       </span>
       <span className="inline-flex items-center gap-2">
-        <Clock size={15} style={{ color: palette.gold }} />
+        <Clock size={15} style={{ color: palette.goldText }} />
         {post.readTime}
       </span>
     </div>

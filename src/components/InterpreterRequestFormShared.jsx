@@ -55,6 +55,9 @@ export const EMPTY_INTERPRETER_REQUEST = {
 const defaultPalette = {
   burgundy: "#721100",
   gold: "#dd7d00",
+  actionGold: "#a65300",
+  brandText: "var(--mls-brand-ink)",
+  goldText: "var(--mls-accent-ink)",
   charcoal: "#464747",
   white: "#ffffff",
   softGray: "#f5f5f5",
@@ -112,7 +115,7 @@ function SectionCard({ title, subtitle, step, children, palette }) {
   return (
     <div className="rounded-[2rem] border bg-white p-6 shadow-sm md:p-8" style={{ borderColor: palette.border }}>
       <div className="mb-6">
-        <div className="inline-flex rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em]" style={{ backgroundColor: palette.softGray, color: palette.gold }}>
+        <div className="inline-flex rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em]" style={{ backgroundColor: palette.softGray, color: palette.goldText }}>
           Section {step} of 7
         </div>
         <h2 className="mt-4 text-2xl font-bold" style={{ color: palette.charcoal }}>{title}</h2>
@@ -126,7 +129,7 @@ function SectionCard({ title, subtitle, step, children, palette }) {
 function ReviewItem({ label, value, palette }) {
   return (
     <div className="rounded-2xl border bg-white p-4" style={{ borderColor: palette.border }}>
-      <dt className="text-xs font-bold uppercase tracking-[0.16em]" style={{ color: palette.gold }}>{label}</dt>
+      <dt className="text-xs font-bold uppercase tracking-[0.16em]" style={{ color: palette.goldText }}>{label}</dt>
       <dd className="mt-2 whitespace-pre-wrap text-sm leading-6" style={{ color: palette.charcoal }}>{value || "—"}</dd>
     </div>
   );
@@ -323,7 +326,7 @@ export default function InterpreterRequestFormShared({
     return (
       <section className="mx-auto max-w-4xl px-1 py-8 md:px-4">
         <div className="rounded-[2rem] border bg-white p-8 text-center shadow-sm" style={{ borderColor: p.border }}>
-          <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full text-2xl" style={{ backgroundColor: p.softGray, color: p.burgundy }}>✓</div>
+          <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full text-2xl" style={{ backgroundColor: p.softGray, color: p.brandText }}>✓</div>
           <h1 className="text-3xl font-bold" style={{ color: p.charcoal }}>{successTitle}</h1>
           <p className="mx-auto mt-4 max-w-2xl text-sm leading-6" style={{ color: p.charcoal }}>{successMessage}</p>
           <button type="button" onClick={reset} className="mt-6 rounded-full px-5 py-3 text-sm font-bold text-white" style={{ backgroundColor: p.burgundy }}>{resetLabel}</button>

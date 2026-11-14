@@ -39,7 +39,7 @@ function WorkflowTimeline({ steps, palette }) {
     <section className="px-5 py-12 md:px-8 md:py-16">
       <div className="mx-auto max-w-6xl rounded-[2.2rem] border bg-[#fafafa] p-6 md:p-8" style={{ borderColor: palette.border }}>
         <motion.div initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} variants={fadeUp} transition={{ duration: 0.45 }} className="mb-8 max-w-3xl">
-          <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.gold }}>Workflow</p>
+          <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.goldText }}>Workflow</p>
           <h2 className="mt-3 text-3xl font-black tracking-tight md:text-5xl" style={{ color: palette.charcoal }}>How this service works.</h2>
           <p className="mt-4 text-base leading-8 text-[#5f6368]">Clear steps help the request move forward without guesswork.</p>
         </motion.div>
@@ -51,7 +51,7 @@ function WorkflowTimeline({ steps, palette }) {
               <motion.div key={step.title} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.25 }} variants={fadeUp} transition={{ duration: 0.45, delay: index * 0.04 }} className="relative h-full">
                 <div className="flex h-full flex-col rounded-[1.5rem] border bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-lg" style={{ borderColor: palette.border }}>
                   <div className="flex items-center justify-between gap-3">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl text-white" style={{ backgroundColor: index % 2 === 0 ? palette.gold : palette.burgundy }}>
+                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl text-white" style={{ backgroundColor: index % 2 === 0 ? palette.actionGold : palette.burgundy }}>
                       <Icon size={20} />
                     </div>
                     <span className="text-xs font-black uppercase tracking-[0.16em]" style={{ color: palette.body }}>Step {index + 1}</span>
@@ -61,7 +61,7 @@ function WorkflowTimeline({ steps, palette }) {
                 </div>
                 {index < steps.length - 1 && (
                   <div className="pointer-events-none absolute -right-3 top-1/2 hidden -translate-y-1/2 md:block">
-                    <ArrowRight size={18} style={{ color: palette.gold }} />
+                    <ArrowRight size={18} style={{ color: palette.goldText }} />
                   </div>
                 )}
               </motion.div>
@@ -96,7 +96,7 @@ function InfoList({ title, items, palette, dark = false }) {
       <div className="mt-5 space-y-3">
         {items.map((item) => (
           <div key={item} className="flex items-start gap-3 rounded-2xl p-4" style={{ backgroundColor: itemBackground, border: itemBorder }}>
-            <CheckCircle2 size={18} style={{ color: palette.gold, marginTop: 2, flexShrink: 0 }} />
+            <CheckCircle2 size={18} style={{ color: palette.goldText, marginTop: 2, flexShrink: 0 }} />
             <span className="text-sm leading-6" style={{ color: itemTextColor }}>{item}</span>
           </div>
         ))}
@@ -198,7 +198,7 @@ export default function ServiceDetail({ palette }) {
 
   const service = services[serviceId];
   const servicePhoto = ["in-person-interpreting", "video-remote-interpreting", "english-asl-translation", "asl-english-translation"].includes(serviceId) ? serviceId : null;
-  const goldButton = { backgroundColor: palette.gold, color: palette.white };
+  const goldButton = { backgroundColor: palette.actionGold, color: "#ffffff" };
 
   if (!service) {
     return (
@@ -216,14 +216,14 @@ export default function ServiceDetail({ palette }) {
   return (
     <div className="mls-public-site overflow-hidden bg-white">
       <section className="relative px-5 py-14 md:px-8 md:py-20">
-        <div className="absolute inset-0 -z-10" style={{ background: "radial-gradient(circle at 12% 15%, rgba(221,125,0,0.18), transparent 28%), radial-gradient(circle at 92% 8%, rgba(114,17,0,0.14), transparent 32%), linear-gradient(180deg, #ffffff 0%, #f7f3ef 100%)" }} />
+        <div className="absolute inset-0 -z-10" style={{ background: "radial-gradient(circle at 12% 15%, rgba(221,125,0,0.18), transparent 28%), radial-gradient(circle at 92% 8%, rgba(114,17,0,0.14), transparent 32%), linear-gradient(180deg, var(--mls-page) 0%, var(--mls-muted-surface) 100%)" }} />
         <div className="mx-auto max-w-6xl">
           <Link to="/services" className="mb-8 inline-flex items-center gap-2 rounded-full border bg-white px-5 py-3 text-sm font-bold shadow-sm transition hover:-translate-y-0.5 hover:shadow-md" style={{ borderColor: palette.border, color: palette.charcoal }}>
             <ArrowLeft size={16} /> Back to Services
           </Link>
           <motion.div initial="hidden" animate="show" variants={fadeUp} transition={{ duration: 0.55 }} className="grid items-center gap-12 lg:grid-cols-[minmax(0,1fr)_420px]">
             <div className="max-w-3xl">
-              <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.gold }}>{service.eyebrow}</p>
+              <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.goldText }}>{service.eyebrow}</p>
               <h1 className="mt-4 text-4xl font-black leading-[1.03] tracking-tight md:text-6xl" style={{ color: palette.charcoal }}>{service.title}</h1>
               <p className="mt-6 max-w-2xl text-lg leading-8 text-[#555] md:text-xl">{service.subtitle}</p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -237,11 +237,11 @@ export default function ServiceDetail({ palette }) {
                 <MlsSitePhoto name={servicePhoto} alt={`Illustrative ${service.title.toLowerCase()} service scene`} priority className="!rounded-none aspect-[4/3] object-cover" />
               </motion.div>
               <motion.div initial={reduceMotion ? false : { opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.58, delay: 0.3 }} className="relative z-10 -mt-7 ml-auto w-[94%] rounded-[1.35rem] border border-[#721100]/10 bg-white p-5 shadow-xl sm:w-[89%] md:p-6">
-                <p className="text-[11px] font-black uppercase tracking-[0.16em]" style={{ color: palette.burgundy }}>Plan with confidence</p>
+                <p className="text-[11px] font-black uppercase tracking-[0.16em]" style={{ color: palette.brandText }}>Plan with confidence</p>
                 <p className="mt-2 text-sm font-semibold leading-6" style={{ color: palette.charcoal }}>We'll review the setting, preparation, and service fit before confirming details.</p>
                 <div className="mt-3 flex flex-wrap gap-2">
                   {service.settings.slice(0, 3).map((item) => (
-                    <span key={item} className="rounded-full border border-[#721100]/10 bg-[#f7f3ef] px-3 py-1.5 text-[11px] font-bold" style={{ color: palette.burgundy }}>{item}</span>
+                    <span key={item} className="rounded-full border border-[#721100]/10 bg-[#f7f3ef] px-3 py-1.5 text-[11px] font-bold" style={{ color: palette.brandText }}>{item}</span>
                   ))}
                 </div>
               </motion.div>
@@ -254,12 +254,12 @@ export default function ServiceDetail({ palette }) {
         <div className="mx-auto max-w-6xl">
           <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
             <motion.div initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.25 }} variants={fadeUp} transition={{ duration: 0.45 }} className="rounded-[2rem] border bg-white p-6 shadow-sm md:p-8" style={{ borderColor: palette.border }}>
-              <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.gold }}>Service overview</p>
+              <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.goldText }}>Service overview</p>
               <p className="mt-4 text-base leading-8" style={{ color: palette.body }}>{service.description}</p>
               <p className="mt-5 text-base leading-8" style={{ color: palette.body }}>{service.whyItWorks}</p>
             </motion.div>
             <motion.div initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.25 }} variants={fadeUp} transition={{ duration: 0.45, delay: 0.04 }} className="rounded-[2rem] border bg-[#202020] p-6 shadow-sm md:p-8" style={{ borderColor: palette.border }}>
-              <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.gold }}>Policy alignment</p>
+              <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.goldText }}>Policy alignment</p>
               <h2 className="mt-3 text-3xl font-black leading-tight text-white">{service.policyTitle}</h2>
               <p className="mt-5 text-sm leading-7 text-white/72">{service.policyText}</p>
               <p className="mt-4 text-sm leading-7 text-white/72">Full quotes are confirmed after reviewing assignment details, logistics, and any service-specific needs.</p>
@@ -274,7 +274,7 @@ export default function ServiceDetail({ palette }) {
         <section className="px-5 py-12 md:px-8 md:py-16" aria-labelledby="client-vri-access-heading">
           <div className="mx-auto grid max-w-6xl items-center gap-8 rounded-[2rem] border border-[#721100]/10 bg-[#f8f3ed] p-6 md:gap-10 md:p-10 lg:grid-cols-[0.67fr_1.33fr]">
             <div>
-              <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.gold }}>Before your VRI appointment</p>
+              <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.goldText }}>Before your VRI appointment</p>
               <h2 id="client-vri-access-heading" className="mt-3 text-3xl font-black leading-tight md:text-4xl" style={{ color: palette.charcoal }}>Set up for communication access.</h2>
               <p className="mt-4 text-base leading-8 text-[#5f6368]">
                 Check the viewing environment, connection, audio, camera, screen visibility, and placement before the session. Use the illustrated guide to discuss your setup with MLS.

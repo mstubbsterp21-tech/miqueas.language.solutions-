@@ -19,7 +19,7 @@ export default function Resources({ palette }) {
             className="mb-4 inline-flex rounded-full px-4 py-1 text-xs font-semibold uppercase tracking-[0.2em]"
             style={{
               backgroundColor: `${palette.gold}14`,
-              color: palette.gold,
+              color: palette.goldText,
             }}
           >
             Resources & Guidance
@@ -47,7 +47,7 @@ export default function Resources({ palette }) {
               className="rounded-xl px-5 py-2.5 text-sm font-semibold transition"
               style={{
                 backgroundColor: activeTab === "clients" ? palette.burgundy : "transparent",
-                color: activeTab === "clients" ? palette.white : palette.charcoal,
+                color: activeTab === "clients" ? "#ffffff" : palette.charcoal,
               }}
             >
               Clients
@@ -59,7 +59,7 @@ export default function Resources({ palette }) {
               className="rounded-xl px-5 py-2.5 text-sm font-semibold transition"
               style={{
                 backgroundColor: activeTab === "interpreters" ? palette.burgundy : "transparent",
-                color: activeTab === "interpreters" ? palette.white : palette.charcoal,
+                color: activeTab === "interpreters" ? "#ffffff" : palette.charcoal,
               }}
             >
               Interpreters

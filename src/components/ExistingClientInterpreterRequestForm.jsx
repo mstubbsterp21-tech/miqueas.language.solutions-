@@ -11,6 +11,9 @@ import {
 const defaultPalette = {
   burgundy: "#721100",
   gold: "#dd7d00",
+  actionGold: "#a65300",
+  brandText: "var(--mls-brand-ink)",
+  goldText: "var(--mls-accent-ink)",
   charcoal: "#464747",
   white: "#ffffff",
   softGray: "#f5f5f5",
@@ -53,7 +56,7 @@ function ErrorText({ errors, name }) {
 function SectionCard({ title, subtitle, step, children, palette }) {
   return <div className="rounded-[2rem] border bg-white p-6 shadow-sm md:p-8" style={{ borderColor: palette.border }}>
     <div className="mb-6">
-      <div className="inline-flex rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em]" style={{ backgroundColor: palette.softGray, color: palette.gold }}>Section {step} of 5</div>
+      <div className="inline-flex rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em]" style={{ backgroundColor: palette.softGray, color: palette.goldText }}>Section {step} of 5</div>
       <h2 className="mt-4 text-2xl font-bold" style={{ color: palette.charcoal }}>{title}</h2>
       {subtitle ? <p className="mt-2 max-w-3xl text-sm leading-6" style={{ color: palette.charcoal }}>{subtitle}</p> : null}
     </div>
@@ -63,7 +66,7 @@ function SectionCard({ title, subtitle, step, children, palette }) {
 
 function ReviewItem({ label, value, palette }) {
   return <div className="rounded-2xl border bg-white p-4" style={{ borderColor: palette.border }}>
-    <dt className="text-xs font-bold uppercase tracking-[0.16em]" style={{ color: palette.gold }}>{label}</dt>
+    <dt className="text-xs font-bold uppercase tracking-[0.16em]" style={{ color: palette.goldText }}>{label}</dt>
     <dd className="mt-2 whitespace-pre-wrap text-sm leading-6" style={{ color: palette.charcoal }}>{value || "—"}</dd>
   </div>;
 }
@@ -191,7 +194,7 @@ export default function ExistingClientInterpreterRequestForm({
   const renderYesNo = (name, label, extra = []) => renderSelect(name, label, ["Yes", "No", ...extra]);
   const renderCheckboxGroup = (name, label, options, otherName) => <div><p className={labelClass} style={{ color: p.charcoal }}>{label}</p><div className="grid gap-3 md:grid-cols-2">{options.map((option) => <label key={option} className="flex items-start gap-3 rounded-xl border bg-white px-4 py-3 text-sm" style={{ borderColor: p.border, color: p.charcoal }}><input type="checkbox" checked={formData[name].includes(option)} onChange={() => toggleMultiSelect(name, option)} className="mt-1 h-4 w-4 rounded form-checkbox" style={{ accentColor: p.burgundy }} /><span>{option}</span></label>)}</div><ErrorText errors={errors} name={name} />{otherName && formData[name].includes("Other") ? <div className="mt-3"><input value={formData[otherName] || ""} onChange={(event) => setField(otherName, event.target.value)} placeholder="Please specify" className={inputClass} /><ErrorText errors={errors} name={otherName} /></div> : null}</div>;
 
-  if (submitted) return <section className="mx-auto max-w-4xl px-1 py-8 md:px-4"><div className="rounded-[2rem] border bg-white p-8 text-center shadow-sm" style={{ borderColor: p.border }}><div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full text-2xl" style={{ backgroundColor: p.softGray, color: p.burgundy }}>✓</div><h1 className="text-3xl font-bold" style={{ color: p.charcoal }}>{successTitle}</h1><p className="mx-auto mt-4 max-w-2xl text-sm leading-6" style={{ color: p.charcoal }}>{successMessage}</p></div></section>;
+  if (submitted) return <section className="mx-auto max-w-4xl px-1 py-8 md:px-4"><div className="rounded-[2rem] border bg-white p-8 text-center shadow-sm" style={{ borderColor: p.border }}><div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full text-2xl" style={{ backgroundColor: p.softGray, color: p.brandText }}>✓</div><h1 className="text-3xl font-bold" style={{ color: p.charcoal }}>{successTitle}</h1><p className="mx-auto mt-4 max-w-2xl text-sm leading-6" style={{ color: p.charcoal }}>{successMessage}</p></div></section>;
 
   return <div className="mx-auto max-w-5xl space-y-6">
     <div className="rounded-[1.5rem] border border-emerald-200 bg-emerald-50 p-4"><p className="text-sm font-bold text-emerald-950">Using saved client profile</p><p className="mt-1 text-xs leading-5 text-emerald-800">Contact, billing, and saved communication preferences were filled from this client’s MLS profile. Complete only the assignment-specific sections below.</p></div>

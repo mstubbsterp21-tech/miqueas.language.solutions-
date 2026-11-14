@@ -481,6 +481,14 @@
       footer { padding: 10px; }
     }
   </style>
+<script>
+    try {
+      const savedTheme = localStorage.getItem('mls-theme');
+      document.documentElement.dataset.theme = savedTheme === 'dark' || savedTheme === 'light'
+        ? savedTheme : (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    } catch { /* The default light theme also works when storage is unavailable. */ }
+  </script>
+  <link rel="stylesheet" href="/mentor-profile/theme.css" />
 </head>
 
 <body>

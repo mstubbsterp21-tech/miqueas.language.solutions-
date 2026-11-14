@@ -96,18 +96,18 @@ export default function Home({ palette }) {
     setActiveTestimonial((current) => (current + 1) % testimonials.length);
   };
 
-  const goldButton = { backgroundColor: palette.gold, color: palette.white };
+  const goldButton = { backgroundColor: palette.actionGold, color: "#ffffff" };
   const cardStyle = { borderColor: palette.border, backgroundColor: palette.white };
 
   return (
     <div className="mls-public-site overflow-hidden bg-white">
       <section className="relative px-5 py-14 md:px-8 md:py-20">
-        <div className="absolute inset-0 -z-10" style={{ background: "radial-gradient(circle at 12% 15%, rgba(221,125,0,0.18), transparent 28%), radial-gradient(circle at 92% 8%, rgba(114,17,0,0.14), transparent 32%), linear-gradient(180deg, #ffffff 0%, #f7f3ef 100%)" }} />
+        <div className="absolute inset-0 -z-10" style={{ background: "radial-gradient(circle at 12% 15%, rgba(221,125,0,0.18), transparent 28%), radial-gradient(circle at 92% 8%, rgba(114,17,0,0.14), transparent 32%), linear-gradient(180deg, var(--mls-page) 0%, var(--mls-muted-surface) 100%)" }} />
         <div className="mx-auto max-w-6xl">
           <motion.div initial="hidden" animate="show" variants={fadeUp} transition={{ duration: 0.55 }} className="grid items-center gap-12 lg:grid-cols-[minmax(0,1fr)_430px]">
             <div className="max-w-3xl">
-              <div className="mb-5 inline-flex items-center gap-2 rounded-full border bg-white/80 px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] shadow-sm backdrop-blur" style={{ borderColor: palette.border, color: palette.burgundy }}>
-                <BadgeCheck size={15} style={{ color: palette.gold }} />
+              <div className="mb-5 inline-flex items-center gap-2 rounded-full border bg-white/80 px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] shadow-sm backdrop-blur" style={{ borderColor: palette.border, color: palette.brandText }}>
+                <BadgeCheck size={15} style={{ color: palette.goldText }} />
                 Professional ASL-English Interpreting
               </div>
               <h1 className="text-4xl font-black leading-[1.03] tracking-tight md:text-6xl" style={{ color: palette.charcoal }}>
@@ -128,7 +128,7 @@ export default function Home({ palette }) {
               <div className="mt-8 grid gap-3 sm:grid-cols-3">
                 {stats.map(([stat, label]) => (
                   <div key={stat} className="rounded-2xl border bg-white/80 p-4 shadow-sm backdrop-blur" style={{ borderColor: palette.border }}>
-                    <div className="text-lg font-black" style={{ color: palette.burgundy }}>{stat}</div>
+                    <div className="text-lg font-black" style={{ color: palette.brandText }}>{stat}</div>
                     <p className="mt-2 text-xs leading-5 text-[#666]">{label}</p>
                   </div>
                 ))}
@@ -156,7 +156,7 @@ export default function Home({ palette }) {
                 transition={{ duration: 0.55, delay: 0.3 }}
                 className="relative z-10 -mt-7 ml-auto w-[92%] rounded-[1.35rem] border border-white/10 bg-[#202020] px-5 py-5 text-white shadow-2xl sm:w-[80%] sm:px-7"
               >
-                <p className="text-[11px] font-bold uppercase tracking-[0.2em]" style={{ color: palette.gold }}>People first. Access always.</p>
+                <p className="text-[11px] font-bold uppercase tracking-[0.2em]" style={{ color: palette.goldText }}>People first. Access always.</p>
                 <p className="mt-2 text-xl font-black leading-snug">Communication access that puts the conversation—not the process—first.</p>
                 <div className="mt-4 flex flex-wrap gap-2 text-[11px] font-semibold text-white/75">
                   <span className="rounded-full border border-white/20 px-3 py-1">In person</span>
@@ -174,19 +174,19 @@ export default function Home({ palette }) {
         <div className="mx-auto max-w-6xl">
           <motion.div initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} variants={fadeUp} transition={{ duration: 0.45 }} className="mb-6 flex flex-wrap items-end justify-between gap-3">
             <div>
-              <p className="text-xs font-black uppercase tracking-[0.18em]" style={{ color: palette.burgundy }}>Who we support</p>
+              <p className="text-xs font-black uppercase tracking-[0.18em]" style={{ color: palette.brandText }}>Who we support</p>
               <h2 id="mls-sectors-heading" className="mt-2 text-2xl font-black md:text-3xl" style={{ color: palette.charcoal }}>Communication matters in every setting.</h2>
             </div>
-            <Link to="/services" className="inline-flex items-center gap-2 text-sm font-bold" style={{ color: palette.burgundy }}>Explore services <ArrowRight size={16} /></Link>
+            <Link to="/services" className="inline-flex items-center gap-2 text-sm font-bold" style={{ color: palette.brandText }}>Explore services <ArrowRight size={16} /></Link>
           </motion.div>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {sectors.map(({ id, icon: Icon, label, description }, index) => (
               <motion.div key={id} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} variants={fadeUp} transition={{ duration: 0.4, delay: index * 0.08 }} className="group overflow-hidden rounded-[1.3rem] border border-[#721100]/10 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg focus-within:-translate-y-1 focus-within:shadow-lg">
                 <Link to={"/settings/" + id} aria-label={"Explore " + label.toLowerCase() + " interpreting support"} className="flex h-full flex-col p-5 focus-visible:rounded-[1.3rem] focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-[-4px] focus-visible:outline-[#dd7d00]">
-                  <Icon size={24} style={{ color: palette.gold }} aria-hidden="true" />
+                  <Icon size={24} style={{ color: palette.goldText }} aria-hidden="true" />
                   <h3 className="mt-3 text-base font-black" style={{ color: palette.charcoal }}>{label}</h3>
                   <p className="mt-2 flex-1 text-sm leading-6 text-[#656565]">{description}</p>
-                  <span className="mt-4 inline-flex items-center gap-2 text-xs font-black transition-all group-hover:gap-3" style={{ color: palette.burgundy }}>
+                  <span className="mt-4 inline-flex items-center gap-2 text-xs font-black transition-all group-hover:gap-3" style={{ color: palette.brandText }}>
                     Explore {label.toLowerCase()} <ArrowRight size={15} aria-hidden="true" />
                   </span>
                 </Link>
@@ -199,7 +199,7 @@ export default function Home({ palette }) {
       <section className="px-5 py-12 md:px-8 md:py-16">
         <div className="mx-auto max-w-6xl">
           <motion.div initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} variants={fadeUp} transition={{ duration: 0.45 }} className="mb-8 max-w-3xl">
-            <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.gold }}>Services</p>
+            <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.goldText }}>Services</p>
             <h2 className="mt-3 text-3xl font-black tracking-tight md:text-5xl" style={{ color: palette.charcoal }}>Choose the service path that fits the communication need.</h2>
             <p className="mt-4 max-w-2xl text-base leading-7 text-[#626262]">Not sure whether you need an on-site interpreter, VRI, or ASL translation? Get a personalized starting point in a few clicks.</p>
             <Link to="/services#service-finder" className="mt-5 inline-flex min-h-12 items-center gap-2 rounded-full bg-[#721100] px-6 py-3 text-sm font-black text-white transition hover:bg-[#560c00] focus-visible:outline focus-visible:outline-4 focus-visible:outline-[#dd7d00]">
@@ -222,12 +222,12 @@ export default function Home({ palette }) {
                 </Link>
                 <div className="flex flex-1 flex-col px-6 pb-7 pt-6 md:px-8">
                   <div className="mb-3 flex items-center gap-3">
-                    <Icon size={22} style={{ color: palette.gold }} />
-                    <span className="text-[11px] font-bold uppercase tracking-[0.18em]" style={{ color: palette.burgundy }}>MLS Services</span>
+                    <Icon size={22} style={{ color: palette.goldText }} />
+                    <span className="text-[11px] font-bold uppercase tracking-[0.18em]" style={{ color: palette.brandText }}>MLS Services</span>
                   </div>
                   <h3 className="text-2xl font-black leading-tight" style={{ color: palette.charcoal }}>{title}</h3>
                   <p className="mt-3 max-w-xl text-sm leading-7 text-[#626262]">{copy}</p>
-                  <Link to={path} className="mt-auto inline-flex w-fit items-center gap-2 pt-6 text-sm font-bold group-hover:gap-3 transition-all" style={{ color: palette.burgundy }}>Explore service <ArrowRight size={16} /></Link>
+                  <Link to={path} className="mt-auto inline-flex w-fit items-center gap-2 pt-6 text-sm font-bold group-hover:gap-3 transition-all" style={{ color: palette.brandText }}>Explore service <ArrowRight size={16} /></Link>
                 </div>
               </motion.article>
             ))}
@@ -263,19 +263,19 @@ export default function Home({ palette }) {
                       </>
                     ) : (
                       <div className="flex h-full min-h-[250px] flex-col items-center justify-center gap-3 p-8 text-center">
-                        <FileText size={40} style={{ color: palette.gold }} />
+                        <FileText size={40} style={{ color: palette.goldText }} />
                         <span className="text-sm font-bold">Featured article image unavailable</span>
                       </div>
                     )}
                   </Link>
                   <div className="flex flex-wrap items-center gap-x-4 gap-y-2 px-6 py-5 text-xs text-white/80 md:px-8">
-                    <span className="font-bold uppercase tracking-[0.15em]" style={{ color: palette.gold }}>Featured Article</span>
-                    <span className="inline-flex items-center gap-1.5"><CalendarDays size={15} style={{ color: palette.gold }} />{formatBlogDate(featuredArticle.publishDate)}</span>
-                    <span className="inline-flex items-center gap-1.5"><Clock size={15} style={{ color: palette.gold }} />{featuredArticle.readTime}</span>
+                    <span className="font-bold uppercase tracking-[0.15em]" style={{ color: palette.goldText }}>Featured Article</span>
+                    <span className="inline-flex items-center gap-1.5"><CalendarDays size={15} style={{ color: palette.goldText }} />{formatBlogDate(featuredArticle.publishDate)}</span>
+                    <span className="inline-flex items-center gap-1.5"><Clock size={15} style={{ color: palette.goldText }} />{featuredArticle.readTime}</span>
                   </div>
                 </div>
                 <div className="flex flex-col justify-center p-7 md:p-9">
-                  <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.gold }}>{featuredArticle.category}</p>
+                  <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.goldText }}>{featuredArticle.category}</p>
                   <h2 className="mt-4 text-3xl font-black leading-tight md:text-4xl" style={{ color: palette.charcoal }}>{featuredArticle.title}</h2>
                   <p className="mt-4 text-lg leading-8 text-[#555]">{featuredArticle.excerpt}</p>
                   <div className="mt-7 flex flex-col gap-3 sm:flex-row">
@@ -298,7 +298,7 @@ export default function Home({ palette }) {
         <div className="mx-auto max-w-6xl rounded-[2.2rem] border bg-[#fafafa] p-6 md:p-8" style={{ borderColor: palette.border }}>
           <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-center">
             <motion.div initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.25 }} variants={fadeUp} transition={{ duration: 0.45 }}>
-              <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.gold }}>How it works</p>
+              <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.goldText }}>How it works</p>
               <h2 className="mt-3 text-3xl font-black leading-tight md:text-4xl" style={{ color: palette.charcoal }}>A clear process from request to confirmation.</h2>
               <p className="mt-4 text-base leading-8 text-[#5f6368]">MLS reviews service type, setting, logistics, preparation needs, and fit before confirming next steps.</p>
             </motion.div>
@@ -309,7 +309,7 @@ export default function Home({ palette }) {
                 { icon: CalendarCheck2, title: "Confirm", copy: "You receive follow-up with availability, quote details, and next steps." },
               ].map(({ icon: Icon, title, copy }, index) => (
                 <motion.div key={title} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.25 }} variants={fadeUp} transition={{ duration: 0.45, delay: index * 0.04 }} className="rounded-[1.5rem] border bg-white p-6 text-center shadow-sm" style={cardStyle}>
-                  <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full text-white" style={{ backgroundColor: index === 1 ? palette.burgundy : palette.gold }}><Icon size={22} /></div>
+                  <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full text-white" style={{ backgroundColor: index === 1 ? palette.burgundy : palette.actionGold }}><Icon size={22} /></div>
                   <h3 className="text-lg font-black" style={{ color: palette.charcoal }}>{title}</h3>
                   <p className="mt-3 text-sm leading-7 text-[#666]">{copy}</p>
                 </motion.div>
@@ -323,13 +323,13 @@ export default function Home({ palette }) {
         <div className="mx-auto max-w-6xl">
           <div className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-start">
             <motion.div initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.25 }} variants={fadeUp} transition={{ duration: 0.45 }} className="rounded-[2rem] border bg-[#202020] p-7 md:p-8" style={{ borderColor: palette.border }}>
-              <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.gold }}>Trust & experience</p>
+              <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.goldText }}>Trust & experience</p>
               <h2 className="mt-3 text-3xl font-black leading-tight text-white md:text-4xl">Professional service with community-rooted perspective.</h2>
               <p className="mt-5 text-base leading-8 text-white/75">MLS combines professional standards with real-world community experience, helping clients receive support that feels thoughtful, ethical, and human.</p>
               <div className="mt-6 grid gap-3 sm:grid-cols-2">
                 {["RID credential badge", "FRID affiliation", "Client-focused process", "Ethical practice"].map((item) => (
                   <div key={item} className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.06] p-4 text-sm font-bold text-white/85">
-                    <CheckCircle2 size={18} style={{ color: palette.gold, flexShrink: 0 }} />
+                    <CheckCircle2 size={18} style={{ color: palette.goldText, flexShrink: 0 }} />
                     {item}
                   </div>
                 ))}
@@ -339,10 +339,10 @@ export default function Home({ palette }) {
             <motion.div initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.25 }} variants={fadeUp} transition={{ duration: 0.45, delay: 0.05 }} className="rounded-[2rem] border bg-white p-6 shadow-sm md:p-8" style={cardStyle}>
               <div className="mb-6 flex items-center justify-between gap-4">
                 <div>
-                  <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.gold }}>References</p>
+                  <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.goldText }}>References</p>
                   <h2 className="mt-3 text-3xl font-black leading-tight" style={{ color: palette.charcoal }}>What others are saying.</h2>
                 </div>
-                <div className="hidden h-12 w-12 shrink-0 items-center justify-center rounded-2xl md:flex" style={{ backgroundColor: "rgba(221,125,0,0.12)", color: palette.gold }}>
+                <div className="hidden h-12 w-12 shrink-0 items-center justify-center rounded-2xl md:flex" style={{ backgroundColor: "rgba(221,125,0,0.12)", color: palette.goldText }}>
                   <Quote size={22} />
                 </div>
               </div>
@@ -352,7 +352,7 @@ export default function Home({ palette }) {
                   <motion.div key={activeTestimonial} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.35 }}>
                     <p className="text-base leading-8" style={{ color: palette.body }}>“{testimonials[activeTestimonial].quote}”</p>
                     <div className="mt-8 border-t pt-4" style={{ borderColor: palette.border }}>
-                      <div className="text-sm font-black uppercase tracking-[0.14em]" style={{ color: palette.burgundy }}>{testimonials[activeTestimonial].role}</div>
+                      <div className="text-sm font-black uppercase tracking-[0.14em]" style={{ color: palette.brandText }}>{testimonials[activeTestimonial].role}</div>
                     </div>
                   </motion.div>
                 </AnimatePresence>

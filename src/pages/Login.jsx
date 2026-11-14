@@ -10,7 +10,7 @@ export default function Login({ palette }) {
   const isDarkMode = palette.white !== "#ffffff";
   const pageBackground = isDarkMode
     ? "radial-gradient(circle at 12% 18%, rgba(221,125,0,0.16), transparent 30%), radial-gradient(circle at 88% 12%, rgba(114,17,0,0.24), transparent 28%), linear-gradient(180deg, #15100e 0%, #211714 100%)"
-    : "radial-gradient(circle at 12% 18%, rgba(114,17,0,0.14), transparent 30%), radial-gradient(circle at 88% 12%, rgba(221,125,0,0.17), transparent 28%), linear-gradient(180deg, #ffffff 0%, #f7f3ef 100%)";
+    : "radial-gradient(circle at 12% 18%, rgba(114,17,0,0.14), transparent 30%), radial-gradient(circle at 88% 12%, rgba(221,125,0,0.17), transparent 28%), linear-gradient(180deg, var(--mls-page) 0%, var(--mls-muted-surface) 100%)";
   const bodyTextColor = isDarkMode ? "#d8c8bc" : "#555";
   const panel = isDarkMode ? "rgba(255,255,255,0.06)" : "rgba(255,255,255,0.82)";
   const loginCardBackground = isDarkMode ? "#1b1411" : "#ffffff";
@@ -35,7 +35,7 @@ export default function Login({ palette }) {
         <div className="absolute inset-0 -z-10" style={{ background: pageBackground }} />
         <div className="mx-auto grid w-full max-w-7xl min-w-0 gap-8 sm:gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(390px,450px)] lg:items-center">
           <div className="min-w-0 max-w-full">
-            <div className="inline-flex max-w-full items-center gap-2 rounded-full border px-3 py-2 text-[11px] font-black uppercase tracking-[0.12em] sm:px-4 sm:text-xs sm:tracking-[0.16em]" style={{ borderColor: palette.border, color: palette.gold, backgroundColor: panel }}>
+            <div className="inline-flex max-w-full items-center gap-2 rounded-full border px-3 py-2 text-[11px] font-black uppercase tracking-[0.12em] sm:px-4 sm:text-xs sm:tracking-[0.16em]" style={{ borderColor: palette.border, color: palette.goldText, backgroundColor: panel }}>
               <Sparkles size={15} /> MLS secure portal
             </div>
             <h1 className="mt-5 max-w-3xl break-words text-[clamp(2.25rem,11vw,3.75rem)] font-black leading-[1.02] tracking-[-0.045em]" style={{ color: palette.charcoal }}>
@@ -62,7 +62,7 @@ export default function Login({ palette }) {
           <div className="min-w-0 w-full max-w-full overflow-hidden rounded-[1.5rem] border p-3 shadow-2xl sm:rounded-[2rem] sm:p-4 md:p-6" style={{ borderColor: palette.border, backgroundColor: loginCardBackground }}>
             <ClerkLoading>
               <div className="flex min-h-[460px] flex-col items-center justify-center rounded-[1.5rem] border px-6 text-center" style={{ borderColor: clerkBorderColor, backgroundColor: panel }}>
-                <LoaderCircle className="animate-spin" size={34} style={{ color: palette.gold }} />
+                <LoaderCircle className="animate-spin" size={34} style={{ color: palette.goldText }} />
                 <p className="mt-5 text-lg font-black" style={{ color: palette.charcoal }}>Loading secure login</p>
                 <p className="mt-2 max-w-sm text-sm leading-6" style={{ color: bodyTextColor }}>
                   This usually takes only a few seconds. If it does not load, refresh the page or disable strict tracking protection for this preview.

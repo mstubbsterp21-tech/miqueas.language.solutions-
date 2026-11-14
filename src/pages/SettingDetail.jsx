@@ -46,7 +46,7 @@ function Reveal({ children, className = "", delay = 0, reduceMotion = false }) {
 function SectionHeading({ eyebrow, title, description, palette }) {
   return (
     <div className="mb-9 max-w-3xl">
-      <p className="text-xs font-black uppercase tracking-[0.18em]" style={{ color: palette.gold }}>{eyebrow}</p>
+      <p className="text-xs font-black uppercase tracking-[0.18em]" style={{ color: palette.goldText }}>{eyebrow}</p>
       <h2 className="mt-3 text-3xl font-black leading-[1.12] tracking-tight md:text-4xl lg:text-5xl" style={{ color: palette.charcoal }}>{title}</h2>
       {description && <p className="mt-4 text-base leading-8" style={{ color: palette.body }}>{description}</p>}
     </div>
@@ -72,10 +72,10 @@ function SettingNav({ current, palette }) {
             }}
           >
             <span className="inline-flex items-center gap-3">
-              <Icon size={19} style={{ color: palette.gold }} aria-hidden="true" />
+              <Icon size={19} style={{ color: palette.goldText }} aria-hidden="true" />
               {settingPages[key].label}
             </span>
-            {!active && <ArrowRight size={17} className="transition group-hover:translate-x-1" aria-hidden="true" style={{ color: palette.gold }} />}
+            {!active && <ArrowRight size={17} className="transition group-hover:translate-x-1" aria-hidden="true" style={{ color: palette.goldText }} />}
           </Link>
         );
       })}
@@ -91,7 +91,7 @@ export default function SettingDetail({ palette }) {
 
   const Icon = iconsForSetting[settingId];
   const cardStyle = { borderColor: palette.border, backgroundColor: palette.white };
-  const brightButton = { backgroundColor: palette.gold, color: "#fff" };
+  const brightButton = { backgroundColor: palette.actionGold, color: "#fff" };
 
   return (
     <div className="mls-public-site overflow-hidden bg-white">
@@ -103,15 +103,15 @@ export default function SettingDetail({ palette }) {
           <Link
             to="/services"
             className="inline-flex items-center gap-2 text-sm font-bold transition hover:gap-3 focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-[#dd7d00]"
-            style={{ color: palette.burgundy }}
+            style={{ color: palette.brandText }}
           >
             <ArrowLeft size={17} /> All services
           </Link>
           <div className="mt-9 grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.92fr)] lg:gap-14">
             <motion.div initial={reduceMotion ? false : { opacity: 0, y: 22 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
               <div className="mb-6 inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-black uppercase tracking-[0.17em] shadow-sm" style={cardStyle}>
-                <Icon size={16} style={{ color: palette.gold }} aria-hidden="true" />
-                <span style={{ color: palette.burgundy }}>{setting.eyebrow}</span>
+                <Icon size={16} style={{ color: palette.goldText }} aria-hidden="true" />
+                <span style={{ color: palette.brandText }}>{setting.eyebrow}</span>
               </div>
               <h1 className="max-w-3xl text-4xl font-black leading-[1.04] tracking-tight sm:text-5xl md:text-6xl" style={{ color: palette.charcoal }}>
                 {setting.headline}
@@ -152,10 +152,10 @@ export default function SettingDetail({ palette }) {
       <section className="px-5 py-14 md:px-8 md:py-20">
         <div className="mx-auto grid max-w-6xl items-center gap-9 lg:grid-cols-[0.92fr_1.08fr] lg:gap-14">
           <Reveal reduceMotion={reduceMotion}>
-            <p className="text-xs font-black uppercase tracking-[0.18em]" style={{ color: palette.gold }}>Why it matters</p>
+            <p className="text-xs font-black uppercase tracking-[0.18em]" style={{ color: palette.goldText }}>Why it matters</p>
             <h2 className="mt-3 text-3xl font-black leading-tight tracking-tight md:text-4xl" style={{ color: palette.charcoal }}>{setting.introTitle}</h2>
             <p className="mt-5 text-base leading-8" style={{ color: palette.body }}>{setting.introBody}</p>
-            <Link to="/deaf-and-hard-of-hearing" className="mt-6 inline-flex items-center gap-2 text-sm font-black hover:gap-3 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#dd7d00]" style={{ color: palette.burgundy }}>
+            <Link to="/deaf-and-hard-of-hearing" className="mt-6 inline-flex items-center gap-2 text-sm font-black hover:gap-3 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#dd7d00]" style={{ color: palette.brandText }}>
               Learn about communication access <ArrowRight size={17} />
             </Link>
           </Reveal>
@@ -192,7 +192,7 @@ export default function SettingDetail({ palette }) {
               return (
                 <Reveal key={item.title} reduceMotion={reduceMotion} delay={Math.min(index * 0.04, 0.12)}>
                   <div className="group h-full rounded-[1.7rem] border p-6 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg md:p-7" style={cardStyle}>
-                    <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl" style={{ color: palette.gold, backgroundColor: "rgba(221,125,0,0.12)" }}>
+                    <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl" style={{ color: palette.goldText, backgroundColor: "rgba(221,125,0,0.12)" }}>
                       <MomentIcon size={23} aria-hidden="true" />
                     </div>
                     <h3 className="text-xl font-black" style={{ color: palette.charcoal }}>{item.title}</h3>
@@ -212,8 +212,8 @@ export default function SettingDetail({ palette }) {
             {setting.supports.map((step, index) => (
               <Reveal reduceMotion={reduceMotion} delay={index * 0.06} key={step.title}>
                 <div className="relative h-full overflow-hidden rounded-[1.7rem] border p-7 shadow-sm" style={cardStyle}>
-                  <div className="absolute -right-2 -top-8 select-none text-[6.5rem] font-black leading-none opacity-[0.07]" style={{ color: palette.burgundy }} aria-hidden="true">0{index + 1}</div>
-                  <div className="relative flex h-11 w-11 items-center justify-center rounded-full text-sm font-black text-white" style={{ backgroundColor: index === 1 ? palette.burgundy : palette.gold }}>0{index + 1}</div>
+                  <div className="absolute -right-2 -top-8 select-none text-[6.5rem] font-black leading-none opacity-[0.07]" style={{ color: palette.brandText }} aria-hidden="true">0{index + 1}</div>
+                  <div className="relative flex h-11 w-11 items-center justify-center rounded-full text-sm font-black text-white" style={{ backgroundColor: index === 1 ? palette.burgundy : palette.actionGold }}>0{index + 1}</div>
                   <h3 className="relative mt-6 text-xl font-black leading-snug" style={{ color: palette.charcoal }}>{step.title}</h3>
                   <p className="relative mt-3 text-sm leading-7" style={{ color: palette.body }}>{step.text}</p>
                 </div>
@@ -238,20 +238,20 @@ export default function SettingDetail({ palette }) {
           </Reveal>
           <Reveal reduceMotion={reduceMotion} delay={0.08}>
             <div className="h-full rounded-[2rem] border p-7 shadow-sm md:p-10" style={cardStyle}>
-              <p className="text-xs font-black uppercase tracking-[0.17em]" style={{ color: palette.gold }}>Choose the right format</p>
+              <p className="text-xs font-black uppercase tracking-[0.17em]" style={{ color: palette.goldText }}>Choose the right format</p>
               <h2 className="mt-3 text-2xl font-black leading-snug md:text-3xl" style={{ color: palette.charcoal }}>On-site or remote? Context decides.</h2>
               <div className="mt-7 space-y-6">
                 <div className="flex items-start gap-4">
-                  <MapPin className="mt-1 shrink-0" style={{ color: palette.gold }} size={23} aria-hidden="true" />
+                  <MapPin className="mt-1 shrink-0" style={{ color: palette.goldText }} size={23} aria-hidden="true" />
                   <div><h3 className="text-base font-black" style={{ color: palette.charcoal }}>In-person interpreting</h3><p className="mt-2 text-sm leading-7" style={{ color: palette.body }}>{setting.mode.onSite}</p></div>
                 </div>
                 <div className="flex items-start gap-4">
-                  <MonitorPlay className="mt-1 shrink-0" style={{ color: palette.gold }} size={23} aria-hidden="true" />
+                  <MonitorPlay className="mt-1 shrink-0" style={{ color: palette.goldText }} size={23} aria-hidden="true" />
                   <div><h3 className="text-base font-black" style={{ color: palette.charcoal }}>Video remote interpreting</h3><p className="mt-2 text-sm leading-7" style={{ color: palette.body }}>{setting.mode.vri}</p></div>
                 </div>
                 <div className="rounded-2xl border-l-4 p-4 text-sm leading-7" style={{ borderColor: palette.gold, backgroundColor: "var(--mls-muted-surface)", color: palette.body }}>{setting.mode.caution}</div>
               </div>
-              <Link to="/services" className="mt-7 inline-flex items-center gap-2 text-sm font-black hover:gap-3 focus-visible:outline-2 focus-visible:outline-[#dd7d00]" style={{ color: palette.burgundy }}>Compare delivery options <ArrowRight size={16} /></Link>
+              <Link to="/services" className="mt-7 inline-flex items-center gap-2 text-sm font-black hover:gap-3 focus-visible:outline-2 focus-visible:outline-[#dd7d00]" style={{ color: palette.brandText }}>Compare delivery options <ArrowRight size={16} /></Link>
             </div>
           </Reveal>
         </div>
@@ -265,7 +265,7 @@ export default function SettingDetail({ palette }) {
               <Reveal key={item.title} reduceMotion={reduceMotion} delay={index * 0.05}>
                 <div className="h-full rounded-[1.6rem] border p-6 shadow-sm" style={cardStyle}>
                   <div className="flex items-center gap-3">
-                    <CheckCircle2 size={23} style={{ color: palette.gold }} aria-hidden="true" />
+                    <CheckCircle2 size={23} style={{ color: palette.goldText }} aria-hidden="true" />
                     <h3 className="text-lg font-black" style={{ color: palette.charcoal }}>{item.title}</h3>
                   </div>
                   <p className="mt-3 text-sm leading-7" style={{ color: palette.body }}>{item.text}</p>
@@ -275,7 +275,7 @@ export default function SettingDetail({ palette }) {
           </div>
           <div className="mt-7 flex flex-wrap items-center gap-4">
             <Link to="/contact" className="mls-cta-motion inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-black shadow-sm" style={brightButton}>Start your request <ArrowRight size={17} /></Link>
-            <Link to="/clients" className="inline-flex items-center gap-2 text-sm font-black" style={{ color: palette.burgundy }}>Client planning guide <FileText size={17} /></Link>
+            <Link to="/clients" className="inline-flex items-center gap-2 text-sm font-black" style={{ color: palette.brandText }}>Client planning guide <FileText size={17} /></Link>
           </div>
         </div>
       </section>
@@ -289,20 +289,20 @@ export default function SettingDetail({ palette }) {
                 <details key={question} className="group rounded-[1.4rem] border p-5 shadow-sm open:shadow-md" style={cardStyle}>
                   <summary className="flex cursor-pointer list-none items-start justify-between gap-4 text-base font-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#dd7d00] [&::-webkit-details-marker]:hidden" style={{ color: palette.charcoal }}>
                     {question}
-                    <ChevronDown size={19} className="mt-0.5 shrink-0 transition group-open:rotate-180" style={{ color: palette.gold }} aria-hidden="true" />
+                    <ChevronDown size={19} className="mt-0.5 shrink-0 transition group-open:rotate-180" style={{ color: palette.goldText }} aria-hidden="true" />
                   </summary>
                   <p className="mt-4 border-t pt-4 text-sm leading-7" style={{ borderColor: palette.border, color: palette.body }}>{answer}</p>
                 </details>
               ))}
             </div>
             <div className="rounded-[1.8rem] border p-7 shadow-sm md:p-8" style={cardStyle}>
-              <div className="mb-5 flex h-13 w-13 items-center justify-center rounded-2xl" style={{ backgroundColor: "rgba(221,125,0,0.12)", color: palette.gold }}>
+              <div className="mb-5 flex h-13 w-13 items-center justify-center rounded-2xl" style={{ backgroundColor: "rgba(221,125,0,0.12)", color: palette.goldText }}>
                 <BookOpen size={27} aria-hidden="true" />
               </div>
-              <p className="text-xs font-black uppercase tracking-[0.16em]" style={{ color: palette.gold }}>Keep exploring</p>
+              <p className="text-xs font-black uppercase tracking-[0.16em]" style={{ color: palette.goldText }}>Keep exploring</p>
               <h3 className="mt-3 text-2xl font-black leading-tight" style={{ color: palette.charcoal }}>Practical access guidance, without the jargon.</h3>
               <p className="mt-4 text-sm leading-7" style={{ color: palette.body }}>Our Insights library goes deeper into planning, interpreter fit, and accessible communication.</p>
-              <Link to={setting.related.href} className="mt-6 inline-flex items-center gap-2 text-sm font-black hover:gap-3 focus-visible:outline-2 focus-visible:outline-[#dd7d00]" style={{ color: palette.burgundy }}>
+              <Link to={setting.related.href} className="mt-6 inline-flex items-center gap-2 text-sm font-black hover:gap-3 focus-visible:outline-2 focus-visible:outline-[#dd7d00]" style={{ color: palette.brandText }}>
                 {setting.related.label} <ArrowRight size={17} />
               </Link>
             </div>

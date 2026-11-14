@@ -374,7 +374,7 @@ export default function InterpreterNetworkForm({ palette = defaultPalette }) {
     return (
       <section className="mx-auto max-w-4xl px-5 py-6 md:px-8">
         <div className="rounded-[2rem] border bg-white p-8 text-center shadow-sm" style={{ borderColor: p.border }}>
-          <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full text-2xl" style={{ backgroundColor: p.softGray, color: p.burgundy }}>✓</div>
+          <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full text-2xl" style={{ backgroundColor: p.softGray, color: p.brandText }}>✓</div>
           <h2 className="text-3xl font-bold" style={{ color: p.charcoal }}>Application Submitted</h2>
           <p className="mx-auto mt-4 max-w-2xl text-sm leading-6" style={{ color: p.charcoal }}>
             Thank you for your interest in joining the Miqueas Language Solutions interpreter network.
@@ -736,7 +736,7 @@ export default function InterpreterNetworkForm({ palette = defaultPalette }) {
                   Rates: formData.comfortableWithStandardIndustryRates,
                 }).map(([label, value]) => (
                   <div key={label} className="rounded-2xl border p-4">
-                    <p className="text-xs font-semibold uppercase tracking-[0.15em]" style={{ color: p.gold }}>{label}</p>
+                    <p className="text-xs font-semibold uppercase tracking-[0.15em]" style={{ color: p.goldText }}>{label}</p>
                     <p className="mt-2 break-words whitespace-pre-wrap leading-6">{value || '—'}</p>
                   </div>
                 ))}
@@ -756,7 +756,7 @@ export default function InterpreterNetworkForm({ palette = defaultPalette }) {
         <div className="sticky bottom-4 rounded-2xl border bg-white/95 p-4 shadow-lg backdrop-blur" style={{ borderColor: p.border }}>
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: p.gold }}>Progress</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: p.goldText }}>Progress</p>
               <p className="mt-1 text-sm font-medium" style={{ color: p.charcoal }}>Step {step} of {totalSteps}</p>
             </div>
             {submitError ? <p className="text-sm font-medium form-error">{submitError}</p> : null}

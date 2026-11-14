@@ -95,8 +95,8 @@ export default function About({ palette }) {
   };
 
   const goldBackground = {
-    backgroundColor: palette.gold,
-    color: palette.white,
+    backgroundColor: palette.actionGold,
+    color: "#ffffff",
   };
 
   return (
@@ -106,7 +106,7 @@ export default function About({ palette }) {
           className="absolute inset-0 -z-10"
           style={{
             background:
-              "radial-gradient(circle at 15% 15%, rgba(221,125,0,0.18), transparent 28%), radial-gradient(circle at 85% 10%, rgba(114,17,0,0.12), transparent 32%), linear-gradient(180deg, #ffffff 0%, #f7f3ef 100%)",
+              "radial-gradient(circle at 15% 15%, rgba(221,125,0,0.18), transparent 28%), radial-gradient(circle at 85% 10%, rgba(114,17,0,0.12), transparent 32%), linear-gradient(180deg, var(--mls-page) 0%, var(--mls-muted-surface) 100%)",
           }}
         />
         <div className="mx-auto max-w-6xl">
@@ -120,9 +120,9 @@ export default function About({ palette }) {
             <div>
               <div
                 className="mb-5 inline-flex items-center gap-2 rounded-full border bg-white/80 px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] shadow-sm backdrop-blur"
-                style={{ borderColor: palette.border, color: palette.burgundy }}
+                style={{ borderColor: palette.border, color: palette.brandText }}
               >
-                <Sparkles size={15} style={{ color: palette.gold }} />
+                <Sparkles size={15} style={{ color: palette.goldText }} />
                 Meet MLS
               </div>
 
@@ -173,7 +173,7 @@ export default function About({ palette }) {
             </div>
 
             <div className="relative mx-auto w-full max-w-[390px]">
-              <div className="absolute -left-6 -top-6 h-28 w-28 rounded-full opacity-90" style={{ backgroundColor: palette.gold }} />
+              <div className="absolute -left-6 -top-6 h-28 w-28 rounded-full opacity-90" style={{ backgroundColor: palette.actionGold }} />
               <div className="absolute -bottom-6 -right-6 h-36 w-36 rounded-full opacity-20" style={{ backgroundColor: palette.burgundy }} />
 
               <div className="relative rounded-[2.2rem] border bg-white p-4 shadow-2xl" style={{ borderColor: palette.border }}>
@@ -182,7 +182,7 @@ export default function About({ palette }) {
                 </div>
 
                 <div className="mt-4 rounded-[1.5rem] border bg-white p-5" style={{ borderColor: palette.border }}>
-                  <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.gold }}>
+                  <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.goldText }}>
                     Philosophy
                   </p>
                   <p className="mt-2 text-xl font-black leading-tight" style={{ color: palette.charcoal }}>
@@ -208,7 +208,7 @@ export default function About({ palette }) {
               style={{ borderColor: palette.border, backgroundColor: "#202020" }}
             >
               <div className="p-7 pb-5 md:p-8 md:pb-5">
-                <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.gold }}>
+                <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.goldText }}>
                   The bridge concept
                 </p>
                 <h2 className="mt-3 text-3xl font-black leading-tight text-white md:text-4xl">
@@ -220,7 +220,7 @@ export default function About({ palette }) {
               </div>
 
               <div className="relative mx-5 mb-5 overflow-hidden rounded-[1.8rem] border bg-[#f7f3ef] shadow-2xl md:mx-7 md:mb-7" style={{ borderColor: "rgba(255,255,255,0.18)" }}>
-                <div className="absolute inset-0" style={{ background: "radial-gradient(circle at 18% 20%, rgba(221,125,0,0.24), transparent 34%), radial-gradient(circle at 90% 8%, rgba(114,17,0,0.18), transparent 38%), linear-gradient(180deg, rgba(255,255,255,0.88), rgba(246,243,239,0.98))" }} />
+                <div className="absolute inset-0" style={{ background: "radial-gradient(circle at 18% 20%, rgba(221,125,0,0.24), transparent 34%), radial-gradient(circle at 90% 8%, rgba(114,17,0,0.18), transparent 38%), linear-gradient(180deg, var(--mls-card), var(--mls-muted-surface))" }} />
                 <div className="absolute -left-24 top-10 h-48 w-48 rounded-full blur-3xl" style={{ backgroundColor: "rgba(221,125,0,0.22)" }} />
                 <div className="absolute -right-20 bottom-6 h-56 w-56 rounded-full blur-3xl" style={{ backgroundColor: "rgba(114,17,0,0.16)" }} />
 
@@ -246,7 +246,7 @@ export default function About({ palette }) {
                   className="rounded-[1.6rem] border bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
                   style={cardStyle}
                 >
-                  <div className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-2xl" style={{ backgroundColor: "rgba(221,125,0,0.12)", color: palette.gold }}>
+                  <div className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-2xl" style={{ backgroundColor: "rgba(221,125,0,0.12)", color: palette.goldText }}>
                     <Icon size={22} />
                   </div>
                   <h3 className="text-lg font-black" style={{ color: palette.charcoal }}>{title}</h3>
@@ -268,7 +268,7 @@ export default function About({ palette }) {
             transition={{ duration: 0.45 }}
             className="mb-8 max-w-3xl"
           >
-            <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.gold }}>
+            <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.goldText }}>
               My story
             </p>
             <h2 className="mt-3 text-3xl font-black tracking-tight md:text-5xl" style={{ color: palette.charcoal }}>
@@ -290,19 +290,19 @@ export default function About({ palette }) {
                   className="relative rounded-[1.75rem] border bg-white p-6 shadow-sm md:ml-14 md:p-7"
                   style={cardStyle}
                 >
-                  <div className="absolute -left-[4.35rem] top-7 hidden h-10 w-10 items-center justify-center rounded-full border-4 border-white text-sm font-black text-white shadow-md md:flex" style={{ backgroundColor: palette.gold }}>
+                  <div className="absolute -left-[4.35rem] top-7 hidden h-10 w-10 items-center justify-center rounded-full border-4 border-white text-sm font-black text-white shadow-md md:flex" style={{ backgroundColor: palette.actionGold }}>
                     {index + 1}
                   </div>
                   <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
                     <div>
-                      <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.burgundy }}>
+                      <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.brandText }}>
                         {block.eyebrow}
                       </p>
                       <h3 className="mt-2 text-2xl font-black" style={{ color: palette.charcoal }}>
                         {block.title}
                       </h3>
                     </div>
-                    <div className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl" style={{ backgroundColor: "rgba(114,17,0,0.08)", color: palette.burgundy }}>
+                    <div className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl" style={{ backgroundColor: "rgba(114,17,0,0.08)", color: palette.brandText }}>
                       <MapPinned size={20} />
                     </div>
                   </div>
@@ -326,7 +326,7 @@ export default function About({ palette }) {
               variants={fadeUp}
               transition={{ duration: 0.45 }}
             >
-              <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.gold }}>
+              <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.goldText }}>
                 Experience across settings
               </p>
               <h2 className="mt-3 text-3xl font-black leading-tight md:text-4xl" style={{ color: palette.charcoal }}>
@@ -349,7 +349,7 @@ export default function About({ palette }) {
                   className="rounded-[1.5rem] border bg-white p-5 shadow-sm"
                   style={cardStyle}
                 >
-                  <CheckCircle2 size={22} style={{ color: palette.gold }} />
+                  <CheckCircle2 size={22} style={{ color: palette.goldText }} />
                   <h3 className="mt-4 text-lg font-black" style={{ color: palette.charcoal }}>
                     {setting.title}
                   </h3>
@@ -371,7 +371,7 @@ export default function About({ palette }) {
             transition={{ duration: 0.45 }}
             className="mx-auto max-w-3xl text-center"
           >
-            <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.gold }}>
+            <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.goldText }}>
               What happens next
             </p>
             <h2 className="mt-3 text-3xl font-black tracking-tight md:text-5xl" style={{ color: palette.charcoal }}>

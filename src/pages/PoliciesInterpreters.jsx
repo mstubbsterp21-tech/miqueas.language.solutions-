@@ -232,12 +232,12 @@ export default function PoliciesInterpreters({ palette }) {
         </p>
       </PolicySection>
 
-      <section className="rounded-[2rem] p-6 text-white md:p-8" style={{ background: `linear-gradient(135deg, ${palette.burgundy}, ${palette.charcoal})` }}>
+      <section className="rounded-[2rem] p-6 text-white md:p-8 mls-dark-panel" style={{ background: `linear-gradient(135deg, ${palette.burgundy}, #464747)` }}>
         <h3 className="text-2xl font-bold">Interested in joining the roster?</h3>
         <p className="mt-3 max-w-3xl text-sm leading-7 text-white/80 md:text-base">
           MLS is building a values-driven roster with clear standards, consumer-centered policies, and setting-specific assignment approval.
         </p>
-        <Link to="/resources/interpreters" className="mt-5 inline-flex rounded-2xl px-5 py-3 text-sm font-bold text-white transition hover:-translate-y-0.5" style={{ backgroundColor: palette.gold }}>
+        <Link to="/resources/interpreters" className="mt-5 inline-flex rounded-2xl px-5 py-3 text-sm font-bold text-white transition hover:-translate-y-0.5" style={{ backgroundColor: palette.actionGold }}>
           Join Our Roster
         </Link>
       </section>

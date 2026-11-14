@@ -48,7 +48,7 @@ export default function PoliciesLayout({ palette }) {
             style={({ isActive }) => ({
               borderColor: isActive ? palette.burgundy : palette.border,
               backgroundColor: isActive ? palette.burgundy : palette.white,
-              color: isActive ? palette.white : palette.charcoal,
+              color: isActive ? "#ffffff" : palette.charcoal,
             })}
           >
             {({ isActive }) => (

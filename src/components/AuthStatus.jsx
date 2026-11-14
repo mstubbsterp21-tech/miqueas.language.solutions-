@@ -16,7 +16,7 @@ export default function AuthStatus({ palette }) {
         <Link
           to="/portal"
           className="rounded-2xl px-4 py-2.5 text-sm font-semibold leading-tight text-white transition hover:-translate-y-0.5"
-          style={{ backgroundColor: palette.gold }}
+          style={{ backgroundColor: palette.actionGold }}
         >
           Open Portal
         </Link>

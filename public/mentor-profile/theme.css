@@ -1,0 +1,38 @@
+/* Shared screen theme; printed agreements retain their original white paper. */
+@media screen {
+  :root { --gold: #995000; }
+  footer { color: #626262; }
+  input, textarea { border-color: #827165; }
+  input::placeholder, textarea::placeholder { color: #626262; }
+  .toolbar .button { --gold: #dd7d00; }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --charcoal: #f7f3ef;
+    --text: #d6c9bf;
+    --cream: #251c18;
+    --paper: #18110f;
+    --border: #857063;
+    --gold: #ffb23f;
+    --focus: #ffb23f;
+  }
+  :root[data-theme="dark"] body { background: #0f0b0a; }
+  :root[data-theme="dark"] :is(.profile, .section, .credential, .detail-card,
+    .structure-item, .community-box, .workflow-step, .role-response, .agreement-box) {
+    background: #18110f;
+  }
+  :root[data-theme="dark"] :is(.section-header h2, .credential strong, .detail-card strong,
+    .structure-item h3, .community-box strong, .workflow-step strong, .agreement-box h2,
+    .section-heading, .eyebrow) { color: #ffb199; }
+  :root[data-theme="dark"] :is(.mentor-section, .mentee-section, .joint-section) .section-heading {
+    background: #30221c; color: #ffb199;
+  }
+  :root[data-theme="dark"] :is(input, textarea, input[readonly], textarea[readonly],
+    .standard-answer, .standard-answer textarea) {
+    background: #211714; color: #efe7df; border-color: #a48b79;
+  }
+  :root[data-theme="dark"] :is(input, textarea)::placeholder { color: #cdbfb5; }
+  :root[data-theme="dark"] :is(.answer-note, footer) { color: #cdbfb5; }
+  :root[data-theme="dark"] .saved-status { color: #93e6ac; }
+  :root[data-theme="dark"] .role-response.mentee .role-label { background: #464747; }
+  :is(a, button, input, textarea):focus-visible { outline: 3px solid var(--focus, #995000); outline-offset: 3px; }
+}

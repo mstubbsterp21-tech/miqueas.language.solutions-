@@ -47,7 +47,7 @@ function renderBlock(block, index, palette) {
       <ul key={index} className="mt-5 space-y-3">
         {block.items.map((item) => (
           <li key={item} className="flex gap-3 text-base leading-8 text-[#555]">
-            <span className="mt-3 h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: palette.gold }} />
+            <span className="mt-3 h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: palette.actionGold }} />
             <span>{item}</span>
           </li>
         ))}
@@ -136,18 +136,18 @@ export default function BlogPost({ palette }) {
         .blog-html thead { background: #f7f3ef; }
       `}</style>
       <section className="relative px-5 py-14 md:px-8 md:py-20">
-        <div className="absolute inset-0 -z-10" style={{ background: "radial-gradient(circle at 15% 15%, rgba(221,125,0,0.18), transparent 28%), radial-gradient(circle at 85% 10%, rgba(114,17,0,0.12), transparent 32%), linear-gradient(180deg, #ffffff 0%, #f7f3ef 100%)" }} />
+        <div className="absolute inset-0 -z-10" style={{ background: "radial-gradient(circle at 15% 15%, rgba(221,125,0,0.18), transparent 28%), radial-gradient(circle at 85% 10%, rgba(114,17,0,0.12), transparent 32%), linear-gradient(180deg, var(--mls-page) 0%, var(--mls-muted-surface) 100%)" }} />
         <div className="mx-auto max-w-4xl">
-          <Link to="/blog" className="mb-8 inline-flex items-center gap-2 text-sm font-bold transition hover:opacity-75" style={{ color: palette.burgundy }}>
+          <Link to="/blog" className="mb-8 inline-flex items-center gap-2 text-sm font-bold transition hover:opacity-75" style={{ color: palette.brandText }}>
             <ArrowLeft size={17} />
             Back to Blog
           </Link>
-          <p className="text-xs font-bold uppercase tracking-[0.2em]" style={{ color: palette.gold }}>{post.category}</p>
+          <p className="text-xs font-bold uppercase tracking-[0.2em]" style={{ color: palette.goldText }}>{post.category}</p>
           <h1 className="mt-4 text-4xl font-black leading-[1.05] tracking-tight md:text-6xl" style={{ color: palette.charcoal }}>{post.title}</h1>
           <p className="mt-6 max-w-3xl text-lg leading-8 text-[#555] md:text-xl">{post.excerpt}</p>
           <div className="mt-7 flex flex-wrap gap-4 text-sm font-semibold text-[#666]">
-            <span className="inline-flex items-center gap-2"><CalendarDays size={16} style={{ color: palette.gold }} />{formatBlogDate(post.publishDate)}</span>
-            <span className="inline-flex items-center gap-2"><Clock size={16} style={{ color: palette.gold }} />{post.readTime}</span>
+            <span className="inline-flex items-center gap-2"><CalendarDays size={16} style={{ color: palette.goldText }} />{formatBlogDate(post.publishDate)}</span>
+            <span className="inline-flex items-center gap-2"><Clock size={16} style={{ color: palette.goldText }} />{post.readTime}</span>
           </div>
         </div>
       </section>

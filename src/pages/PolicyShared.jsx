@@ -9,7 +9,7 @@ export function PolicyHero({ palette, eyebrow, title, description }) {
     >
       <div
         className="mb-4 inline-flex rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em]"
-        style={{ backgroundColor: `${palette.gold}14`, color: palette.gold }}
+        style={{ backgroundColor: `${palette.gold}14`, color: palette.goldText }}
       >
         {eyebrow}
       </div>

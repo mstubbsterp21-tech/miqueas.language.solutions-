@@ -29,7 +29,7 @@ export default function ResourcesLayout({ palette }) {
           }
           style={({ isActive }) => ({
             backgroundColor: isActive ? palette.burgundy : palette.white,
-            color: isActive ? palette.white : palette.charcoal,
+            color: isActive ? "#ffffff" : palette.charcoal,
             borderColor: palette.border,
           })}
         >
@@ -43,7 +43,7 @@ export default function ResourcesLayout({ palette }) {
           }
           style={({ isActive }) => ({
             backgroundColor: isActive ? palette.burgundy : palette.white,
-            color: isActive ? palette.white : palette.charcoal,
+            color: isActive ? "#ffffff" : palette.charcoal,
             borderColor: palette.border,
           })}
         >

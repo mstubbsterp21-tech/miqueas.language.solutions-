@@ -92,16 +92,16 @@ const rules = [
 export default function InterpreterCommunity({ palette }) {
   return (
     <div className="bg-white text-center">
-      <section className="relative overflow-hidden px-4 py-16 md:px-8 md:py-24" style={{ background: `radial-gradient(circle at top left, ${palette.gold}55, transparent 30%), linear-gradient(135deg, ${palette.burgundy}, ${palette.charcoal})` }}>
+      <section className="relative overflow-hidden px-4 py-16 md:px-8 md:py-24 mls-dark-panel" style={{ background: `radial-gradient(circle at top left, ${palette.gold}55, transparent 30%), linear-gradient(135deg, ${palette.burgundy}, #464747)` }}>
         <div className="absolute left-1/2 top-8 h-32 w-32 -translate-x-1/2 rounded-full bg-white/10 blur-2xl" />
         <div className="relative mx-auto flex max-w-5xl flex-col items-center text-white">
-          <div className="mb-5 inline-flex rounded-full border border-white/20 bg-white/10 px-5 py-2 text-xs font-bold uppercase tracking-[0.28em] backdrop-blur" style={{ color: palette.gold }}>
+          <div className="mb-5 inline-flex rounded-full border border-white/20 bg-white/10 px-5 py-2 text-xs font-bold uppercase tracking-[0.28em] backdrop-blur" style={{ color: palette.goldText }}>
             Miqueas Language Solutions
           </div>
           <h1 className="mx-auto max-w-4xl text-4xl font-black tracking-tight md:text-6xl">
             MLS Interpreter Network Guidelines
           </h1>
-          <div className="mt-5 h-1.5 w-28 rounded-full" style={{ backgroundColor: palette.gold }} />
+          <div className="mt-5 h-1.5 w-28 rounded-full" style={{ backgroundColor: palette.actionGold }} />
           <p className="mx-auto mt-6 max-w-3xl text-base leading-8 text-white/85 md:text-lg">
             A private guide for interpreters connected with MLS. This page explains how the network is organized, what each group is for, and how we keep communication clear, respectful, and confidential.
           </p>
@@ -111,7 +111,7 @@ export default function InterpreterCommunity({ palette }) {
       <section className="px-4 py-12 md:px-8">
         <div className="mx-auto max-w-5xl space-y-12">
           <div className="mx-auto max-w-3xl rounded-[2rem] border bg-white p-7 shadow-xl md:p-9" style={{ borderColor: palette.border }}>
-            <p className="text-sm font-bold uppercase tracking-[0.22em]" style={{ color: palette.gold }}>Purpose</p>
+            <p className="text-sm font-bold uppercase tracking-[0.22em]" style={{ color: palette.goldText }}>Purpose</p>
             <h2 className="mt-3 text-3xl font-black" style={{ color: palette.charcoal }}>Why this network exists</h2>
             <p className="mx-auto mt-4 max-w-2xl leading-8" style={{ color: palette.body }}>
               The MLS Interpreter Network is designed to support quick communication, assignment visibility, interpreter connection, and professional coordination. It is not meant to replace direct communication with MLS or formal assignment confirmation.
@@ -119,7 +119,7 @@ export default function InterpreterCommunity({ palette }) {
           </div>
 
           <section>
-            <p className="text-sm font-bold uppercase tracking-[0.22em]" style={{ color: palette.gold }}>1. Community Rules</p>
+            <p className="text-sm font-bold uppercase tracking-[0.22em]" style={{ color: palette.goldText }}>1. Community Rules</p>
             <h2 className="mx-auto mt-3 max-w-3xl text-3xl font-black md:text-4xl" style={{ color: palette.charcoal }}>Standards for participation</h2>
             <div className="mx-auto mt-7 grid max-w-5xl gap-4 md:grid-cols-2">
               {rules.map((rule, index) => (
@@ -135,27 +135,27 @@ export default function InterpreterCommunity({ palette }) {
           </section>
 
           <section>
-            <p className="text-sm font-bold uppercase tracking-[0.22em]" style={{ color: palette.gold }}>2. Group Descriptions</p>
+            <p className="text-sm font-bold uppercase tracking-[0.22em]" style={{ color: palette.goldText }}>2. Group Descriptions</p>
             <h2 className="mx-auto mt-3 max-w-3xl text-3xl font-black md:text-4xl" style={{ color: palette.charcoal }}>What each group is for</h2>
             <div className="mx-auto mt-7 grid max-w-5xl gap-4 md:grid-cols-2">
               {groups.map((group) => (
                 <article key={group.name} className="rounded-[1.5rem] border bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-lg" style={{ borderColor: palette.border }}>
-                  <div className="mx-auto mb-4 h-1.5 w-16 rounded-full" style={{ backgroundColor: palette.gold }} />
-                  <h3 className="text-xl font-black" style={{ color: palette.burgundy }}>{group.name}</h3>
+                  <div className="mx-auto mb-4 h-1.5 w-16 rounded-full" style={{ backgroundColor: palette.actionGold }} />
+                  <h3 className="text-xl font-black" style={{ color: palette.brandText }}>{group.name}</h3>
                   <p className="mx-auto mt-3 max-w-md text-sm leading-7" style={{ color: palette.body }}>{group.description}</p>
                 </article>
               ))}
             </div>
           </section>
 
-          <section className="mx-auto max-w-4xl rounded-[2rem] p-8 text-white shadow-xl md:p-10" style={{ background: `linear-gradient(135deg, ${palette.charcoal}, ${palette.burgundy})` }}>
-            <p className="text-sm font-bold uppercase tracking-[0.22em]" style={{ color: palette.gold }}>3. Direct Contact</p>
+          <section className="mx-auto max-w-4xl rounded-[2rem] p-8 text-white shadow-xl md:p-10 mls-dark-panel" style={{ background: `linear-gradient(135deg, #464747, ${palette.burgundy})` }}>
+            <p className="text-sm font-bold uppercase tracking-[0.22em]" style={{ color: palette.goldText }}>3. Direct Contact</p>
             <h2 className="mt-3 text-3xl font-black">When to contact MLS directly</h2>
             <p className="mx-auto mt-4 max-w-2xl leading-8 text-white/80">
               Contact MLS directly for assignment-specific questions, urgent updates, ethical concerns, access concerns, documentation questions, payment issues, or anything that includes private or sensitive information.
             </p>
             <div className="mt-7 flex flex-wrap justify-center gap-3">
-              <a href="mailto:m.stubbs@miqueaslanguagesolutions.com" className="rounded-xl px-5 py-3 text-sm font-bold text-white transition hover:-translate-y-0.5" style={{ backgroundColor: palette.gold }}>
+              <a href="mailto:m.stubbs@miqueaslanguagesolutions.com" className="rounded-xl px-5 py-3 text-sm font-bold text-white transition hover:-translate-y-0.5" style={{ backgroundColor: palette.actionGold }}>
                 m.stubbs@miqueaslanguagesolutions.com
               </a>
               <a href="tel:+13213798010" className="rounded-xl border border-white/20 px-5 py-3 text-sm font-bold text-white transition hover:-translate-y-0.5 hover:bg-white/10">

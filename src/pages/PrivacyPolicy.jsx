@@ -11,7 +11,7 @@ export default function PrivacyPolicy({ palette }) {
     <div className="mx-auto max-w-4xl px-5 py-16 md:px-8 md:py-20">
       <div className="rounded-[2rem] border bg-white p-6 shadow-sm md:p-10" style={{ borderColor: palette.border }}>
         <div className="mb-8">
-          <div className="text-sm font-semibold uppercase tracking-[0.2em]" style={{ color: palette.gold }}>
+          <div className="text-sm font-semibold uppercase tracking-[0.2em]" style={{ color: palette.goldText }}>
             Legal
           </div>
           <h1 className="mt-3 text-4xl font-bold tracking-tight md:text-5xl" style={sectionTitle}>

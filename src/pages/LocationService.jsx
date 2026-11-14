@@ -47,13 +47,13 @@ function Landing({ palette, data }) {
   ];
   return (
     <div>
-      <section className="px-5 py-16 md:px-8 md:py-24" style={{ background: "linear-gradient(135deg, #f7f3ef 0%, #ffffff 62%)" }}>
+      <section className="px-5 py-16 md:px-8 md:py-24" style={{ background: "linear-gradient(135deg, var(--mls-muted-surface) 0%, var(--mls-page) 62%)" }}>
         <div className="mx-auto max-w-6xl">
           <div className="max-w-4xl">
-            <p className="text-xs font-black uppercase tracking-[0.2em]" style={{ color: palette.gold }}>{data.eyebrow}</p>
+            <p className="text-xs font-black uppercase tracking-[0.2em]" style={{ color: palette.goldText }}>{data.eyebrow}</p>
             <h1 className="mt-4 text-4xl font-black leading-tight tracking-tight md:text-6xl" style={{ color: palette.charcoal }}>{data.title}</h1>
             <p className="mt-6 max-w-3xl text-lg leading-8 text-[#5b5b5b] md:text-xl">{data.intro}</p>
-            <div className="mt-6 inline-flex items-center gap-2 rounded-full border bg-white px-4 py-2 text-sm font-bold" style={{ borderColor: palette.border, color: palette.burgundy }}><MapPin size={17} />{data.area}</div>
+            <div className="mt-6 inline-flex items-center gap-2 rounded-full border bg-white px-4 py-2 text-sm font-bold" style={{ borderColor: palette.border, color: palette.brandText }}><MapPin size={17} />{data.area}</div>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link to="/contact" className="inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-black text-white" style={{ backgroundColor: palette.burgundy }}>Request an interpreter <ArrowRight size={17} /></Link>
               <Link to="/services" className="inline-flex items-center rounded-full border bg-white px-6 py-3 text-sm font-black" style={{ borderColor: palette.border, color: palette.charcoal }}>Compare services</Link>
@@ -66,12 +66,12 @@ function Landing({ palette, data }) {
           <h2 className="max-w-3xl text-3xl font-black tracking-tight md:text-4xl" style={{ color: palette.charcoal }}>Communication access matched to the assignment</h2>
           <p className="mt-4 max-w-3xl text-base leading-8 text-[#5b5b5b]">MLS reviews the setting, participants, modality, timing, preparation materials, and requested credentials before confirming coverage. Availability varies by assignment and advance notice.</p>
           <div className="mt-8 grid gap-4 md:grid-cols-3">
-            {services.map(({ Icon, title, text }) => <article key={title} className="rounded-3xl border bg-white p-6 shadow-sm" style={{ borderColor: palette.border }}><Icon size={23} style={{ color: palette.gold }} /><h2 className="mt-4 text-xl font-black" style={{ color: palette.charcoal }}>{title}</h2><p className="mt-3 text-sm leading-7 text-[#666]">{text}</p></article>)}
+            {services.map(({ Icon, title, text }) => <article key={title} className="rounded-3xl border bg-white p-6 shadow-sm" style={{ borderColor: palette.border }}><Icon size={23} style={{ color: palette.goldText }} /><h2 className="mt-4 text-xl font-black" style={{ color: palette.charcoal }}>{title}</h2><p className="mt-3 text-sm leading-7 text-[#666]">{text}</p></article>)}
           </div>
           <div className="mt-10 rounded-3xl bg-[#202020] p-7 text-white md:p-10">
             <h2 className="text-2xl font-black md:text-3xl">Ready to discuss the communication need?</h2>
             <p className="mt-3 max-w-2xl leading-7 text-white/75">Share the date, time, location or platform, setting, and known communication needs. MLS will review the request and follow up about fit and availability.</p>
-            <Link to="/contact" className="mt-6 inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-black text-white" style={{ backgroundColor: palette.gold }}>Start a request <ArrowRight size={17} /></Link>
+            <Link to="/contact" className="mt-6 inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-black text-white" style={{ backgroundColor: palette.actionGold }}>Start a request <ArrowRight size={17} /></Link>
           </div>
         </div>
       </section>

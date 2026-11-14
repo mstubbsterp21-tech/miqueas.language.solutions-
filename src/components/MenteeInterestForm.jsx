@@ -4,6 +4,9 @@ import logo from "../logo.png";
 const defaultPalette = {
   burgundy: "#721100",
   gold: "#dd7d00",
+  actionGold: "#a65300",
+  brandText: "var(--mls-brand-ink)",
+  goldText: "var(--mls-accent-ink)",
   charcoal: "#464747",
   white: "#ffffff",
   softGray: "#f5f5f5",
@@ -44,7 +47,7 @@ function Field({ label, id, error, children }) {
 }
 function Panel({ number, title, children, palette }) {
   return <section className="min-w-0 max-w-full rounded-[2rem] border bg-white p-4 shadow-sm sm:p-6 md:p-8" style={{ borderColor: palette.border }}>
-    <span className="text-xs font-bold uppercase tracking-[0.16em]" style={{ color: palette.gold }}>Section {number}</span>
+    <span className="text-xs font-bold uppercase tracking-[0.16em]" style={{ color: palette.goldText }}>Section {number}</span>
     <h2 className="mt-2 mb-6 text-2xl font-bold" style={{ color: palette.charcoal }}>{title}</h2>
     <div className="min-w-0 space-y-6 break-words">{children}</div>
   </section>;
@@ -171,7 +174,7 @@ export default function MenteeInterestForm({ palette = defaultPalette }) {
     <form onSubmit={submit} className="min-w-0 max-w-full space-y-6" noValidate>
       <header className="rounded-[2rem] border bg-white p-6 text-center shadow-sm md:p-8" style={{ borderColor: p.border }}>
         <img src={logo} alt="Miqueas Language Solutions" className="mx-auto h-20 max-w-full object-contain" />
-        <p className="mx-auto mt-3 max-w-full px-1 text-center text-xs font-medium leading-relaxed whitespace-normal break-words" style={{ color: p.gold }}>Bridging Perspectives. Delivering Understanding.</p>
+        <p className="mx-auto mt-3 max-w-full px-1 text-center text-xs font-medium leading-relaxed whitespace-normal break-words" style={{ color: p.goldText }}>Bridging Perspectives. Delivering Understanding.</p>
         <h1 className="mx-auto mt-6 max-w-full text-center text-2xl font-bold leading-tight whitespace-normal break-words sm:text-3xl md:text-4xl" style={{ color: p.charcoal }}>Mentorship Interest Form</h1>
         <div className="mt-6 flex items-center justify-between gap-4 text-left text-xs font-bold" style={{ color: p.charcoal }}>
           <span>Step {page} of 2</span><span>{page === 1 ? "Mentee Application" : "Recording & Consent"}</span>

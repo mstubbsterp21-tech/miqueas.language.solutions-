@@ -430,7 +430,7 @@ export default function InterpreterNetworkFormOptional({ palette = defaultPalett
     return (
       <section className="mx-auto max-w-4xl px-5 py-6 md:px-8">
         <div className="rounded-[2rem] border bg-white p-8 text-center shadow-sm" style={{ borderColor: p.border }}>
-          <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full text-2xl" style={{ backgroundColor: p.softGray, color: p.burgundy }}>✓</div>
+          <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full text-2xl" style={{ backgroundColor: p.softGray, color: p.brandText }}>✓</div>
           <h2 className="text-3xl font-bold" style={{ color: p.charcoal }}>Application Submitted</h2>
           <p className="mx-auto mt-4 max-w-2xl text-sm leading-6" style={{ color: p.charcoal }}>
             Thank you for your interest in joining the Miqueas Language Solutions interpreter network.

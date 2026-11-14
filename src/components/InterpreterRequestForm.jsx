@@ -3,6 +3,9 @@ import InterpreterRequestFormShared from "./InterpreterRequestFormShared";
 const defaultPalette = {
   burgundy: "#721100",
   gold: "#dd7d00",
+  actionGold: "#a65300",
+  brandText: "var(--mls-brand-ink)",
+  goldText: "var(--mls-accent-ink)",
   charcoal: "#464747",
   white: "#ffffff",
   softGray: "#f5f5f5",

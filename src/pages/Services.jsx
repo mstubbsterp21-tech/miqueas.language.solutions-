@@ -112,17 +112,17 @@ const useCases = [
 export default function Services({ palette }) {
   const reduceMotion = useReducedMotion();
   const cardStyle = { borderColor: palette.border, backgroundColor: palette.white };
-  const goldButton = { backgroundColor: palette.gold, color: palette.white };
+  const goldButton = { backgroundColor: palette.actionGold, color: "#ffffff" };
 
   return (
     <div className="mls-public-site overflow-hidden bg-white">
       <section className="relative px-5 py-14 md:px-8 md:py-20">
-        <div className="absolute inset-0 -z-10" style={{ background: "radial-gradient(circle at 12% 15%, rgba(221,125,0,0.18), transparent 28%), radial-gradient(circle at 92% 8%, rgba(114,17,0,0.14), transparent 32%), linear-gradient(180deg, #ffffff 0%, #f7f3ef 100%)" }} />
+        <div className="absolute inset-0 -z-10" style={{ background: "radial-gradient(circle at 12% 15%, rgba(221,125,0,0.18), transparent 28%), radial-gradient(circle at 92% 8%, rgba(114,17,0,0.14), transparent 32%), linear-gradient(180deg, var(--mls-page) 0%, var(--mls-muted-surface) 100%)" }} />
         <div className="mx-auto max-w-6xl">
           <motion.div initial="hidden" animate="show" variants={fadeUp} transition={{ duration: 0.55 }} className="grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_420px]">
             <div>
-              <div className="mb-5 inline-flex items-center gap-2 rounded-full border bg-white/80 px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] shadow-sm backdrop-blur" style={{ borderColor: palette.border, color: palette.burgundy }}>
-                <MonitorUp size={15} style={{ color: palette.gold }} />
+              <div className="mb-5 inline-flex items-center gap-2 rounded-full border bg-white/80 px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] shadow-sm backdrop-blur" style={{ borderColor: palette.border, color: palette.brandText }}>
+                <MonitorUp size={15} style={{ color: palette.goldText }} />
                 Services
               </div>
               <h1 className="max-w-4xl text-4xl font-black leading-[1.03] tracking-tight md:text-6xl" style={{ color: palette.charcoal }}>
@@ -143,9 +143,9 @@ export default function Services({ palette }) {
               <div className="mt-8 flex flex-wrap gap-3">
                 {specialtyCards.map(({ icon: Icon, title }) => (
                   <Link key={title} to={"/settings/" + title.toLowerCase()} aria-label={"Explore " + title.toLowerCase() + " settings"} className="group flex items-center gap-3 rounded-full border bg-white/80 px-4 py-2 text-sm font-bold shadow-sm backdrop-blur transition hover:-translate-y-0.5 hover:shadow-md focus-visible:outline focus-visible:outline-4 focus-visible:outline-[#dd7d00]" style={{ borderColor: palette.border, color: palette.charcoal }}>
-                    <Icon size={16} style={{ color: palette.gold }} aria-hidden="true" />
+                    <Icon size={16} style={{ color: palette.goldText }} aria-hidden="true" />
                     {title}
-                    <ArrowRight size={14} className="transition group-hover:translate-x-1" style={{ color: palette.gold }} aria-hidden="true" />
+                    <ArrowRight size={14} className="transition group-hover:translate-x-1" style={{ color: palette.goldText }} aria-hidden="true" />
                   </Link>
                 ))}
               </div>
@@ -156,7 +156,7 @@ export default function Services({ palette }) {
                 <MlsSitePhoto name="in-person-interpreting" alt="A professional ASL interpreter assisting communication in a healthcare setting" className="!rounded-none aspect-[4/3] object-cover" priority />
               </motion.div>
               <motion.div initial={reduceMotion ? false : { opacity: 0, y: 22 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.25 }} className="relative z-10 -mt-7 ml-auto max-w-[88%] rounded-[1.3rem] bg-[#202020] p-5 text-white shadow-xl md:p-6">
-                <p className="text-xs font-black uppercase tracking-[0.15em]" style={{ color: palette.gold }}>Focused on your needs</p>
+                <p className="text-xs font-black uppercase tracking-[0.15em]" style={{ color: palette.goldText }}>Focused on your needs</p>
                 <p className="mt-2 text-lg font-bold leading-snug">Live interpreting and recorded ASL translation, coordinated with care.</p>
               </motion.div>
             </div>
@@ -172,7 +172,7 @@ export default function Services({ palette }) {
 
       <section className="px-5 py-12 md:px-8 md:py-16">
         <div className="mx-auto max-w-6xl rounded-[2.2rem] border bg-[#f7f3ef] p-6 md:p-9" style={{ borderColor: palette.border }}>
-          <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.gold }}>Service areas</p>
+          <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.goldText }}>Service areas</p>
           <h2 className="mt-3 max-w-3xl text-3xl font-black tracking-tight md:text-4xl" style={{ color: palette.charcoal }}>Local Florida coverage and nationwide remote access.</h2>
           <p className="mt-4 max-w-3xl leading-8 text-[#5f6368]">Explore area-specific service information or request remote interpreting anywhere in the United States. Coverage remains subject to assignment fit and interpreter availability.</p>
           <div className="mt-7 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -181,7 +181,7 @@ export default function Services({ palette }) {
               ["/locations/ocala", "Ocala"],
               ["/locations/central-florida", "Central Florida"],
               ["/services/video-remote-interpreting-nationwide", "Nationwide VRI"],
-            ].map(([path, label]) => <Link key={path} to={path} className="group inline-flex items-center justify-between rounded-2xl border bg-white px-5 py-4 text-sm font-black shadow-sm transition hover:-translate-y-0.5 hover:shadow-md" style={{ borderColor: palette.border, color: palette.burgundy }}>{label}<ArrowRight size={16} className="transition group-hover:translate-x-1" /></Link>)}
+            ].map(([path, label]) => <Link key={path} to={path} className="group inline-flex items-center justify-between rounded-2xl border bg-white px-5 py-4 text-sm font-black shadow-sm transition hover:-translate-y-0.5 hover:shadow-md" style={{ borderColor: palette.border, color: palette.brandText }}>{label}<ArrowRight size={16} className="transition group-hover:translate-x-1" /></Link>)}
           </div>
         </div>
       </section>
@@ -189,7 +189,7 @@ export default function Services({ palette }) {
       <section className="px-5 py-12 md:px-8 md:py-16">
         <div className="mx-auto max-w-6xl">
           <motion.div initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} variants={fadeUp} transition={{ duration: 0.45 }} className="mb-8 max-w-3xl">
-            <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.gold }}>Service options</p>
+            <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.goldText }}>Service options</p>
             <h2 className="mt-3 text-3xl font-black tracking-tight md:text-5xl" style={{ color: palette.charcoal }}>Different needs call for different workflows.</h2>
           </motion.div>
 
@@ -210,12 +210,12 @@ export default function Services({ palette }) {
                   </Link>
                   <div className="flex flex-col justify-center p-7 md:p-10 lg:p-12">
                     <div className="mb-5 flex items-center gap-3">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-2xl" style={{ backgroundColor: "rgba(221,125,0,0.12)", color: palette.gold }}><Icon size={23} /></div>
-                      <p className="text-xs font-black uppercase tracking-[0.15em]" style={{ color: palette.burgundy }}>{card.label}</p>
+                      <div className="flex h-12 w-12 items-center justify-center rounded-2xl" style={{ backgroundColor: "rgba(221,125,0,0.12)", color: palette.goldText }}><Icon size={23} /></div>
+                      <p className="text-xs font-black uppercase tracking-[0.15em]" style={{ color: palette.brandText }}>{card.label}</p>
                     </div>
                     <h3 className="text-3xl font-black leading-tight" style={{ color: palette.charcoal }}>{card.title}</h3>
                     <p className="mt-5 max-w-md text-base leading-8 text-[#626262]">{card.text}</p>
-                    <Link to={`/services/${card.id}`} className="mt-7 inline-flex w-fit items-center gap-2 rounded-full border px-5 py-3 text-sm font-bold transition-all duration-300 group-hover:gap-3 group-hover:shadow-md" style={{ borderColor: palette.border, color: palette.burgundy }}>
+                    <Link to={`/services/${card.id}`} className="mt-7 inline-flex w-fit items-center gap-2 rounded-full border px-5 py-3 text-sm font-bold transition-all duration-300 group-hover:gap-3 group-hover:shadow-md" style={{ borderColor: palette.border, color: palette.brandText }}>
                       Explore this service <ArrowRight size={17} />
                     </Link>
                   </div>
@@ -230,14 +230,14 @@ export default function Services({ palette }) {
         <div className="mx-auto max-w-6xl rounded-[2.2rem] border bg-[#fafafa] p-6 md:p-8" style={{ borderColor: palette.border }}>
           <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-center">
             <motion.div initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.25 }} variants={fadeUp} transition={{ duration: 0.45 }}>
-              <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.gold }}>How it works</p>
+              <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.goldText }}>How it works</p>
               <h2 className="mt-3 text-3xl font-black leading-tight md:text-4xl" style={{ color: palette.charcoal }}>One intake process. Different service paths.</h2>
               <p className="mt-4 text-base leading-8 text-[#5f6368]">The same request form starts the process, but the workflow changes depending on whether you need live interpreting, remote access, or translation work.</p>
             </motion.div>
             <div className="grid gap-4 md:grid-cols-3">
               {workflow.map(({ icon: Icon, title, copy }, index) => (
                 <motion.div key={title} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.25 }} variants={fadeUp} transition={{ duration: 0.45, delay: index * 0.04 }} className="rounded-[1.5rem] border bg-white p-6 text-center shadow-sm" style={cardStyle}>
-                  <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full text-white" style={{ backgroundColor: index === 1 ? palette.burgundy : palette.gold }}><Icon size={22} /></div>
+                  <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full text-white" style={{ backgroundColor: index === 1 ? palette.burgundy : palette.actionGold }}><Icon size={22} /></div>
                   <h3 className="text-lg font-black" style={{ color: palette.charcoal }}>{title}</h3>
                   <p className="mt-3 text-sm leading-7 text-[#666]">{copy}</p>
                 </motion.div>
@@ -251,7 +251,7 @@ export default function Services({ palette }) {
         <div className="mx-auto max-w-6xl">
           <div className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-start">
             <motion.div initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.25 }} variants={fadeUp} transition={{ duration: 0.45 }} className="rounded-[2rem] border bg-[#202020] p-7 md:p-8" style={{ borderColor: palette.border }}>
-              <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.gold }}>Compare options</p>
+              <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.goldText }}>Compare options</p>
               <h2 className="mt-3 text-3xl font-black leading-tight text-white md:text-4xl">Which service fits your request?</h2>
               <p className="mt-5 text-base leading-8 text-white/75">Every request still goes through the same quote process, but the service type changes preparation, workflow, and pricing structure.</p>
               <div className="mt-6 grid gap-3 sm:grid-cols-2">
@@ -264,11 +264,11 @@ export default function Services({ palette }) {
             <div className="space-y-4">
               {comparisonRows.map((row, rowIndex) => (
                 <motion.div key={row.label} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.25 }} variants={fadeUp} transition={{ duration: 0.45, delay: rowIndex * 0.04 }} className="rounded-[1.5rem] border bg-white p-5 shadow-sm" style={cardStyle}>
-                  <h3 className="text-sm font-black uppercase tracking-[0.16em]" style={{ color: palette.gold }}>{row.label}</h3>
+                  <h3 className="text-sm font-black uppercase tracking-[0.16em]" style={{ color: palette.goldText }}>{row.label}</h3>
                   <div className="mt-4 grid gap-3 sm:grid-cols-2">
                     {row.values.map((value, index) => (
                       <div key={`${row.label}-${index}`} className="rounded-2xl bg-[#f7f3ef] p-4 text-sm leading-6" style={{ color: palette.body }}>
-                        <span className="mb-2 block text-xs font-black uppercase tracking-[0.12em]" style={{ color: palette.burgundy }}>{serviceCards[index].title}</span>
+                        <span className="mb-2 block text-xs font-black uppercase tracking-[0.12em]" style={{ color: palette.brandText }}>{serviceCards[index].title}</span>
                         {value}
                       </div>
                     ))}
@@ -284,11 +284,11 @@ export default function Services({ palette }) {
         <div className="mx-auto max-w-6xl">
           <div className="grid gap-6 lg:grid-cols-[1fr_1.15fr] lg:gap-8">
             <motion.div initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.25 }} variants={fadeUp} transition={{ duration: 0.45 }} className="rounded-[2rem] border bg-white p-6 shadow-sm md:p-8" style={cardStyle}>
-              <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.gold }}>Real-world use cases</p>
+              <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: palette.goldText }}>Real-world use cases</p>
               <div className="mt-5 space-y-3">
                 {useCases.map((item) => (
                   <div key={item} className="flex items-start gap-3 rounded-2xl bg-[#f7f3ef] p-4">
-                    <CheckCircle2 size={18} style={{ color: palette.gold, marginTop: 2, flexShrink: 0 }} />
+                    <CheckCircle2 size={18} style={{ color: palette.goldText, marginTop: 2, flexShrink: 0 }} />
                     <span className="text-sm leading-6" style={{ color: palette.body }}>{item}</span>
                   </div>
                 ))}
