@@ -67,6 +67,9 @@
 
     <script>
       (function () {
+        // The build injects complete per-route metadata for public pages.
+        // Do not replace it with the older client-side route table.
+        if (document.querySelector('meta[name="mls-prerendered-page"]')) return;
         const siteUrl = "https://miqueaslanguagesolutions.com";
         const defaultDescription = "Miqueas Language Solutions provides professional ASL-English interpreting, video remote interpreting, and ASL video translation services for healthcare, education, business, and community settings in Florida and remotely.";
         const previewImage = siteUrl + "/preview.png";
