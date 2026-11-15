@@ -69,7 +69,13 @@
       (function () {
         // The build injects complete per-route metadata for public pages.
         // Do not replace it with the older client-side route table.
-        if (document.querySelector('meta[name="mls-prerendered-page"]')) return;
+        const staticMarker = document.querySelector('meta[name="mls-prerendered-page"]');
+        const staticCanonical = document.querySelector('link[rel="canonical"]')?.getAttribute("href");
+        const staticPath = staticCanonical ? new URL(staticCanonical, window.location.href).pathname.replace(/\/+$/, "") || "/" : null;
+        const requestPath = window.location.pathname.replace(/\/+$/, "") || "/";
+        // A catch-all Vercel rewrite can serve the homepage HTML for unknown
+        // paths. Only trust a static page when its canonical matches this URL.
+        if (staticMarker && staticPath === requestPath) return;
         const siteUrl = "https://miqueaslanguagesolutions.com";
         const defaultDescription = "Miqueas Language Solutions provides professional ASL-English interpreting, video remote interpreting, and ASL video translation services for healthcare, education, business, and community settings in Florida and remotely.";
         const previewImage = siteUrl + "/preview.png";
