@@ -42,7 +42,7 @@ export default function seoStaticPages() {
         }
         const output = join(dist, `${path.slice(1)}.html`);
         await mkdir(dirname(output), { recursive: true });
-        await writeFile(output, replaceHead(template, path, meta));
+        await writeFile(output, await replaceHead(template, path, meta));
       }
 
       // Sitemap is generated at request time by /api/sitemap so scheduled
