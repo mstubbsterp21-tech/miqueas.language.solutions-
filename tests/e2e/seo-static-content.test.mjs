@@ -44,3 +44,15 @@ test("unpublished blog drafts are not exported as indexable pages", async () => 
     }
   }
 });
+
+test("article bodies do not duplicate their page-level H1", async () => {
+  const slugs = [
+    "asl-healthcare-community-hands-up-conference-2026-orlando",
+    "celebrating-black-deaf-excellence-juneteenth-2026-florida",
+    "summer-school-accessibility-professional-asl-support",
+  ];
+  for (const slug of slugs) {
+    const html = await builtPage("blog/" + slug + ".html");
+    assert.equal((html.match(/<h1\b/gi) || []).length, 1, "Duplicate H1 in " + slug);
+  }
+});
