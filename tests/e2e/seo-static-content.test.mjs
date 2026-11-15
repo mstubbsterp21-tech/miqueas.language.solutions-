@@ -37,8 +37,9 @@ test("unpublished blog drafts are not exported as indexable pages", async () => 
   const { siteMetadata } = await import("../../src/seo/siteMetadata.js");
   const { publicSiteEntries } = await import("../../src/seo/publishing.js");
   const published = new Set(publicSiteEntries(siteMetadata).map(([path]) => path));
+  const { isBlogReviewApprovedInMetadata } = await import("../../src/seo/blogReviewGate.js");
   for (const [path, meta] of Object.entries(siteMetadata)) {
-    if (path.startsWith("/blog/") && meta.publishDate > "2026-10-28") {
+    if (path.startsWith("/blog/") && !isBlogReviewApprovedInMetadata(path, meta)) {
       assert.equal(published.has(path), false, "Unreviewed article should not be published: " + path);
     }
   }
