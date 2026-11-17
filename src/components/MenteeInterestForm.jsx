@@ -176,6 +176,12 @@ export default function MenteeInterestForm({ palette = defaultPalette }) {
         <img src={logo} alt="Miqueas Language Solutions" className="mx-auto h-20 max-w-full object-contain" />
         <p className="mx-auto mt-3 max-w-full px-1 text-center text-xs font-medium leading-relaxed whitespace-normal break-words" style={{ color: p.goldText }}>Bridging Perspectives. Delivering Understanding.</p>
         <h1 className="mx-auto mt-6 max-w-full text-center text-2xl font-bold leading-tight whitespace-normal break-words sm:text-3xl md:text-4xl" style={{ color: p.charcoal }}>Mentorship Interest Form</h1>
+        <div className="mt-5">
+          <a href="/mentor-profile/" target="_blank" rel="noopener noreferrer" className="btn btn-primary" aria-describedby="mentor-profile-note">
+            Who’s my mentor? <span aria-hidden="true">↗</span>
+          </a>
+          <p id="mentor-profile-note" className="mt-2 text-xs form-note">Meet Micah Stubbs. Opens in a new tab so you can keep your place in the form.</p>
+        </div>
         <div className="mt-6 flex items-center justify-between gap-4 text-left text-xs font-bold" style={{ color: p.charcoal }}>
           <span>Step {page} of 2</span><span>{page === 1 ? "Mentee Application" : "Recording & Consent"}</span>
         </div>
