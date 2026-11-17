@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Simple Mentoring Agreement | Miqueas Language Solutions</title>
+  <title>MLS Mentoring Agreement | Miqueas Language Solutions</title>
   <meta name="description" content="A practical mentoring agreement for interpreters working with Miqueas Language Solutions." />
   <meta name="robots" content="noindex,nofollow,noarchive" />
   <link rel="icon" href="/favicon-32x32.png" />
@@ -37,6 +37,7 @@
 
     button,
     input,
+    select,
     textarea { font: inherit; }
 
     .toolbar {
@@ -197,6 +198,7 @@
     }
 
     input,
+    select,
     textarea {
       width: 100%;
       border: 1px solid #ab9b90;
@@ -205,7 +207,7 @@
       color: #222;
     }
 
-    input {
+    input, select {
       min-height: 45px;
       padding: 10px 12px;
     }
@@ -513,210 +515,27 @@
     </header>
 
     <section class="intro">
-      <h1>Simple Mentoring Agreement</h1>
-      <p>Complete the mentor and mentee sections first. Finalize the shared agreement together after the initial meeting.</p>
+      <h1>MLS Mentoring Agreement</h1>
+      <p>A reusable agreement for a collaborative mentoring relationship. Review the commitments and complete the shared plan together.</p>
     </section>
 
     <form class="form-body" id="mentoring-agreement" autocomplete="off">
-      <div class="privacy-note">
-        <strong>Privacy:</strong> Nothing entered on this page is sent to MLS. Your draft is stored only in this browser until you clear it. Use “Print / Save PDF” when you are ready to keep or share a copy.
-      </div>
-
-      <div class="identity-grid">
-        <div class="field">
-          <label for="mentor-name">Mentor</label>
-          <input id="mentor-name" name="mentorName" type="text" value="Micah Stubbs" readonly />
-        </div>
-        <div class="field">
-          <label for="mentee-name">Mentee</label>
-          <input id="mentee-name" name="menteeName" type="text" placeholder="Full name" />
-        </div>
-      </div>
-
-      <div class="workflow-note" aria-label="Agreement workflow">
-        <div class="workflow-step"><strong>1. Mentor</strong>Review the reusable mentor answers.</div>
-        <div class="workflow-step"><strong>2. Mentee</strong>Complete the mentee reflection questions.</div>
-        <div class="workflow-step"><strong>3. Together</strong>Finalize the agreement after the initial meeting.</div>
-      </div>
-
-      <div class="ethics-note">
-        <strong>Professional and ethical practice:</strong> Mentoring conversations should respect the NAD-RID Code of Professional Conduct, applicable law, and workplace policies. Interpreting samples and discussions must be de-identified unless proper permission has been obtained. Mentoring supports professional growth; it does not replace independent professional judgment, supervision, legal advice, or mental-health care.
-      </div>
-
-      <section class="agreement-section mentor-section" aria-labelledby="mentor-section-heading">
-        <h2 class="section-heading" id="mentor-section-heading"><span class="section-number">01</span> Mentor Section — Micah’s Commitments</h2>
-        <p class="section-intro">These are Micah’s standard answers and do not need to be completed again. Any relationship-specific adjustments can be recorded in the shared agreement after the initial meeting.</p>
-        <div class="questions">
-          <div class="question-block standard-answer">
-            <label class="prompt" for="mentor-support">What can the mentee expect from me as their mentor?</label>
-            <textarea id="mentor-support" name="mentorSupport" readonly>I will provide individualized support based on the mentee’s stated goals, experience, and learning needs. I will listen before assuming what they need, treat them as a competent professional peer, and offer practical resources and next steps they can continue using outside our sessions.</textarea>
-          </div>
-
-          <div class="question-block standard-answer">
-            <label class="prompt" for="mentor-feedback-approach">How will I approach feedback?</label>
-            <textarea id="mentor-feedback-approach" name="mentorFeedbackApproach" readonly>I will give honest, specific, and constructive feedback in a respectful way. Whenever possible, I will connect feedback to observable choices in the work, explain why it matters, invite the mentee’s perspective, and help turn the feedback into a realistic practice goal.</textarea>
-          </div>
-
-          <div class="question-block standard-answer">
-            <label class="prompt" for="mentor-preparation">How will I prepare and follow through?</label>
-            <textarea id="mentor-preparation" name="mentorPreparation" readonly>I will arrive prepared, review agreed-upon materials when they are provided in advance, keep track of our goals and action steps, and communicate promptly if I need clarification or cannot meet a commitment. I will not promise outcomes such as passing an exam, receiving certification, or obtaining employment.</textarea>
-          </div>
-
-          <div class="question-block standard-answer">
-            <label class="prompt" for="mentor-role-boundaries">What professional boundaries guide my role?</label>
-            <textarea id="mentor-role-boundaries" name="mentorRoleBoundaries" readonly>My role is mentor—not supervisor, evaluator, therapist, attorney, or decision-maker for the mentee. The mentee remains responsible for their professional judgment and choices. We will use de-identified interpreting samples unless proper permission has been obtained, and we will keep communication within mutually agreed channels and reasonable hours.</textarea>
-          </div>
-
-          <div class="question-block standard-answer">
-            <label class="prompt" for="mentor-confidentiality">How will I handle confidentiality?</label>
-            <textarea id="mentor-confidentiality" name="mentorConfidentiality" readonly>I will keep the mentee’s reflections, goals, feedback, and shared materials private. I will only share information with the mentee’s permission or when disclosure is required by law, professional obligation, or an immediate safety concern. Any necessary disclosure will be limited to what is needed, and I will inform the mentee when legally and safely possible.</textarea>
-          </div>
-
-          <div class="question-block standard-answer">
-            <label class="prompt" for="mentor-scheduling">What is my general approach to meetings and schedule changes?</label>
-            <textarea id="mentor-scheduling" name="mentorScheduling" readonly>Mentoring sessions are generally virtual, one-on-one, and approximately 60 minutes. The exact schedule will be agreed upon after the initial meeting. If I need to change or cancel a meeting, I will communicate as soon as reasonably possible and work with the mentee to reschedule when feasible.</textarea>
-          </div>
-          <p class="answer-note">These standard answers are locked. Use the shared agreement section for any mutually agreed changes.</p>
-        </div>
-      </section>
-
-      <section class="agreement-section mentee-section" aria-labelledby="mentee-section-heading">
-        <h2 class="section-heading" id="mentee-section-heading"><span class="section-number">02</span> Mentee Section — Before the Initial Meeting</h2>
-        <p class="section-intro">The mentee completes this section. These answers help Micah understand what the mentee needs before the two of you finalize the agreement together.</p>
-        <div class="questions">
-          <div class="question-block">
-            <label class="prompt" for="mentee-outcomes">What would you like to accomplish through mentoring?</label>
-            <textarea id="mentee-outcomes" name="menteeOutcomes" placeholder="Describe the growth, skill, decision, or outcome you hope to work toward."></textarea>
-          </div>
-
-          <div class="question-block">
-            <label class="prompt" for="mentee-experience">What experience and strengths are you bringing into mentorship?</label>
-            <textarea id="mentee-experience" name="menteeExperience" placeholder="Include settings, training, assessments, strengths, or experience that may be relevant."></textarea>
-          </div>
-
-          <div class="question-block">
-            <label class="prompt" for="mentee-challenges">What specific challenges or skills would you like to examine first?</label>
-            <textarea id="mentee-challenges" name="menteeChallenges" placeholder="Be as specific as you can; this can be refined during the initial meeting."></textarea>
-          </div>
-
-          <div class="question-block">
-            <label class="prompt" for="mentee-feedback-preferences">How do you prefer to receive feedback?</label>
-            <textarea id="mentee-feedback-preferences" name="menteeFeedbackPreferences" placeholder="Consider directness, timing, written or signed feedback, examples, and time to reflect."></textarea>
-          </div>
-
-          <div class="question-block">
-            <label class="prompt" for="mentee-learning-support">What helps you learn, practice, and stay accountable?</label>
-            <textarea id="mentee-learning-support" name="menteeLearningSupport" placeholder="For example: demonstrations, repetition, reflection questions, deadlines, check-ins, or practice resources."></textarea>
-          </div>
-
-          <div class="question-block">
-            <label class="prompt" for="mentee-needs-boundaries">What communication needs, access needs, preferences, or boundaries should your mentor know?</label>
-            <textarea id="mentee-needs-boundaries" name="menteeNeedsBoundaries" placeholder="Share anything that will help the mentoring space work well for you."></textarea>
-          </div>
-
-          <div class="question-block">
-            <label class="prompt" for="mentee-materials">Is there a question, interpreting sample, or other material you want to discuss during the initial meeting?</label>
-            <textarea id="mentee-materials" name="menteeMaterials" placeholder="Do not include identifying or confidential consumer information."></textarea>
-          </div>
-        </div>
-      </section>
-
-      <section class="agreement-section joint-section" aria-labelledby="joint-section-heading">
-        <h2 class="section-heading" id="joint-section-heading"><span class="section-number">03</span> Shared Agreement — After the Initial Meeting</h2>
-        <p class="section-intro">Complete this section together after discussing the mentor’s commitments and the mentee’s responses.</p>
-        <div class="questions">
-          <div class="joint-grid">
-            <div class="field">
-              <label for="initial-meeting-date">Initial Meeting Date</label>
-              <input id="initial-meeting-date" name="initialMeetingDate" type="date" />
-            </div>
-            <div class="field">
-              <label for="review-date">Agreement Review / End Date</label>
-              <input id="review-date" name="reviewDate" type="date" />
-            </div>
-          </div>
-
-          <div class="question-block">
-            <label class="prompt" for="shared-goals">What goal or goals will this mentoring relationship focus on?</label>
-            <textarea id="shared-goals" name="sharedGoals" placeholder="Write the goal you agreed to after discussing the mentee’s priorities and the mentor’s scope."></textarea>
-          </div>
-
-          <div class="question-block">
-            <label class="prompt" for="progress-measures">How will we know that progress is being made?</label>
-            <textarea id="progress-measures" name="progressMeasures" placeholder="Identify observable changes, completed practice, reflection, assessment evidence, or other milestones."></textarea>
-          </div>
-
-          <div class="question-block">
-            <label class="prompt" for="meeting-plan">How and when will we meet and communicate?</label>
-            <textarea id="meeting-plan" name="meetingPlan" placeholder="Record the frequency, format, typical session length, communication method, and expectations between sessions."></textarea>
-          </div>
-
-          <div class="joint-grid">
-            <div class="field">
-              <label for="agreed-mentor-responsibilities">Mentor Responsibilities</label>
-              <textarea id="agreed-mentor-responsibilities" name="agreedMentorResponsibilities" placeholder="Any responsibilities or adjustments agreed to beyond the standard mentor commitments."></textarea>
-            </div>
-            <div class="field">
-              <label for="agreed-mentee-responsibilities">Mentee Responsibilities</label>
-              <textarea id="agreed-mentee-responsibilities" name="agreedMenteeResponsibilities" placeholder="Preparation, practice, communication, or follow-through the mentee agrees to provide."></textarea>
-            </div>
-          </div>
-
-          <div class="question-block">
-            <label class="prompt" for="changes-challenges">What will we do if a meeting changes, a commitment is missed, or a concern comes up?</label>
-            <textarea id="changes-challenges" name="changesChallenges" placeholder="Record your agreed communication, rescheduling, and problem-solving process."></textarea>
-          </div>
-
-          <div class="joint-grid">
-            <div class="field">
-              <label for="mentor-next-step">Mentor’s Next Action</label>
-              <textarea id="mentor-next-step" name="mentorNextStep" placeholder="Before the next meeting, Micah will..."></textarea>
-            </div>
-            <div class="field">
-              <label for="mentee-next-step">Mentee’s Next Action</label>
-              <textarea id="mentee-next-step" name="menteeNextStep" placeholder="Before the next meeting, the mentee will..."></textarea>
-            </div>
-          </div>
-
-          <div class="question-block">
-            <label class="prompt" for="additional-agreements">Is there anything else we agreed to or need to revisit?</label>
-            <textarea id="additional-agreements" name="additionalAgreements" placeholder="Optional"></textarea>
-          </div>
-        </div>
-      </section>
-
-      <section class="agreement-box" aria-labelledby="agreement-heading">
-        <h2 id="agreement-heading">Agreement</h2>
-        <p>We have discussed these questions and agree to use this document as a guide for our mentoring relationship. We understand that we may revise the agreement together as our needs or goals change.</p>
-
-        <label class="acknowledgment" for="agreement-confirmed">
-          <input id="agreement-confirmed" name="agreementConfirmed" type="checkbox" />
-          <span>We have reviewed this agreement together and agree to the expectations recorded above.</span>
-        </label>
-
-        <div class="signature-grid">
-          <div class="field">
-            <label for="mentor-signature">Mentor Signature</label>
-            <input id="mentor-signature" name="mentorSignature" type="text" placeholder="Type or print full name" />
-          </div>
-          <div class="field">
-            <label for="mentor-signature-date">Date</label>
-            <input id="mentor-signature-date" name="mentorSignatureDate" type="date" />
-          </div>
-          <div class="field">
-            <label for="mentee-signature">Mentee Signature</label>
-            <input id="mentee-signature" name="menteeSignature" type="text" placeholder="Type or print full name" />
-          </div>
-          <div class="field">
-            <label for="mentee-signature-date">Date</label>
-            <input id="mentee-signature-date" name="menteeSignatureDate" type="date" />
-          </div>
-        </div>
-
-        <p class="signature-help">If your program requires handwritten or verified electronic signatures, print or save this document and complete signatures using the method your program accepts.</p>
-        <p class="saved-status" id="saved-status" role="status" aria-live="polite"></p>
-      </section>
-    </form>
+<div class="privacy-note"><strong>Draft privacy:</strong> Your answers save only in this browser and are not submitted to MLS. On a shared device, print or save your copy, then choose “New Agreement” to clear the draft. Each person should keep a copy of the completed agreement.</div>
+<div class="identity-grid"><div class="field"><label for="mentor-name">Mentor name</label><input id="mentor-name" name="mentor-name" type="text" placeholder="Full name" /></div><div class="field"><label for="mentee-name">Mentee name</label><input id="mentee-name" name="mentee-name" type="text" placeholder="Full name" /></div><div class="field"><label for="mentor-email">Mentor email</label><input id="mentor-email" name="mentor-email" type="email" placeholder="" /></div><div class="field"><label for="mentee-email">Mentee email</label><input id="mentee-email" name="mentee-email" type="email" placeholder="" /></div><div class="field"><label for="start-date">Start date</label><input id="start-date" name="start-date" type="date" placeholder="" /></div><div class="field"><label for="review-date">Review / end date</label><input id="review-date" name="review-date" type="date" placeholder="" /></div></div>
+<section class="agreement-section joint-section"><h2 class="section-heading"><span class="section-number">01</span> Purpose and Scope</h2><div class="questions"><p>This agreement guides a collaborative mentoring relationship through Miqueas Language Solutions LLC (MLS). Mentoring supports the mentee’s interpreting skills, reflection, ethical decision-making, and professional development. The focus, duration, and activities will be agreed upon together.</p><p>The mentor provides guidance within their experience and competence. The mentee remains responsible for professional decisions and assignment acceptance. Mentoring does not establish employment, supervision, certification, or authorization to practice, and does not guarantee examination results, credentials, placement, or employment. Any formal assessment or separate service must be identified and agreed to separately.</p></div></section>
+<section class="agreement-section joint-section"><h2 class="section-heading"><span class="section-number">02</span> Mentor Commitments</h2><div class="questions"><ul><li>Listen to the mentee’s priorities, recognize their strengths and experience, and work together to set realistic goals.</li><li>Prepare for sessions and review agreed materials when provided by the agreed deadline.</li><li>Offer honest, specific, respectful feedback tied to observable work; invite the mentee’s perspective and support self-assessment.</li><li>Provide relevant resources and practical next steps, and follow through on agreed commitments.</li><li>Respect communication preferences, access needs, boundaries, and confidentiality.</li><li>Identify limits in expertise, disclose relevant conflicts or overlapping roles, and discuss referrals or adjustments when appropriate.</li></ul></div></section>
+<section class="agreement-section joint-section"><h2 class="section-heading"><span class="section-number">03</span> Mentee Commitments</h2><div class="questions"><ul><li>Take an active role in choosing goals, asking questions, and communicating learning and access needs.</li><li>Arrive prepared and on time, provide agreed materials by the agreed deadline, and communicate when plans change.</li><li>Consider feedback thoughtfully, share a different perspective when needed, and complete mutually agreed practice or reflection.</li><li>Use only materials that may appropriately be shared and protect consumer, colleague, employer, and client information.</li><li>Take responsibility for professional judgment, choices, and follow-through, and raise concerns about the mentoring relationship promptly.</li></ul></div></section>
+<section class="agreement-section joint-section"><h2 class="section-heading"><span class="section-number">04</span> Shared Mentoring Plan</h2><div class="questions"><p>Complete this plan together. Revisit it when goals, availability, or support needs change.</p><div class="field"><label for="shared-goals">What goals will we work toward?</label><textarea id="shared-goals" name="shared-goals" placeholder="Identify one to three specific priorities."></textarea></div><div class="field"><label for="progress-measures">How will we recognize progress?</label><textarea id="progress-measures" name="progress-measures" placeholder="Record observable outcomes, practice evidence, milestones, and review dates."></textarea></div><div class="field"><label for="practice-plan">What activities and preparation will support these goals?</label><textarea id="practice-plan" name="practice-plan" placeholder="Include practice, reflections, materials, and deadlines."></textarea></div><div class="field"><label for="meeting-plan">How and when will we meet?</label><textarea id="meeting-plan" name="meeting-plan" placeholder="Frequency, session length, platform or location, and time zone."></textarea></div><div class="field"><label for="communication-plan">How will we communicate between sessions?</label><textarea id="communication-plan" name="communication-plan" placeholder="Preferred channels, reasonable contact hours, expected response times, and limits on between-session review."></textarea></div><div class="field"><label for="access-needs">What access needs and feedback preferences will we accommodate?</label><textarea id="access-needs" name="access-needs" placeholder="Communication preferences, captions, pacing, breaks, feedback format, or other agreed supports."></textarea></div><div class="field"><label for="mentor-next-step">Mentor’s next action and due date</label><textarea id="mentor-next-step" name="mentor-next-step" placeholder=""></textarea></div><div class="field"><label for="mentee-next-step">Mentee’s next action and due date</label><textarea id="mentee-next-step" name="mentee-next-step" placeholder=""></textarea></div></div></section>
+<section class="agreement-section joint-section"><h2 class="section-heading"><span class="section-number">05</span> Scheduling, Fees, and Follow-Through</h2><div class="questions"><p>Both people will give as much notice as reasonably possible when a session needs to change. If a commitment is missed, they will discuss what happened and agree on a workable next step. Repeated missed sessions or an ongoing mismatch in availability may lead to a revised plan, pause, or end to mentoring.</p><div class="field"><label for="scheduling-expectations">Our cancellation, lateness, and rescheduling expectations</label><textarea id="scheduling-expectations" name="scheduling-expectations" placeholder="Agree on notice, how long to wait, and how to handle technical interruptions."></textarea></div><div class="field"><label for="fee-arrangement">Mentoring arrangement</label><select id="fee-arrangement" name="fee-arrangement"><option value="">Select together</option><option value="free">Free mentoring — no mentoring fee</option><option value="separate">Paid or sponsored — separate written fee terms apply</option></select></div><div class="field"><label for="fee-reference">Fee or sponsorship terms, if applicable</label><textarea id="fee-reference" name="fee-reference" placeholder="Reference the separate written terms, including payment, cancellation charges, refunds, or sponsor obligations."></textarea></div><p>No fee, cancellation charge, or payment obligation is created by an uncompleted field. Any paid arrangement must be agreed in writing before the related services begin.</p></div></section>
+<section class="agreement-section joint-section"><h2 class="section-heading"><span class="section-number">06</span> Confidentiality and Professional Boundaries</h2><div class="questions"><p>Both people will protect private reflections, feedback, goals, and shared materials. Information may be disclosed with the affected person’s permission or where disclosure is required by applicable law or a binding professional obligation. A serious, immediate safety concern may also require limited disclosure. Any disclosure should be limited to what is necessary, with notice when legally and safely possible.</p><p>Use de-identified or simulated interpreting examples whenever possible. Remove names and other identifying details; de-identification alone does not override workplace rules, ownership, or permission requirements. Obtain appropriate authorization before sharing restricted materials. Mentoring discussions should respect the NAD-RID Code of Professional Conduct and applicable workplace policies.</p><p>Mentoring feedback and materials will not be used for marketing, public posting, or unrelated employment or screening decisions without separate permission. Discuss any overlapping agency, contracting, or assessment role before proceeding.</p><div class="field"><label for="materials-plan">How will we share, store, and dispose of mentoring materials?</label><textarea id="materials-plan" name="materials-plan" placeholder="Agree on access, storage method, retention period, and deletion responsibilities. Recording terms belong in the separate addendum."></textarea></div></div></section>
+<section class="agreement-section joint-section"><h2 class="section-heading"><span class="section-number">07</span> Recording and Observation</h2><div class="questions"><p><strong>Signing this agreement does not authorize recording.</strong> Recording, transcription, AI meeting summaries, and third-party observation require a separate, specific consent or addendum before they begin.</p><p>That addendum must identify the purpose, information captured, observers, platform, sharing method, retention or deletion date, and how requests to stop future recording or withdraw participation will be handled. Public or promotional use requires separate permission.</p><p>For a practicum that requires recording, review its recording and observation terms separately before accepting that particular opportunity. Previously completed application acknowledgments do not authorize additional uses beyond their stated scope.</p><div class="field"><label for="recording-addendum">Applicable recording / observation addendum</label><textarea id="recording-addendum" name="recording-addendum" placeholder="Enter title, version, and consent date, or “None — no recording or outside observation.”"></textarea></div></div></section>
+<section class="agreement-section joint-section"><h2 class="section-heading"><span class="section-number">08</span> Reviewing, Pausing, or Ending Mentorship</h2><div class="questions"><p>Either person may request a change, pause, or end to mentoring by notifying the other through the agreed communication channel. No one is required to continue a relationship that no longer meets their needs. Where practical, discuss outstanding action steps and useful referrals. Any remaining payment or refund matters follow the separately agreed fee terms.</p><p>Confidentiality and restrictions on sharing materials continue after mentoring ends. Existing recordings remain subject to their separate consent terms and applicable requirements. Any changes to this agreement should be documented and acknowledged by both people.</p><div class="field"><label for="concerns-plan">How will we raise and address concerns?</label><textarea id="concerns-plan" name="concerns-plan" placeholder="Agree on a way to discuss concerns and, if needed, contact MLS."></textarea></div><div class="field"><label for="additional-agreements">Additional commitments or adjustments</label><textarea id="additional-agreements" name="additional-agreements" placeholder="Record anything specific to this mentoring relationship."></textarea></div></div></section>
+<section class="agreement-box" aria-labelledby="agreement-heading"><h2 id="agreement-heading">Shared Acknowledgment</h2>
+<p>We have reviewed this agreement, discussed our goals and expectations, and had an opportunity to ask questions. We agree to the commitments and plan recorded here and will review them together as needed. We understand that recording permission and any fee terms must be addressed separately.</p>
+<label class="acknowledgment" for="agreement-confirmed"><input id="agreement-confirmed" name="agreementConfirmed" type="checkbox" /><span>We have reviewed this agreement together and agree to the expectations recorded above.</span></label>
+<div class="signature-grid"><div class="field"><label for="mentor-signature">Mentor signature</label><input id="mentor-signature" name="mentor-signature" type="text" placeholder="Type or print full name" /></div><div class="field"><label for="mentor-signature-date">Date</label><input id="mentor-signature-date" name="mentor-signature-date" type="date" placeholder="" /></div><div class="field"><label for="mentee-signature">Mentee signature</label><input id="mentee-signature" name="mentee-signature" type="text" placeholder="Type or print full name" /></div><div class="field"><label for="mentee-signature-date">Date</label><input id="mentee-signature-date" name="mentee-signature-date" type="date" placeholder="" /></div></div>
+<p class="signature-help">Use “Print / Save PDF” to keep and share a copy. If verified electronic or handwritten signatures are needed, complete them using your program’s accepted method. This page does not submit or verify signatures.</p>
+<p class="saved-status" id="saved-status" role="status" aria-live="polite"></p></section></form>
 
     <footer>Miqueas Language Solutions LLC • Bridging Perspectives. Delivering Understanding. • © 2026</footer>
   </main>
@@ -725,7 +544,7 @@
     (() => {
       const form = document.getElementById('mentoring-agreement');
       const status = document.getElementById('saved-status');
-      const storageKey = 'mls-mentoring-agreement-draft-v3';
+      const storageKey = 'mls-mentoring-agreement-draft-v4';
       let statusTimer;
 
       const controls = Array.from(form.elements).filter((control) => control.name);
@@ -781,7 +600,7 @@
       });
 
       document.getElementById('clear-form').addEventListener('click', () => {
-        if (!window.confirm('Start a new agreement? This will clear the mentee and shared answers saved on this device.')) return;
+        if (!window.confirm('Start a new agreement? This will clear all agreement answers saved on this device.')) return;
         form.reset();
         localStorage.removeItem(storageKey);
         showStatus('New agreement ready.');
