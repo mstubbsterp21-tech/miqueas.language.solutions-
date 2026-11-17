@@ -1,0 +1,544 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Consent to Record and Share Mentoring Sessions | Miqueas Language Solutions</title>
+  <meta name="description" content="Consent for recording and peer observation during the MLS interpreter mentoring practicum." />
+  <meta name="robots" content="noindex,nofollow,noarchive" />
+  <link rel="icon" href="/favicon-32x32.png" />
+
+  <style>
+    :root {
+      --burgundy: #721100;
+      --burgundy-dark: #4f0c02;
+      --gold: #dd7d00;
+      --charcoal: #3d3f40;
+      --text: #55595b;
+      --cream: #f7f3ef;
+      --paper: #ffffff;
+      --border: #d7c9bf;
+      --focus: #1d64c8;
+      --shadow: 0 18px 46px rgba(57, 34, 25, 0.12);
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      background: #f1ece7;
+      color: var(--charcoal);
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 16px;
+      line-height: 1.55;
+    }
+
+    button,
+    input,
+    select,
+    textarea { font: inherit; }
+
+    .toolbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 18px;
+      padding: 12px max(18px, calc((100vw - 980px) / 2));
+      background: rgba(61, 63, 64, 0.97);
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+    }
+
+    .toolbar p {
+      margin: 0;
+      font-size: 0.9rem;
+    }
+
+    .toolbar-actions {
+      display: flex;
+      flex: 0 0 auto;
+      gap: 9px;
+    }
+
+    .button {
+      min-height: 42px;
+      padding: 9px 14px;
+      border: 1px solid transparent;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .button-primary {
+      background: var(--gold);
+      color: #23170a;
+    }
+
+    .button-secondary {
+      border-color: rgba(255, 255, 255, 0.45);
+      background: transparent;
+      color: #fff;
+    }
+
+    .button:hover { filter: brightness(0.96); }
+
+    .button:focus-visible,
+    input:focus-visible,
+    select:focus-visible,
+    textarea:focus-visible,
+    a:focus-visible {
+      outline: 3px solid var(--focus);
+      outline-offset: 2px;
+    }
+
+    .page {
+      width: min(980px, calc(100% - 36px));
+      margin: 30px auto 54px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      background: var(--paper);
+      box-shadow: var(--shadow);
+    }
+
+    .brand-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 24px;
+      padding: 18px 30px;
+      border-bottom: 5px solid var(--burgundy);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .brand img {
+      width: 64px;
+      height: 64px;
+      object-fit: contain;
+    }
+
+    .brand-name {
+      margin: 0;
+      font-weight: 800;
+    }
+
+    .tagline {
+      margin: 2px 0 0;
+      color: #9b5700;
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+
+    .document-label {
+      color: var(--burgundy);
+      font-size: 0.76rem;
+      font-weight: 800;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+    }
+
+    .intro {
+      padding: 34px 38px 30px;
+      background: var(--burgundy);
+      color: #fff;
+    }
+
+    .intro h1 {
+      margin: 0 0 10px;
+      color: #fff;
+      font-size: clamp(2rem, 5vw, 3.1rem);
+      line-height: 1.05;
+      letter-spacing: -0.025em;
+    }
+
+    .intro p {
+      max-width: 760px;
+      margin: 0;
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .form-body { padding: 30px 38px 42px; }
+
+    .privacy-note,
+    .ethics-note {
+      margin-bottom: 24px;
+      padding: 16px 18px;
+      border-left: 5px solid var(--gold);
+      background: var(--cream);
+      color: var(--text);
+    }
+
+    .privacy-note strong,
+    .ethics-note strong { color: var(--charcoal); }
+
+    .identity-grid,
+    .signature-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px 22px;
+    }
+
+    .field {
+      display: grid;
+      gap: 7px;
+    }
+
+    label,
+    .prompt {
+      color: var(--charcoal);
+      font-weight: 700;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      border: 1px solid #ab9b90;
+      border-radius: 3px;
+      background: #fff;
+      color: #222;
+    }
+
+    input, select {
+      min-height: 45px;
+      padding: 10px 12px;
+    }
+
+    textarea {
+      min-height: 108px;
+      padding: 11px 12px;
+      line-height: 1.5;
+      resize: vertical;
+    }
+
+    input::placeholder,
+    textarea::placeholder { color: #7b7d7e; opacity: 1; }
+
+    input[readonly],
+    textarea[readonly] {
+      background: #fffaf8;
+      color: #343536;
+      cursor: default;
+    }
+
+    .agreement-section {
+      margin-top: 25px;
+      border: 1px solid var(--border);
+    }
+
+    .workflow-note {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 20px;
+      margin-bottom: 24px;
+    }
+
+    .workflow-step {
+      padding: 13px 14px;
+      border: 1px solid var(--border);
+      background: #fff;
+      color: var(--text);
+      font-size: 0.88rem;
+    }
+
+    .workflow-step strong {
+      display: block;
+      margin-bottom: 3px;
+      color: var(--burgundy);
+    }
+
+    .section-intro {
+      margin: 0;
+      padding: 15px 20px 0;
+      color: var(--text);
+    }
+
+    .mentor-section { border-top: 5px solid var(--burgundy); }
+    .mentee-section { border-top: 5px solid var(--charcoal); }
+    .joint-section { border-top: 5px solid var(--gold); }
+
+    .mentor-section .section-heading { background: #f8eeeb; }
+    .mentee-section .section-heading { background: #eff0f0; color: var(--charcoal); }
+    .joint-section .section-heading { background: #fff6e9; }
+
+    .standard-answer {
+      border-left: 4px solid var(--burgundy);
+      background: #fffaf8;
+    }
+
+    .standard-answer textarea {
+      min-height: 125px;
+      background: #fffaf8;
+    }
+
+    .answer-note {
+      margin: 0;
+      color: #6e625b;
+      font-size: 0.82rem;
+    }
+
+    .joint-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .section-heading {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      margin: 0;
+      padding: 13px 17px;
+      border-bottom: 1px solid var(--border);
+      background: var(--cream);
+      color: var(--burgundy);
+      font-size: 1.12rem;
+    }
+
+    .section-number {
+      color: var(--gold);
+      font-size: 0.9rem;
+      letter-spacing: 0.08em;
+    }
+
+    .questions {
+      display: grid;
+      gap: 20px;
+      padding: 20px;
+    }
+
+    .question-block {
+      display: grid;
+      gap: 10px;
+    }
+
+    .question-block + .question-block {
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+    }
+
+    .response-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .role-response {
+      overflow: hidden;
+      border: 1px solid var(--border);
+      background: #fff;
+    }
+
+    .role-label {
+      display: block;
+      padding: 8px 11px;
+      color: #fff;
+      font-size: 0.79rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .role-response.mentor .role-label { background: var(--burgundy); }
+    .role-response.mentee .role-label { background: var(--charcoal); }
+
+    .role-response textarea {
+      display: block;
+      min-height: 100px;
+      border: 0;
+      border-radius: 0;
+    }
+
+    .helper {
+      display: block;
+      color: var(--text);
+      font-size: 0.86rem;
+      font-weight: 400;
+    }
+
+    .agreement-box {
+      margin-top: 26px;
+      padding: 24px;
+      border: 2px solid var(--burgundy);
+      background: #fff;
+    }
+
+    .agreement-box h2 {
+      margin: 0 0 10px;
+      color: var(--burgundy);
+      font-size: 1.28rem;
+    }
+
+    .agreement-box > p {
+      margin: 0 0 20px;
+      color: var(--text);
+    }
+
+    .acknowledgment {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin: 0 0 20px;
+      color: var(--charcoal);
+    }
+
+    .acknowledgment input {
+      width: 22px;
+      height: 22px;
+      min-height: 0;
+      margin: 1px 0 0;
+      flex: 0 0 auto;
+    }
+
+    .signature-help {
+      margin: 14px 0 0;
+      color: var(--text);
+      font-size: 0.84rem;
+    }
+
+    footer {
+      padding: 17px 28px;
+      border-top: 1px solid var(--border);
+      background: var(--cream);
+      color: #686b6c;
+      text-align: center;
+      font-size: 0.78rem;
+    }
+
+    .saved-status {
+      min-height: 1.2em;
+      margin: 10px 0 0;
+      color: #24613b;
+      font-size: 0.84rem;
+      font-weight: 700;
+    }
+
+    @media (max-width: 680px) {
+      .toolbar {
+        position: static;
+        align-items: flex-start;
+        padding: 12px 16px;
+      }
+
+      .toolbar p { display: none; }
+      .toolbar-actions { width: 100%; }
+      .button { flex: 1; }
+
+      .page {
+        width: 100%;
+        margin: 0;
+        border: 0;
+        box-shadow: none;
+      }
+
+      .brand-header { padding: 15px 18px; }
+      .brand img { width: 54px; height: 54px; }
+      .document-label { display: none; }
+      .tagline { font-size: 0.75rem; }
+      .intro { padding: 28px 20px 25px; }
+      .form-body { padding: 22px 16px 30px; }
+      .identity-grid,
+      .signature-grid,
+      .response-grid,
+      .workflow-note,
+      .joint-grid { grid-template-columns: 1fr; }
+      .questions { padding: 17px; }
+    }
+
+    @media print {
+      @page { size: Letter; margin: 0.45in; }
+
+      body { background: #fff; font-size: 10.5pt; }
+      .toolbar { display: none; }
+      .page { width: 100%; margin: 0; border: 0; box-shadow: none; }
+      .brand-header { padding: 10px 16px; }
+      .brand img { width: 46px; height: 46px; }
+      .intro { padding: 19px 22px; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+      .intro h1 { font-size: 25pt; }
+      .form-body { padding: 18px 22px; }
+      .privacy-note { display: none; }
+      .ethics-note { margin-bottom: 14px; }
+      .agreement-box,
+      .field { break-inside: avoid; }
+      .agreement-section { break-inside: auto; }
+      .section-heading { break-after: avoid; }
+      .agreement-section { margin-top: 14px; }
+      .section-heading { padding: 8px 11px; }
+      .questions { gap: 11px; padding: 12px; }
+      .response-grid { grid-template-columns: 1fr 1fr; }
+      .workflow-note { grid-template-columns: repeat(3, 1fr); }
+      .joint-grid { grid-template-columns: 1fr 1fr; }
+      .role-response textarea { min-height: 60px; }
+      textarea { min-height: 68px; }
+      input, textarea { border-color: #777; }
+      .saved-status { display: none; }
+      footer { padding: 10px; }
+    }
+  </style>
+<script>
+    try {
+      const savedTheme = localStorage.getItem('mls-theme');
+      document.documentElement.dataset.theme = savedTheme === 'dark' || savedTheme === 'light'
+        ? savedTheme : (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    } catch { /* The default light theme also works when storage is unavailable. */ }
+  </script>
+  <link rel="stylesheet" href="/mentor-profile/theme.css" />
+</head>
+
+<body>
+  <div class="toolbar" aria-label="Agreement actions">
+    <p>Print or save a copy before closing this page.</p>
+    <div class="toolbar-actions">
+      <button class="button button-secondary" type="button" id="clear-form">Clear Form</button>
+      <button class="button button-primary" type="button" id="print-form">Print / Save PDF</button>
+    </div>
+  </div>
+
+  <main class="page">
+    <header class="brand-header">
+      <div class="brand">
+        <img src="/logo.png" alt="Miqueas Language Solutions logo" />
+        <div>
+          <p class="brand-name">Miqueas Language Solutions</p>
+          <p class="tagline">Bridging Perspectives. Delivering Understanding.</p>
+        </div>
+      </div>
+      <div class="document-label">Practicum recording consent</div>
+    </header>
+
+    <section class="intro"><h1>Consent to Record and Share Mentoring Sessions</h1><p>MLS interpreter mentoring practicum · November 2026 version</p></section>
+<form id="consent" class="form-body" autocomplete="off">
+<p>The mentor completes the session details before the mentee reviews this form. Both people keep a copy before recording begins. Entries stay on this page until you print or save them.</p>
+<div class="identity-grid"><div class="field"><label for="mentor">Mentor</label><input id="mentor" type="text" value="Micah Stubbs"></div><div class="field"><label for="mentee">Mentee</label><input id="mentee" type="text" value=""></div><div class="field"><label for="sessions">Sessions covered (dates or date range)</label><input id="sessions" type="text" value=""></div><div class="field"><label for="contact">Mentor contact</label><input id="contact" type="email" value="m.stubbs@miqueaslanguagesolutions.com"></div></div>
+<h2>What you’re agreeing to</h2>
+<p>The <em>So You Want to Be an Interpreter Mentor</em> practicum requires the mentor to record six live virtual sessions across the practicum. This consent covers only the sessions identified above. A recording may capture your face, voice, signing, practice interpretations, questions, and feedback. Fellow practicum participants will review the mentor’s approach to supporting you. Use simulated or appropriately authorized practice materials and leave identifying consumer details out of the session.</p>
+<h2>Who can view the recordings?</h2>
+<p>The mentor will upload recordings to YouTube as unlisted videos and send links to designated practicum participants for observation and feedback. Unlisted videos generally stay out of search results and public channel listings. Anyone who obtains a link may view or reshare it. Public posting, promotional use, or sharing for another purpose requires separate permission.</p>
+<h2>How long are recordings kept?</h2>
+<p>In June 2027, the mentor will remove the videos from YouTube and delete copies under the mentor’s control. Copies independently saved or shared by others may be impossible to retrieve.</p>
+<h2>Your choice</h2>
+<p>You may ask questions before deciding. Participation in this recorded practicum requires both permissions below. To decline, leave the permissions unsigned and tell the mentor. To stop a recording, tell the mentor during the session. You may contact the mentor listed above to withdraw from future recorded sessions. Previously recorded and shared material may still be used for practicum feedback under these terms, subject to applicable requirements.</p>
+<section class="agreement-box"><h2>Mentee permissions</h2>
+<label class="acknowledgment" for="record"><input id="record" type="checkbox"><span>I voluntarily authorize audio and video recording of my participation in the sessions listed above for the mentor’s practicum.</span></label>
+<label class="acknowledgment" for="share"><input id="share" type="checkbox"><span>I authorize the mentor to upload these recordings to YouTube as unlisted videos and share the links with designated practicum participants. I understand that anyone with a link may view or reshare it.</span></label>
+<div class="signature-grid"><div class="field"><label for="signed">Mentee signature</label><input id="signed" type="text" value=""></div><div class="field"><label for="date">Date signed</label><input id="date" type="date" value=""></div><div class="field"><label for="mentor-signed">Mentor acknowledgment signature</label><input id="mentor-signed" type="text" value=""></div><div class="field"><label for="mentor-date">Date acknowledged</label><input id="mentor-date" type="date" value=""></div></div>
+<p class="signature-help">Print for handwritten signatures or save a PDF for your signing service. This page does not submit a signed copy to MLS.</p></section>
+</form></main>
+<script>
+  const consentForm = document.getElementById('consent');
+  consentForm.addEventListener('submit', event => event.preventDefault());
+  document.getElementById('print-form').addEventListener('click', () => window.print());
+  document.getElementById('clear-form').addEventListener('click', () => {
+    if (window.confirm('Clear this consent form and start a new copy?')) consentForm.reset();
+  });
+</script></body></html>
