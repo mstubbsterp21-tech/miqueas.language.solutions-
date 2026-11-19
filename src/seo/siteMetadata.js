@@ -4,17 +4,17 @@ export const SITE_URL = "https://miqueaslanguagesolutions.com";
 export const DEFAULT_IMAGE = `${SITE_URL}/preview.png`;
 
 const defaultDescription =
-  "Miqueas Language Solutions provides professional ASL-English interpreting, video remote interpreting, and ASL video translation services for healthcare, education, business, and community settings in Florida and remotely.";
+  "Professional ASL-English interpreting, VRI, and ASL video translation for Florida healthcare, education, business, and community organizations.";
 
 export const siteMetadata = {
   "/": {
-    title: "ASL Interpreter Services in Florida | Miqueas Language Solutions",
+    title: "ASL Interpreting in Florida | Miqueas Language Solutions",
     description: defaultDescription,
     priority: "1.0",
   },
   "/services": {
     title: "ASL Interpreting & Translation Services | MLS",
-    description: "Explore in-person ASL interpreting, video remote interpreting, English-to-ASL translation, and ASL-to-English translation services for organizations and community settings.",
+    description: "Explore on-site ASL interpreting, VRI, and English-ASL video translation services for organizations in Florida and nationwide remote settings.",
     schemaType: "Service",
     priority: "0.9",
   },
@@ -95,7 +95,7 @@ export const siteMetadata = {
   },
   "/about": {
     title: "About Miqueas Language Solutions | Professional ASL Access",
-    description: "Learn about Miqueas Language Solutions, an ASL-English interpreting and translation company focused on clarity, preparation, and respectful communication access.",
+    description: "Meet Miqueas Language Solutions, a professional ASL-English interpreting and translation provider focused on preparation and communication access.",
     priority: "0.7",
   },
   "/blog": {
@@ -131,7 +131,7 @@ export const siteMetadata = {
   "/policies/clients": { title: "Client Policies | Miqueas Language Solutions", description: "Review MLS client policies for scheduling, preparation, cancellation, billing, and communication access expectations.", priority: "0.4" },
   "/policies/consumers": { title: "Consumer Access Policies | Miqueas Language Solutions", description: "Review communication access policies for Deaf, DeafBlind, hard-of-hearing, and hearing consumers using MLS services.", priority: "0.4" },
   "/policies/interpreters": { title: "Interpreter Policies | Miqueas Language Solutions", description: "Review MLS interpreter policies for credentials, screenings, professionalism, assignment expectations, and ethical practice.", priority: "0.4" },
-  "/privacy": { title: "Privacy Policy | Miqueas Language Solutions", description: "Read the Miqueas Language Solutions privacy policy.", priority: "0.2" },
+  "/privacy": { title: "Privacy Policy | Miqueas Language Solutions", description: "Learn how MLS handles website form submissions, communications, and personal information in its privacy policy.", priority: "0.2" },
   "/terms": { title: "Terms & Conditions | Miqueas Language Solutions", description: "Review the terms and conditions for using the Miqueas Language Solutions website and services.", priority: "0.2" },
   "/accessibility": { title: "Accessibility Statement | Miqueas Language Solutions", description: "Read the MLS website accessibility statement and learn how to request communication support.", priority: "0.3" },
   "/interpreter-community": { title: "ASL Interpreter Community | Miqueas Language Solutions", description: "Connect with the MLS interpreter community and learn about professional collaboration, support, and ethical interpreting practice.", priority: "0.5" },
