@@ -20,6 +20,7 @@ const areaLinks = [
 const globalLinks = [
   ["/", "Home"], ["/services", "Services"], ["/about", "About MLS"],
   ["/blog", "Communication access blog"], ["/contact", "Request services"],
+  ["/mentor-profile", "ASL interpreter mentor profile"], ["/mentee-interest", "Free virtual mentoring application"],
 ];
 
 const specificCopy = {
@@ -220,6 +221,60 @@ const resourceDepthCopy = {
   ]
 };
 
+
+const publicPolicyCopy = {
+  "/policies/clients": [
+    "Miqueas Language Solutions provides professional ASL/English interpreting, Video Remote Interpreting, and ASL/English translation services. MLS is committed to services that are ethical, qualified, consumer-centered, and aligned with professional interpreting standards.",
+    "Clients and requesters submit assignment details through an MLS-approved request method. Requests are reviewed for setting, consumer access needs, service format, interpreter qualifications, team or Deaf Interpreter support, urgency, and staffing feasibility. Incomplete information may delay confirmation.",
+    "A request, verbal discussion, availability check, or tentative hold does not create a confirmed assignment. MLS may accept urgent or short-notice requests when they can be staffed appropriately; any rush fees are disclosed before confirmation.",
+    "Clients remain responsible for their own accessibility-law obligations. Contract terms, applicable laws, court or school requirements, and other setting-specific standards may create additional responsibilities. See the complete client policy on this page for billing, cancellation, deposits, preparation, and interpreter working conditions."
+  ],
+  "/policies/consumers": [
+    "MLS recognizes that the paying client is not always the person most affected by interpreting quality. MLS considers the communication access, dignity, preferences, and needs of Deaf, DeafBlind, Hard-of-Hearing, and hearing consumers in assignment planning and quality review.",
+    "Consumers can share preferred communication modes, language preferences, specific interpreter requests, or requests not to use a particular interpreter. Requests for a Deaf Interpreter, onsite rather than video remote service, or tactile and protactile communication can also be considered.",
+    "MLS makes reasonable efforts to honor those preferences while considering availability, qualifications, conflicts, safety, and effective access. The complete consumer policy explains how to share feedback and raise immediate access concerns, including confidentiality and no-retaliation protections."
+  ],
+  "/policies/interpreters": [
+    "MLS expects interpreters and contractors to follow the NAD-RID Code of Professional Conduct, applicable professional standards, client-specific requirements, and MLS policies for every assignment accepted through MLS.",
+    "Interpreter matching considers credentials, documented experience, setting, language and communication needs, modality, risk, consumer preferences, conflicts, team or Deaf Interpreter support, working conditions, and specialized requirements.",
+    "Interpreters must review their qualifications and availability before accepting an assignment. The interpreter policy addresses onboarding, credential accuracy, scope of practice, accepted assignments, confidentiality, recording, AI restrictions, payment documentation, complaints, and roster status.",
+    "The MLS independent contractor agreement, assignment confirmation, applicable law, and any stricter setting-specific requirements remain relevant to each accepted assignment."
+  ],
+  "/privacy": [
+    "Miqueas Language Solutions LLC respects personal privacy. The Privacy Policy explains how information may be collected when people visit the website, submit an inquiry, request interpreting services, or express interest in joining the interpreter roster.",
+    "The policy covers use, storage, sharing, retention, website analytics, cookies, third-party platforms, safeguards, and ways to raise privacy questions. MLS states that it does not sell personal information, though service providers and authorized participants may receive information reasonably necessary to operate the business or respond to a request.",
+    "No online transmission or storage system can be guaranteed to be completely secure. Information-retention periods depend on operational, legal, business, and security needs. Read the full Privacy Policy on this page for the current terms and contact information."
+  ],
+  "/terms": [
+    "This site is provided for informational and business inquiry purposes. Accessing it constitutes agreement to the published website terms, and visitors who do not agree should not use the site.",
+    "Submitting an inquiry does not guarantee availability or booking. Interpreting services remain subject to scheduling, qualification, availability, and a separate agreement where required.",
+    "Website text, branding, and other materials belong to Miqueas Language Solutions LLC and may not be reused without permission. The terms also address site-related liability, third-party links, and Florida governing law. Read the full terms displayed on this page."
+  ],
+  "/accessibility": [
+    "Miqueas Language Solutions is committed to providing a website that is accessible to as many people as possible, including Deaf and hard-of-hearing individuals and others with communication needs.",
+    "MLS works to maintain a readable and usable experience across devices and assistive technologies. Accessibility improvements include reviewing layout, contrast, navigation, and general usability, and the process is ongoing.",
+    "If an individual has trouble accessing the site or its content, MLS encourages them to contact the company. MLS will make reasonable efforts to provide information or services in an accessible format and to address the difficulty."
+  ],
+  "/mentee-interest": [
+    "MLS offers a free, virtual mentoring opportunity for individuals who are studying interpreting, beginning professional work, returning to interpreting, or seeking focused skill development. Sessions take place live through video conferencing rather than in person.",
+    "The opportunity is connected to the So You Want to Be an Interpreter Mentor practicum and includes constructive feedback, interpreting skill development, professional discussion, and reflection. Applicants are asked about their interpreting backgrounds, goals, development areas, and availability.",
+    "The application also includes information about recording and peer observation as part of the practicum. Read that information carefully before submitting. An application expresses interest and does not guarantee a mentoring placement.",
+    "To learn about the mentor's experience and focus areas, review the public mentor profile and then complete the interactive interest form on this page."
+  ]
+};
+const legalLinks = [
+  ["/policies/clients", "Client policies"],
+  ["/policies/consumers", "Consumer access policies"],
+  ["/policies/interpreters", "Interpreter policies"],
+  ["/privacy", "Privacy"],
+  ["/terms", "Terms"],
+  ["/accessibility", "Accessibility statement"],
+];
+const mentoringLinks = [
+  ["/mentor-profile", "Meet the ASL interpreter mentor"],
+  ["/mentee-interest", "Apply for free virtual mentorship"],
+];
+
 function escapeHtml(value) {
   return String(value == null ? "" : value)
     .replaceAll("&", "&amp;").replaceAll("<", "&lt;")
@@ -234,7 +289,7 @@ function links(items) {
 }
 
 function extraContent(path) {
-  const paragraphs = [...(specificCopy[path] || []), ...(supplementalCopy[path] || []), ...(resourceDepthCopy[path] || [])];
+  const paragraphs = [...(specificCopy[path] || []), ...(supplementalCopy[path] || []), ...(resourceDepthCopy[path] || []), ...(publicPolicyCopy[path] || [])];
   return paragraphs.map((text) => "<p>" + escapeHtml(text) + "</p>").join("");
 }
 
@@ -310,14 +365,16 @@ export async function staticFallbackForRoute(path, meta, published = []) {
   const audiencesSection = (path === "/" || path === "/about" || path === "/services" || path === "/blog")
     ? '<section><h2>Resources and next steps</h2>' + links(audienceLinks) + "</section>" : "";
   const articlesSection = path === "/blog" ? articleDirectory(published) : path === "/" ? articleDirectory(published, 5) : "";
+  const mentoringSection = (path === "/" || path === "/interpreter-community" || path === "/mentee-interest" || path === "/interpreters")
+    ? '<section><h2>Interpreting mentorship</h2>' + links(mentoringLinks) + "</section>" : "";
   const requestSection = path === "/contact"
     ? '<p>To request services, email <a href="mailto:m.stubbs@miqueaslanguagesolutions.com">m.stubbs@miqueaslanguagesolutions.com</a> or call <a href="tel:+13213798010">(321) 379-8010</a>.</p>'
     : '<p><a href="/contact">Request an interpreter or discuss a translation project</a></p>';
 
   return '<div class="mls-static-content" data-mls-seo-fallback="true">'
     + '<header><a href="/">Miqueas Language Solutions</a><nav aria-label="Main navigation">' + links(globalLinks) + '</nav></header>'
-    + '<main>' + sections + servicesSection + areaSection + settingsSection + audiencesSection + articlesSection + requestSection + '</main>'
-    + '<footer>Bridging Perspectives. Delivering Understanding.</footer></div>';
+    + '<main>' + sections + servicesSection + areaSection + settingsSection + audiencesSection + mentoringSection + articlesSection + requestSection + '</main>'
+    + '<footer><p>Bridging Perspectives. Delivering Understanding.</p><nav aria-label="Legal and access information">' + links(legalLinks) + '</nav></footer></div>';
 }
 
 export const fallbackStyles =
