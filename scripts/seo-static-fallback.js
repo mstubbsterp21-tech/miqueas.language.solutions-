@@ -185,6 +185,41 @@ const audienceLinks = [
   ["/join-our-team", "Join the interpreter network"],
 ];
 
+
+const resourceDepthCopy = {
+  "/clients": [
+    "For reliable planning, designate a contact person who can answer questions about the event or appointment and communicate any schedule changes. Requests involving multiple participants, specialized subject matter, or a long duration may need extra coordination before the right staffing plan can be confirmed."
+  ],
+  "/contact": [
+    "If an event includes multiple speakers, a presentation, sensitive subject matter, or a request for a Deaf Interpreter, include that detail in the initial message. It can help MLS identify possible preparation and staffing needs and avoid preventable follow-up delays."
+  ],
+  "/deaf-and-hard-of-hearing": [
+    "A consumer's ability to participate independently matters throughout an interpreted interaction, not only at the initial request. Preferences may change depending on the subject, environment, technology, or available language options, so requesting organizations should be ready to revisit their access plan when needed."
+  ],
+  "/interpreter-community": [
+    "Mentoring, skills development, and collegial consultation can support professional growth, provided that consumer confidentiality and professional boundaries are maintained. Interpreters can benefit from reflecting on assignment fit, language choices, ethical decisions, and the impact of their work on communication access.",
+    "The broader interpreting profession also depends on continued engagement with Deaf communities and recognition that accessibility planning should center the communication needs and preferences of the people being served."
+  ],
+  "/interpreters": [
+    "Assignment preparation may include reviewing terminology, clarifying the purpose of an interaction, coordinating with a team interpreter, and assessing whether the physical or virtual environment supports effective service. Maintaining appropriate boundaries and confidentiality is essential across service formats."
+  ],
+  "/join-our-team": [
+    "Applicants can strengthen their introduction by describing the kinds of assignments they are equipped to accept, areas they are actively developing, and the accommodations or working conditions they may need to perform effectively. Honest self-assessment supports appropriate staffing and protects consumers."
+  ],
+  "/settings/medical": [
+    "Healthcare teams should consider access throughout check-in, consent, consultations, instructions, and follow-up rather than assuming interpreting is needed only during the central medical conversation. Clear communication at every stage can affect how well participants understand and act on information."
+  ],
+  "/settings/educational": [
+    "Educational interpreting needs can change across academic subjects, student age groups, meetings, and extracurricular activities. A thoughtful request identifies the specific setting and how the interpreter will interact with students, staff, and family members."
+  ],
+  "/settings/business": [
+    "Communication planning should also address unscheduled questions and interactive portions of the workday, not solely formal presentations. A recurring meeting may require different preparation from a confidential human-resources conversation or a multi-day conference."
+  ],
+  "/settings/community": [
+    "For events open to the public, organizers should make access information easy to find and offer a clear way to communicate individual requirements. Accessible announcements and realistic lead times can help participants make informed decisions about attending."
+  ]
+};
+
 function escapeHtml(value) {
   return String(value == null ? "" : value)
     .replaceAll("&", "&amp;").replaceAll("<", "&lt;")
@@ -199,7 +234,7 @@ function links(items) {
 }
 
 function extraContent(path) {
-  const paragraphs = [...(specificCopy[path] || []), ...(supplementalCopy[path] || [])];
+  const paragraphs = [...(specificCopy[path] || []), ...(supplementalCopy[path] || []), ...(resourceDepthCopy[path] || [])];
   return paragraphs.map((text) => "<p>" + escapeHtml(text) + "</p>").join("");
 }
 
