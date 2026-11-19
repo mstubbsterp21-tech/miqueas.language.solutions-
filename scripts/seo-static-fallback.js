@@ -71,6 +71,120 @@ const specificCopy = {
   ],
 };
 
+
+const supplementalCopy = {
+  "/": [
+    "Planning communication access starts before the meeting or appointment. Details such as the subject matter, communication preferences, schedule, setting, and whether a team or Deaf Interpreter is appropriate all inform the assignment review. MLS works with requesters to clarify these details rather than treating every interpreting request as interchangeable.",
+    "Organizations can explore service-specific information for in-person assignments, video remote interpreting, and recorded ASL translation. The site also provides service-area information, public policy guides, and articles about preparing effective access for Deaf, DeafBlind, and hard-of-hearing participants."
+  ],
+  "/services": [
+    "Choosing the right service depends on whether communication is happening live or through pre-recorded materials. On-site interpreting supports shared physical environments, while VRI requires accessible technology and an encounter appropriate for remote delivery. Translation projects instead involve source materials, recording or transcription, review, and an agreed deliverable.",
+    "Requesters should share the purpose of the communication, participant preferences, duration, language needs, and relevant materials. For complex or high-stakes settings, MLS may review whether specialized skills, team interpreting, or Deaf Interpreter involvement are needed before accepting an assignment."
+  ],
+  "/about": [
+    "MLS approaches interpreting as more than assigning a person to a time slot. Effective service requires attention to setting, language, preparation, technology, and the choices of the people participating in the communication. An assignment is reviewed for a suitable interpreter fit before coverage is confirmed.",
+    "The company coordinates both live ASL-English interpreting and translation projects involving ASL video or written English. Services are organized around access needs in healthcare, education, workplaces, and the community, including remote encounters when the format supports effective communication.",
+    "To learn how that planning works in practice, review the service descriptions and client information before submitting a request. Interpreters interested in professional collaboration can also explore the interpreter resources and application pages."
+  ],
+  "/join-our-team": [
+    "MLS welcomes inquiries from professional ASL-English interpreters and Deaf Interpreters who are interested in contract opportunities. Applicants should be prepared to share relevant experience, settings of practice, qualifications, and geographic or remote-service availability.",
+    "Interpreter placement depends on each assignment's requirements rather than a one-size-fits-all roster. Credentials, language competencies, preparation, professional conduct, consumer preferences, and specialized experience may be considered before a potential assignment is offered.",
+    "Joining an interpreter network does not guarantee assignments. The interpreter resources page provides additional context, and applicants can use the team application process to begin a conversation about whether the work is a good professional fit."
+  ],
+  "/clients": [
+    "When requesting an interpreter, specify the date, time zone, expected duration, in-person location or online platform, and the purpose of the interaction. Include relevant communication preferences and any need for specialized qualifications, team interpreting, or Deaf Interpreter support.",
+    "Preparation can include agendas, slides, vocabulary, participant roles, and instructions about sight lines, lighting, and sound. For video remote services, the platform, camera setup, and reliability of the connection matter as much as scheduling.",
+    "Submitting a request begins an assignment review; it is not a guarantee of staffing. The service pages and public client policies explain more about coordination, expectations, and the steps toward confirmation."
+  ],
+  "/interpreters": [
+    "Interpreter work calls for linguistic skill, ethical judgment, cultural responsiveness, and the ability to assess whether an assignment is within one's competencies. MLS considers professional preparation, service format, setting, and consumer needs when coordinating assignments.",
+    "Interpreters can explore professional collaboration and potential contract opportunities through the MLS network. Information about qualifications, experience, availability, and relevant specialties helps determine whether an assignment is a suitable match.",
+    "Review the interpreter community, team application, and interpreter policy pages for more about professional expectations and how to express interest in the network."
+  ],
+  "/deaf-and-hard-of-hearing": [
+    "Communication access should reflect the preferences and actual language needs of the people participating. Deaf, DeafBlind, and hard-of-hearing individuals may use different signed, spoken, tactile, or other communication approaches, and a single service format will not fit every interaction.",
+    "Consumers may have preferences regarding interpreter qualifications, language variety, interpreter teaming, placement, and whether remote video works for their situation. Those preferences are important information when services are planned.",
+    "This site provides descriptions of interpreting and translation services, a way to contact MLS, and information about communication access expectations. Individuals can share access concerns or questions before an assignment is finalized."
+  ],
+  "/settings/medical": [
+    "Medical encounters can involve complex terminology, informed decisions, sensitive information, and rapid changes in the conversation. Planning should consider the type of appointment, expected participants, patient communication preferences, and whether on-site interpreting or accessible video remote interpreting is appropriate.",
+    "For VRI, the team should check video quality, audio, lighting, camera position, and whether the patient can comfortably see and engage with the interpreter. Some situations require on-site support, specialized skills, or a Deaf Interpreter.",
+    "Requesting staff can provide appointment details and relevant terminology in advance, while keeping confidential information limited to what is necessary for effective service planning."
+  ],
+  "/settings/educational": [
+    "Educational communication access can include classroom instruction, parent and teacher conferences, planning meetings, staff development, and school activities. These contexts differ in pace, terminology, interaction patterns, and the support needed for effective participation.",
+    "Before requesting coverage, schools can describe the students or participants involved, communication preferences, the duration and format of the activity, and any relevant educational interpreting requirements. Preparation materials and the opportunity to coordinate with the educational team may be important.",
+    "MLS reviews assignment requirements and interpreter qualifications rather than assuming that experience in one setting automatically transfers to every educational encounter."
+  ],
+  "/settings/business": [
+    "Workplace communication access may be needed for job interviews, onboarding, team meetings, disciplinary discussions, trainings, presentations, and everyday collaboration. Each setting has different confidentiality, vocabulary, and participation requirements.",
+    "Organizations should plan interpreting access early, clarify whether events are on-site or virtual, and share agendas or presentation materials when available. For longer, high-density, or multi-speaker events, interpreter team support may be appropriate.",
+    "MLS reviews workplace assignment details to determine whether available interpreting resources are suitable for the participants and format."
+  ],
+  "/settings/community": [
+    "Community interpreting may support social services, public programs, nonprofit events, local meetings, workshops, and other occasions where people need to participate in shared conversations. Clear access planning should account for the environment, number of participants, and nature of the interaction.",
+    "Organizers can prepare by identifying sight lines, lighting, microphones, speaker positions, schedules, and materials that interpreters will need. Consumer preferences and any requests for specialized language access should be shared before confirming coverage.",
+    "MLS can review on-site and suitable remote options based on available qualified interpreters and the setting's communication demands."
+  ],
+  "/services/english-asl-translation": [
+    "A translation request can begin with public information, policy documents, training scripts, educational materials, or another approved English source. The project review considers the intended Deaf audience, purpose, clarity of the source text, specialized terminology, and preferred video format.",
+    "English-to-ASL translation is not simply replacing one word with one sign. Decisions about organization, visual delivery, cultural and linguistic equivalence, and revisions help create understandable signed content. Final scope and production expectations should be agreed on before work begins."
+  ],
+  "/services/asl-english-translation": [
+    "ASL-to-English translation involves interpreting the meaning of recorded signed material and producing an agreed English deliverable. This might be a transcript, summary, caption-ready text, or a document prepared for a defined audience and purpose.",
+    "Project details should identify the source video's length, language variety, any specialist vocabulary, confidentiality requirements, output format, and review expectations. Complex material may require additional consultation or careful terminology verification."
+  ],
+  "/services/in-person-interpreting": [
+    "Useful assignment details include the venue, expected duration, number and roles of participants, topic, anticipated pace, and information about sight lines and acoustics. The location should support safe and effective communication for everyone involved.",
+    "Long meetings, specialized settings, or dense interactive discussions may require more than one interpreter or the involvement of a Deaf Interpreter. MLS considers these factors and consumer preferences when evaluating staffing rather than treating every hour of interpreting as identical."
+  ],
+  "/services/video-remote-interpreting": [
+    "Remote interpreting is not automatically appropriate just because a video platform is available. Participants need a clear view of signing, functional audio for the interpreter, adequate lighting, privacy, and enough bandwidth for continuous visual communication.",
+    "When participants cannot use the technology effectively, or when the setting calls for tactile communication or other specialized access, on-site arrangements may be more suitable. MLS evaluates the communication circumstances and platform before confirming VRI."
+  ],
+  "/services/video-remote-interpreting-nationwide": [
+    "Nationwide requests should identify each participant's location and time zone, the online platform, the type of encounter, expected length, and any accessibility requirements. Virtual availability still depends on interpreter skills and whether remote delivery fits the situation.",
+    "Preparation materials and a technical contact can help a remote session begin smoothly. If the platform does not provide stable audio and video, or if remote delivery would prevent effective participation, an alternative approach may be needed."
+  ],
+  "/locations/orlando": [
+    "Orlando requests can involve healthcare facilities, educational institutions, corporate meetings, conferences, and community programs. Organizations should send the specific venue, schedule, accessibility requirements, and preparation information so the interpreting assignment can be evaluated.",
+    "Coverage in Orlando and nearby communities depends on availability and appropriate qualifications. MLS may recommend team interpreting or specialized support based on complexity and duration."
+  ],
+  "/locations/ocala": [
+    "Organizations in Ocala and Marion County may need interpreting for appointments, school meetings, public services, trainings, and community activities. Early requests help clarify location, duration, language preferences, and the qualifications relevant to the situation.",
+    "MLS coordinates service according to interpreter availability and the practical needs of each encounter, including preparation and the possibility of additional interpreter support."
+  ],
+  "/locations/central-florida": [
+    "Central Florida assignments can differ significantly between healthcare, school, workplace, and community settings. Requesters should identify the precise city and venue, the expected schedule, and whether a specialized interpreting background is necessary.",
+    "Service coverage is reviewed case by case, including travel logistics, consumer preferences, preparation, and the availability of appropriately qualified interpreters."
+  ],
+  "/blog": [
+    "The MLS communication access blog offers educational articles for organizations, interpreters, and community members. Topics include video remote interpreting, DeafBlind communication, healthcare and workplace access, emergency planning, and preparation for interpreted interactions.",
+    "Browse the published articles below for practical considerations, common access barriers, and questions to raise when arranging interpreting services. Articles provide general information rather than replacing an individual assessment of communication needs."
+  ],
+  "/interpreter-community": [
+    "Professional collaboration includes sharing resources, discussing work thoughtfully, reflecting on ethical practice, and staying engaged in ongoing learning. An effective interpreter community also respects the experiences and perspectives of Deaf consumers and colleagues.",
+    "Explore MLS interpreter resources, the team application page, and current communication access articles for opportunities to learn and connect."
+  ],
+  "/contact": [
+    "Requests are easier to evaluate when they include the setting, requested dates and times, participants' communication preferences, location or virtual platform, and materials that might require advance preparation.",
+    "If the details are still being determined, explain what is known and what remains undecided. MLS can review the request and communicate next steps without assuming that submitting an inquiry guarantees an interpreter."
+  ]
+};
+
+const settingLinks = [
+  ["/settings/medical", "Medical and healthcare interpreting"],
+  ["/settings/educational", "Educational interpreting"],
+  ["/settings/business", "Workplace and business interpreting"],
+  ["/settings/community", "Community interpreting"],
+];
+const audienceLinks = [
+  ["/clients", "Information for organizations"],
+  ["/deaf-and-hard-of-hearing", "Information for Deaf and hard-of-hearing consumers"],
+  ["/interpreters", "Interpreter resources"],
+  ["/join-our-team", "Join the interpreter network"],
+];
+
 function escapeHtml(value) {
   return String(value == null ? "" : value)
     .replaceAll("&", "&amp;").replaceAll("<", "&lt;")
@@ -85,7 +199,7 @@ function links(items) {
 }
 
 function extraContent(path) {
-  const paragraphs = specificCopy[path] || [];
+  const paragraphs = [...(specificCopy[path] || []), ...(supplementalCopy[path] || [])];
   return paragraphs.map((text) => "<p>" + escapeHtml(text) + "</p>").join("");
 }
 
@@ -97,7 +211,9 @@ function safeArticleHtml(value) {
     .replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, "")
     .replace(/<iframe\b[^>]*>[\s\S]*?<\/iframe>/gi, "")
     .replace(/<video\b[^>]*>[\s\S]*?<\/video>/gi, "")
-    .replace(/<img\b[^>]*>/gi, "");
+    .replace(/<img\b[^>]*>/gi, "")
+    .replace(/<h1\b([^>]*)>/gi, "<h2$1>")
+    .replace(/<\/h1>/gi, "</h2>");
 }
 
 async function blogBody(slug) {
@@ -125,7 +241,20 @@ async function blogBody(slug) {
   return end < 0 ? "" : safeArticleHtml(post.slice(begin, end));
 }
 
-export async function staticFallbackForRoute(path, meta) {
+function articleDirectory(published, limit = 100) {
+  const posts = published
+    .filter(([path]) => path.startsWith("/blog/"))
+    .sort((a, b) => (b[1].publishDate || "").localeCompare(a[1].publishDate || ""))
+    .slice(0, limit);
+  if (!posts.length) return "";
+  const entries = posts.map(([url, article]) =>
+    '<li><a href="' + escapeHtml(url) + '">' + escapeHtml(article.title.split("|")[0].trim()) + '</a>'
+    + (article.description ? '<p>' + escapeHtml(article.description) + '</p>' : "") + "</li>"
+  ).join("");
+  return '<section><h2>' + (limit < 100 ? "Latest communication access articles" : "Published articles") + '</h2><ul>' + entries + '</ul></section>';
+}
+
+export async function staticFallbackForRoute(path, meta, published = []) {
   const title = meta.title.split("|")[0].trim();
   const description = meta.description || "";
   const isArticle = path.startsWith("/blog/");
@@ -141,13 +270,18 @@ export async function staticFallbackForRoute(path, meta) {
   const areaSection = (path === "/" || path === "/services")
     ? '<section><h2>Service areas</h2>' + links(areaLinks) + '</section>'
     : "";
+  const settingsSection = (path === "/" || path === "/services" || path.startsWith("/services/"))
+    ? '<section><h2>Interpreting by setting</h2>' + links(settingLinks) + "</section>" : "";
+  const audiencesSection = (path === "/" || path === "/about" || path === "/services" || path === "/blog")
+    ? '<section><h2>Resources and next steps</h2>' + links(audienceLinks) + "</section>" : "";
+  const articlesSection = path === "/blog" ? articleDirectory(published) : path === "/" ? articleDirectory(published, 5) : "";
   const requestSection = path === "/contact"
     ? '<p>To request services, email <a href="mailto:m.stubbs@miqueaslanguagesolutions.com">m.stubbs@miqueaslanguagesolutions.com</a> or call <a href="tel:+13213798010">(321) 379-8010</a>.</p>'
     : '<p><a href="/contact">Request an interpreter or discuss a translation project</a></p>';
 
   return '<div class="mls-static-content" data-mls-seo-fallback="true">'
     + '<header><a href="/">Miqueas Language Solutions</a><nav aria-label="Main navigation">' + links(globalLinks) + '</nav></header>'
-    + '<main>' + sections + servicesSection + areaSection + requestSection + '</main>'
+    + '<main>' + sections + servicesSection + areaSection + settingsSection + audiencesSection + articlesSection + requestSection + '</main>'
     + '<footer>Bridging Perspectives. Delivering Understanding.</footer></div>';
 }
 
