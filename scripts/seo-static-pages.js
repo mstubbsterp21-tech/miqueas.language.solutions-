@@ -7,10 +7,10 @@ import { staticFallbackForRoute, fallbackStyles } from "./seo-static-fallback.js
 
 const escapeAttribute = (value) => String(value).replaceAll("&", "&amp;").replaceAll('"', "&quot;").replaceAll("<", "&lt;");
 
-async function replaceHead(html, path, meta) {
+async function replaceHead(html, path, meta, published) {
   const canonical = `${SITE_URL}${path === "/" ? "/" : path}`;
   const schemas = schemaForRoute(path, meta);
-  const fallback = await staticFallbackForRoute(path, meta);
+  const fallback = await staticFallbackForRoute(path, meta, published);
   return html
     .replace(/<title>[\s\S]*?<\/title>/, `<title>${escapeAttribute(meta.title)}</title>`)
     .replace(/<meta\s+name="description"[\s\S]*?\/>/, `<meta name="description" content="${escapeAttribute(meta.description)}" />`)
@@ -37,12 +37,12 @@ export default function seoStaticPages() {
 
       for (const [path, meta] of published) {
         if (path === "/") {
-          await writeFile(join(dist, "index.html"), await replaceHead(template, path, meta));
+          await writeFile(join(dist, "index.html"), await replaceHead(template, path, meta, published));
           continue;
         }
         const output = join(dist, `${path.slice(1)}.html`);
         await mkdir(dirname(output), { recursive: true });
-        await writeFile(output, await replaceHead(template, path, meta));
+        await writeFile(output, await replaceHead(template, path, meta, published));
       }
 
       // Sitemap is generated at request time by /api/sitemap so scheduled
