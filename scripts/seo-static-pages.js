@@ -36,6 +36,9 @@ export default function seoStaticPages() {
       const published = publicSiteEntries(siteMetadata);
 
       for (const [path, meta] of published) {
+        // This profile is a separately authored static HTML page in public/mentor-profile/index.html.
+        // Do not overwrite it with a generated React fallback page.
+        if (path === "/mentor-profile") continue;
         if (path === "/") {
           await writeFile(join(dist, "index.html"), await replaceHead(template, path, meta, published));
           continue;
