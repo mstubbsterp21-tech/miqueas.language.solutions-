@@ -118,6 +118,18 @@ export const siteMetadata = {
     description: "Information for Deaf, DeafBlind, hard-of-hearing, and hearing consumers about communication access and professional interpreting services.",
     priority: "0.7",
   },
+  "/mentee-interest": {
+    title: "Free ASL Interpreter Mentorship Application | MLS",
+    description: "Apply for free virtual ASL-English interpreting mentorship with MLS, featuring skill development, feedback, and professional reflection.",
+    dateModified: "2026-11-19",
+    priority: "0.7",
+  },
+  "/mentor-profile": {
+    title: "ASL Interpreting Mentor Profile | Micah Stubbs",
+    description: "Learn about the free virtual ASL-English interpreter mentoring opportunity with Micah Stubbs and how to apply through MLS.",
+    dateModified: "2026-11-19",
+    priority: "0.7",
+  },
   "/join-our-team": {
     title: "Join the MLS ASL Interpreter Network | Apply Today",
     description: "Apply to join the Miqueas Language Solutions network of ASL-English interpreters and Certified Deaf Interpreters.",
