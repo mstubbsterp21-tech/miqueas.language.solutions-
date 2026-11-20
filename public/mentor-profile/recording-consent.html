@@ -484,6 +484,46 @@
       .saved-status { display: none; }
       footer { padding: 10px; }
     }
+  
+    .pdf-blank { display: none; }
+    @media print {
+      @page { size: Letter; margin: 0.5in; }
+      .page { overflow: visible; }
+      .screen-help, .signature-help { display: none; }
+      #consent input { display: none !important; }
+      #consent .pdf-blank {
+        display: block;
+        height: 34pt;
+        width: 100%;
+        border: 1pt solid #777;
+        border-radius: 2pt;
+        background: #fff;
+        box-sizing: border-box;
+      }
+      #consent .acknowledgment .pdf-blank {
+        width: 14pt;
+        height: 14pt;
+        flex: 0 0 14pt;
+        margin-top: 2pt;
+      }
+      .brand-header { padding: 8pt 0; }
+      .intro { padding: 14pt 16pt; }
+      .intro h1 { font-size: 22pt; }
+      .form-body { padding: 14pt 0 0; }
+      .form-body h2 { font-size: 13pt; margin: 12pt 0 5pt; break-after: avoid; }
+      .form-body p { margin: 5pt 0 9pt; orphans: 3; widows: 3; }
+      .identity-grid, .signature-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12pt 16pt; }
+      .field, .acknowledgment { break-inside: avoid; page-break-inside: avoid; }
+      .agreement-box {
+        break-before: page;
+        page-break-before: always;
+        break-inside: avoid;
+        page-break-inside: avoid;
+        margin-top: 0;
+        padding: 18pt;
+      }
+    }
+
   </style>
 <script>
     try {
@@ -518,8 +558,8 @@
 
     <section class="intro"><h1>Consent to Record and Share Mentoring Sessions</h1><p>MLS interpreter mentoring practicum · November 2026 version</p></section>
 <form id="consent" class="form-body" autocomplete="off">
-<p>The mentor completes the session details before the mentee reviews this form. Both people keep a copy before recording begins. Entries stay on this page until you print or save them.</p>
-<div class="identity-grid"><div class="field"><label for="mentor">Mentor</label><input id="mentor" type="text" value="Micah Stubbs"></div><div class="field"><label for="mentee">Mentee</label><input id="mentee" type="text" value=""></div><div class="field"><label for="sessions">Sessions covered (dates or date range)</label><input id="sessions" type="text" value=""></div><div class="field"><label for="contact">Mentor contact</label><input id="contact" type="email" value="m.stubbs@miqueaslanguagesolutions.com"></div></div>
+<p class="screen-help">The mentor completes the session details before the mentee reviews this form. Both people keep a copy before recording begins. Entries stay on this page until you print or save them.</p>
+<div class="identity-grid"><div class="field"><label for="mentor">Mentor</label><input id="mentor" type="text" value="Micah Stubbs"><span class="pdf-blank" aria-hidden="true"></span></div><div class="field"><label for="mentee">Mentee</label><input id="mentee" type="text" value=""><span class="pdf-blank" aria-hidden="true"></span></div><div class="field"><label for="sessions">Sessions covered (dates or date range)</label><input id="sessions" type="text" value=""><span class="pdf-blank" aria-hidden="true"></span></div><div class="field"><label for="contact">Mentor contact</label><input id="contact" type="email" value="m.stubbs@miqueaslanguagesolutions.com"><span class="pdf-blank" aria-hidden="true"></span></div></div>
 <h2>What you’re agreeing to</h2>
 <p>The <em>So You Want to Be an Interpreter Mentor</em> practicum requires the mentor to record six live virtual sessions across the practicum. This consent covers only the sessions identified above. A recording may capture your face, voice, signing, practice interpretations, questions, and feedback. Fellow practicum participants will review the mentor’s approach to supporting you. Use simulated or appropriately authorized practice materials and leave identifying consumer details out of the session.</p>
 <h2>Who can view the recordings?</h2>
@@ -529,9 +569,9 @@
 <h2>Your choice</h2>
 <p>You may ask questions before deciding. Participation in this recorded practicum requires both permissions below. To decline, leave the permissions unsigned and tell the mentor. To stop a recording, tell the mentor during the session. You may contact the mentor listed above to withdraw from future recorded sessions. Previously recorded and shared material may still be used for practicum feedback under these terms, subject to applicable requirements.</p>
 <section class="agreement-box"><h2>Mentee permissions</h2>
-<label class="acknowledgment" for="record"><input id="record" type="checkbox"><span>I voluntarily authorize audio and video recording of my participation in the sessions listed above for the mentor’s practicum.</span></label>
-<label class="acknowledgment" for="share"><input id="share" type="checkbox"><span>I authorize the mentor to upload these recordings to YouTube as unlisted videos and share the links with designated practicum participants. I understand that anyone with a link may view or reshare it.</span></label>
-<div class="signature-grid"><div class="field"><label for="signed">Mentee signature</label><input id="signed" type="text" value=""></div><div class="field"><label for="date">Date signed</label><input id="date" type="date" value=""></div><div class="field"><label for="mentor-signed">Mentor acknowledgment signature</label><input id="mentor-signed" type="text" value=""></div><div class="field"><label for="mentor-date">Date acknowledged</label><input id="mentor-date" type="date" value=""></div></div>
+<label class="acknowledgment" for="record"><input id="record" type="checkbox"><span class="pdf-blank" aria-hidden="true"></span><span>I voluntarily authorize audio and video recording of my participation in the sessions listed above for the mentor’s practicum.</span></label>
+<label class="acknowledgment" for="share"><input id="share" type="checkbox"><span class="pdf-blank" aria-hidden="true"></span><span>I authorize the mentor to upload these recordings to YouTube as unlisted videos and share the links with designated practicum participants. I understand that anyone with a link may view or reshare it.</span></label>
+<div class="signature-grid"><div class="field"><label for="signed">Mentee signature</label><input id="signed" type="text" value=""><span class="pdf-blank" aria-hidden="true"></span></div><div class="field"><label for="date">Date signed</label><input id="date" type="date" value=""><span class="pdf-blank" aria-hidden="true"></span></div><div class="field"><label for="mentor-signed">Mentor acknowledgment signature</label><input id="mentor-signed" type="text" value=""><span class="pdf-blank" aria-hidden="true"></span></div><div class="field"><label for="mentor-date">Date acknowledged</label><input id="mentor-date" type="date" value=""><span class="pdf-blank" aria-hidden="true"></span></div></div>
 <p class="signature-help">Print for handwritten signatures or save a PDF for your signing service. This page does not submit a signed copy to MLS.</p></section>
 </form></main>
 <script>
