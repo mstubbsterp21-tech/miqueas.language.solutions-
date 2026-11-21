@@ -561,9 +561,10 @@
 
     <section class="intro"><h1>Consent to Record and Share Mentoring Sessions</h1></section>
 <form id="consent" class="form-body" autocomplete="off">
-<p class="screen-help">Use Print / Save Blank PDF to create a blank template, then upload it to your electronic signature platform. Complete all arrangement details there before sending it to the mentee for review and signature. Entries made on this webpage do not appear in the PDF. Both people should receive a completed, signed copy before recording begins.</p>
+<p class="screen-help">Use Print / Save Blank PDF to create a blank template, then upload it to your electronic signature platform. Set the signing order to mentor first, mentee second. Assign all arrangement-detail fields and the mentor signature/date to the mentor; assign the two permission checkboxes and mentee signature/date to the mentee. The mentor completes the details and signs first, then the platform routes the completed form to the mentee for review and signature. Entries made on this webpage do not appear in the PDF. Both people should receive a completed, signed copy before recording begins.</p>
 <section class="consent-details">
 <h2>People and sessions covered</h2>
+<p>The mentor completes all details in this section and the recording arrangement below during the first signing step. The mentee reviews those completed details during the second signing step.</p>
 <div class="identity-grid">
 <div class="field"><label for="mentor">Mentor</label><input id="mentor" type="text" value=""><span class="pdf-blank" aria-hidden="true"></span></div>
 <div class="field"><label for="mentee">Mentee</label><input id="mentee" type="text" value=""><span class="pdf-blank" aria-hidden="true"></span></div>
@@ -573,7 +574,7 @@
 <div class="field"><label for="session-dates">Dates covered</label><input id="session-dates" type="text" value=""><span class="pdf-blank" aria-hidden="true"></span></div>
 </div>
 <h2>Recording arrangement</h2>
-<p>Complete every field before signing. Identify the specific sessions, purpose, and viewers; use “None” where appropriate. Any later expansion of the sessions, purpose, or audience requires new consent.</p>
+<p>Mentor: complete every arrangement-detail field before adding your signature. Identify the specific sessions, purpose, and viewers; use “None” where appropriate. Any later expansion of the sessions, purpose, or audience requires new consent.</p>
 <div class="identity-grid">
 <div class="field"><label for="purpose">Purpose of recording and sharing</label><input id="purpose" type="text" value=""><span class="pdf-blank" aria-hidden="true"></span></div>
 <div class="field"><label for="viewers">Authorized viewers (names or defined group)</label><input id="viewers" type="text" value=""><span class="pdf-blank" aria-hidden="true"></span></div>
@@ -583,7 +584,7 @@
 </section>
 <section class="consent-terms">
 <h2>What you’re agreeing to</h2>
-<p>This consent covers only the sessions and purpose identified above. A recording may capture your face, voice, signing, practice interpretations, questions, and feedback. Use simulated or appropriately authorized practice materials and leave identifying consumer details out of the session. Recording begins only after both permissions below are given and this form is signed. The mentor will announce when recording starts and will pause or stop it when you ask.</p>
+<p>This consent covers only the sessions and purpose identified above. A recording may capture your face, voice, signing, practice interpretations, questions, and feedback. Use simulated or appropriately authorized practice materials and leave identifying consumer details out of the session. Recording begins only after the mentor has signed, the mentee has selected both permissions below, and the mentee has signed. The mentor will announce when recording starts and will pause or stop it when you ask.</p>
 <h2>Who can view the recordings?</h2>
 <p>The mentor will upload recordings to YouTube as unlisted videos and share links only with the authorized viewers listed above. Unlisted does not mean private: anyone who obtains a link can view or reshare it, and adding an unlisted video to a public playlist may make it appear in search results. Public posting, promotional use, or use for another purpose requires separate permission.</p>
 <p>Before sharing a link, the mentor will obtain each viewer’s agreement to keep the recording and session information confidential and not download, screen-record, copy, forward links, or add the video to a public playlist. Viewers may use the material only for the purpose stated above. These rules reduce risk but cannot guarantee that unauthorized copying or sharing will not occur.</p>
@@ -593,18 +594,20 @@
 <p>You may ask questions before deciding. Both permissions below are required for the recorded arrangement described here. If you decline either permission, no recording or sharing will take place under this form. Any available unrecorded mentoring option must be identified above before signing; if none is offered, you cannot participate in this recorded arrangement.</p>
 <p>You may ask to pause or stop recording during any session. To withdraw consent for future recording or sharing, or to request deletion of existing recordings, contact the mentor at the email listed above. On receiving a withdrawal, the mentor will stop further recording and sharing under this consent. On receiving a deletion request, the mentor will remove the affected videos from YouTube, delete recording copies under the mentor’s control, ask authorized viewers to delete any copies they hold, and confirm the action taken. Material already viewed cannot be unseen, and copies independently saved or shared by others may be impossible to retrieve.</p>
 </section>
-<section class="agreement-box"><h2>Mentee permissions</h2>
-<p>Review the completed arrangement details and terms before selecting both permissions and signing.</p>
+<section class="agreement-box">
+<h2>Step 1 — Mentor completes and signs</h2>
+<p>By signing first, I confirm that I have completed the arrangement details and agree to follow the recording, viewer access, withdrawal, and deletion commitments in this form. My signature alone does not authorize recording or sharing.</p>
+<div class="signature-grid"><div class="field"><label for="mentor-signed">Mentor signature</label><input id="mentor-signed" type="text" value=""><span class="pdf-blank" aria-hidden="true"></span></div>
+<div class="field"><label for="mentor-date">Date signed</label><input id="mentor-date" type="date" value=""><span class="pdf-blank" aria-hidden="true"></span></div></div>
+<h2>Step 2 — Mentee reviews and signs</h2>
+<p>Review the details completed by the mentor and all terms before deciding. Select both permissions below only if you agree. If anything needs to change, ask the mentor to revise the form and sign the revised version before you sign.</p>
 <label class="acknowledgment" for="record"><input id="record" type="checkbox"><span class="pdf-blank" aria-hidden="true"></span><span>I voluntarily authorize audio and video recording of my participation in the sessions identified in this form, for the stated purpose.</span></label>
 <label class="acknowledgment" for="share"><input id="share" type="checkbox"><span class="pdf-blank" aria-hidden="true"></span><span>I authorize the mentor to upload these recordings to YouTube as unlisted videos and share links with the authorized viewers identified in this form. I understand the privacy risks and the withdrawal and deletion terms.</span></label>
-<p>By signing, the mentee confirms that they have reviewed the completed form and had an opportunity to ask questions. The mentor agrees to follow the recording, viewer access, withdrawal, and deletion commitments in this form.</p>
-<div class="signature-grid">
-<div class="field"><label for="signed">Mentee signature</label><input id="signed" type="text" value=""><span class="pdf-blank" aria-hidden="true"></span></div>
-<div class="field"><label for="date">Date signed</label><input id="date" type="date" value=""><span class="pdf-blank" aria-hidden="true"></span></div>
-<div class="field"><label for="mentor-signed">Mentor acknowledgment signature</label><input id="mentor-signed" type="text" value=""><span class="pdf-blank" aria-hidden="true"></span></div>
-<div class="field"><label for="mentor-date">Date acknowledged</label><input id="mentor-date" type="date" value=""><span class="pdf-blank" aria-hidden="true"></span></div>
-</div>
-<p class="signature-help">Complete and sign the PDF in your electronic signature platform. This webpage does not submit or store a signed copy.</p>
+<p>By signing, I confirm that I have reviewed the completed form and had an opportunity to ask questions.</p>
+<div class="signature-grid"><div class="field"><label for="signed">Mentee signature</label><input id="signed" type="text" value=""><span class="pdf-blank" aria-hidden="true"></span></div>
+<div class="field"><label for="date">Date signed</label><input id="date" type="date" value=""><span class="pdf-blank" aria-hidden="true"></span></div></div>
+<p>Both people receive a copy after both signing steps are complete. Recording may begin only after the mentee has given both permissions and both people have signed.</p>
+<p class="signature-help">Use sequential signing in your electronic signature platform: mentor first, mentee second. This webpage does not route, submit, or store a signed copy.</p>
 </section>
 </form></main>
 <script>
