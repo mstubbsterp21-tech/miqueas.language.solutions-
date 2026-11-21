@@ -1,6 +1,7 @@
 import crypto from "node:crypto";
 import { database, readBody, send } from "./ops-v2-core.js";
 import { getGoogleWorkspaceAccessToken } from "./gmail-oauth.js";
+import { MENTEE_APPLICATIONS_OPEN, MENTEE_APPLICATIONS_CLOSED_MESSAGE } from "../../config/mentee-intake.js";
 
 const spreadsheetId = process.env.MENTEE_INTEREST_SHEET_ID || "1o4IxQOK3WLlzCU1OWr6f1VCjHsMgF-VPVI0KqnPuCzg";
 const sheetsWriteScope = "https://www.googleapis.com/auth/spreadsheets";
@@ -61,6 +62,7 @@ export default async function handler(req, res) {
     res.setHeader("Allow", "POST");
     return send(res, 405, { status: "error", message: "Use POST to submit the mentee interest form." });
   }
+  if (!MENTEE_APPLICATIONS_OPEN) return send(res, 403, { status: "error", message: MENTEE_APPLICATIONS_CLOSED_MESSAGE });
   if (Number(req.headers["content-length"] || 0) > maxPayload) return send(res, 413, { status: "error", message: "The submitted form is too large." });
   if (!String(req.headers["content-type"] || "").toLowerCase().startsWith("application/json")) return send(res, 415, { status: "error", message: "Please submit the form as JSON." });
   const origin = String(req.headers.origin || "");
