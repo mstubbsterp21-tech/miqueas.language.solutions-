@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Consent to Record and Share Mentoring Sessions | Miqueas Language Solutions</title>
-  <meta name="description" content="Consent for recording and peer observation during the MLS interpreter mentoring practicum." />
+  <meta name="description" content="Consent for recording and sharing MLS mentoring sessions." />
   <meta name="robots" content="noindex,nofollow,noarchive" />
   <link rel="icon" href="/favicon-32x32.png" />
 
@@ -514,6 +514,9 @@
       .form-body p { margin: 5pt 0 9pt; orphans: 3; widows: 3; }
       .identity-grid, .signature-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12pt 16pt; }
       .field, .acknowledgment { break-inside: avoid; page-break-inside: avoid; }
+      .consent-terms { break-before: page; page-break-before: always; }
+      .consent-details { break-inside: avoid; page-break-inside: avoid; }
+      .consent-terms p { break-inside: avoid; page-break-inside: avoid; }
       .agreement-box {
         break-before: page;
         page-break-before: always;
@@ -537,10 +540,10 @@
 
 <body>
   <div class="toolbar" aria-label="Agreement actions">
-    <p>Print or save a copy before closing this page.</p>
+    <p>Save a blank PDF, then complete it in your electronic signature platform.</p>
     <div class="toolbar-actions">
       <button class="button button-secondary" type="button" id="clear-form">Clear Form</button>
-      <button class="button button-primary" type="button" id="print-form">Print / Save PDF</button>
+      <button class="button button-primary" type="button" id="print-form">Print / Save Blank PDF</button>
     </div>
   </div>
 
@@ -558,21 +561,51 @@
 
     <section class="intro"><h1>Consent to Record and Share Mentoring Sessions</h1></section>
 <form id="consent" class="form-body" autocomplete="off">
-<p class="screen-help">The mentor completes the session details before the mentee reviews this form. Both people keep a copy before recording begins. Entries stay on this page until you print or save them.</p>
-<div class="identity-grid"><div class="field"><label for="mentor">Mentor</label><input id="mentor" type="text" value="Micah Stubbs"><span class="pdf-blank" aria-hidden="true"></span></div><div class="field"><label for="mentee">Mentee</label><input id="mentee" type="text" value=""><span class="pdf-blank" aria-hidden="true"></span></div><div class="field"><label for="sessions"># of sessions / session length / dates covered</label><input id="sessions" type="text" value=""><span class="pdf-blank" aria-hidden="true"></span></div><div class="field"><label for="contact">Mentor contact</label><input id="contact" type="email" value="m.stubbs@miqueaslanguagesolutions.com"><span class="pdf-blank" aria-hidden="true"></span></div></div>
+<p class="screen-help">Use Print / Save Blank PDF to create a blank template, then upload it to your electronic signature platform. Complete all arrangement details there before sending it to the mentee for review and signature. Entries made on this webpage do not appear in the PDF. Both people should receive a completed, signed copy before recording begins.</p>
+<section class="consent-details">
+<h2>People and sessions covered</h2>
+<div class="identity-grid">
+<div class="field"><label for="mentor">Mentor</label><input id="mentor" type="text" value=""><span class="pdf-blank" aria-hidden="true"></span></div>
+<div class="field"><label for="mentee">Mentee</label><input id="mentee" type="text" value=""><span class="pdf-blank" aria-hidden="true"></span></div>
+<div class="field"><label for="contact">Mentor contact email</label><input id="contact" type="email" value=""><span class="pdf-blank" aria-hidden="true"></span></div>
+<div class="field"><label for="sessions"># of sessions</label><input id="sessions" type="text" value=""><span class="pdf-blank" aria-hidden="true"></span></div>
+<div class="field"><label for="session-length">Session length</label><input id="session-length" type="text" value=""><span class="pdf-blank" aria-hidden="true"></span></div>
+<div class="field"><label for="session-dates">Dates covered</label><input id="session-dates" type="text" value=""><span class="pdf-blank" aria-hidden="true"></span></div>
+</div>
+<h2>Recording arrangement</h2>
+<p>Complete every field before signing. Identify the specific sessions, purpose, and viewers; use “None” where appropriate. Any later expansion of the sessions, purpose, or audience requires new consent.</p>
+<div class="identity-grid">
+<div class="field"><label for="purpose">Purpose of recording and sharing</label><input id="purpose" type="text" value=""><span class="pdf-blank" aria-hidden="true"></span></div>
+<div class="field"><label for="viewers">Authorized viewers (names or defined group)</label><input id="viewers" type="text" value=""><span class="pdf-blank" aria-hidden="true"></span></div>
+<div class="field"><label for="delete-by">Delete recordings by</label><input id="delete-by" type="date" value=""><span class="pdf-blank" aria-hidden="true"></span></div>
+<div class="field"><label for="alternative">Unrecorded mentoring option, if available</label><input id="alternative" type="text" value=""><span class="pdf-blank" aria-hidden="true"></span></div>
+</div>
+</section>
+<section class="consent-terms">
 <h2>What you’re agreeing to</h2>
-<p>The <em>So You Want to Be an Interpreter Mentor</em> practicum requires the mentor to record six live virtual sessions across the practicum. This consent covers only the sessions identified above. A recording may capture your face, voice, signing, practice interpretations, questions, and feedback. Fellow practicum participants will review the mentor’s approach to supporting you. Use simulated or appropriately authorized practice materials and leave identifying consumer details out of the session.</p>
+<p>This consent covers only the sessions and purpose identified above. A recording may capture your face, voice, signing, practice interpretations, questions, and feedback. Use simulated or appropriately authorized practice materials and leave identifying consumer details out of the session. Recording begins only after both permissions below are given and this form is signed. The mentor will announce when recording starts and will pause or stop it when you ask.</p>
 <h2>Who can view the recordings?</h2>
-<p>The mentor will upload recordings to YouTube as unlisted videos and send links to designated practicum participants for observation and feedback. Unlisted videos generally stay out of search results and public channel listings. Anyone who obtains a link may view or reshare it. Public posting, promotional use, or sharing for another purpose requires separate permission.</p>
-<h2>How long are recordings kept?</h2>
-<p>In June 2027, the mentor will remove the videos from YouTube and delete copies under the mentor’s control. Copies independently saved or shared by others may be impossible to retrieve.</p>
-<h2>Your choice</h2>
-<p>You may ask questions before deciding. Participation in this recorded practicum requires both permissions below. To decline, leave the permissions unsigned and tell the mentor. To stop a recording, tell the mentor during the session. You may contact the mentor listed above to withdraw from future recorded sessions. Previously recorded and shared material may still be used for practicum feedback under these terms, subject to applicable requirements.</p>
+<p>The mentor will upload recordings to YouTube as unlisted videos and share links only with the authorized viewers listed above. Unlisted does not mean private: anyone who obtains a link can view or reshare it, and adding an unlisted video to a public playlist may make it appear in search results. Public posting, promotional use, or use for another purpose requires separate permission.</p>
+<p>Before sharing a link, the mentor will obtain each viewer’s agreement to keep the recording and session information confidential and not download, screen-record, copy, forward links, or add the video to a public playlist. Viewers may use the material only for the purpose stated above. These rules reduce risk but cannot guarantee that unauthorized copying or sharing will not occur.</p>
+<h2>Storage and deletion</h2>
+<p>The mentor will restrict access to copies under the mentor’s control to the authorized viewers and protect accounts used to store recordings. By the deletion date listed above, the mentor will remove the videos from YouTube and delete other recording copies under the mentor’s control, including copies in the recording platform or local storage. This deadline applies to recordings; both people may retain their signed consent forms.</p>
+<h2>Your choice and withdrawal</h2>
+<p>You may ask questions before deciding. Both permissions below are required for the recorded arrangement described here. If you decline either permission, no recording or sharing will take place under this form. Any available unrecorded mentoring option must be identified above before signing; if none is offered, you cannot participate in this recorded arrangement.</p>
+<p>You may ask to pause or stop recording during any session. To withdraw consent for future recording or sharing, or to request deletion of existing recordings, contact the mentor at the email listed above. On receiving a withdrawal, the mentor will stop further recording and sharing under this consent. On receiving a deletion request, the mentor will remove the affected videos from YouTube, delete recording copies under the mentor’s control, ask authorized viewers to delete any copies they hold, and confirm the action taken. Material already viewed cannot be unseen, and copies independently saved or shared by others may be impossible to retrieve.</p>
+</section>
 <section class="agreement-box"><h2>Mentee permissions</h2>
-<label class="acknowledgment" for="record"><input id="record" type="checkbox"><span class="pdf-blank" aria-hidden="true"></span><span>I voluntarily authorize audio and video recording of my participation in the sessions listed above for the mentor’s practicum.</span></label>
-<label class="acknowledgment" for="share"><input id="share" type="checkbox"><span class="pdf-blank" aria-hidden="true"></span><span>I authorize the mentor to upload these recordings to YouTube as unlisted videos and share the links with designated practicum participants. I understand that anyone with a link may view or reshare it.</span></label>
-<div class="signature-grid"><div class="field"><label for="signed">Mentee signature</label><input id="signed" type="text" value=""><span class="pdf-blank" aria-hidden="true"></span></div><div class="field"><label for="date">Date signed</label><input id="date" type="date" value=""><span class="pdf-blank" aria-hidden="true"></span></div><div class="field"><label for="mentor-signed">Mentor acknowledgment signature</label><input id="mentor-signed" type="text" value=""><span class="pdf-blank" aria-hidden="true"></span></div><div class="field"><label for="mentor-date">Date acknowledged</label><input id="mentor-date" type="date" value=""><span class="pdf-blank" aria-hidden="true"></span></div></div>
-<p class="signature-help">Print for handwritten signatures or save a PDF for your signing service. This page does not submit a signed copy to MLS.</p></section>
+<p>Review the completed arrangement details and terms before selecting both permissions and signing.</p>
+<label class="acknowledgment" for="record"><input id="record" type="checkbox"><span class="pdf-blank" aria-hidden="true"></span><span>I voluntarily authorize audio and video recording of my participation in the sessions identified in this form, for the stated purpose.</span></label>
+<label class="acknowledgment" for="share"><input id="share" type="checkbox"><span class="pdf-blank" aria-hidden="true"></span><span>I authorize the mentor to upload these recordings to YouTube as unlisted videos and share links with the authorized viewers identified in this form. I understand the privacy risks and the withdrawal and deletion terms.</span></label>
+<p>By signing, the mentee confirms that they have reviewed the completed form and had an opportunity to ask questions. The mentor agrees to follow the recording, viewer access, withdrawal, and deletion commitments in this form.</p>
+<div class="signature-grid">
+<div class="field"><label for="signed">Mentee signature</label><input id="signed" type="text" value=""><span class="pdf-blank" aria-hidden="true"></span></div>
+<div class="field"><label for="date">Date signed</label><input id="date" type="date" value=""><span class="pdf-blank" aria-hidden="true"></span></div>
+<div class="field"><label for="mentor-signed">Mentor acknowledgment signature</label><input id="mentor-signed" type="text" value=""><span class="pdf-blank" aria-hidden="true"></span></div>
+<div class="field"><label for="mentor-date">Date acknowledged</label><input id="mentor-date" type="date" value=""><span class="pdf-blank" aria-hidden="true"></span></div>
+</div>
+<p class="signature-help">Complete and sign the PDF in your electronic signature platform. This webpage does not submit or store a signed copy.</p>
+</section>
 </form></main>
 <script>
   const consentForm = document.getElementById('consent');
