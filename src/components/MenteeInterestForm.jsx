@@ -1,5 +1,6 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import logo from "../logo.png";
+import { MENTEE_APPLICATIONS_OPEN, MENTEE_APPLICATIONS_CLOSED_MESSAGE } from "../../config/mentee-intake.js";
 
 const defaultPalette = {
   burgundy: "#721100",
@@ -67,6 +68,13 @@ export default function MenteeInterestForm({ palette = defaultPalette }) {
   const inputClass = "form-input w-full rounded-xl border bg-white px-4 py-3 text-sm outline-none transition focus:border-transparent focus:ring-2";
   const boxClass = "h-4 w-4 shrink-0 rounded form-checkbox";
   const consentVersion = "mentee-practicum-nov-2026-v1";
+  const closedDialogRef = useRef(null);
+
+  useEffect(() => {
+    if (!MENTEE_APPLICATIONS_OPEN && closedDialogRef.current && !closedDialogRef.current.open) {
+      closedDialogRef.current.showModal();
+    }
+  }, []);
 
   const selectedSlots = useMemo(() => Object.values(values.availability).filter(Boolean).length, [values.availability]);
   const update = (name, value) => {
@@ -157,6 +165,36 @@ export default function MenteeInterestForm({ palette = defaultPalette }) {
       setSubmitting(false);
     }
   };
+  if (!MENTEE_APPLICATIONS_OPEN) {
+    return <section className="mx-auto max-w-4xl px-5 py-8 md:px-8">
+      <div className="rounded-[2rem] border p-6 text-center shadow-sm md:p-10" style={{ borderColor: p.border, backgroundColor: p.white, color: p.charcoal }}>
+        <img src={logo} alt="Miqueas Language Solutions" className="mx-auto mb-6 h-20 max-w-full object-contain" />
+        <h1 className="text-2xl font-bold sm:text-3xl">Mentorship Applications Closed</h1>
+        <p className="mx-auto mt-5 max-w-2xl text-base leading-7">{MENTEE_APPLICATIONS_CLOSED_MESSAGE}</p>
+      </div>
+      <dialog
+        ref={closedDialogRef}
+        aria-labelledby="mentee-applications-closed-title"
+        aria-describedby="mentee-applications-closed-message"
+        className="w-[calc(100%-2rem)] max-w-lg rounded-[2rem] border p-0 shadow-2xl backdrop:bg-black/70"
+        style={{ borderColor: p.border, backgroundColor: p.white, color: p.charcoal }}
+      >
+        <div className="p-7 text-center sm:p-9">
+          <img src={logo} alt="Miqueas Language Solutions" className="mx-auto mb-5 h-16 max-w-full object-contain" />
+          <h2 id="mentee-applications-closed-title" className="text-2xl font-bold">Mentorship Applications Closed</h2>
+          <p id="mentee-applications-closed-message" className="mt-5 text-base leading-7">{MENTEE_APPLICATIONS_CLOSED_MESSAGE}</p>
+          <button
+            type="button"
+            className="mt-7 min-w-28 rounded-xl px-6 py-3 text-sm font-bold transition hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+            style={{ backgroundColor: p.burgundy, color: "#ffffff" }}
+            onClick={() => closedDialogRef.current?.close()}
+          >
+            Got it
+          </button>
+        </div>
+      </dialog>
+    </section>;
+  }
   if (complete) {
     return <section className="mx-auto max-w-4xl px-5 py-8 md:px-8">
       <div className="rounded-[2rem] border bg-white p-8 text-center shadow-sm" style={{ borderColor: p.border }}>
