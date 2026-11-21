@@ -485,6 +485,7 @@
       footer { padding: 10px; }
     }
   
+    .recording-arrangement-heading { margin-top: 32px; }
     .pdf-blank { display: none; }
     @media print {
       @page {
@@ -533,6 +534,7 @@
       .intro h1 { font-size: 22pt; }
       .form-body { padding: 14pt 0 0; }
       .form-body h2 { font-size: 14pt; margin: 12pt 0 5pt; break-after: avoid; }
+      .form-body .recording-arrangement-heading { margin-top: 28pt; }
       .form-body p { margin: 5pt 0 9pt; orphans: 3; widows: 3; }
       .identity-grid, .signature-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12pt 16pt; }
       .field, .acknowledgment { break-inside: avoid; page-break-inside: avoid; }
@@ -595,7 +597,7 @@
 <div class="field"><label for="session-length">Session length</label><input id="session-length" type="text" value=""><span class="pdf-blank" aria-hidden="true"></span></div>
 <div class="field"><label for="session-dates">Dates covered</label><input id="session-dates" type="text" value=""><span class="pdf-blank" aria-hidden="true"></span></div>
 </div>
-<h2 style="text-align: center;">Recording arrangement</h2>
+<h2 class="recording-arrangement-heading" style="text-align: center;">Recording arrangement</h2>
 
 <div class="identity-grid">
 <div class="field"><label for="purpose">Purpose of recording and sharing</label><input id="purpose" type="text" value=""><span class="pdf-blank" aria-hidden="true"></span></div>
