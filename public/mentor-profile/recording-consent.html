@@ -490,6 +490,16 @@
       @page {
         size: Letter;
         margin: 0.5in;
+        @bottom-left {
+          content: "© 2026 Mikea’s Language Solutions LLC. All rights reserved.";
+          font-family: Arial, Helvetica, sans-serif;
+          font-size: 8pt;
+          font-weight: normal;
+          color: #55595b;
+          text-align: left;
+          vertical-align: middle;
+          white-space: nowrap;
+        }
         @bottom-right {
           content: "Page " counter(page) " of " counter(pages);
           font-family: Arial, Helvetica, sans-serif;
@@ -501,7 +511,7 @@
         }
       }
       .page { overflow: visible; }
-      .screen-help, .signature-help { display: none; }
+      .screen-help, .signature-help, .copyright-footer { display: none; }
       #consent input { display: none !important; }
       #consent .pdf-blank {
         display: block;
@@ -621,7 +631,7 @@
 
 
 </section>
-</form></main>
+</form><footer class="copyright-footer">© 2026 Mikea’s Language Solutions LLC. All rights reserved.</footer></main>
 <script>
   const consentForm = document.getElementById('consent');
   consentForm.addEventListener('submit', event => event.preventDefault());
