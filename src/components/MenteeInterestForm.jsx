@@ -176,7 +176,7 @@ export default function MenteeInterestForm({ palette = defaultPalette }) {
         ref={closedDialogRef}
         aria-labelledby="mentee-applications-closed-title"
         aria-describedby="mentee-applications-closed-message"
-        className="w-[calc(100%-2rem)] max-w-lg rounded-[2rem] border p-0 shadow-2xl backdrop:bg-black/70"
+        className="fixed inset-0 m-auto max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-lg overflow-y-auto rounded-[2rem] border p-0 shadow-2xl backdrop:bg-black/40 backdrop:backdrop-blur-md"
         style={{ borderColor: p.border, backgroundColor: p.white, color: p.charcoal }}
       >
         <div className="p-7 text-center sm:p-9">
@@ -189,7 +189,7 @@ export default function MenteeInterestForm({ palette = defaultPalette }) {
             style={{ backgroundColor: p.burgundy, color: "#ffffff" }}
             onClick={() => closedDialogRef.current?.close()}
           >
-            Got it
+            Ok
           </button>
         </div>
       </dialog>
