@@ -450,20 +450,162 @@
     }
 
     @media print {
-      @page { size: Letter; margin: .4in; }
-      body { padding: 0; background: #fff; }
-      .profile { width: 100%; border: 0; box-shadow: none; }
-      .hero { padding: 24px 28px; }
-      .hero h1 { font-size: 3rem; }
-      .photo-wrap { width: 172px; }
-      .content { padding: 24px 28px; }
-      .section,
-      .credential,
-      .detail-card,
-      .structure-item,
-      .community-box,
-      .business-card { break-inside: avoid; }
+      /* Keep the profile's screen design intact, while letting pages flow naturally. */
+      @page { size: Letter; margin: .42in .48in; }
+
+      html, body, .profile, .content, .section, .section-body {
+        height: auto !important;
+        max-height: none !important;
+        overflow: visible !important;
+      }
+      html, body {
+        width: auto;
+        margin: 0;
+        padding: 0;
+        background: #fff;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      body { font-size: 9pt; line-height: 1.38; }
+      .profile {
+        width: 100%;
+        max-width: none;
+        margin: 0;
+        border: 0;
+        box-shadow: none;
+      }
+
+      /* A compact, complete first-page introduction. */
+      .brand-header {
+        gap: 12pt;
+        padding: 7pt 0 10pt;
+        border-bottom-width: 3pt;
+        break-inside: avoid-page;
+      }
+      .brand { gap: 9pt; }
+      .brand img { width: 41pt; height: 41pt; }
+      .brand-name { font-size: 9.5pt; }
+      .tagline { font-size: 7.3pt; }
+      .document-title { font-size: 8pt; }
+
+      .hero {
+        grid-template-columns: minmax(0, 1fr) 112pt;
+        gap: 16pt;
+        padding: 14pt 17pt;
+        break-inside: avoid-page;
+      }
+      .hero h1 { font-size: 25pt; }
+      .hero-kicker { margin-bottom: 6pt; }
+      .role { margin: 7pt 0 9pt; font-size: 9.5pt; }
+      .hero-text { font-size: 8.7pt; line-height: 1.35; }
+      .availability { gap: 4pt; margin-top: 10pt; }
+      .availability span { padding: 4pt 6pt; font-size: 7pt; }
+      .photo-wrap {
+        width: 108pt;
+        border-width: 2pt;
+        border-radius: 7pt;
+        box-shadow: none;
+      }
+
+      /* Release long sections from the page-level keep-together constraint. */
+      .content { display: block; padding: 13pt 0 0; }
+      .section {
+        display: block;
+        margin: 0 0 10pt;
+        border-width: .7pt;
+        break-inside: auto;
+        page-break-inside: auto;
+      }
+      .section-header {
+        padding: 6pt 10pt;
+        break-inside: avoid-page;
+        break-after: avoid-page;
+        page-break-after: avoid;
+      }
+      .section-header h2 { font-size: 10.3pt; }
+      .section-body { display: block; padding: 9pt 11pt; }
+      .section-body p {
+        margin: 0 0 6pt;
+        font-size: 8.8pt;
+        line-height: 1.4;
+        orphans: 3;
+        widows: 3;
+      }
+      .section-body > p:first-child { break-before: avoid-page; }
+      .section-body p:last-child { margin-bottom: 0; }
+
+      /* Keep only compact pieces together, not entire multi-paragraph sections. */
+      .credential, .detail-card, .structure-item, .community-box,
+      .path-note, .chip, .clean-list li, .business-card {
+        break-inside: avoid-page;
+        page-break-inside: avoid;
+      }
+      .experience-grid, .detail-grid {
+        gap: 8pt;
+        margin-bottom: 8pt;
+      }
+      .credential, .detail-card {
+        padding: 8pt 10pt;
+        border-top-width: 2pt;
+      }
+      .credential strong, .detail-card strong {
+        margin-bottom: 3pt;
+        font-size: 8.7pt;
+      }
+      .credential span, .detail-card span { font-size: 8pt; }
+      .focus-label { margin-bottom: 5pt; font-size: 8.3pt; }
+      .chips { gap: 5pt; }
+      .chip { padding: 4pt 7pt; font-size: 7.7pt; }
+      .path-note { padding: 9pt 10pt; font-size: 8.5pt; }
+
+      .philosophy {
+        padding: 10pt 13pt;
+        border-left-width: 4pt;
+        break-inside: auto;
+        page-break-inside: auto;
+      }
+      .philosophy .lead { font-size: 9.3pt; }
+      .philosophy p { margin-bottom: 7pt; }
+      .community-box { padding: 9pt 11pt; }
+      .community-box strong { margin-bottom: 4pt; font-size: 8.7pt; }
+
+      .structure-grid { gap: 8pt; }
+      .structure-item { padding: 8pt; }
+      .structure-item h3 { margin-bottom: 4pt; font-size: 8.6pt; }
+      .structure-item p { font-size: 8pt; line-height: 1.35; }
+      .clean-list { gap: 5pt 16pt; }
+      .clean-list li { font-size: 8.5pt; }
+
+      /* The recruitment section may flow, but the card itself must stay intact. */
+      .apply-button {
+        display: inline-block;
+        margin-top: 5pt;
+        padding: 0;
+        background: none;
+        color: var(--burgundy);
+        text-decoration: underline;
+        font-size: 8.8pt;
+      }
+      .business-card {
+        margin-top: 11pt;
+        padding-top: 9pt;
+      }
+      .business-card img {
+        width: auto;
+        max-width: 4.2in;
+        max-height: 1.9in;
+        margin: 0 auto;
+        object-fit: contain;
+      }
+      footer {
+        padding: 8pt 0 0;
+        margin-top: 8pt;
+        background: #fff;
+        font-size: 7.3pt;
+        break-inside: avoid-page;
+      }
     }
+
   </style>
 <script>
     try {
