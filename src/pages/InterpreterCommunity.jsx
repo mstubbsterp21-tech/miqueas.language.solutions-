@@ -155,7 +155,7 @@ export default function InterpreterCommunity({ palette }) {
               Contact MLS directly for assignment-specific questions, urgent updates, ethical concerns, access concerns, documentation questions, payment issues, or anything that includes private or sensitive information.
             </p>
             <div className="mt-7 flex flex-wrap justify-center gap-3">
-              <a href="mailto:m.stubbs@miqueaslanguagesolutions.com" className="rounded-xl px-5 py-3 text-sm font-bold text-white transition hover:-translate-y-0.5" style={{ backgroundColor: palette.actionGold }}>
+              <a href="mailto:m.stubbs@miqueaslanguagesolutions.com" className="min-w-0 max-w-full break-all rounded-xl px-5 py-3 text-center text-sm font-bold text-white transition hover:-translate-y-0.5" style={{ backgroundColor: palette.actionGold }}>
                 m.stubbs@miqueaslanguagesolutions.com
               </a>
               <a href="tel:+13213798010" className="rounded-xl border border-white/20 px-5 py-3 text-sm font-bold text-white transition hover:-translate-y-0.5 hover:bg-white/10">

@@ -104,13 +104,13 @@ export default function Home({ palette }) {
       <section className="relative px-5 py-14 md:px-8 md:py-20">
         <div className="absolute inset-0 -z-10" style={{ background: "radial-gradient(circle at 12% 15%, rgba(221,125,0,0.18), transparent 28%), radial-gradient(circle at 92% 8%, rgba(114,17,0,0.14), transparent 32%), linear-gradient(180deg, var(--mls-page) 0%, var(--mls-muted-surface) 100%)" }} />
         <div className="mx-auto max-w-6xl">
-          <motion.div initial="hidden" animate="show" variants={fadeUp} transition={{ duration: 0.55 }} className="grid items-center gap-12 lg:grid-cols-[minmax(0,1fr)_430px]">
-            <div className="max-w-3xl">
-              <div className="mb-5 inline-flex items-center gap-2 rounded-full border bg-white/80 px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] shadow-sm backdrop-blur" style={{ borderColor: palette.border, color: palette.brandText }}>
+          <motion.div initial="hidden" animate="show" variants={fadeUp} transition={{ duration: 0.55 }} className="grid min-w-0 grid-cols-1 items-center gap-12 lg:grid-cols-[minmax(0,1fr)_430px]">
+            <div className="min-w-0 max-w-3xl">
+              <div className="mb-5 inline-flex max-w-full items-center gap-2 rounded-full border bg-white/80 px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] shadow-sm backdrop-blur" style={{ borderColor: palette.border, color: palette.brandText }}>
                 <BadgeCheck size={15} style={{ color: palette.goldText }} />
                 Professional ASL-English Interpreting
               </div>
-              <h1 className="text-4xl font-black leading-[1.03] tracking-tight md:text-6xl" style={{ color: palette.charcoal }}>
+              <h1 className="text-4xl font-black leading-[1.03] tracking-tight [overflow-wrap:anywhere] md:text-6xl" style={{ color: palette.charcoal }}>
                 Professional ASL-English interpreting for organizations that can’t afford miscommunication.
               </h1>
               <p className="mt-6 max-w-2xl text-lg leading-8 text-[#555] md:text-xl">
@@ -125,7 +125,7 @@ export default function Home({ palette }) {
                   Join Our Team
                 </Link>
               </div>
-              <div className="mt-8 grid gap-3 sm:grid-cols-3">
+              <div className="mt-8 grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-3">
                 {stats.map(([stat, label]) => (
                   <div key={stat} className="rounded-2xl border bg-white/80 p-4 shadow-sm backdrop-blur" style={{ borderColor: palette.border }}>
                     <div className="text-lg font-black" style={{ color: palette.brandText }}>{stat}</div>
@@ -135,7 +135,7 @@ export default function Home({ palette }) {
               </div>
             </div>
 
-            <div className="relative mx-auto w-full max-w-[560px] lg:mx-0">
+            <div className="relative mx-auto min-w-0 w-full max-w-[560px] lg:mx-0">
               <div className="mls-ambient-orb pointer-events-none absolute -right-4 -top-5 h-32 w-32 rounded-full bg-[#dd7d00]/20 blur-2xl" />
               <motion.div
                 initial={reduceMotion ? false : { opacity: 0, x: 25 }}

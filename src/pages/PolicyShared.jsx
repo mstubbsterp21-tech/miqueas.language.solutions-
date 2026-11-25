@@ -73,8 +73,24 @@ export function PolicyCallout({ palette, title, children }) {
 
 export function PolicyTable({ palette, columns, rows }) {
   return (
-    <div className="overflow-hidden rounded-2xl border" style={{ borderColor: palette.border }}>
-      <div className="overflow-x-auto">
+    <div className="min-w-0 overflow-hidden rounded-2xl border" style={{ borderColor: palette.border }}>
+      <div className="space-y-3 p-3 sm:hidden">
+        {rows.map((row, rowIndex) => (
+          <dl key={rowIndex} className="min-w-0 space-y-3 rounded-xl border bg-white p-4" style={{ borderColor: palette.border }}>
+            {row.map((cell, cellIndex) => (
+              <div key={cellIndex} className="min-w-0">
+                <dt className="text-xs font-bold uppercase tracking-[0.12em]" style={{ color: palette.brandText }}>
+                  {columns[cellIndex]}
+                </dt>
+                <dd className="mt-1 text-sm leading-6 [overflow-wrap:anywhere]" style={{ color: palette.body }}>
+                  {cell}
+                </dd>
+              </div>
+            ))}
+          </dl>
+        ))}
+      </div>
+      <div className="hidden overflow-x-auto sm:block">
         <table className="min-w-full divide-y" style={{ borderColor: palette.border }}>
           <thead style={{ backgroundColor: palette.softGray }}>
             <tr>

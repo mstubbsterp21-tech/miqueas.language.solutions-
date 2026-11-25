@@ -224,8 +224,8 @@ export default function App() {
     <div className={`theme-${theme} min-h-screen overflow-x-hidden bg-white pb-24 text-slate-900 transition-colors duration-300 md:pb-0`}>
       <AccessibilityOverlay theme={theme} onToggle={toggleTheme} palette={palette} />
 
-      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur">
-        <div className="border-b border-black/5">
+      <header className={`sticky top-0 z-50 bg-white/95 backdrop-blur ${mobileOpen ? "flex max-h-[100dvh] flex-col md:block md:max-h-none" : ""}`}>
+        <div className="shrink-0 border-b border-black/5">
           <div className="mx-auto grid max-w-[96rem] grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 gap-y-3 px-4 py-4 md:grid-cols-[auto_minmax(0,1fr)_auto] md:gap-x-10 md:px-8 md:py-5 xl:px-10">
             <Link to="/" className="min-w-0 shrink-0">
               <div className="hidden md:block"><BrandLockup palette={palette} /></div>
@@ -283,7 +283,7 @@ export default function App() {
           </div>
         </div>
 
-        <div className="hidden border-b border-black/5 bg-[rgba(245,245,245,0.85)] sm:block">
+        <div className="hidden shrink-0 border-b border-black/5 bg-[rgba(245,245,245,0.85)] sm:block">
           <div className="mx-auto flex max-w-[96rem] flex-wrap items-center justify-center gap-x-5 gap-y-2 px-4 py-2.5 text-sm md:px-8 xl:px-10">
             <div className="inline-flex items-center gap-3 font-semibold" style={{ color: palette.brandText }}>
               <span>Connect With Us</span>
@@ -309,7 +309,7 @@ export default function App() {
         </div>
 
         {mobileOpen && (
-          <div className="max-h-[calc(100vh-76px)] overflow-y-auto border-b border-black/5 bg-white md:hidden">
+          <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain border-b border-black/5 bg-white pb-[env(safe-area-inset-bottom)] md:hidden">
             <div className="mx-auto flex max-w-6xl flex-col gap-1 px-4 py-4">
               {navItems.map((item) => item.path === "/services" ? (
                 <details key={item.path} className="rounded-xl">

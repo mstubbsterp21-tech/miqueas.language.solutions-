@@ -69,17 +69,17 @@ export default function Contact({ palette }) {
             animate="show"
             variants={fadeUp}
             transition={{ duration: 0.55 }}
-            className="grid items-center gap-12 lg:grid-cols-[minmax(0,1fr)_420px]"
+            className="grid min-w-0 grid-cols-1 items-center gap-12 lg:grid-cols-[minmax(0,1fr)_420px]"
           >
-            <div className="max-w-3xl">
+            <div className="min-w-0 max-w-3xl">
               <div
-                className="mb-5 inline-flex items-center gap-2 rounded-full border bg-white/80 px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] shadow-sm backdrop-blur"
+                className="mb-5 inline-flex max-w-full items-center gap-2 rounded-full border bg-white/80 px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] shadow-sm backdrop-blur"
                 style={{ borderColor: palette.border, color: palette.brandText }}
               >
                 <Send size={15} style={{ color: palette.goldText }} />
                 Contact MLS
               </div>
-              <h1 className="text-4xl font-black leading-[1.03] tracking-tight md:text-6xl" style={{ color: palette.charcoal }}>
+              <h1 className="text-4xl font-black leading-[1.03] tracking-tight [overflow-wrap:anywhere] md:text-6xl" style={{ color: palette.charcoal }}>
                 Start your request with the right next step.
               </h1>
               <p className="mt-6 max-w-2xl text-lg leading-8 text-[#555] md:text-xl">
@@ -96,7 +96,7 @@ export default function Contact({ palette }) {
               </div>
             </div>
 
-            <div className="relative mx-auto w-full max-w-[420px] lg:mx-0">
+            <div className="relative mx-auto min-w-0 w-full max-w-[420px] lg:mx-0">
               <div className="absolute -right-6 -top-6 h-28 w-28 rounded-full opacity-20" style={{ backgroundColor: palette.burgundy }} />
               <div className="absolute -bottom-6 -left-6 h-24 w-24 rounded-full opacity-80" style={{ backgroundColor: palette.actionGold }} />
               <div className="relative rounded-[2.2rem] border bg-white p-4 shadow-2xl md:p-5" style={{ borderColor: palette.border }}>
@@ -109,7 +109,7 @@ export default function Contact({ palette }) {
                         <Icon size={20} style={{ color: palette.goldText, flexShrink: 0, marginTop: 2 }} />
                         <span className="min-w-0">
                           <span className="block text-xs font-bold uppercase tracking-[0.14em] text-white/50">{title}</span>
-                          <span className="mt-1 block break-words text-sm font-semibold leading-6 text-white/90">{value}</span>
+                          <span className="mt-1 block [overflow-wrap:anywhere] text-sm font-semibold leading-6 text-white/90">{value}</span>
                         </span>
                       </a>
                     ))}
